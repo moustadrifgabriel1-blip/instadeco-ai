@@ -248,3 +248,94 @@ export async function seedFirestoreData() {
     throw error;
   }
 }
+
+// ============================================
+// STORAGE ADMIN (Server-side uploads)
+// ============================================
+
+/**
+ * Upload une image base64 vers Firebase Storage (côté serveur)
+ */
+export async function uploadImageFromBase64(
+  base64String: string,
+  userId: string,
+  folder: 'inputs' | 'outputs' = 'inputs'
+): Promise<string> {
+  try {
+    // Supprimer le préfixe "data:image/xxx;base64," si présent
+    const base64Data = base64String.includes(',') 
+      ? base64String.split(',')[1] 
+      : base64String;
+    
+    const buffer = Buffer.from(base64Data, 'base64');
+    
+    // Créer un nom de fichier unique
+    const timestamp = Date.now();
+    const randomId = Math.random().toString(36).substring(7);
+    const fileName = `${userId}/${folder}/${timestamp}-${randomId}.jpg`;
+    
+    const bucket = adminStorage.bucket();
+    const file = bucket.file(fileName);
+    
+    await file.save(buffer, {
+      metadata: {
+        contentType: 'image/jpeg',
+      },
+    });
+    
+    // Rendre le fichier public et obtenir l'URL
+    await file.makePublic();
+    const publicUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
+    
+    console.log(`[Admin Storage] ✅ Image uploaded: ${publicUrl}`);
+    return publicUrl;
+  } catch (error) {
+    console.error('[Admin Storage] ❌ Upload error:', error);
+    throw new Error('Erreur lors de l\'upload de l\'image');
+  }
+}
+
+/**
+ * Upload une image depuis une URL vers Firebase Storage (côté serveur)
+ */
+export async function uploadImageFromUrlServer(
+  imageUrl: string,
+  userId: string,
+  folder: 'inputs' | 'outputs' = 'outputs'
+): Promise<string> {
+  try {
+    console.log(`[Admin Storage] Downloading image from: ${imageUrl}`);
+    
+    const response = await fetch(imageUrl);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch image: ${response.statusText}`);
+    }
+    
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    
+    // Créer un nom de fichier unique
+    const timestamp = Date.now();
+    const randomId = Math.random().toString(36).substring(7);
+    const fileName = `${userId}/${folder}/${timestamp}-${randomId}.jpg`;
+    
+    const bucket = adminStorage.bucket();
+    const file = bucket.file(fileName);
+    
+    await file.save(buffer, {
+      metadata: {
+        contentType: 'image/jpeg',
+      },
+    });
+    
+    // Rendre le fichier public et obtenir l'URL
+    await file.makePublic();
+    const publicUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
+    
+    console.log(`[Admin Storage] ✅ Image uploaded from URL: ${publicUrl}`);
+    return publicUrl;
+  } catch (error) {
+    console.error('[Admin Storage] ❌ Error uploading from URL:', error);
+    throw error;
+  }
+}

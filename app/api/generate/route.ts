@@ -7,10 +7,8 @@ import {
   type DecorationStyle,
   type RoomType
 } from '@/lib/ai/fal-client';
-import { deductCredits } from '@/lib/firebase/credits';
-import { uploadImageToStorage, uploadImageFromUrl, base64ToBlob } from '@/lib/firebase/storage';
-import { db } from '@/lib/firebase/config';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { deductCredits, adminDb, uploadImageFromBase64, uploadImageFromUrlServer } from '@/lib/firebase/admin';
+import * as admin from 'firebase-admin';
 
 /**
  * POST /api/generate
@@ -71,11 +69,7 @@ export async function POST(req: Request) {
     // ====================================
     console.log(`[Generate] Vérification crédits pour user ${userId}`);
     
-    const hasCredits = await deductCredits(userId, 1, {
-      action: 'generation',
-      roomType,
-      style,
-    });
+    const hasCredits = await deductCredits(userId, 1);
 
     if (!hasCredits) {
       console.warn(`[Generate] Crédits insuffisants pour user ${userId}`);
@@ -100,12 +94,11 @@ export async function POST(req: Request) {
     
     // Déterminer si imageUrl est base64 ou URL
     if (imageUrl.startsWith('data:')) {
-      // C'est du base64, convertir et uploader
-      const blob = base64ToBlob(imageUrl);
-      inputImageStorageUrl = await uploadImageToStorage(blob, userId, 'inputs');
+      // C'est du base64, uploader via Admin SDK
+      inputImageStorageUrl = await uploadImageFromBase64(imageUrl, userId, 'inputs');
     } else {
-      // C'est une URL, uploader directement
-      inputImageStorageUrl = await uploadImageFromUrl(imageUrl, userId, 'inputs');
+      // C'est une URL, uploader via Admin SDK
+      inputImageStorageUrl = await uploadImageFromUrlServer(imageUrl, userId, 'inputs');
     }
     
     console.log(`[Generate] ✅ Image source uploadée: ${inputImageStorageUrl}`);
@@ -126,7 +119,7 @@ export async function POST(req: Request) {
     // ====================================
     // CRÉER DOCUMENT GENERATION DANS FIRESTORE (status: pending)
     // ====================================
-    const generationDoc = await addDoc(collection(db, 'generations'), {
+    const generationRef = await adminDb.collection('generations').add({
       userId,
       styleSlug: style,
       roomTypeSlug: roomType,
@@ -137,11 +130,11 @@ export async function POST(req: Request) {
       status: 'pending',
       replicateRequestId: null,
       errorMessage: null,
-      createdAt: serverTimestamp(),
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
       completedAt: null,
     });
     
-    console.log(`[Generate] ✅ Document generation créé: ${generationDoc.id}`);
+    console.log(`[Generate] ✅ Document generation créé: ${generationRef.id}`);
 
     // ====================================
     // SOUMETTRE À REPLICATE.AI
@@ -158,27 +151,17 @@ export async function POST(req: Request) {
       guidanceScale: 7.5,
     });
 
-    // Mettre à jour le document avec l'ID Replicate
-    await addDoc(collection(db, 'generations'), {
-      userId,
-      styleSlug: style,
-      roomTypeSlug: roomType,
-      prompt,
-      controlnetType: controlMode,
-      inputImageUrl: inputImageStorageUrl,
-      outputImageUrl: null,
+    // Mettre à jour le document avec l'ID Replicate et status processing
+    await adminDb.collection('generations').doc(generationRef.id).update({
       status: 'processing',
       replicateRequestId: result.requestId,
-      errorMessage: null,
-      createdAt: serverTimestamp(),
-      completedAt: null,
     });
 
-    console.log(`[Generate] ✅ Generation ${generationDoc.id} en cours (Replicate: ${result.requestId})`);
+    console.log(`[Generate] ✅ Generation ${generationRef.id} en cours (Replicate: ${result.requestId})`);
 
     // Retourner l'ID de génération pour le polling côté client
     return NextResponse.json({
-      generationId: generationDoc.id,
+      generationId: generationRef.id,
       requestId: result.requestId,
       status: 'processing',
       prompt,
@@ -186,18 +169,19 @@ export async function POST(req: Request) {
     });
 
   } catch (error) {
-    console.error('[Generate] Erreur:', error);
+    console.error('[Generate] Erreur complète:', error);
     
-    // Distinguer les erreurs Replicate des autres
+    // Toujours afficher les détails d'erreur pour le debug
     const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
-    const isReplicateError = errorMessage.includes('Replicate');
+    const errorStack = error instanceof Error ? error.stack : '';
+    
+    console.error('[Generate] Error message:', errorMessage);
+    console.error('[Generate] Error stack:', errorStack);
     
     return NextResponse.json(
       { 
-        error: isReplicateError 
-          ? 'Erreur lors de la génération. Veuillez réessayer.' 
-          : 'Erreur serveur',
-        details: process.env.NODE_ENV === 'development' ? errorMessage : undefined,
+        error: 'Erreur lors de la génération',
+        details: errorMessage,
       },
       { status: 500 }
     );

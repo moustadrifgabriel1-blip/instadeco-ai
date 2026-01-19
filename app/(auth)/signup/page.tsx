@@ -5,6 +5,7 @@ import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, up
 import { auth, db } from '@/lib/firebase/config';
 import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
+import { translateFirebaseError } from '@/lib/utils/error-messages';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -57,8 +58,8 @@ export default function SignupPage() {
       await createUserProfile(userCredential.user.uid, email, fullName);
 
       router.push('/generate');
-    } catch (err: any) {
-      setError(err.message || 'Erreur lors de la création du compte');
+    } catch (err: unknown) {
+      setError(translateFirebaseError(err));
     } finally {
       setLoading(false);
     }
@@ -80,8 +81,8 @@ export default function SignupPage() {
       );
 
       router.push('/generate');
-    } catch (err: any) {
-      setError(err.message || 'Erreur lors de l\'inscription avec Google');
+    } catch (err: unknown) {
+      setError(translateFirebaseError(err));
     } finally {
       setLoading(false);
     }

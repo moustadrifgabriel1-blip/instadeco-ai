@@ -25,7 +25,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
       <div className="min-h-screen flex items-center justify-center bg-[#fbfbfd]">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-[#d2d2d7] border-t-[#1d1d1f] rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-[#86868b]">Vérification de l'authentification...</p>
+          <p className="text-[#86868b]">Vérification de l&apos;authentification...</p>
         </div>
       </div>
     );

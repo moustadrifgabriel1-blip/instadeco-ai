@@ -5,6 +5,7 @@ import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 
 import { auth, db } from '@/lib/firebase/config';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
+import { translateFirebaseError } from '@/lib/utils/error-messages';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -42,8 +43,8 @@ export default function LoginPage() {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       await ensureUserProfile(userCredential.user.uid, userCredential.user.email!, userCredential.user.displayName || undefined);
       router.push('/generate');
-    } catch (err: any) {
-      setError(err.message || 'Erreur lors de la connexion');
+    } catch (err: unknown) {
+      setError(translateFirebaseError(err));
     } finally {
       setLoading(false);
     }
@@ -62,8 +63,8 @@ export default function LoginPage() {
         userCredential.user.displayName || undefined
       );
       router.push('/generate');
-    } catch (err: any) {
-      setError(err.message || 'Erreur lors de la connexion Google');
+    } catch (err: unknown) {
+      setError(translateFirebaseError(err));
     } finally {
       setLoading(false);
     }

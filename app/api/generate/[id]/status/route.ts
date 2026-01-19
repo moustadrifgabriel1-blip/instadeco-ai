@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
-import { getGenerationStatus } from '@/lib/ai/fal-client';
-import { db } from '@/lib/firebase/config';
-import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { uploadImageFromUrl } from '@/lib/firebase/storage';
+import { checkGenerationStatus } from '@/lib/ai/fal-client';
+import { adminDb, uploadImageFromUrlServer } from '@/lib/firebase/admin';
+import * as admin from 'firebase-admin';
 
 /**
  * GET /api/generate/[id]/status
@@ -26,18 +25,18 @@ export async function GET(
   try {
     const { id } = params;
 
-    // Récupérer le document depuis Firestore
-    const generationRef = doc(db, 'generations', id);
-    const generationSnap = await getDoc(generationRef);
+    // Récupérer le document depuis Firestore (Admin SDK)
+    const generationRef = adminDb.collection('generations').doc(id);
+    const generationSnap = await generationRef.get();
 
-    if (!generationSnap.exists()) {
+    if (!generationSnap.exists) {
       return NextResponse.json(
         { error: 'Génération introuvable' },
         { status: 404 }
       );
     }
 
-    const generation = generationSnap.data();
+    const generation = generationSnap.data()!;
 
     // Si déjà completed ou failed, retourner directement
     if (generation.status === 'completed' || generation.status === 'failed') {
@@ -60,13 +59,13 @@ export async function GET(
 
     // Vérifier le statut sur Replicate
     console.log(`[Status] Vérification Replicate: ${generation.replicateRequestId}`);
-    const replicateStatus = await getGenerationStatus(generation.replicateRequestId);
+    const replicateStatus = await checkGenerationStatus(generation.replicateRequestId);
 
     // Si toujours en cours, retourner status processing
-    if (replicateStatus.status === 'processing' || replicateStatus.status === 'starting') {
+    if (replicateStatus.status === 'IN_QUEUE' || replicateStatus.status === 'IN_PROGRESS') {
       // Mettre à jour le status dans Firestore si nécessaire
       if (generation.status !== 'processing') {
-        await updateDoc(generationRef, {
+        await generationRef.update({
           status: 'processing',
         });
       }
@@ -74,30 +73,28 @@ export async function GET(
       return NextResponse.json({
         id,
         status: 'processing',
-        progress: replicateStatus.logs?.includes('step') 
-          ? parseInt(replicateStatus.logs.match(/(\d+)%/)?.[1] || '50')
-          : 50,
+        progress: replicateStatus.progress || 50,
       });
     }
 
     // Si succeeded, télécharger l'image et mettre à jour Firestore
-    if (replicateStatus.status === 'succeeded' && replicateStatus.output) {
+    if (replicateStatus.status === 'COMPLETED' && replicateStatus.images?.[0]?.url) {
       console.log(`[Status] ✅ Génération terminée: ${generation.replicateRequestId}`);
 
-      // Uploader l'image générée vers Firebase Storage
-      const outputImageStorageUrl = await uploadImageFromUrl(
-        replicateStatus.output,
+      // Uploader l'image générée vers Firebase Storage (Admin SDK)
+      const outputImageStorageUrl = await uploadImageFromUrlServer(
+        replicateStatus.images[0].url,
         generation.userId,
         'outputs'
       );
 
       console.log(`[Status] ✅ Image output uploadée: ${outputImageStorageUrl}`);
 
-      // Mettre à jour Firestore
-      await updateDoc(generationRef, {
+      // Mettre à jour Firestore (Admin SDK)
+      await generationRef.update({
         status: 'completed',
         outputImageUrl: outputImageStorageUrl,
-        completedAt: serverTimestamp(),
+        completedAt: admin.firestore.FieldValue.serverTimestamp(),
       });
 
       return NextResponse.json({
@@ -108,13 +105,13 @@ export async function GET(
     }
 
     // Si failed
-    if (replicateStatus.status === 'failed') {
+    if (replicateStatus.status === 'FAILED') {
       console.error(`[Status] ❌ Génération échouée: ${replicateStatus.error}`);
 
-      await updateDoc(generationRef, {
+      await generationRef.update({
         status: 'failed',
         errorMessage: replicateStatus.error || 'Erreur lors de la génération',
-        completedAt: serverTimestamp(),
+        completedAt: admin.firestore.FieldValue.serverTimestamp(),
       });
 
       return NextResponse.json({
