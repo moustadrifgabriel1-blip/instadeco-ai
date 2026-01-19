@@ -8,16 +8,18 @@ import { ProtectedRoute } from '@/components/features/protected-route';
 import { CreditBadge } from '@/components/features/credit-badge';
 import { useAuth } from '@/hooks/use-auth';
 
-// Styles de décoration disponibles
+// Styles de décoration disponibles - MEGA PROMPTS pour transformation complète
 const STYLES = [
-  { id: 'moderne', name: 'Moderne' },
-  { id: 'minimaliste', name: 'Minimaliste' },
-  { id: 'boheme', name: 'Bohème' },
-  { id: 'industriel', name: 'Industriel' },
-  { id: 'classique', name: 'Classique' },
-  { id: 'japandi', name: 'Japandi' },
-  { id: 'midcentury', name: 'Mid-Century' },
-  { id: 'coastal', name: 'Coastal' },
+  { id: 'moderne', name: 'Moderne', desc: 'Élégance contemporaine sophistiquée' },
+  { id: 'minimaliste', name: 'Minimaliste', desc: 'Simplicité scandinave épurée' },
+  { id: 'boheme', name: 'Bohème', desc: 'Chaleur éclectique globe-trotter' },
+  { id: 'industriel', name: 'Industriel', desc: 'Loft urbain brut et raffiné' },
+  { id: 'classique', name: 'Classique', desc: 'Élégance traditionnelle intemporelle' },
+  { id: 'japandi', name: 'Japandi', desc: 'Zen japonais & cocooning nordique' },
+  { id: 'midcentury', name: 'Mid-Century', desc: 'Rétro iconique années 50-60' },
+  { id: 'coastal', name: 'Coastal', desc: 'Bord de mer relaxant et lumineux' },
+  { id: 'farmhouse', name: 'Farmhouse', desc: 'Charme rustique contemporain' },
+  { id: 'artdeco', name: 'Art Déco', desc: 'Glamour opulent années 1920' },
 ];
 
 // Types de pièces
