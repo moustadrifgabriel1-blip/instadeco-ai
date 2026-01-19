@@ -1,0 +1,11 @@
+{
+  "name": "InstaDeco",
+  "short_name": "InstaDeco",
+  "description": "Transformez vos pièces en rendus décorés professionnels par IA",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#9333ea",
+  "orientation": "portrait",
+  "icons": []
+}

@@ -4,6 +4,9 @@ import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import Image from 'next/image';
 import { Plus, X, ArrowRight, Download, Check } from 'lucide-react';
+import { ProtectedRoute } from '@/components/features/protected-route';
+import { CreditBadge } from '@/components/features/credit-badge';
+import { useAuth } from '@/hooks/use-auth';
 
 // Styles de décoration disponibles
 const STYLES = [
@@ -27,7 +30,16 @@ const ROOM_TYPES = [
   { id: 'salle-a-manger', name: 'Salle à manger' },
 ];
 
-export default function DemoPage() {
+export default function GeneratePage() {
+  return (
+    <ProtectedRoute>
+      <GenerateContent />
+    </ProtectedRoute>
+  );
+}
+
+function GenerateContent() {
+  const { user } = useAuth();
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [selectedStyle, setSelectedStyle] = useState('moderne');
@@ -66,7 +78,7 @@ export default function DemoPage() {
   };
 
   const handleGenerate = async () => {
-    if (!imageFile) return;
+    if (!imageFile || !user) return;
 
     setIsGenerating(true);
     setProgress(0);
@@ -83,11 +95,18 @@ export default function DemoPage() {
           roomType: selectedRoomType,
           style: selectedStyle,
           controlMode: 'canny',
+          userId: user.uid, // Ajout de l'ID utilisateur
         }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
+        
+        // Gérer spécifiquement l'erreur de crédits insuffisants
+        if (errorData.code === 'INSUFFICIENT_CREDITS') {
+          throw new Error('Crédits insuffisants. Rechargez votre compte pour continuer.');
+        }
+        
         throw new Error(errorData.error || 'Erreur lors de la génération');
       }
 
@@ -131,7 +150,7 @@ export default function DemoPage() {
     if (!generatedImage) return;
     const link = document.createElement('a');
     link.href = generatedImage;
-    link.download = 'instantdecor-design.jpg';
+    link.download = 'instadeco-design.jpg';
     link.click();
   };
 
@@ -163,16 +182,17 @@ export default function DemoPage() {
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-[#fbfbfd]/80 backdrop-blur-xl border-b border-black/5">
         <div className="max-w-[980px] mx-auto px-6 h-12 flex items-center justify-between">
-          <span className="text-[21px] font-semibold tracking-[-0.01em] text-[#1d1d1f]">
-            InstantDecor
-          </span>
-          <div className="flex items-center gap-8">
-            <a href="#" className="text-xs text-[#424245] hover:text-[#1d1d1f] transition-colors">
+          <a href="/" className="text-[21px] font-semibold tracking-[-0.01em] text-[#1d1d1f]">
+            InstaDeco
+          </a>
+          <div className="flex items-center gap-6">
+            <CreditBadge />
+            <a href="/pricing" className="text-xs text-[#424245] hover:text-[#1d1d1f] transition-colors">
               Tarifs
             </a>
-            <button className="text-xs font-medium text-[#fbfbfd] bg-[#1d1d1f] px-4 py-1.5 rounded-full hover:bg-black transition-colors">
-              Connexion
-            </button>
+            <a href="/dashboard" className="text-xs font-medium text-[#fbfbfd] bg-[#1d1d1f] px-4 py-1.5 rounded-full hover:bg-black transition-colors">
+              Mon Compte
+            </a>
           </div>
         </div>
       </nav>

@@ -1,9 +1,10 @@
-# 🏠 InstantDecor AI - Contrat de Contexte Global
+# 🏠 InstaDeco AI - Contrat de Contexte Global
 
 **Date de création :** 16 janvier 2026  
-**Version :** 1.1.0  
+**Version :** 1.3.0  
 **Type de projet :** SaaS B2C - Décoration d'intérieur par IA  
 **⚡ Optimisation :** Migration Replicate.ai (flux-canny-pro)  
+**🎨 Branding :** InstaDeco AI (anciennement InstantDecor)  
 
 ---
 
@@ -26,7 +27,7 @@
 ## 🎯 Vision et Positionnement
 
 ### Concept
-**InstantDecor AI** permet aux utilisateurs de transformer leurs photos de pièces en rendus décorés professionnels grâce à l'IA générative (Flux.1 + ControlNet).
+**InstaDeco AI** permet aux utilisateurs de transformer leurs photos de pièces en rendus décorés professionnels grâce à l'IA générative (Flux.1 + ControlNet).
 
 ### Proposition de Valeur
 - ✅ **Rapide** : Génération en moins de 30 secondes
@@ -487,7 +488,8 @@ Liste les générations de l'utilisateur (paginé).
     /image-upload.tsx         # Zone de drag & drop
     /style-selector.tsx       # Grille de sélection de styles
     /generation-card.tsx      # Carte d'une génération
-    /credit-badge.tsx         # Badge de crédits
+    /credit-badge.tsx         # ✅ Badge de crédits (real-time Firestore)
+    /protected-route.tsx      # ✅ Wrapper protection auth
 
 /lib
   /db
@@ -512,7 +514,7 @@ Liste les générations de l'utilisateur (paginé).
 
 /hooks
   /use-credits.ts             # Hook pour gérer les crédits
-  /use-generation.ts          # Hook pour polling de génération
+  /use-generation.ts          # ✅ Hook auth Firebase (onAuthStateChanged)de génération
   /use-auth.ts                # Hook auth Supabase
 
 /public
@@ -830,17 +832,23 @@ export default async function StylePage({
 
 ### Phase 1: MVP Core (Semaines 1-2)
 
-#### Milestone 1.1 - Setup Projet
+#### Milestone 1.1 - Setup Projet ✅
 - [x] Initialiser Next.js + TypeScript + Tailwind
-- [ ] Configurer Supabase (Database + Auth + Storage)
+- [x] Configurer Firebase (Database + Auth + Storage)
 - [ ] Installer Shadcn/UI (composants de base)
 - [ ] Setup Stripe (mode test)
-- [ ] Configurer variables d'environnement
+- [x] Configurer variables d'environnement
+- [x] **Firebase Auth configuré (email + Google OAuth)**
+- [x] **Pages login/signup créées**
+- [x] **Hook useAuth implémenté**
 
 **Livrables:**
-- Projet initialisé avec structure de dossiers
-- Base de données Supabase créée avec schéma
-- Authentification fonctionnelle (email + Google OAuth)
+- ✅ Projet initialisé avec structure de dossiers
+- ✅ Projet Firebase créé (instantdecor-ai)
+- ✅ Variables d'environnement configurées
+- ✅ **Authentification complète (email + Google OAuth)**
+- ✅ **Création automatique profil Firestore (3 crédits gratuits)**
+- ✅ **Déploiement Vercel actif (instantdecor-ai.vercel.app)**
 
 ---
 
@@ -873,14 +881,17 @@ export default async function StylePage({
 - ✅ ControlNet Canny intégré (edge detection parfait)
 - ✅ Documentation de migration complète
 
----
-
-### Phase 2: Système de Crédits (Semaine 3)
-
-#### Milestone 2.1 - Base de Données Crédits
-- [ ] Implémenter fonctions SQL (`deduct_credits`, `add_credits`)
+--- 🔄
+- [ ] Implémenter fonctions Firestore (`deductCredits`, `addCredits`)
 - [ ] Tester les transactions atomiques
-- [ ] Créer composant `CreditBadge`
+- [x] **Créer composant `CreditBadge` (real-time updates)**
+- [x] **Créer composant `ProtectedRoute`**
+- [x] **Middleware de protection routes**
+
+**Livrables:**
+- 🔄 Système de crédits fonctionnel (UI ✅, Backend à faire)
+- ✅ Affichage du solde en temps réel (Firestore onSnapshot)
+- ✅ Protection routes authentifiées`
 
 **Livrables:**
 - Système de crédits fonctionnel
@@ -1056,14 +1067,43 @@ Copie du fichier ci-dessus avec des valeurs `your_xxx_here`.
 
 ## 🎯 Prochaines Étapes Immédiates
 
-1. **Lire ce fichier à chaque nouvelle session**
-2. **Commencer par Milestone 1.1** (Setup Projet)
-3. **Valider chaque milestone avant de passer à la suivante**
-4. **Documenter les décisions importantes dans ce fichier**
+### ✅ Complété (17 janvier 2026)
+- ✅ Firebase Auth configuré (email + Google OAuth)
+- ✅ Pages login/signup fonctionnelles
+- ✅ CreditBadge avec mises à jour temps réel
+- ✅ Protection des routes authentifiées
+- ✅ Déploiement Vercel actif
+
+### ✅ Complété (19 janvier 2026)
+- ✅ **Rebranding InstaDeco AI** (anciennement InstantDecor)
+- ✅ **Optimisation mobile complète** (responsive design)
+- ✅ **Carousel pricing mobile** (swipe + indicateurs)
+- ✅ **Fix erreurs console** (favicon, icons PWA)
+- ✅ **Page Demo fonctionnelle** avec résultat exemple
+- ✅ **Page Pricing responsive** (3 packs de crédits)
+- ✅ **PWA manifest configuré** (InstaDeco AI)
+
+### 🔄 En Cours (Milestone 2)
+1. **Implémenter déduction crédits** lors de la génération
+2. **Créer collections Firestore** (styles, roomTypes)
+3. **Intégrer Firebase Storage** pour uploads d'images
+4. **Créer produits Stripe TEST** (Starter, Pro, Unlimited)
+
+### 📋 À Faire (Priorité)
+1. **Implémenter fonctions Firestore** (`deductCredits`, `addCredits`)
+2. **Modifier `/api/generate`** pour déduire 1 crédit
+3. **Créer collection `creditTransactions`** (audit trail)
+4. **Configurer Stripe Checkout** (mode test)
+5. **Créer icônes PWA** (192x192, 512x512 PNG)
+6. **Tester flux complet** inscription → génération → paiement
 
 ---
 
-**Dernière mise à jour:** 16 janvier 2026  
+**Dernière mise à jour:** 19 janvier 2026  
 **Mainteneur:** @gabrielmoustadrif  
-**Version du contexte:** 1.1.0  
-**Changelog:** Migration Replicate.ai (flux-canny-pro) - API plus simple, ControlNet Canny intégré
+**Version du contexte:** 1.3.0  
+**Changelog:** 
+- v1.3.0 (19/01) - Rebranding InstaDeco AI + Optimisation mobile complète
+- v1.2.0 (17/01) - Milestone 1.1 complété (Firebase Auth + UI crédits)
+- v1.1.0 (16/01) - Migration Replicate.ai
+- Déploiement Vercel actif (instantdecor-ai.vercel.app)

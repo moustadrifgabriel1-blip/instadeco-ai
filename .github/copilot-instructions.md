@@ -1,10 +1,10 @@
-# Copilot Instructions - InstantDecor AI
+# Copilot Instructions - InstaDeco
 
 ## Contexte du Projet
 
 Ce projet est un **SaaS B2C de décoration d'intérieur par IA** utilisant Flux.1 + ControlNet.
 
-**⚠️ IMPORTANT:** À chaque nouvelle session, **lire le fichier [docs/CONTEXT.md](../docs/CONTEXT.md)** pour synchroniser le contexte complet du projet.
+**⚠️ IMPORTANT:** À chaque nouvelle session, **lire le fichier `../docs/CONTEXT.md`** pour synchroniser le contexte complet du projet.
 
 ## Stack Technique
 
@@ -133,13 +133,13 @@ import Image from 'next/image';
 
 ## Workflow de Développement
 
-### Phase Actuelle: **Milestone 1.1 - Setup Projet**
+### Phase Actuelle: **Milestone 2 - Backend Crédits & Stripe**
 
-Voir [docs/CONTEXT.md](../docs/CONTEXT.md) section "Milestones de Développement" pour le plan complet.
+Voir `../docs/CONTEXT.md` section "Milestones de Développement" pour le plan complet.
 
 ### Avant de Coder
 
-1. Lire `docs/CONTEXT.md` pour comprendre l'architecture
+1. Lire `../docs/CONTEXT.md` pour comprendre l'architecture
 2. Vérifier le milestone en cours
 3. Vérifier les dépendances nécessaires
 
@@ -181,7 +181,7 @@ STRIPE_SECRET_KEY=...
 
 ## Ressources Importantes
 
-- **Contexte Complet:** [docs/CONTEXT.md](../docs/CONTEXT.md)
+- **Contexte Complet:** `../docs/CONTEXT.md`
 - **Schéma DB:** Voir section "Structure de la Base de Données" dans CONTEXT.md
 - **Endpoints API:** Voir section "Endpoints API" dans CONTEXT.md
 - **Next.js Docs:** https://nextjs.org/docs

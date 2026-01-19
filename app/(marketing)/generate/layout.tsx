@@ -1,6 +1,6 @@
 export const metadata = {
-  title: 'Demo - InstantDecor AI',
-  description: 'Testez InstantDecor AI gratuitement',
+  title: 'Demo - InstaDeco',
+  description: 'Testez InstaDeco gratuitement',
 };
 
 export default function DemoLayout({

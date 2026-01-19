@@ -1,23 +1,23 @@
 export default function HomePage() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24">
-      <div className="text-center">
-        <h1 className="text-6xl font-bold mb-4">
-          🏠 InstantDecor AI
+    <main className="flex min-h-screen flex-col items-center justify-center p-4 sm:p-8 md:p-24">
+      <div className="text-center max-w-4xl mx-auto px-4">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6">
+          🏠 InstaDeco
         </h1>
-        <p className="text-xl text-muted-foreground mb-8">
+        <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-6 sm:mb-8 px-2">
           Transformez vos pièces avec l&apos;IA générative
         </p>
-        <div className="flex gap-4 justify-center">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center max-w-md mx-auto">
           <a
-            href="/demo"
-            className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:opacity-90 transition"
+            href="/generate"
+            className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:opacity-90 transition touch-manipulation min-h-[48px] flex items-center justify-center"
           >
-            Essayer la démo
+            Commencer
           </a>
           <a
             href="/pricing"
-            className="px-6 py-3 border border-border rounded-lg font-medium hover:bg-accent transition"
+            className="px-6 py-3 border border-border rounded-lg font-medium hover:bg-accent transition touch-manipulation min-h-[48px] flex items-center justify-center"
           >
             Voir les tarifs
           </a>
