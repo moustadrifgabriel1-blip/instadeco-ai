@@ -32,6 +32,8 @@ export interface FalGenerationOptions {
   numInferenceSteps?: number;
   /** Guidance scale (adhérence au prompt) */
   guidanceScale?: number;
+  /** Mode de transformation (full_redesign, keep_layout, decor_only) */
+  transformMode?: TransformMode;
 }
 
 export interface FalGenerationResponse {
@@ -54,70 +56,199 @@ export interface FalResultResponse {
 }
 
 // ============================================
-// PROMPT TEMPLATE PROFESSIONNEL
+// PROMPT TEMPLATE PROFESSIONNEL V2
 // ============================================
+
+/**
+ * Options de personnalisation pour la génération
+ */
+export interface GenerationOptions {
+  mode: 'full_redesign' | 'keep_layout' | 'decor_only';
+  keepExistingFurniture?: boolean;
+  focusAreas?: ('furniture' | 'decor' | 'lighting' | 'colors' | 'layout')[];
+}
+
+// Mode de transformation par défaut
+export type TransformMode = 'full_redesign' | 'keep_layout' | 'decor_only';
+
+// Instructions spécifiques par mode de transformation
+export const TRANSFORM_MODE_INSTRUCTIONS = {
+  full_redesign: {
+    name: 'Transformation complète',
+    instruction: `COMPLETE TRANSFORMATION MODE:
+- REMOVE ALL existing furniture completely from the scene
+- ADD entirely NEW furniture pieces matching the requested style
+- CHANGE all decorative elements (art, plants, accessories)
+- NEW lighting fixtures and lamps
+- FRESH textiles (curtains, rugs, pillows)
+- Only PRESERVE: walls, windows, doors, ceiling, floor structure`,
+    negative: 'existing furniture, original furniture, same furniture, minor changes, subtle modifications, keeping current items',
+  },
+  
+  keep_layout: {
+    name: 'Conserver la disposition',
+    instruction: `KEEP LAYOUT - NEW FURNITURE MODE:
+- PRESERVE the exact furniture POSITIONS and LAYOUT
+- REPLACE furniture with NEW pieces of SIMILAR SIZE at SAME LOCATIONS
+- Sofa stays where sofa is, table stays where table is, etc.
+- UPDATE style of furniture to match requested aesthetic
+- Change decorative elements, textiles, and accessories
+- Maintain room flow and traffic patterns`,
+    negative: 'moving furniture, rearranging, different layout, empty spaces where furniture was',
+  },
+  
+  decor_only: {
+    name: 'Décoration uniquement',
+    instruction: `DECOR-ONLY MODE:
+- KEEP ALL existing furniture pieces EXACTLY as they are
+- DO NOT change or replace any furniture
+- ONLY modify: wall art, plants, decorative accessories
+- ADD: new lighting fixtures, throw pillows, blankets
+- CHANGE: curtains, rugs, small decorative items
+- UPDATE color scheme through accessories only
+- Furniture shape, color, and position stay IDENTICAL`,
+    negative: 'new furniture, replacing furniture, different furniture, furniture change, modified furniture',
+  },
+} as const;
 
 /**
  * Génère le prompt optimisé pour la décoration d'intérieur
  * Ces prompts sont conçus pour produire une TRANSFORMATION COMPLÈTE
  * avec du mobilier et de la décoration ENTIÈREMENT NOUVEAUX
  * tout en préservant la structure architecturale (murs, fenêtres, proportions)
+ * 
+ * IMPORTANT: Le prompt inclut des contraintes strictes pour éviter
+ * que l'IA sorte du cadre de la photo originale
+ * 
+ * @param roomType - Type de pièce (living room, bedroom, etc.)
+ * @param styleKey - Clé du style de décoration (boheme, minimaliste, etc.)
+ * @param transformMode - Mode de transformation (full_redesign, keep_layout, decor_only)
  */
-export function buildInteriorDesignPrompt(roomType: string, styleKey: string): string {
+export function buildInteriorDesignPrompt(
+  roomType: string, 
+  styleKey: string,
+  transformMode: TransformMode = 'full_redesign'
+): string {
   // Récupérer le méga-prompt spécifique au style
   const stylePrompt = MEGA_STYLE_PROMPTS[styleKey as DecorationStyle] || MEGA_STYLE_PROMPTS.moderne;
   
+  // Récupérer les instructions du mode de transformation
+  const modeInstructions = TRANSFORM_MODE_INSTRUCTIONS[transformMode];
+  
+  // Instructions de base pour RESTER DANS LE CADRE - RENFORCÉES
+  const frameConstraints = `
+⚠️ ABSOLUTE FRAME BOUNDARIES - CRITICAL ⚠️
+The input image defines EXACT boundaries. You MUST NOT generate ANY content outside these boundaries.
+
+FORBIDDEN ACTIONS (will result in failure):
+❌ DO NOT extend walls beyond the visible edges
+❌ DO NOT add new walls, columns, or architectural elements on the sides
+❌ DO NOT generate plants, furniture, or decor outside the original frame
+❌ DO NOT change the perspective or camera angle
+❌ DO NOT zoom out or expand the visible area
+❌ DO NOT add content where the original image ends
+
+MANDATORY CONSTRAINTS:
+✅ Work ONLY within the exact pixel boundaries of the input image
+✅ Keep all 4 edges (top, bottom, left, right) exactly as they appear
+✅ Preserve the exact camera position and field of view
+✅ If an edge of the room is cut off in the original, keep it cut off
+✅ Transform ONLY what is visible in the original photograph
+✅ The output must have IDENTICAL framing to the input`;
+
+  // Adapter le contenu du prompt en fonction du mode
+  let furnitureSection = '';
+  let decorSection = '';
+  
+  if (transformMode === 'full_redesign') {
+    furnitureSection = `FURNITURE TO ADD (inspired by real European furniture brands style):
+${stylePrompt.furniture}`;
+    decorSection = `DECORATION ELEMENTS:
+${stylePrompt.decor}`;
+  } else if (transformMode === 'keep_layout') {
+    furnitureSection = `REPLACEMENT FURNITURE (same positions, new style):
+${stylePrompt.furniture}
+IMPORTANT: Replace furniture at EXACT SAME LOCATIONS, matching approximate sizes`;
+    decorSection = `NEW DECORATION ELEMENTS:
+${stylePrompt.decor}`;
+  } else if (transformMode === 'decor_only') {
+    furnitureSection = `KEEP ALL EXISTING FURNITURE - DO NOT CHANGE`;
+    decorSection = `ADD/CHANGE DECORATIVE ELEMENTS ONLY:
+${stylePrompt.decor}
+- New wall art and frames
+- New plants and greenery
+- New throw pillows and blankets
+- New small accessories and vases
+- Updated curtains or blinds
+- New rugs (if appropriate)`;
+  }
+
   // Construire le prompt complet avec emphase sur la TRANSFORMATION
-  return `COMPLETELY REDESIGN this ${roomType} with BRAND NEW FURNITURE AND DECOR. ${stylePrompt.prompt}. 
+  return `[INPAINTING MODE] Transform the interior of this ${roomType} photograph. ${stylePrompt.prompt}.
 
-MANDATORY REQUIREMENTS:
-- Replace ALL existing furniture with ${stylePrompt.furniture}
-- Add ${stylePrompt.decor}
-- Use color palette: ${stylePrompt.colors}
-- Create ${stylePrompt.lighting} lighting atmosphere
-- Apply ${stylePrompt.flooring} flooring style
-- Add ${stylePrompt.textiles} textiles and fabrics
-- Include ${stylePrompt.plants} greenery arrangement
+IMPORTANT: This is an INPAINTING task. You must ONLY modify content WITHIN the existing photograph boundaries. Do NOT extend or expand the image in any direction.
 
-PRESERVE ONLY: walls position, windows location, doors placement, room proportions and architectural structure.
-REMOVE: all current furniture, decorations, and personal items.
-STYLE: ${stylePrompt.description}
+${frameConstraints}
 
-Ultra photorealistic interior design photography, 8K resolution, professional architectural photography, Architectural Digest magazine quality, perfect composition, cinematic natural lighting through windows, high-end luxury finish, award-winning interior design.`;
+${modeInstructions.instruction}
+
+${furnitureSection}
+
+${decorSection}
+
+COLOR PALETTE: ${stylePrompt.colors}
+LIGHTING MOOD: ${stylePrompt.lighting}
+FLOORING STYLE: ${transformMode === 'decor_only' ? 'KEEP EXISTING FLOOR' : stylePrompt.flooring}
+TEXTILES & FABRICS: ${stylePrompt.textiles}
+PLANTS & GREENERY: ${stylePrompt.plants}
+
+STRICT PRESERVATION:
+- Keep exact wall positions and boundaries
+- Keep exact window positions, sizes, and frames
+- Keep exact door positions
+- Keep room proportions and ceiling height
+- Keep floor area exactly as visible in original photo
+- Keep same natural lighting direction from windows
+- DO NOT add any content outside the original photo edges
+
+STYLE REFERENCE: ${stylePrompt.description}
+
+QUALITY: Ultra photorealistic interior design photography, professional architectural photography. Perfect composition strictly within ORIGINAL FRAME BOUNDARIES, cinematic natural lighting, high-end European furniture showroom quality.`;
 }
 
 /**
  * Méga-prompts détaillés pour chaque style de décoration
- * Chaque style a des éléments spécifiques pour une vraie transformation
+ * Avec références à des styles de meubles inspirés des grandes enseignes
+ * (IKEA, Maisons du Monde, Habitat, AM.PM, La Redoute Intérieurs)
  */
 export const MEGA_STYLE_PROMPTS = {
   boheme: {
     description: 'Bohemian Chic - Free-spirited eclectic warmth with global influences',
-    prompt: 'Transform into a warm bohemian sanctuary with layered textures and global artisan pieces',
-    furniture: 'low wooden coffee table with carved details, rattan peacock chair, floor cushions with kilim patterns, vintage wooden sideboard, cane armchairs, hanging wicker egg chair, low platform daybed with cushions',
-    decor: 'macramé wall hangings, vintage Moroccan rugs layered, brass lanterns, woven baskets on walls, dreamcatchers, global artifacts, terracotta pottery, beaded curtains, vintage mirrors with ornate frames',
-    colors: 'warm terracotta, burnt orange, mustard yellow, deep rust, cream, sage green, golden honey tones',
-    lighting: 'warm ambient with string lights, rattan pendant lamps, brass floor lamps, candle clusters, soft diffused golden glow',
-    flooring: 'natural jute sisal rugs layered over wooden floors, vintage Persian runner',
-    textiles: 'velvet throw pillows in jewel tones, chunky knit blankets, embroidered cushions, tasseled throws, ikat patterns',
-    plants: 'abundant trailing pothos, fiddle leaf fig, snake plants in terracotta pots, dried pampas grass arrangements, eucalyptus branches',
+    prompt: 'Transform into a warm bohemian sanctuary with layered textures and global artisan pieces. Style inspired by Maisons du Monde Nomade and La Redoute ethnic collections',
+    furniture: 'low mango wood coffee table with carved details, natural rattan peacock armchair, floor poufs with kilim patterns, vintage-style wooden sideboard with cane doors, hanging egg chair in natural rattan, low platform daybed with linen cushions, IKEA STOCKHOLM style rattan pieces',
+    decor: 'macramé wall hangings, layered vintage-style Moroccan rugs, brass Moroccan lanterns, woven seagrass baskets on walls, global artisan pottery in terracotta, beaded curtains, ornate mirrors with distressed gold frames, ethnic textile wall art',
+    colors: 'warm terracotta, burnt orange, mustard yellow, deep rust, off-white cream, sage green, golden honey tones',
+    lighting: 'warm ambient string lights, rattan pendant lamps like IKEA SINNERLIG, brass floor lamps, cluster of pillar candles, soft diffused golden glow',
+    flooring: 'natural jute sisal rugs layered over wooden floors, vintage-style Persian runner',
+    textiles: 'velvet throw pillows in jewel tones, chunky knit blankets, embroidered ethnic cushions, tasseled cotton throws, ikat pattern fabrics',
+    plants: 'abundant trailing pothos on shelves, large fiddle leaf fig in woven basket, snake plants in terracotta pots, dried pampas grass in ceramic vases, eucalyptus branches',
   },
   
   minimaliste: {
     description: 'Minimalist Scandinavian - Clean serenity with functional elegance',
-    prompt: 'Transform into a serene minimalist Scandinavian space with clean lines and purposeful simplicity',
-    furniture: 'streamlined white oak sofa with clean lines, iconic Wegner wishbone chairs, floating wall shelves, minimal TV console, sculptural coffee table, simple platform bed with hidden storage, slim profile dining table',
-    decor: 'single statement abstract art piece, minimal ceramic vases, simple geometric sculptures, one large round mirror, curated book stacks, subtle wall sconces',
-    colors: 'pure white, warm greige, soft dove grey, natural blonde wood, touches of black accent',
-    lighting: 'abundant natural light, sleek pendant lights, minimal floor lamp, recessed lighting, large unobstructed windows',
-    flooring: 'light blonde oak wide plank floors, single neutral area rug with subtle texture',
-    textiles: 'linen in natural tones, boucle texture sofa, cashmere throw in cream, cotton bedding in white',
-    plants: 'single large monstera or olive tree, minimal greenery in simple white ceramic pots',
+    prompt: 'Transform into a serene minimalist Scandinavian space. Style inspired by IKEA, HAY, Muuto, and Nordic design principles',
+    furniture: 'streamlined light oak 3-seater sofa with clean lines like IKEA LANDSKRONA, wishbone-style dining chairs, floating white wall shelves, minimal oak TV console like IKEA BESTA, sculptural round coffee table, low platform bed with hidden storage, slim Scandinavian dining table',
+    decor: 'single large abstract art print in neutral tones, minimal white ceramic vases, simple geometric brass sculptures, one large round mirror with thin black frame, carefully curated coffee table books, subtle wall-mounted reading lights',
+    colors: 'pure white walls, warm greige accents, soft dove grey upholstery, natural blonde oak wood, minimal black metal accents',
+    lighting: 'maximized natural daylight, sleek white pendant lights like MUUTO style, minimal arc floor lamp, hidden LED strips, sheer white curtains',
+    flooring: 'light blonde oak wide plank floors, single cream wool area rug with subtle texture',
+    textiles: 'natural linen curtains and cushions, bouclé texture sofa throw, cream cashmere blanket, crisp white cotton bedding',
+    plants: 'single large monstera deliciosa or olive tree in minimal white pot, one small succulent arrangement',
   },
   
   industriel: {
     description: 'Industrial Modern - Raw urban loft with refined edge',
-    prompt: 'Transform into an authentic industrial loft with exposed materials and urban sophistication',
+    prompt: 'Transform into an authentic industrial loft with exposed materials and urban sophistication. Style inspired by Maisons du Monde Factory collection and AM.PM industrial range',
     furniture: 'distressed leather Chesterfield sofa, reclaimed wood dining table with metal legs, vintage factory cart coffee table, metal and wood open shelving, industrial bar stools, Edison-style pendant clusters, rolling metal side tables',
     decor: 'exposed brick walls, metal wall art, vintage factory clocks, old maps and blueprints, antique gears, wire cage pendant lights, concrete planters, black framed mirrors',
     colors: 'charcoal grey, rust orange, matte black, aged bronze, warm wood tones, exposed concrete grey',
@@ -214,6 +345,18 @@ export const MEGA_STYLE_PROMPTS = {
 
 /**
  * Prompt négatif pour éviter les artefacts courants
+ * @param transformMode - Mode de transformation pour ajouter des négatifs spécifiques
+ */
+export function getNegativePrompt(transformMode: TransformMode = 'full_redesign'): string {
+  const baseNegative = 'blurry, low quality, distorted, deformed, ugly, bad proportions, watermark, text, logo, cartoon, anime, illustration, painting, drawing, unrealistic, oversaturated, extending beyond frame, cropped differently, different camera angle, different perspective';
+  
+  const modeSpecificNegative = TRANSFORM_MODE_INSTRUCTIONS[transformMode]?.negative || '';
+  
+  return `${baseNegative}, ${modeSpecificNegative}`;
+}
+
+/**
+ * Prompt négatif de base (pour compatibilité)
  */
 export const NEGATIVE_PROMPT = 'blurry, low quality, distorted, deformed, ugly, bad proportions, watermark, text, logo, cartoon, anime, illustration, painting, drawing, unrealistic, oversaturated, keeping existing furniture, same furniture different color, minor changes only, subtle modifications';
 
@@ -275,17 +418,21 @@ export async function submitGeneration(
   // Enrichir le style si c'est une clé connue
   const styleDescription = DECORATION_STYLES[options.style as DecorationStyle] || options.style;
   
-  // Construire le prompt professionnel
-  const prompt = buildInteriorDesignPrompt(roomTypeEnglish, styleDescription);
+  // Mode de transformation (défaut: full_redesign)
+  const transformMode = options.transformMode || 'full_redesign';
   
-  console.log('[Replicate] Submitting generation with prompt:', prompt);
+  // Construire le prompt professionnel avec le mode de transformation
+  const prompt = buildInteriorDesignPrompt(roomTypeEnglish, styleDescription, transformMode);
+  
+  console.log('[Replicate] Submitting generation with transform mode:', transformMode);
+  console.log('[Replicate] Prompt:', prompt);
   console.log('[Replicate] Conditioning image:', options.imageUrl.substring(0, 50) + '...');
   console.log('[Replicate] Control mode:', options.controlMode || 'canny');
 
   try {
     // Utiliser Flux Canny Pro pour le ControlNet
-    // Guidance élevée (25-30) force l'IA à VRAIMENT transformer la pièce
-    // avec du mobilier entièrement nouveau
+    // La guidance contrôle l'adhérence au prompt
+    // Le ControlNet Canny préserve les contours/structure
     const prediction = await replicate.predictions.create({
       model: 'black-forest-labs/flux-canny-pro',
       input: {
@@ -295,9 +442,12 @@ export async function submitGeneration(
         // IMAGE SOURCE = CONTROL IMAGE (préserve structure/murs/fenêtres)
         control_image: options.imageUrl,
         
-        // Paramètres optimisés pour TRANSFORMATION MAXIMALE
+        // Paramètres optimisés pour RESPECT DU CADRE + TRANSFORMATION
         steps: 50, // Maximum pour meilleure qualité
-        guidance: 30, // Élevé pour forcer le suivi du prompt (transformation complète)
+        guidance: 20, // Réduit de 30→20 pour mieux respecter l'image source
+        
+        // Paramètres supplémentaires si supportés par le modèle
+        // control_strength: 0.9, // Force du ControlNet (plus = plus fidèle à la structure)
       },
     });
 

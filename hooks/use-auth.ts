@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { User, onAuthStateChanged, signOut as firebaseSignOut } from 'firebase/auth';
-import { auth } from '@/lib/firebase/config';
+import { auth, db } from '@/lib/firebase/config';
+import { doc, onSnapshot } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [credits, setCredits] = useState<number>(0);
   const router = useRouter();
 
   useEffect(() => {
@@ -19,6 +21,23 @@ export function useAuth() {
     return () => unsubscribe();
   }, []);
 
+  // Écouter les crédits en temps réel
+  useEffect(() => {
+    if (!user?.uid) {
+      setCredits(0);
+      return;
+    }
+
+    const userDocRef = doc(db, 'users', user.uid);
+    const unsubscribe = onSnapshot(userDocRef, (docSnap) => {
+      if (docSnap.exists()) {
+        setCredits(docSnap.data()?.credits || 0);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [user?.uid]);
+
   const signOut = async () => {
     try {
       await firebaseSignOut(auth);
@@ -28,5 +47,5 @@ export function useAuth() {
     }
   };
 
-  return { user, loading, signOut };
+  return { user, loading, credits, signOut };
 }

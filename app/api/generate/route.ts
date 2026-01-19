@@ -5,7 +5,8 @@ import {
   DECORATION_STYLES,
   ROOM_TYPES,
   type DecorationStyle,
-  type RoomType
+  type RoomType,
+  type TransformMode
 } from '@/lib/ai/fal-client';
 import { deductCredits, adminDb, uploadImageFromBase64, uploadImageFromUrlServer } from '@/lib/firebase/admin';
 import * as admin from 'firebase-admin';
@@ -22,6 +23,7 @@ import * as admin from 'firebase-admin';
  * - roomType: string (type de pièce: salon, chambre, etc.)
  * - style: string (style de déco: boheme, minimaliste, etc.)
  * - controlMode?: 'canny' | 'depth' (mode ControlNet, défaut: canny)
+ * - transformMode?: 'full_redesign' | 'keep_layout' | 'decor_only' (mode de transformation)
  * 
  * Response:
  * - requestId: string (ID pour le polling)
@@ -36,6 +38,7 @@ export async function POST(req: Request) {
       roomType = 'salon', 
       style = 'moderne',
       controlMode = 'canny',
+      transformMode = 'full_redesign', // Nouveau: Mode de transformation
       userId // Ajouté: ID utilisateur Firebase Auth
     } = body;
 
@@ -108,13 +111,17 @@ export async function POST(req: Request) {
       roomType,
       style,
       controlMode,
+      transformMode, // Nouveau: Mode de transformation
       inputImageStorageUrl,
     });
 
-    // Construire le prompt
+    // Construire le prompt avec le mode de transformation
     const roomTypeEnglish = ROOM_TYPES[roomType as RoomType] || roomType;
     const styleDescription = DECORATION_STYLES[style as DecorationStyle] || style;
-    const prompt = buildInteriorDesignPrompt(roomTypeEnglish, styleDescription);
+    const validTransformMode = (['full_redesign', 'keep_layout', 'decor_only'].includes(transformMode) 
+      ? transformMode 
+      : 'full_redesign') as TransformMode;
+    const prompt = buildInteriorDesignPrompt(roomTypeEnglish, styleDescription, validTransformMode);
 
     // ====================================
     // CRÉER DOCUMENT GENERATION DANS FIRESTORE (status: pending)
@@ -123,6 +130,7 @@ export async function POST(req: Request) {
       userId,
       styleSlug: style,
       roomTypeSlug: roomType,
+      transformMode: validTransformMode, // Nouveau: Sauvegarder le mode
       prompt,
       controlnetType: controlMode,
       inputImageUrl: inputImageStorageUrl,
@@ -146,6 +154,7 @@ export async function POST(req: Request) {
       roomType,
       style,
       controlMode,
+      transformMode: validTransformMode, // Nouveau: Mode de transformation
       imageStrength: 0.85, // 85% fidèle à la structure originale
       numInferenceSteps: 28,
       guidanceScale: 7.5,

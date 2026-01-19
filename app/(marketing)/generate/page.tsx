@@ -32,6 +32,28 @@ const ROOM_TYPES = [
   { id: 'salle-a-manger', name: 'Salle à manger' },
 ];
 
+// Modes de transformation
+const TRANSFORM_MODES = [
+  { 
+    id: 'full_redesign', 
+    name: 'Transformation complète', 
+    desc: 'Remplacer tous les meubles et la déco',
+    icon: '✨'
+  },
+  { 
+    id: 'keep_layout', 
+    name: 'Garder la disposition', 
+    desc: 'Nouveaux meubles, même emplacement',
+    icon: '📐'
+  },
+  { 
+    id: 'decor_only', 
+    name: 'Déco uniquement', 
+    desc: 'Garder les meubles, changer la déco',
+    icon: '🖼️'
+  },
+];
+
 export default function GeneratePage() {
   return (
     <ProtectedRoute>
@@ -46,10 +68,11 @@ function GenerateContent() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [selectedStyle, setSelectedStyle] = useState('moderne');
   const [selectedRoomType, setSelectedRoomType] = useState('salon');
+  const [selectedMode, setSelectedMode] = useState('full_redesign');
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
-  const [requestId, setRequestId] = useState<string | null>(null);
+  const [generationId, setGenerationId] = useState<string | null>(null); // ID Firestore de la génération
   const [error, setError] = useState<string | null>(null);
 
   // Upload d'image avec drag & drop
@@ -97,6 +120,7 @@ function GenerateContent() {
           roomType: selectedRoomType,
           style: selectedStyle,
           controlMode: 'canny',
+          transformMode: selectedMode, // Mode de transformation (full_redesign, keep_layout, decor_only)
           userId: user.uid, // Ajout de l'ID utilisateur
         }),
       });
@@ -115,7 +139,7 @@ function GenerateContent() {
       const data = await response.json();
       // Utiliser generationId (Firestore) pour le polling, pas requestId (Replicate)
       const pollingId = data.generationId || data.requestId;
-      setRequestId(pollingId);
+      setGenerationId(pollingId);
       pollStatus(pollingId);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Une erreur est survenue';
@@ -150,25 +174,150 @@ function GenerateContent() {
     }, 2000);
   };
 
-  const handleDownload = () => {
+  // Fonction pour ajouter le filigrane sur l'image
+  const addWatermarkToImage = async (imageUrl: string): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const img = document.createElement('img');
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        if (!ctx) {
+          reject(new Error('Canvas context not available'));
+          return;
+        }
+        
+        // Définir les dimensions du canvas
+        canvas.width = img.width;
+        canvas.height = img.height;
+        
+        // Dessiner l'image originale
+        ctx.drawImage(img, 0, 0);
+        
+        // ===== FILIGRANE PRINCIPAL "InstaDeco" =====
+        // Configurer le texte principal (gros et semi-transparent)
+        const mainText = 'InstaDeco';
+        const fontSize = Math.max(img.width / 8, 60); // Taille adaptative, minimum 60px
+        ctx.font = `bold ${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        // Position au centre
+        const centerX = img.width / 2;
+        const centerY = img.height / 2;
+        
+        // Rotation légère
+        ctx.save();
+        ctx.translate(centerX, centerY);
+        ctx.rotate(-15 * Math.PI / 180); // -15 degrés
+        
+        // Ombre pour lisibilité
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+        ctx.shadowBlur = 10;
+        ctx.shadowOffsetX = 2;
+        ctx.shadowOffsetY = 2;
+        
+        // Texte principal semi-transparent (plus foncé qu'avant)
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.45)'; // 45% opacité (était 25%)
+        ctx.fillText(mainText, 0, 0);
+        
+        // Contour pour plus de visibilité
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
+        ctx.lineWidth = 2;
+        ctx.strokeText(mainText, 0, 0);
+        
+        ctx.restore();
+        
+        // ===== MENTION "Généré par IA" en bas à droite =====
+        const aiText = 'Généré par IA';
+        const aiFontSize = Math.max(img.width / 50, 12); // Tout petit, minimum 12px
+        ctx.font = `${aiFontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'bottom';
+        
+        // Position en bas à droite avec marge
+        const marginRight = 15;
+        const marginBottom = 10;
+        
+        // Réinitialiser les ombres
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+        ctx.shadowBlur = 3;
+        ctx.shadowOffsetX = 1;
+        ctx.shadowOffsetY = 1;
+        
+        // Texte discret
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+        ctx.fillText(aiText, img.width - marginRight, img.height - marginBottom);
+        
+        // Convertir en blob et créer une URL
+        canvas.toBlob((blob) => {
+          if (blob) {
+            resolve(URL.createObjectURL(blob));
+          } else {
+            reject(new Error('Failed to create blob'));
+          }
+        }, 'image/jpeg', 0.92);
+      };
+      
+      img.onerror = () => {
+        reject(new Error('Failed to load image'));
+      };
+      
+      img.src = imageUrl;
+    });
+  };
+
+  // Télécharger l'image avec filigrane
+  const handleDownload = async () => {
     if (!generatedImage) return;
-    const link = document.createElement('a');
-    link.href = generatedImage;
-    link.download = 'instadeco-design.jpg';
-    link.click();
+    
+    try {
+      // Ajouter le filigrane
+      const watermarkedUrl = await addWatermarkToImage(generatedImage);
+      
+      // Télécharger
+      const link = document.createElement('a');
+      link.href = watermarkedUrl;
+      link.download = 'instadeco-apercu.jpg';
+      link.click();
+      
+      // Nettoyer l'URL blob après téléchargement
+      setTimeout(() => URL.revokeObjectURL(watermarkedUrl), 1000);
+    } catch (error) {
+      console.error('Erreur lors du téléchargement:', error);
+      // Fallback: télécharger sans filigrane côté client (mais avec filigrane serveur si implémenté)
+      const link = document.createElement('a');
+      link.href = generatedImage;
+      link.download = 'instadeco-apercu.jpg';
+      link.click();
+    }
   };
 
   const handleUnlock = async () => {
+    if (!generationId) {
+      alert('Génération non trouvée. Veuillez réessayer.');
+      return;
+    }
+    
     try {
       const response = await fetch('/api/unlock-image', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ generationId: requestId }),
+        body: JSON.stringify({ 
+          generationId, 
+          userId: user?.uid || 'anonymous',
+        }),
       });
       const data = await response.json();
-      if (data.url) window.location.href = data.url;
+      
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert(data.error || 'Erreur lors de la création du paiement');
+      }
     } catch {
-      alert('Erreur lors de la redirection');
+      alert('Erreur lors de la redirection vers le paiement');
     }
   };
 
@@ -265,6 +414,34 @@ function GenerateContent() {
 
               {/* Options */}
               <div className="space-y-8">
+                {/* Transform Mode - NEW */}
+                <div className="text-center">
+                  <label className="block text-[12px] font-medium text-[#86868b] uppercase tracking-[.1em] mb-4">
+                    Que voulez-vous faire ?
+                  </label>
+                  <div className="flex flex-wrap justify-center gap-3">
+                    {TRANSFORM_MODES.map((mode) => (
+                      <button
+                        key={mode.id}
+                        onClick={() => setSelectedMode(mode.id)}
+                        className={`
+                          px-5 py-3 rounded-2xl text-left transition-all duration-200 min-w-[180px]
+                          ${selectedMode === mode.id
+                            ? 'bg-[#1d1d1f] text-white ring-2 ring-[#1d1d1f] ring-offset-2'
+                            : 'bg-[#f5f5f7] text-[#1d1d1f] hover:bg-[#e8e8ed]'
+                          }
+                        `}
+                      >
+                        <span className="text-lg mr-2">{mode.icon}</span>
+                        <span className="text-[14px] font-medium">{mode.name}</span>
+                        <p className={`text-[11px] mt-0.5 ${selectedMode === mode.id ? 'text-white/70' : 'text-[#86868b]'}`}>
+                          {mode.desc}
+                        </p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 {/* Room Type */}
                 <div className="text-center">
                   <label className="block text-[12px] font-medium text-[#86868b] uppercase tracking-[.1em] mb-4">
@@ -300,17 +477,22 @@ function GenerateContent() {
                         key={style.id}
                         onClick={() => setSelectedStyle(style.id)}
                         className={`
-                          px-5 py-2.5 rounded-full text-[14px] font-medium transition-all duration-200
+                          group relative px-5 py-2.5 rounded-full text-[14px] font-medium transition-all duration-200
                           ${selectedStyle === style.id
                             ? 'bg-[#1d1d1f] text-white'
                             : 'bg-[#f5f5f7] text-[#1d1d1f] hover:bg-[#e8e8ed]'
                           }
                         `}
+                        title={style.desc}
                       >
                         {style.name}
                       </button>
                     ))}
                   </div>
+                  {/* Style description */}
+                  <p className="mt-3 text-[13px] text-[#86868b]">
+                    {STYLES.find(s => s.id === selectedStyle)?.desc}
+                  </p>
                 </div>
               </div>
 
@@ -401,10 +583,19 @@ function GenerateContent() {
                       height={400}
                       className="w-full h-auto"
                     />
-                    {/* Watermark */}
+                    {/* Watermark Principal - InstaDeco */}
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                      <span className="text-white/25 text-[28px] font-semibold tracking-[.15em] rotate-[-12deg]">
-                        APERÇU
+                      <span 
+                        className="text-white/40 text-[32px] md:text-[48px] font-bold tracking-[.08em] rotate-[-15deg]"
+                        style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.2)' }}
+                      >
+                        InstaDeco
+                      </span>
+                    </div>
+                    {/* Mention IA - Tout petit en bas à droite */}
+                    <div className="absolute bottom-2 right-3 pointer-events-none">
+                      <span className="text-white/50 text-[9px] md:text-[10px]" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.4)' }}>
+                        Généré par IA
                       </span>
                     </div>
                   </div>

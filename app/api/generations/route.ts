@@ -5,21 +5,10 @@ import { adminDb } from '@/lib/firebase/admin';
  * GET /api/generations
  * 
  * Récupère les générations de l'utilisateur connecté
+ * Accepte userId en query param (authentification côté client via Firebase)
  */
 export async function GET(req: Request) {
   try {
-    // Récupérer l'userId depuis les headers (ajouté par le middleware d'auth)
-    const authHeader = req.headers.get('authorization');
-    
-    if (!authHeader) {
-      return NextResponse.json(
-        { error: 'Non authentifié' },
-        { status: 401 }
-      );
-    }
-
-    // Extraire le userId du token (simplifié - à améliorer avec vérification Firebase)
-    // Pour l'instant, on utilise un query param temporaire
     const url = new URL(req.url);
     const userId = url.searchParams.get('userId');
 
@@ -29,6 +18,8 @@ export async function GET(req: Request) {
         { status: 400 }
       );
     }
+    
+    console.log('[Generations] Chargement pour userId:', userId);
 
     // Récupérer les générations de l'utilisateur
     const generationsSnapshot = await adminDb
