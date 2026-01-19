@@ -111,8 +111,10 @@ function GenerateContent() {
       }
 
       const data = await response.json();
-      setRequestId(data.requestId);
-      pollStatus(data.requestId);
+      // Utiliser generationId (Firestore) pour le polling, pas requestId (Replicate)
+      const pollingId = data.generationId || data.requestId;
+      setRequestId(pollingId);
+      pollStatus(pollingId);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Une erreur est survenue';
       setError(message);
