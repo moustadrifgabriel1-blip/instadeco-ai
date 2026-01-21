@@ -8,6 +8,9 @@
 
 **🌐 Site en production** : [instadeco.app](https://instadeco.app)
 
+> **⚠️ IMPORTANT** : Déploiement immédiat obligatoire après chaque commit jusqu'au **21 mai 2026**  
+> `npx vercel --prod --yes` ou `./scripts/deploy.sh production`
+
 ---
 
 ## ✨ Fonctionnalités

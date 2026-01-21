@@ -1,5 +1,28 @@
 # 🎉 Déploiement InstaDeco v2.0 Réussi !
 
+## ⚠️ NOTE IMPORTANTE - DÉPLOIEMENT IMMÉDIAT REQUIS
+
+**🚨 PÉRIODE CRITIQUE : 21 janvier 2026 → 21 mai 2026**
+
+**RÈGLE OBLIGATOIRE** : Toutes les modifications doivent être **déployées immédiatement en production** après chaque commit pendant les 4 prochains mois.
+
+**Workflow à suivre** :
+```bash
+# 1. Faire les modifications
+# 2. Commiter
+git add .
+git commit -m "votre message"
+
+# 3. DÉPLOYER IMMÉDIATEMENT (obligatoire)
+npx vercel --prod --yes
+# OU
+./scripts/deploy.sh production
+```
+
+**Pourquoi ?** : Phase de lancement critique - déploiement continu requis pour tests et ajustements en temps réel.
+
+---
+
 ## ✅ Site Déployé
 
 **URL Production** : https://instadeco.app
