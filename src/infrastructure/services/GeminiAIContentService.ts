@@ -207,47 +207,152 @@ ${content.slice(0, 2000)}`;
   }
 
   private buildPrompt(options: ArticleGenerationOptions): string {
-    const minWords = options.minWords ?? 1200;
+    const minWords = options.minWords ?? 1800;
 
-    return `Tu es un expert en décoration d'intérieur et en rédaction SEO. 
-Rédige un article de blog COMPLET et OPTIMISÉ pour le thème: "${options.theme}"
+    return `Tu es un expert en décoration d'intérieur et en rédaction SEO professionnelle. 
+Rédige un article de blog UNIQUE, COMPLET et PARFAITEMENT OPTIMISÉ pour: "${options.theme}"
 
-## CONTEXTE
-- Site: InstaDeco AI - plateforme de décoration d'intérieur par IA
-- Cible: Particuliers francophones (Suisse, France, Belgique)
-- Langue: Français
-- Type de session associé: ${options.sessionType}
+## CONTEXTE & OBJECTIF
+- Site: InstaDeco AI - Plateforme IA de décoration (Suisse, France, Belgique)
+- But: Article SEO unique, naturel, non-détectable comme généré par IA
+- Session: ${options.sessionType}
 ${options.additionalInstructions ? `- Instructions: ${options.additionalInstructions}` : ''}
 
-## CONSIGNES DE RÉDACTION
+## ⚠️ RÈGLES D'UNICITÉ ABSOLUES
+1. JAMAIS utiliser de titres génériques type "Guide complet", "Tout savoir sur"
+2. TOUJOURS créer un angle UNIQUE et ORIGINAL
+3. VARIER systématiquement le vocabulaire (bannir répétitions)
+4. Créer un titre ACCROCHEUR et SPÉCIFIQUE (max 60 car, incluant mot-clé)
 
-### Structure obligatoire:
-1. **Titre H1** accrocheur avec le mot-clé principal (max 60 caractères)
-2. **Introduction** engageante (100-150 mots)
-3. **4-6 sections H2** avec sous-titres H3 si nécessaire
-4. **Conclusion** avec appel à l'action vers InstaDeco AI
-5. **FAQ** avec 3-4 questions/réponses pertinentes
+## 📐 STRUCTURE OBLIGATOIRE (Format HTML)
 
-### Style et ton:
-- Ton professionnel mais accessible, enthousiaste
-- Phrases courtes et dynamiques (max 25 mots par phrase)
-- Paragraphes de 3-4 lignes maximum
-- Utilisez "vous" pour s'adresser au lecteur
+### 1. TITRE H1 (unique, accrocheur, 50-60 caractères)
+Exemple: "5 Secrets pour Transformer Votre Salon en Havre Scandinave"
 
-### Optimisation SEO:
-- Mot-clé principal dans: titre H1, intro, 2 H2, conclusion
-- Densité mot-clé principal: 1-2%
-- Utilisez des synonymes et variations naturelles
+### 2. INTRODUCTION CAPTIVANTE (120-150 mots)
+- Accrocher le lecteur dès la 1ère phrase
+- Introduire naturellement le mot-clé
+- Poser une question ou problème concret
+- Annoncer la valeur ajoutée de l'article
 
-### Longueur:
-- MINIMUM ${minWords} mots
+### 3. SOMMAIRE INTERACTIF (HTML)
+\`\`\`html
+<div class="sommaire">
+<h2>Sommaire</h2>
+<ol>
+<li><a href="#section1">Titre Section 1</a></li>
+<li><a href="#section2">Titre Section 2</a></li>
+[...]
+</ol>
+</div>
+\`\`\`
 
-## FORMAT DE SORTIE (JSON)
+### 4. CORPS DE L'ARTICLE (4-7 sections)
+- **Chaque H2** avec id (ex: id="section1")
+- **Sous-titres H3** pour structurer
+- **Paragraphes courts** (3-4 lignes max)
+- **Listes à puces** pour la lisibilité
+- **Gras** sur mots-clés importants
+- **Exemples concrets** (prix, marques, dimensions)
+- **Emojis subtils** pour dynamiser (🏠 ✨ 💡)
 
-Réponds UNIQUEMENT avec un objet JSON valide (sans markdown, sans code blocks):
+### 5. IMAGES SUGGESTIONS (balises)
+Insérer 4-5 emplacements images avec:
+\`\`\`html
+<img src="placeholder" alt="Description SEO détaillée incluant mot-clé" title="Titre image">
+<figcaption>Légende descriptive</figcaption>
+\`\`\`
+
+### 6. FAQ OPTIMISÉE (4-5 Q/R, Schema.org)
+\`\`\`html
+<div class="faq" itemscope itemtype="https://schema.org/FAQPage">
+<h2>Questions Fréquentes</h2>
+<div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+<h3 itemprop="name">Question précise et naturelle ?</h3>
+<div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+<p itemprop="text">Réponse détaillée et utile (50-100 mots)</p>
+</div>
+</div>
+[répéter 4-5 fois]
+</div>
+\`\`\`
+
+### 7. CONCLUSION + CTA (100-120 mots)
+- Résumer les points clés
+- Appel action naturel vers InstaDeco AI
+- Encourager à essayer la plateforme
+- Lien: "Essayez InstaDeco AI gratuitement"
+
+### 8. SUGGESTIONS MAILLAGE INTERNE (3-5 liens)
+\`\`\`html
+<div class="articles-lies">
+<h3>Articles complémentaires</h3>
+<ul>
+<li><a href="/blog/[slug-suggeré]">Titre article lié pertinent</a></li>
+[répéter 3-5 fois avec vrais thèmes décoration]
+</ul>
+</div>
+\`\`\`
+
+## ✍️ STYLE ANTI-DÉTECTION IA
+
+### À FAIRE:
+✅ Varier longueur phrases (courtes/moyennes/longues)
+✅ Utiliser tournures personnelles ("je recommande", "d'expérience")
+✅ Inclure anecdotes, chiffres précis, exemples concrets
+✅ Poser questions rhétoriques au lecteur
+✅ Utiliser connecteurs naturels ("cependant", "par ailleurs", "en outre")
+✅ Insérer expressions idiomatiques françaises
+✅ Citer sources crédibles (sites déco reconnus)
+
+### À ÉVITER:
+❌ Répétitions de mots/structures
+❌ Transitions robotiques
+❌ Listes à puces systématiques sans prose
+❌ Ton trop formel ou académique
+❌ Formules génériques ("il est important de", "n'hésitez pas")
+
+## 🎯 OPTIMISATION SEO AVANCÉE
+
+### Mot-clé principal: "${options.theme}"
+- **Densité cible**: 1.5-2% (naturelle, pas forcée)
+- **Placements**: H1, intro (1ère phrase), 2 H2, conclusion, meta
+- **LSI keywords**: intégrer 8-10 synonymes/variantes
+- **Questions longue traîne**: répondre à 3-4 "comment", "pourquoi", "quel"
+
+### Balises sémantiques:
+- <strong> pour mots-clés importants
+- <em> pour nuances/emphases
+- <mark> pour points essentiels (à retenir)
+
+## 📏 CONTRAINTES TECHNIQUES
+
+- **Longueur minimale**: ${minWords} mots (sans HTML)
+- **Phrases**: 15-25 mots en moyenne (varier !)
+- **Paragraphes**: 50-80 mots max
+- **Lisibilité**: Score Flesch > 60 (accessible)
+
+## 📤 FORMAT SORTIE (JSON STRICT)
+
+Réponds UNIQUEMENT avec JSON valide (PAS de markdown, PAS de \`\`\`):
 
 {
-  "title": "Le titre H1 de l'article",
+  "title": "Titre H1 unique et accrocheur",
+  "content": "<p>Introduction...</p><div class='sommaire'>...</div><h2 id='section1'>...</h2><p>...</p>...<div class='faq'>...</div><p>Conclusion avec CTA...</p><div class='articles-lies'>...</div>",
+  "metaDescription": "Meta SEO 150-160 caractères incluant mot-clé",
+  "slug": "url-slug-optimise-seo",
+  "tags": ["tag1", "tag2", "tag3", "tag4", "tag5"]
+}
+
+## ⚡ EXEMPLES DE TITRES UNIQUES (inspiration)
+
+❌ Mauvais: "Guide Complet de la Décoration Scandinave"
+✅ Bon: "7 Secrets Nordiques pour un Salon Hygge Inoubliable"
+
+❌ Mauvais: "Comment Décorer sa Chambre"  
+✅ Bon: "Transformez Votre Chambre en Sanctuaire : 5 Astuces de Pro"
+
+Maintenant, rédige l'article COMPLET, UNIQUE et PARFAITEMENT OPTIMISÉ !`;
   "metaDescription": "Description meta SEO de 150-160 caractères",
   "slug": "le-slug-url-optimise",
   "content": "Le contenu complet en Markdown",
