@@ -10,10 +10,11 @@ import { SupabaseBlogArticleRepository } from '@/src/infrastructure/repositories
 import { ListBlogArticlesUseCase } from '@/src/application/use-cases/blog/ListBlogArticlesUseCase';
 
 export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic'; // Force dynamic rendering
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
+    const searchParams = request.nextUrl.searchParams;
     
     // Paramètres de pagination
     const page = parseInt(searchParams.get('page') || '1', 10);
