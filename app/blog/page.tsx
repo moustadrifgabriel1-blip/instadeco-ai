@@ -8,6 +8,9 @@ import { Suspense } from 'react';
 import { Metadata } from 'next';
 import { Newspaper } from 'lucide-react';
 import { ArticleCard, ArticleCardSkeleton, BlogSidebar, Pagination } from '@/components/features/blog';
+import { SupabaseBlogArticleRepository } from '@/src/infrastructure/repositories/SupabaseBlogArticleRepository';
+import { ListBlogArticlesUseCase } from '@/src/application/use-cases/blog/ListBlogArticlesUseCase';
+import { BlogArticleMapper } from '@/src/application/mappers/BlogArticleMapper';
 
 // Métadonnées SEO
 export const metadata: Metadata = {
@@ -44,27 +47,34 @@ interface BlogPageProps {
 
 // Fonction pour récupérer les articles
 async function getArticles(page: number, tag?: string, search?: string) {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://instadeco.app';
-  const params = new URLSearchParams({
-    page: page.toString(),
-    limit: '9',
-  });
-
-  if (tag) params.set('tag', tag);
-  if (search) params.set('search', search);
-
   try {
-    const response = await fetch(`${baseUrl}/api/blog/articles?${params}`, {
-      next: { revalidate: 60 }, // Revalidate toutes les 60 secondes
+    const repository = new SupabaseBlogArticleRepository();
+    const useCase = new ListBlogArticlesUseCase(repository);
+
+    const result = await useCase.execute({
+      page,
+      limit: 9,
+      status: 'published',
+      tags: tag ? [tag] : undefined,
+      search,
     });
 
-    if (!response.ok) {
-      console.error('Failed to fetch articles:', response.status);
-      return { data: [], pagination: { page: 1, limit: 9, total: 0, totalPages: 0 } };
-    }
-
-    const result = await response.json();
-    return result;
+    return {
+      data: result.articles.map(a => ({
+        ...a,
+        // Ensure dates are strings for serialization if needed, though DTO usually provides strings/dates.
+        // BlogArticleDTO defines publishedAt as Date | string. Next.js server components handle Date objects fine usually,
+        // but if we pass to Client Components we might need serialization.
+        // ArticleCard expects string
+        publishedAt: typeof a.publishedAt === 'string' ? a.publishedAt : new Date(a.publishedAt).toISOString()
+      })),
+      pagination: {
+        page: result.page,
+        limit: result.limit,
+        total: result.total,
+        totalPages: result.totalPages
+      }
+    };
   } catch (error) {
     console.error('Error fetching articles:', error);
     return { data: [], pagination: { page: 1, limit: 9, total: 0, totalPages: 0 } };
@@ -73,34 +83,28 @@ async function getArticles(page: number, tag?: string, search?: string) {
 
 // Fonction pour récupérer les données du sidebar
 async function getSidebarData() {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://instadeco.app';
-
   try {
-    const response = await fetch(`${baseUrl}/api/blog/articles?limit=5`, {
-      next: { revalidate: 300 }, // Revalidate toutes les 5 minutes
+    const repository = new SupabaseBlogArticleRepository();
+    const useCase = new ListBlogArticlesUseCase(repository);
+
+    // Récupérer les 5 derniers articles pour la sidebar
+    const result = await useCase.execute({
+      limit: 5,
+      status: 'published',
+      sortBy: 'publishedAt',
+      sortOrder: 'desc'
     });
 
-    if (!response.ok) {
-      return { recentArticles: [], popularTags: [] };
-    }
-
-    const data = await response.json();
-    
-    // Extraire les articles récents
-    const recentArticles = data.data?.map((article: {
-      slug: string;
-      title: string;
-      publishedAt: string;
-    }) => ({
+    const recentArticles = result.articles.map(article => ({
       slug: article.slug,
       title: article.title,
-      publishedAt: article.publishedAt,
-    })) || [];
+      publishedAt: typeof article.publishedAt === 'string' ? article.publishedAt : new Date(article.publishedAt).toISOString(),
+    }));
 
-    // Extraire les tags populaires (comptage)
+    // Extraire les tags populaires (comptage sur les articles récents)
     const tagCounts: Record<string, number> = {};
-    data.data?.forEach((article: { tags: string[] }) => {
-      article.tags?.forEach((tag: string) => {
+    result.articles.forEach(article => {
+      article.tags?.forEach(tag => {
         tagCounts[tag] = (tagCounts[tag] || 0) + 1;
       });
     });

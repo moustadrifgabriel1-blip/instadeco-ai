@@ -14,13 +14,19 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { ArticleCard } from '@/components/features/blog';
 
+import { SupabaseBlogArticleRepository } from '@/src/infrastructure/repositories/SupabaseBlogArticleRepository';
+import { GetBlogArticleBySlugUseCase } from '@/src/application/use-cases/blog/GetBlogArticleBySlugUseCase';
+import { BlogArticleMapper } from '@/src/application/mappers/BlogArticleMapper';
+
+export const dynamic = 'force-dynamic';
+
 interface ArticlePageProps {
   params: Promise<{
     slug: string;
   }>;
 }
 
-// Type pour l'article
+// Type pour l'article (adapté du DTO)
 interface ArticleData {
   id: string;
   title: string;
@@ -46,25 +52,51 @@ interface ArticleData {
 
 // Fonction pour récupérer un article
 async function getArticle(slug: string): Promise<ArticleData | null> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-
   try {
-    const response = await fetch(`${baseUrl}/api/blog/${slug}`, {
-      next: { revalidate: 60 },
+    const repository = new SupabaseBlogArticleRepository();
+    const useCase = new GetBlogArticleBySlugUseCase(repository);
+
+    const result = await useCase.execute({
+      slug,
+      includeRelated: true,
+      relatedLimit: 3
     });
 
-    if (!response.ok) {
-      if (response.status === 404) {
-        return null;
-      }
-      console.error('Failed to fetch article:', response.status);
+    if (!result.article) {
+      console.log(`[getArticle] Article not found for slug: ${slug}`);
       return null;
     }
 
-    const data = await response.json();
-    return data.article;
+    // Mapper manuellement ou utiliser le Mapper existant pour conformer à l'interface
+    // Ici on adapte l'entité au format attendu par la page
+    const articleDTO = BlogArticleMapper.toDTO(result.article);
+    
+    // Convertir les dates en string pour l'interface locale
+    const articleData: ArticleData = {
+      ...articleDTO,
+      publishedAt: typeof result.article.publishedAt === 'string' 
+        ? result.article.publishedAt 
+        : new Date(result.article.publishedAt).toISOString(),
+      internalLinks: result.article.internalLinks || [],
+      // Mapper les articles liés
+      relatedArticles: result.relatedArticles?.map(related => {
+        const relatedDTO = BlogArticleMapper.toDTO(related);
+        return {
+          ...relatedDTO,
+          publishedAt: typeof related.publishedAt === 'string'
+            ? related.publishedAt
+            : new Date(related.publishedAt).toISOString()
+        };
+      })
+    };
+
+    return articleData;
   } catch (error) {
     console.error('Error fetching article:', error);
+    if (error instanceof Error) {
+        console.error('Error message:', error.message);
+        console.error('Error stack:', error.stack);
+    }
     return null;
   }
 }
@@ -127,7 +159,8 @@ function ArticleContent({ content }: { content: string }) {
 
 // Page principale
 export default async function ArticlePage({ params }: ArticlePageProps) {
-  const { slug } = await params;
+  const resolvedParams = await params;
+  const slug = decodeURIComponent(resolvedParams.slug);
   const article = await getArticle(slug);
 
   if (!article) {
