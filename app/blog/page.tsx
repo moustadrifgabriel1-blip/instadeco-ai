@@ -60,13 +60,14 @@ async function getArticles(page: number, tag?: string, search?: string) {
 
     if (!response.ok) {
       console.error('Failed to fetch articles:', response.status);
-      return { articles: [], pagination: { page: 1, limit: 9, total: 0, totalPages: 0 } };
+      return { data: [], pagination: { page: 1, limit: 9, total: 0, totalPages: 0 } };
     }
 
-    return response.json();
+    const result = await response.json();
+    return result;
   } catch (error) {
     console.error('Error fetching articles:', error);
-    return { articles: [], pagination: { page: 1, limit: 9, total: 0, totalPages: 0 } };
+    return { data: [], pagination: { page: 1, limit: 9, total: 0, totalPages: 0 } };
   }
 }
 
@@ -86,7 +87,7 @@ async function getSidebarData() {
     const data = await response.json();
     
     // Extraire les articles récents
-    const recentArticles = data.articles?.map((article: {
+    const recentArticles = data.data?.map((article: {
       slug: string;
       title: string;
       publishedAt: string;
@@ -98,7 +99,7 @@ async function getSidebarData() {
 
     // Extraire les tags populaires (comptage)
     const tagCounts: Record<string, number> = {};
-    data.articles?.forEach((article: { tags: string[] }) => {
+    data.data?.forEach((article: { tags: string[] }) => {
       article.tags?.forEach((tag: string) => {
         tagCounts[tag] = (tagCounts[tag] || 0) + 1;
       });
@@ -176,7 +177,8 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
     getSidebarData(),
   ]);
 
-  const { articles, pagination } = articlesData;
+  const articles = articlesData.data || [];
+  const pagination = articlesData.pagination;
   const { recentArticles, popularTags } = sidebarData;
 
   return (
