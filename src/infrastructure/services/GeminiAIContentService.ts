@@ -22,10 +22,11 @@ interface GeminiResponse {
 
 export class GeminiAIContentService implements IAIContentService {
   private apiKey: string;
-  private baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent';
+  private baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
 
   constructor() {
     this.apiKey = process.env.GEMINI_API_KEY || '';
+    console.log('[GeminiAIContentService] API Key présente:', !!this.apiKey, 'Longueur:', this.apiKey.length);
     if (!this.apiKey) {
       console.warn('GEMINI_API_KEY non configurée - le service ne fonctionnera pas');
     }
