@@ -1,15 +1,79 @@
-# 🏠 InstantDecor AI
+# 🏠 InstaDeco AI
 
-**SaaS B2C de décoration d'intérieur par IA** - Transformez vos photos de pièces en rendus décorés professionnels grâce à Flux.1 + ControlNet.
+**SaaS B2C de décoration d'intérieur par IA** - Transformez vos photos de pièces en rendus décorés professionnels grâce à l'intelligence artificielle.
 
-## 🚀 Stack Technique
+[![Déployé sur Vercel](https://img.shields.io/badge/Déployé%20sur-Vercel-black?style=flat&logo=vercel)](https://instadeco.app)
+[![Next.js 14](https://img.shields.io/badge/Next.js-14-black?style=flat&logo=next.js)](https://nextjs.org)
+[![Supabase](https://img.shields.io/badge/Supabase-Database-green?style=flat&logo=supabase)](https://supabase.com)
 
-- **Frontend:** Next.js 14 (App Router) + TypeScript + Tailwind CSS
-- **UI:** Shadcn/UI (Radix UI)
-- **Backend:** Next.js API Routes + Firebase Functions
-- **Database:** Firebase Firestore + Firebase Auth + Firebase Storage
-- **IA:** Fal.ai (Flux.1 [dev] + ControlNet)
-- **Paiements:** Stripe (modèle de crédits)
+**🌐 Site en production** : [instadeco.app](https://instadeco.app)
+
+---
+
+## ✨ Fonctionnalités
+
+- 🎨 **Génération IA** : Transformez vos intérieurs avec Flux.1 Canny Pro (Replicate)
+## 📁 Structure du Projet
+
+```
+/app                     # Next.js App Router
+  /(auth)               # Routes authentification (login, signup)
+  /(dashboard)          # Routes protégées (dashboard)
+  /(marketing)          # Routes publiques (generate, pricing)
+  /api/v2               # API Routes v2 (generations, credits, payments)
+  /api/blog             # API Blog (articles, sitemap)
+  /api/cron             # Cron Jobs (génération articles)
+  /blog                 # Pages blog (/blog, /blog/[slug])
+  sitemap.ts            # Sitemap dynamique
+  robots.ts             # Robots.txt dynamique
+
+/src                     # Architecture Hexagonale
+  /domain               # Couche Domain (entities, ports, value-objects)
+  /application          # Couche Application (use-cases, DTOs, mappers)
+  /infrastructure       # Couche Infrastructure (repositories, services)
+  /presentation         # Couche Presentation (hooks, components)
+  /shared               # Code partagé (types, constants)
+
+/components              # Composants React
+  /ui                   # Composants Shadcn/UI réutilisables
+  /layout               # Header, Footer, Layout
+  /features             # Composants métier (blog, credits, generations)
+
+/lib                     # Clients et utilitaires
+  /supabase             # Clients Supabase (client, server, admin)
+  /utils                # Fonctions utilitaires
+
+/docs                    # Documentation complète
+  CONTEXT.md            # Architecture et contexte (v2.0.0)
+  BLOG_INTEGRATION.md   # Guide intégration blog
+  POST_DEPLOYMENT.md    # Checklist post-déploiement
+  LINKS.md              # URLs et dashboards
+
+/scripts                 # Scripts utilitaires
+  deploy.sh             # Script de déploiement Vercel
+  test-blog-generation.sh # Test génération articles
+```
+
+---
+
+## 🛠️ Installation
+
+### 1. Cloner et installer
+
+```bash
+# Cloner le repo
+git clone https://github.com/votre-org/instadeco.git
+cd instadeco
+
+# Installer les dépendances
+npm install
+
+# Copier les variables d'environnement
+cp .env.example .env.local
+```
+
+### 2. Configurer Supa
+---
 
 ## 📁 Structure du Projet
 
