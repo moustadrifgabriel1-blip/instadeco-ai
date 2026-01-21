@@ -26,6 +26,10 @@ function verifyCronSecret(request: NextRequest): boolean {
   const authHeader = request.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;
 
+  console.log('[DEBUG] CRON_SECRET présent:', !!cronSecret, 'Longueur:', cronSecret?.length);
+  console.log('[DEBUG] authHeader:', authHeader?.slice(0, 20) + '...');
+  console.log('[DEBUG] Expected:', `Bearer ${cronSecret?.slice(0, 20)}...`);
+
   if (!cronSecret) {
     console.error('CRON_SECRET non configuré');
     return false;
@@ -33,6 +37,7 @@ function verifyCronSecret(request: NextRequest): boolean {
 
   // Vercel envoie le secret dans le header Authorization
   if (authHeader === `Bearer ${cronSecret}`) {
+    console.log('[DEBUG] Auth réussie via Bearer token');
     return true;
   }
 
@@ -40,9 +45,13 @@ function verifyCronSecret(request: NextRequest): boolean {
   if (process.env.NODE_ENV === 'development') {
     const url = new URL(request.url);
     const secretParam = url.searchParams.get('secret');
-    return secretParam === cronSecret;
+    if (secretParam === cronSecret) {
+      console.log('[DEBUG] Auth réussie via query param');
+      return true;
+    }
   }
 
+  console.error('[DEBUG] Auth échouée');
   return false;
 }
 
