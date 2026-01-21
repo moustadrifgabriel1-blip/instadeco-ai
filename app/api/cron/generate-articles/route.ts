@@ -142,7 +142,7 @@ export async function GET(request: NextRequest) {
       metaDescription: generatedContent.metaDescription,
       tags: generatedContent.tags,
       sessionType: getSessionTypeFromTime(),
-      antiAIScore: antiAIResult.score,
+      antiAIScore: Math.round(antiAIResult.score),
       source: 'automation',
     });
 
