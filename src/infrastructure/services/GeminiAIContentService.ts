@@ -346,20 +346,13 @@ Réponds UNIQUEMENT avec JSON valide (PAS de markdown, PAS de \`\`\`):
 
 ## ⚡ EXEMPLES DE TITRES UNIQUES (inspiration)
 
-❌ Mauvais: "Guide Complet de la Décoration Scandinave"
-✅ Bon: "7 Secrets Nordiques pour un Salon Hygge Inoubliable"
+Mauvais: "Guide Complet de la Décoration Scandinave"
+Bon: "7 Secrets Nordiques pour un Salon Hygge Inoubliable"
 
-❌ Mauvais: "Comment Décorer sa Chambre"  
-✅ Bon: "Transformez Votre Chambre en Sanctuaire : 5 Astuces de Pro"
+Mauvais: "Comment Décorer sa Chambre"  
+Bon: "Transformez Votre Chambre en Sanctuaire : 5 Astuces de Pro"
 
 Maintenant, rédige l'article COMPLET, UNIQUE et PARFAITEMENT OPTIMISÉ !`;
-  "metaDescription": "Description meta SEO de 150-160 caractères",
-  "slug": "le-slug-url-optimise",
-  "content": "Le contenu complet en Markdown",
-  "tags": ["tag1", "tag2", "tag3", "tag4", "tag5"]
-}
-
-IMPORTANT: Le contenu doit être en Markdown valide.`;
   }
 
   private parseGeneratedContent(
