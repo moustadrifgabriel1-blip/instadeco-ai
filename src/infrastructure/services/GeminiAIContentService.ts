@@ -290,8 +290,33 @@ IMPORTANT: Le contenu doit être en Markdown valide.`;
       };
     } catch (parseError) {
       console.error('Erreur parsing JSON Gemini:', parseError);
+      console.error('Contenu brut (premiers 500 chars):', cleanContent.slice(0, 500));
 
-      // Fallback: extraire les parties essentielles
+      // Fallback: utiliser une regex plus robuste pour extraire le JSON
+      // Chercher le premier objet JSON valide dans la réponse
+      const jsonMatch = cleanContent.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        try {
+          // Essayer de parser ce qu'on a trouvé
+          const parsed = JSON.parse(jsonMatch[0]);
+          if (parsed.title && parsed.content) {
+            const slug = parsed.slug || this.generateSlug(parsed.title);
+            return {
+              title: parsed.title.trim(),
+              content: parsed.content.trim(),
+              metaDescription: (parsed.metaDescription || parsed.title).trim().slice(0, 160),
+              slug: slug,
+              tags: Array.isArray(parsed.tags)
+                ? parsed.tags.map((t: string) => t.trim().toLowerCase())
+                : [options.theme.toLowerCase()],
+            };
+          }
+        } catch {
+          // Si ça échoue encore, continuer au fallback manuel
+        }
+      }
+
+      // Fallback manuel: extraire les parties essentielles avec regex
       const titleMatch = cleanContent.match(/"title"\s*:\s*"([^"]+)"/);
       const contentMatch = cleanContent.match(/"content"\s*:\s*"([\s\S]+?)(?:",\s*"|"\s*})/);
       const metaMatch = cleanContent.match(/"metaDescription"\s*:\s*"([^"]+)"/);
