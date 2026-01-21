@@ -89,7 +89,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
       title: article.title,
       description: article.metaDescription,
       type: 'article',
-      url: `https://instadeco.ai/blog/${article.slug}`,
+      url: `https://instadeco.app/blog/${article.slug}`,
       publishedTime: article.publishedAt,
       authors: ['InstaDeco AI'],
       tags: article.tags,
@@ -100,7 +100,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
       description: article.metaDescription,
     },
     alternates: {
-      canonical: `https://instadeco.ai/blog/${article.slug}`,
+      canonical: `https://instadeco.app/blog/${article.slug}`,
     },
   };
 }

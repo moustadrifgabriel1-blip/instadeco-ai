@@ -21,7 +21,7 @@ export class SEONotificationService implements ISEONotificationService {
 
   constructor() {
     this.indexNowKey = process.env.INDEXNOW_KEY || '';
-    this.siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://instadeco.ai';
+    this.siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://instadeco.app';
 
     if (!this.indexNowKey) {
       console.warn('INDEXNOW_KEY non configurée - les notifications SEO seront limitées');

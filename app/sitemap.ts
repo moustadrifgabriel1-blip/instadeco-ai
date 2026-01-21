@@ -10,7 +10,7 @@ import { MetadataRoute } from 'next';
  * @see https://nextjs.org/docs/app/api-reference/file-conventions/metadata/sitemap
  */
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://instadeco.ai';
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://instadeco.app';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();

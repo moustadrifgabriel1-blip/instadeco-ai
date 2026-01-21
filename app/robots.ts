@@ -10,7 +10,7 @@ import { MetadataRoute } from 'next';
  * @see https://nextjs.org/docs/app/api-reference/file-conventions/metadata/robots
  */
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://instadeco.ai';
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://instadeco.app';
 
 export default function robots(): MetadataRoute.Robots {
   return {

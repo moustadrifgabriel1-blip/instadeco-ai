@@ -150,7 +150,7 @@ export async function GET(request: NextRequest) {
     const savedArticle = await repository.save(article);
 
     // 11. Notifier les moteurs de recherche
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://instadeco.ai';
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://instadeco.app';
     const articleUrl = `${siteUrl}/blog/${savedArticle.slug}`;
     
     const seoResults = await seoService.notifyAll(articleUrl);

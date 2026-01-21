@@ -5,7 +5,7 @@ import { Header, Footer } from '@/components/layout';
 
 const inter = Inter({ subsets: ['latin'] });
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://instadeco.ai';
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://instadeco.app';
 
 export const metadata: Metadata = {
   // ============================================

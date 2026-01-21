@@ -27,10 +27,10 @@ export const metadata: Metadata = {
     title: 'Blog Décoration Intérieure | InstaDeco AI',
     description: 'Conseils, tendances et inspirations pour transformer votre intérieur.',
     type: 'website',
-    url: 'https://instadeco.ai/blog',
+    url: 'https://instadeco.app/blog',
   },
   alternates: {
-    canonical: 'https://instadeco.ai/blog',
+    canonical: 'https://instadeco.app/blog',
   },
 };
 
@@ -44,7 +44,7 @@ interface BlogPageProps {
 
 // Fonction pour récupérer les articles
 async function getArticles(page: number, tag?: string, search?: string) {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://instadeco.app';
   const params = new URLSearchParams({
     page: page.toString(),
     limit: '9',
@@ -72,7 +72,7 @@ async function getArticles(page: number, tag?: string, search?: string) {
 
 // Fonction pour récupérer les données du sidebar
 async function getSidebarData() {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://instadeco.app';
 
   try {
     const response = await fetch(`${baseUrl}/api/blog/articles?limit=5`, {
@@ -247,11 +247,11 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
             '@type': 'Blog',
             name: 'Blog InstaDeco AI',
             description: 'Conseils et tendances en décoration intérieure',
-            url: 'https://instadeco.ai/blog',
+            url: 'https://instadeco.app/blog',
             publisher: {
               '@type': 'Organization',
               name: 'InstaDeco AI',
-              url: 'https://instadeco.ai',
+              url: 'https://instadeco.app',
             },
             blogPost: articles.slice(0, 10).map((article: {
               title: string;
@@ -261,7 +261,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
             }) => ({
               '@type': 'BlogPosting',
               headline: article.title,
-              url: `https://instadeco.ai/blog/${article.slug}`,
+              url: `https://instadeco.app/blog/${article.slug}`,
               description: article.metaDescription,
               datePublished: article.publishedAt,
             })),

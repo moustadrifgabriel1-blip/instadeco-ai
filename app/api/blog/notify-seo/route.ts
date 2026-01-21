@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
 
     const repository = new SupabaseBlogArticleRepository();
     const seoService = new SEONotificationService();
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://instadeco.ai';
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://instadeco.app';
 
     // Mode 1: Notifier un article spécifique
     if (slug) {
