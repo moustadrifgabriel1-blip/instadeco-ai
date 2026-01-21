@@ -1,14 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { doc, onSnapshot } from 'firebase/firestore';
-import { db } from '@/lib/firebase/config';
+import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 
 export function CreditBadge() {
   const { user } = useAuth();
   const [credits, setCredits] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
+  const supabase = createClient();
 
   useEffect(() => {
     if (!user) {
@@ -17,29 +17,47 @@ export function CreditBadge() {
       return;
     }
 
-    // Écoute en temps réel du solde de crédits
-    const unsubscribe = onSnapshot(
-      doc(db, 'users', user.uid),
-      (doc) => {
-        console.log('[CreditBadge] Document snapshot:', doc.exists(), doc.data());
-        if (doc.exists()) {
-          const creditsValue = doc.data().credits || 0;
-          console.log('[CreditBadge] Credits found:', creditsValue);
-          setCredits(creditsValue);
-        } else {
-          console.warn('[CreditBadge] ⚠️ User document does not exist in Firestore!');
-          setCredits(0);
-        }
-        setLoading(false);
-      },
-      (error) => {
-        console.error('[CreditBadge] Error fetching credits:', error);
-        setLoading(false);
-      }
-    );
+    // Récupérer les crédits initiaux
+    const fetchCredits = async () => {
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('credits')
+        .eq('id', user.id)
+        .single();
 
-    return () => unsubscribe();
-  }, [user]);
+      if (error) {
+        console.error('[CreditBadge] Error fetching credits:', error);
+        setCredits(0);
+      } else {
+        setCredits(profile?.credits || 0);
+      }
+      setLoading(false);
+    };
+
+    fetchCredits();
+
+    // Écouter les changements en temps réel
+    const channel = supabase
+      .channel(`credits-${user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'profiles',
+          filter: `id=eq.${user.id}`,
+        },
+        (payload) => {
+          console.log('[CreditBadge] Credits updated:', payload.new);
+          setCredits((payload.new as { credits: number }).credits || 0);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, supabase]);
 
   if (loading) {
     return (

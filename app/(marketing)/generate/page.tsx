@@ -1,36 +1,15 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import Image from 'next/image';
 import { Plus, X, ArrowRight, Download, Check } from 'lucide-react';
 import { ProtectedRoute } from '@/components/features/protected-route';
-import { CreditBadge } from '@/components/features/credit-badge';
 import { useAuth } from '@/hooks/use-auth';
-
-// Styles de décoration disponibles - MEGA PROMPTS pour transformation complète
-const STYLES = [
-  { id: 'moderne', name: 'Moderne', desc: 'Élégance contemporaine sophistiquée' },
-  { id: 'minimaliste', name: 'Minimaliste', desc: 'Simplicité scandinave épurée' },
-  { id: 'boheme', name: 'Bohème', desc: 'Chaleur éclectique globe-trotter' },
-  { id: 'industriel', name: 'Industriel', desc: 'Loft urbain brut et raffiné' },
-  { id: 'classique', name: 'Classique', desc: 'Élégance traditionnelle intemporelle' },
-  { id: 'japandi', name: 'Japandi', desc: 'Zen japonais & cocooning nordique' },
-  { id: 'midcentury', name: 'Mid-Century', desc: 'Rétro iconique années 50-60' },
-  { id: 'coastal', name: 'Coastal', desc: 'Bord de mer relaxant et lumineux' },
-  { id: 'farmhouse', name: 'Farmhouse', desc: 'Charme rustique contemporain' },
-  { id: 'artdeco', name: 'Art Déco', desc: 'Glamour opulent années 1920' },
-];
-
-// Types de pièces
-const ROOM_TYPES = [
-  { id: 'salon', name: 'Salon' },
-  { id: 'chambre', name: 'Chambre' },
-  { id: 'cuisine', name: 'Cuisine' },
-  { id: 'salle-de-bain', name: 'Salle de bain' },
-  { id: 'bureau', name: 'Bureau' },
-  { id: 'salle-a-manger', name: 'Salle à manger' },
-];
+import { useGenerate } from '@/src/presentation/hooks/useGenerate';
+import { useHDUnlock } from '@/src/presentation/hooks/useHDUnlock';
+import { useGenerationStatus } from '@/src/presentation/hooks/useGenerationStatus';
+import { STYLES, ROOM_TYPES } from '@/src/shared/constants';
 
 // Modes de transformation
 const TRANSFORM_MODES = [
@@ -54,7 +33,7 @@ const TRANSFORM_MODES = [
   },
 ];
 
-export default function GeneratePage() {
+export default function GeneratePageV2() {
   return (
     <ProtectedRoute>
       <GenerateContent />
@@ -63,17 +42,37 @@ export default function GeneratePage() {
 }
 
 function GenerateContent() {
-  const { user } = useAuth();
+  const { user, credits } = useAuth();
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [selectedStyle, setSelectedStyle] = useState('moderne');
   const [selectedRoomType, setSelectedRoomType] = useState('salon');
   const [selectedMode, setSelectedMode] = useState('full_redesign');
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
-  const [generationId, setGenerationId] = useState<string | null>(null); // ID Firestore de la génération
-  const [error, setError] = useState<string | null>(null);
+  const [generationId, setGenerationId] = useState<string | null>(null);
+
+  // Hooks de la couche Presentation
+  const { generate, state: generateState, reset: resetGenerate } = useGenerate();
+  const { unlock, isLoading: isUnlocking, error: hdError } = useHDUnlock();
+  
+  // Polling du statut de génération
+  const { 
+    generation: statusGeneration, 
+    isComplete, 
+    isFailed 
+  } = useGenerationStatus(generationId);
+
+  // États dérivés
+  const isGenerating = generateState.isLoading || (generationId && !isComplete && !isFailed);
+  const progress = generateState.progress;
+  const generatedImage = statusGeneration?.outputImageUrl || null;
+  const error = generateState.error || hdError || (isFailed ? 'La génération a échoué' : null);
+
+  // Quand la génération démarre, stocker l'ID pour le polling
+  useEffect(() => {
+    if (generateState.data?.id) {
+      setGenerationId(generateState.data.id);
+    }
+  }, [generateState.data?.id]);
 
   // Upload d'image avec drag & drop
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -81,10 +80,10 @@ function GenerateContent() {
     if (file) {
       setImageFile(file);
       setImagePreview(URL.createObjectURL(file));
-      setGeneratedImage(null);
-      setError(null);
+      resetGenerate();
+      setGenerationId(null);
     }
-  }, []);
+  }, [resetGenerate]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -98,80 +97,19 @@ function GenerateContent() {
   const removeImage = () => {
     setImageFile(null);
     setImagePreview(null);
-    setGeneratedImage(null);
-    setError(null);
+    resetGenerate();
+    setGenerationId(null);
   };
 
   const handleGenerate = async () => {
     if (!imageFile || !user) return;
-
-    setIsGenerating(true);
-    setProgress(0);
-    setError(null);
-
-    try {
-      const base64 = await fileToBase64(imageFile);
-
-      const response = await fetch('/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          imageUrl: base64,
-          roomType: selectedRoomType,
-          style: selectedStyle,
-          controlMode: 'canny',
-          transformMode: selectedMode, // Mode de transformation (full_redesign, keep_layout, decor_only)
-          userId: user.uid, // Ajout de l'ID utilisateur
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        
-        // Gérer spécifiquement l'erreur de crédits insuffisants
-        if (errorData.code === 'INSUFFICIENT_CREDITS') {
-          throw new Error('Crédits insuffisants. Rechargez votre compte pour continuer.');
-        }
-        
-        throw new Error(errorData.error || 'Erreur lors de la génération');
-      }
-
-      const data = await response.json();
-      // Utiliser generationId (Firestore) pour le polling, pas requestId (Replicate)
-      const pollingId = data.generationId || data.requestId;
-      setGenerationId(pollingId);
-      pollStatus(pollingId);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Une erreur est survenue';
-      setError(message);
-      setIsGenerating(false);
-    }
-  };
-
-  const pollStatus = async (id: string) => {
-    const interval = setInterval(async () => {
-      try {
-        const response = await fetch(`/api/generate/${id}/status`);
-        const data = await response.json();
-
-        if (data.status === 'completed') {
-          clearInterval(interval);
-          setGeneratedImage(data.outputImageUrl);
-          setIsGenerating(false);
-          setProgress(100);
-        } else if (data.status === 'failed') {
-          clearInterval(interval);
-          setError('La génération a échoué.');
-          setIsGenerating(false);
-        } else {
-          setProgress((prev) => Math.min(prev + 8, 95));
-        }
-      } catch (err) {
-        clearInterval(interval);
-        setError('Erreur de connexion.');
-        setIsGenerating(false);
-      }
-    }, 2000);
+    
+    // Utiliser le hook generate
+    await generate({
+      imageFile,
+      roomType: selectedRoomType,
+      style: selectedStyle,
+    });
   };
 
   // Fonction pour ajouter le filigrane sur l'image
@@ -188,69 +126,53 @@ function GenerateContent() {
           return;
         }
         
-        // Définir les dimensions du canvas
         canvas.width = img.width;
         canvas.height = img.height;
-        
-        // Dessiner l'image originale
         ctx.drawImage(img, 0, 0);
         
-        // ===== FILIGRANE PRINCIPAL "InstaDeco" =====
-        // Configurer le texte principal (gros et semi-transparent)
+        // Filigrane principal
         const mainText = 'InstaDeco';
-        const fontSize = Math.max(img.width / 8, 60); // Taille adaptative, minimum 60px
+        const fontSize = Math.max(img.width / 8, 60);
         ctx.font = `bold ${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         
-        // Position au centre
         const centerX = img.width / 2;
         const centerY = img.height / 2;
         
-        // Rotation légère
         ctx.save();
         ctx.translate(centerX, centerY);
-        ctx.rotate(-15 * Math.PI / 180); // -15 degrés
+        ctx.rotate(-15 * Math.PI / 180);
         
-        // Ombre pour lisibilité
         ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
         ctx.shadowBlur = 10;
         ctx.shadowOffsetX = 2;
         ctx.shadowOffsetY = 2;
         
-        // Texte principal semi-transparent (plus foncé qu'avant)
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.45)'; // 45% opacité (était 25%)
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
         ctx.fillText(mainText, 0, 0);
         
-        // Contour pour plus de visibilité
         ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
         ctx.lineWidth = 2;
         ctx.strokeText(mainText, 0, 0);
         
         ctx.restore();
         
-        // ===== MENTION "Généré par IA" en bas à droite =====
+        // Mention IA
         const aiText = 'Généré par IA';
-        const aiFontSize = Math.max(img.width / 50, 12); // Tout petit, minimum 12px
+        const aiFontSize = Math.max(img.width / 50, 12);
         ctx.font = `${aiFontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
         ctx.textAlign = 'right';
         ctx.textBaseline = 'bottom';
         
-        // Position en bas à droite avec marge
-        const marginRight = 15;
-        const marginBottom = 10;
-        
-        // Réinitialiser les ombres
         ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
         ctx.shadowBlur = 3;
         ctx.shadowOffsetX = 1;
         ctx.shadowOffsetY = 1;
         
-        // Texte discret
         ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-        ctx.fillText(aiText, img.width - marginRight, img.height - marginBottom);
+        ctx.fillText(aiText, img.width - 15, img.height - 10);
         
-        // Convertir en blob et créer une URL
         canvas.toBlob((blob) => {
           if (blob) {
             resolve(URL.createObjectURL(blob));
@@ -268,25 +190,18 @@ function GenerateContent() {
     });
   };
 
-  // Télécharger l'image avec filigrane
   const handleDownload = async () => {
     if (!generatedImage) return;
     
     try {
-      // Ajouter le filigrane
       const watermarkedUrl = await addWatermarkToImage(generatedImage);
-      
-      // Télécharger
       const link = document.createElement('a');
       link.href = watermarkedUrl;
       link.download = 'instadeco-apercu.jpg';
       link.click();
-      
-      // Nettoyer l'URL blob après téléchargement
       setTimeout(() => URL.revokeObjectURL(watermarkedUrl), 1000);
-    } catch (error) {
-      console.error('Erreur lors du téléchargement:', error);
-      // Fallback: télécharger sans filigrane côté client (mais avec filigrane serveur si implémenté)
+    } catch (err) {
+      console.error('Erreur lors du téléchargement:', err);
       const link = document.createElement('a');
       link.href = generatedImage;
       link.download = 'instadeco-apercu.jpg';
@@ -300,35 +215,13 @@ function GenerateContent() {
       return;
     }
     
-    try {
-      const response = await fetch('/api/unlock-image', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          generationId, 
-          userId: user?.uid || 'anonymous',
-        }),
-      });
-      const data = await response.json();
-      
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        alert(data.error || 'Erreur lors de la création du paiement');
-      }
-    } catch {
-      alert('Erreur lors de la redirection vers le paiement');
+    const checkoutUrl = await unlock({ generationId });
+    if (checkoutUrl) {
+      window.location.href = checkoutUrl;
     }
   };
 
-  const fileToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = (error) => reject(error);
-    });
-  };
+  const selectedStyleInfo = STYLES.find(s => s.id === selectedStyle);
 
   return (
     <div className="min-h-screen bg-[#fbfbfd]">
@@ -339,7 +232,7 @@ function GenerateContent() {
             InstaDeco
           </a>
           <div className="flex items-center gap-6">
-            <CreditBadge />
+            <span className="text-sm text-[#424245]">{credits} crédits</span>
             <a href="/pricing" className="text-xs text-[#424245] hover:text-[#1d1d1f] transition-colors">
               Tarifs
             </a>
@@ -403,7 +296,9 @@ function GenerateContent() {
                   alt="Votre pièce"
                   width={1200}
                   height={800}
-                  className="w-full h-auto"                  unoptimized                />
+                  className="w-full h-auto"
+                  unoptimized
+                />
                 <button
                   onClick={removeImage}
                   className="absolute top-4 right-4 w-9 h-9 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-white transition-colors shadow-[0_2px_8px_rgba(0,0,0,0.08)]"
@@ -414,7 +309,7 @@ function GenerateContent() {
 
               {/* Options */}
               <div className="space-y-8">
-                {/* Transform Mode - NEW */}
+                {/* Transform Mode */}
                 <div className="text-center">
                   <label className="block text-[12px] font-medium text-[#86868b] uppercase tracking-[.1em] mb-4">
                     Que voulez-vous faire ?
@@ -489,9 +384,8 @@ function GenerateContent() {
                       </button>
                     ))}
                   </div>
-                  {/* Style description */}
                   <p className="mt-3 text-[13px] text-[#86868b]">
-                    {STYLES.find(s => s.id === selectedStyle)?.desc}
+                    {selectedStyleInfo?.desc}
                   </p>
                 </div>
               </div>
@@ -538,7 +432,7 @@ function GenerateContent() {
                 <div className="text-center py-4">
                   <p className="text-[#ff3b30] text-[14px]">{error}</p>
                   <button 
-                    onClick={() => setError(null)}
+                    onClick={resetGenerate}
                     className="mt-2 text-[14px] text-[#0071e3] hover:underline"
                   >
                     Réessayer
@@ -553,7 +447,6 @@ function GenerateContent() {
             <div className="space-y-10">
               {/* Before/After */}
               <div className="grid md:grid-cols-2 gap-5">
-                {/* Before */}
                 <div className="space-y-3">
                   <span className="block text-[12px] font-medium text-[#86868b] uppercase tracking-[.1em]">
                     Avant
@@ -570,10 +463,9 @@ function GenerateContent() {
                   </div>
                 </div>
 
-                {/* After */}
                 <div className="space-y-3">
                   <span className="block text-[12px] font-medium text-[#86868b] uppercase tracking-[.1em]">
-                    Après — {STYLES.find(s => s.id === selectedStyle)?.name}
+                    Après — {selectedStyleInfo?.name}
                   </span>
                   <div className="relative rounded-[20px] overflow-hidden bg-[#f5f5f7]">
                     <Image
@@ -583,7 +475,6 @@ function GenerateContent() {
                       height={400}
                       className="w-full h-auto"
                     />
-                    {/* Watermark Principal - InstaDeco */}
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                       <span 
                         className="text-white/40 text-[32px] md:text-[48px] font-bold tracking-[.08em] rotate-[-15deg]"
@@ -592,7 +483,6 @@ function GenerateContent() {
                         InstaDeco
                       </span>
                     </div>
-                    {/* Mention IA - Tout petit en bas à droite */}
                     <div className="absolute bottom-2 right-3 pointer-events-none">
                       <span className="text-white/50 text-[9px] md:text-[10px]" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.4)' }}>
                         Généré par IA
@@ -613,19 +503,18 @@ function GenerateContent() {
                 </button>
                 <button
                   onClick={handleUnlock}
-                  className="inline-flex items-center gap-2 px-7 py-3 rounded-full text-[14px] font-medium text-white bg-[#1d1d1f] hover:bg-black transition-colors"
+                  disabled={isUnlocking}
+                  className="inline-flex items-center gap-2 px-7 py-3 rounded-full text-[14px] font-medium text-white bg-[#1d1d1f] hover:bg-black transition-colors disabled:opacity-50"
                 >
                   <Check className="w-4 h-4" strokeWidth={2} />
-                  Obtenir en HD — 4,99 €
+                  {isUnlocking ? 'Chargement...' : 'Obtenir en HD — 4,99 €'}
                 </button>
               </div>
 
-              {/* Info */}
               <p className="text-center text-[12px] text-[#86868b]">
                 Version HD : sans filigrane, résolution 4K.
               </p>
 
-              {/* New Generation */}
               <div className="flex justify-center">
                 <button
                   onClick={removeImage}
@@ -643,7 +532,7 @@ function GenerateContent() {
       <footer className="border-t border-[#d2d2d7] py-6 px-6 bg-[#f5f5f7]">
         <div className="max-w-[980px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-[12px] text-[#86868b]">
-            © 2026 InstantDecor. Propulsé par Flux.1 ControlNet.
+            © 2026 InstaDeco. Propulsé par Flux.1 ControlNet.
           </p>
           <div className="flex items-center gap-6 text-[12px] text-[#424245]">
             <a href="#" className="hover:text-[#1d1d1f] transition-colors">Confidentialité</a>

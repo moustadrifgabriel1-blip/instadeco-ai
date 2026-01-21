@@ -1,13 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, Download, Loader2, XCircle, ArrowLeft } from 'lucide-react';
 
-export default function HDSuccessPage() {
+function HDSuccessContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   
@@ -19,17 +20,13 @@ export default function HDSuccessPage() {
   const sessionId = searchParams.get('session_id');
   const generationId = searchParams.get('generation_id');
 
-  useEffect(() => {
+  const verifyAndUnlock = useCallback(async () => {
     if (!sessionId || !generationId) {
       setStatus('error');
       setErrorMessage('Paramètres manquants');
       return;
     }
 
-    verifyAndUnlock();
-  }, [sessionId, generationId]);
-
-  const verifyAndUnlock = async () => {
     try {
       const response = await fetch('/api/hd-unlock/download', {
         method: 'POST',
@@ -55,7 +52,11 @@ export default function HDSuccessPage() {
       setStatus('error');
       setErrorMessage('Erreur de connexion');
     }
-  };
+  }, [sessionId, generationId]);
+
+  useEffect(() => {
+    verifyAndUnlock();
+  }, [verifyAndUnlock]);
 
   const handleDownload = () => {
     if (downloadUrl) {
@@ -122,11 +123,13 @@ export default function HDSuccessPage() {
             <>
               {/* Aperçu de l'image */}
               {imageUrl && (
-                <div className="rounded-lg overflow-hidden border-2 border-green-200 shadow-md">
-                  <img 
+                <div className="rounded-lg overflow-hidden border-2 border-green-200 shadow-md relative aspect-video">
+                  <Image 
                     src={imageUrl} 
                     alt="Votre création HD" 
-                    className="w-full h-auto"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 400px"
                   />
                 </div>
               )}
@@ -166,5 +169,32 @@ export default function HDSuccessPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+// Loading fallback pour Suspense
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md shadow-xl">
+        <CardHeader className="text-center">
+          <div className="mx-auto mb-4">
+            <Loader2 className="h-16 w-16 text-purple-600 animate-spin" />
+          </div>
+          <CardTitle className="text-2xl">Chargement...</CardTitle>
+          <CardDescription>
+            Préparation de votre téléchargement HD
+          </CardDescription>
+        </CardHeader>
+      </Card>
+    </div>
+  );
+}
+
+export default function HDSuccessPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <HDSuccessContent />
+    </Suspense>
   );
 }

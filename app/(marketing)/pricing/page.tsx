@@ -1,73 +1,57 @@
 'use client';
 
+import { useState, useRef } from 'react';
 import { Check } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
-import { useState, useEffect, useRef } from 'react';
+import { usePurchaseCredits } from '@/src/presentation/hooks/usePurchaseCredits';
+import { CreditPackId } from '@/src/presentation/types';
 
 const PRICING_PLANS = [
   {
-    id: 'starter',
+    id: 'pack_10' as CreditPackId,
     name: 'Starter',
     credits: 10,
     price: 9.99,
     popular: false,
-    checkoutUrl: 'https://buy.stripe.com/test_5kQ8wP379eNU0IWasH3F600',
   },
   {
-    id: 'pro',
+    id: 'pack_25' as CreditPackId,
     name: 'Pro',
-    credits: 30,
-    price: 24.99,
+    credits: 25,
+    price: 19.99,
     popular: true,
-    checkoutUrl: 'https://buy.stripe.com/00wcN5azB218dvI7gv3F604',
   },
   {
-    id: 'unlimited',
+    id: 'pack_50' as CreditPackId,
     name: 'Unlimited',
-    credits: 100,
-    price: 69.99,
+    credits: 50,
+    price: 34.99,
     popular: false,
-    checkoutUrl: 'https://buy.stripe.com/9B6fZhdLN5dkfDQ30f3F603',
   },
 ];
 
-export default function PricingPage() {
+export default function PricingPageV2() {
   const { user } = useAuth();
   const router = useRouter();
+  
+  // Nouveau hook pour acheter des crédits
+  const { purchase, isLoading, error } = usePurchaseCredits();
 
-  const handleSelectPlan = async (planId: string) => {
+  const handleSelectPlan = async (planId: CreditPackId) => {
     if (!user) {
       router.push('/login');
       return;
     }
 
-    try {
-      // Appeler l'API pour créer une session Stripe
-      const response = await fetch('/api/payments/create-checkout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          packId: planId,
-          userId: user.uid,
-          userEmail: user.email,
-        }),
-      });
+    const checkoutUrl = await purchase({
+      packId: planId,
+      successUrl: `${window.location.origin}/dashboard?payment=success`,
+      cancelUrl: `${window.location.origin}/pricing?payment=cancelled`,
+    });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.details || errorData.error || 'Erreur lors de la création de la session');
-      }
-
-      const { url } = await response.json();
-
-      // Rediriger vers Stripe Checkout
-      window.location.href = url;
-    } catch (error) {
-      console.error('Erreur:', error);
-      alert(error instanceof Error ? error.message : 'Une erreur est survenue. Veuillez réessayer.');
+    if (checkoutUrl) {
+      window.location.href = checkoutUrl;
     }
   };
 
@@ -113,18 +97,36 @@ export default function PricingPage() {
         </p>
       </div>
 
+      {/* Error message */}
+      {error && (
+        <div className="max-w-md mx-auto px-4 mb-6">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm text-center">
+            {error}
+          </div>
+        </div>
+      )}
+
       {/* Pricing Cards */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-20">
         {/* Desktop: Grille normale */}
         <div className="hidden md:grid md:grid-cols-3 gap-6">
           {PRICING_PLANS.map((plan) => (
-            <PricingCard key={plan.id} plan={plan} onSelect={handleSelectPlan} />
+            <PricingCard 
+              key={plan.id} 
+              plan={plan} 
+              onSelect={() => handleSelectPlan(plan.id)}
+              isLoading={isLoading}
+            />
           ))}
         </div>
 
         {/* Mobile: Carrousel avec swipe */}
         <div className="md:hidden overflow-hidden">
-          <MobileCarousel plans={PRICING_PLANS} onSelect={handleSelectPlan} />
+          <MobileCarousel 
+            plans={PRICING_PLANS} 
+            onSelect={handleSelectPlan}
+            isLoading={isLoading}
+          />
         </div>
 
         {/* FAQ Section */}
@@ -196,8 +198,25 @@ export default function PricingPage() {
   );
 }
 
+// Types
+interface PricingPlan {
+  id: CreditPackId;
+  name: string;
+  credits: number;
+  price: number;
+  popular: boolean;
+}
+
 // Composant carte de prix réutilisable
-function PricingCard({ plan, onSelect }: { plan: typeof PRICING_PLANS[0]; onSelect: (id: string) => void }) {
+function PricingCard({ 
+  plan, 
+  onSelect, 
+  isLoading 
+}: { 
+  plan: PricingPlan; 
+  onSelect: () => void;
+  isLoading: boolean;
+}) {
   return (
     <div
       className={`relative bg-white rounded-[16px] sm:rounded-[20px] p-4 sm:p-6 md:p-8 shadow-[0_2px_16px_rgba(0,0,0,0.08)] transition-all hover:scale-[1.02] ${
@@ -258,21 +277,30 @@ function PricingCard({ plan, onSelect }: { plan: typeof PRICING_PLANS[0]; onSele
       </ul>
 
       <button
-        onClick={() => onSelect(plan.id)}
-        className={`w-full py-2.5 sm:py-3 rounded-full text-sm sm:text-base md:text-[17px] font-medium transition-all touch-manipulation min-h-[44px] sm:min-h-[48px] ${
+        onClick={onSelect}
+        disabled={isLoading}
+        className={`w-full py-2.5 sm:py-3 rounded-full text-sm sm:text-base md:text-[17px] font-medium transition-all touch-manipulation min-h-[44px] sm:min-h-[48px] disabled:opacity-50 ${
           plan.popular
             ? 'bg-[#1d1d1f] text-white hover:bg-[#424245] active:scale-95'
             : 'bg-[#f5f5f7] text-[#1d1d1f] hover:bg-[#e8e8ed] active:scale-95'
         }`}
       >
-        Choisir ce pack
+        {isLoading ? 'Chargement...' : 'Choisir ce pack'}
       </button>
     </div>
   );
 }
 
 // Carrousel mobile avec swipe
-function MobileCarousel({ plans, onSelect }: { plans: typeof PRICING_PLANS; onSelect: (id: string) => void }) {
+function MobileCarousel({ 
+  plans, 
+  onSelect,
+  isLoading,
+}: { 
+  plans: PricingPlan[]; 
+  onSelect: (id: CreditPackId) => void;
+  isLoading: boolean;
+}) {
   const [currentIndex, setCurrentIndex] = useState(1); // Commencer par le plan "Pro" (populaire)
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
@@ -316,7 +344,11 @@ function MobileCarousel({ plans, onSelect }: { plans: typeof PRICING_PLANS; onSe
         >
           {plans.map((plan) => (
             <div key={plan.id} className="w-full flex-shrink-0 px-4">
-              <PricingCard plan={plan} onSelect={onSelect} />
+              <PricingCard 
+                plan={plan} 
+                onSelect={() => onSelect(plan.id)}
+                isLoading={isLoading}
+              />
             </div>
           ))}
         </div>

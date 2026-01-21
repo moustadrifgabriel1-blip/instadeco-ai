@@ -1,18 +1,123 @@
 import './globals.css';
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
+import { Header, Footer } from '@/components/layout';
 
 const inter = Inter({ subsets: ['latin'] });
 
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://instadeco.ai';
+
 export const metadata: Metadata = {
-  title: 'InstantDecor AI - Décoration d\'intérieur par IA',
-  description: 'Transformez vos pièces en rendus décorés professionnels grâce à l\'IA générative Flux.1 + ControlNet',
-  keywords: ['décoration intérieur', 'IA', 'design', 'home staging', 'Flux.1'],
+  // ============================================
+  // META DE BASE
+  // ============================================
+  title: {
+    default: 'InstaDeco AI - Décoration d\'intérieur par Intelligence Artificielle',
+    template: '%s | InstaDeco AI',
+  },
+  description: 'Transformez vos pièces en rendus décorés professionnels en quelques secondes grâce à l\'IA. Home staging virtuel, inspiration déco, visualisation avant travaux.',
+  keywords: [
+    'décoration intérieur IA',
+    'home staging virtuel',
+    'design intérieur intelligence artificielle',
+    'transformation pièce IA',
+    'décoration maison',
+    'visualisation déco',
+    'avant après décoration',
+    'inspiration intérieur',
+    'aménagement intérieur',
+    'déco salon',
+    'déco chambre',
+    'style scandinave',
+    'style moderne',
+    'style bohème',
+  ],
+  
+  // ============================================
+  // AUTEUR & SITE
+  // ============================================
+  authors: [{ name: 'InstaDeco AI', url: BASE_URL }],
+  creator: 'InstaDeco AI',
+  publisher: 'InstaDeco AI',
+  
+  // ============================================
+  // ROBOTS & INDEXATION
+  // ============================================
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  
+  // ============================================
+  // OPEN GRAPH (Facebook, LinkedIn)
+  // ============================================
+  openGraph: {
+    type: 'website',
+    locale: 'fr_FR',
+    url: BASE_URL,
+    siteName: 'InstaDeco AI',
+    title: 'InstaDeco AI - Décoration d\'intérieur par Intelligence Artificielle',
+    description: 'Transformez vos pièces en rendus décorés professionnels en quelques secondes grâce à l\'IA.',
+    images: [
+      {
+        url: `${BASE_URL}/og-image.png`,
+        width: 1200,
+        height: 630,
+        alt: 'InstaDeco AI - Décoration d\'intérieur par IA',
+      },
+    ],
+  },
+  
+  // ============================================
+  // TWITTER CARD
+  // ============================================
+  twitter: {
+    card: 'summary_large_image',
+    title: 'InstaDeco AI - Décoration d\'intérieur par IA',
+    description: 'Transformez vos pièces en rendus décorés professionnels grâce à l\'IA.',
+    images: [`${BASE_URL}/og-image.png`],
+    creator: '@instadeco_ai',
+  },
+  
+  // ============================================
+  // LIENS ALTERNATIFS
+  // ============================================
+  alternates: {
+    canonical: BASE_URL,
+    languages: {
+      'fr-FR': BASE_URL,
+      'fr-CH': BASE_URL,
+      'fr-BE': BASE_URL,
+    },
+  },
+  
+  // ============================================
+  // CATÉGORIE & CLASSIFICATION
+  // ============================================
+  category: 'technology',
+  
+  // ============================================
+  // PWA & APP
+  // ============================================
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
     title: 'InstaDeco',
+  },
+  
+  // ============================================
+  // AUTRES
+  // ============================================
+  other: {
+    'google-site-verification': '', // À remplir avec votre code Google Search Console
   },
 };
 
@@ -37,7 +142,11 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
       </head>
       <body className={inter.className}>
-        <div className="min-h-screen">{children}</div>
+        <div className="min-h-screen flex flex-col">
+          <Header />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </div>
       </body>
     </html>
   );

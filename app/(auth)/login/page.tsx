@@ -1,38 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
-import { auth, db } from '@/lib/firebase/config';
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
-import { translateFirebaseError } from '@/lib/utils/error-messages';
 
 export default function LoginPage() {
   const router = useRouter();
+  const supabase = createClient();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-
-  // Vérifier/créer le profil utilisateur dans Firestore
-  const ensureUserProfile = async (userId: string, userEmail: string, displayName?: string) => {
-    const userRef = doc(db, 'users', userId);
-    const userDoc = await getDoc(userRef);
-    
-    if (!userDoc.exists()) {
-      console.log('[Login] Creating missing user profile for:', userId);
-      await setDoc(userRef, {
-        email: userEmail,
-        fullName: displayName || '',
-        credits: 3,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      });
-      console.log('[Login] ✅ User profile created with 3 credits');
-    } else {
-      console.log('[Login] ✅ User profile exists');
-    }
-  };
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,11 +18,23 @@ export default function LoginPage() {
     setError('');
 
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      await ensureUserProfile(userCredential.user.uid, userCredential.user.email!, userCredential.user.displayName || undefined);
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (signInError) {
+        if (signInError.message.includes('Invalid login credentials')) {
+          setError('Email ou mot de passe incorrect');
+        } else {
+          setError(signInError.message);
+        }
+        return;
+      }
+
       router.push('/generate');
     } catch (err: unknown) {
-      setError(translateFirebaseError(err));
+      setError('Une erreur est survenue');
     } finally {
       setLoading(false);
     }
@@ -55,17 +45,20 @@ export default function LoginPage() {
     setError('');
 
     try {
-      const provider = new GoogleAuthProvider();
-      const userCredential = await signInWithPopup(auth, provider);
-      await ensureUserProfile(
-        userCredential.user.uid,
-        userCredential.user.email!,
-        userCredential.user.displayName || undefined
-      );
-      router.push('/generate');
+      const { error: signInError } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (signInError) {
+        setError(signInError.message);
+        setLoading(false);
+      }
+      // La redirection est gérée par Supabase
     } catch (err: unknown) {
-      setError(translateFirebaseError(err));
-    } finally {
+      setError('Une erreur est survenue');
       setLoading(false);
     }
   };

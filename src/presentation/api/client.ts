@@ -1,0 +1,286 @@
+/**
+ * Client API V2 pour la couche Presentation
+ * 
+ * Encapsule tous les appels fetch vers l'API V2
+ */
+
+import { GenerationDTO } from '@/src/application/dtos/GenerationDTO';
+import { CreditTransactionDTO } from '@/src/application/dtos/CreditDTO';
+
+const API_BASE = '/api/v2';
+
+/**
+ * Options pour les requêtes
+ */
+interface RequestOptions {
+  signal?: AbortSignal;
+}
+
+/**
+ * Réponse générique de l'API
+ */
+interface ApiResponse<T> {
+  success?: boolean;
+  error?: string;
+  details?: unknown;
+  data?: T;
+}
+
+/**
+ * Helper pour gérer les erreurs fetch
+ */
+async function handleResponse<T>(response: Response): Promise<T> {
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || `Erreur HTTP ${response.status}`);
+  }
+
+  return data;
+}
+
+// ========================
+// GENERATION API
+// ========================
+
+export interface GenerateDesignRequest {
+  userId: string;
+  imageUrl: string;
+  roomType: string;
+  style: string;
+}
+
+export interface GenerateDesignResponse {
+  success: boolean;
+  generation: GenerationDTO;
+  creditsRemaining: number;
+  message?: string;
+}
+
+export async function generateDesign(
+  request: GenerateDesignRequest,
+  options?: RequestOptions
+): Promise<GenerateDesignResponse> {
+  const response = await fetch(`${API_BASE}/generate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(request),
+    signal: options?.signal,
+  });
+
+  return handleResponse<GenerateDesignResponse>(response);
+}
+
+// ========================
+// GENERATIONS LIST API
+// ========================
+
+export interface GetGenerationsRequest {
+  userId: string;
+  limit?: number;
+}
+
+export interface GetGenerationsResponse {
+  generations: GenerationDTO[];
+  total: number;
+}
+
+export async function getGenerations(
+  request: GetGenerationsRequest,
+  options?: RequestOptions
+): Promise<GetGenerationsResponse> {
+  const params = new URLSearchParams({
+    userId: request.userId,
+    ...(request.limit && { limit: request.limit.toString() }),
+  });
+
+  const response = await fetch(`${API_BASE}/generations?${params}`, {
+    method: 'GET',
+    signal: options?.signal,
+  });
+
+  return handleResponse<GetGenerationsResponse>(response);
+}
+
+// ========================
+// GENERATION STATUS API
+// ========================
+
+export interface GetGenerationStatusRequest {
+  generationId: string;
+  userId?: string;
+}
+
+export interface GetGenerationStatusResponse {
+  generation: GenerationDTO;
+  status: string;
+  isComplete: boolean;
+  isFailed: boolean;
+}
+
+export async function getGenerationStatus(
+  request: GetGenerationStatusRequest,
+  options?: RequestOptions
+): Promise<GetGenerationStatusResponse> {
+  const params = new URLSearchParams();
+  if (request.userId) params.append('userId', request.userId);
+
+  const response = await fetch(
+    `${API_BASE}/generations/${request.generationId}/status?${params}`,
+    {
+      method: 'GET',
+      signal: options?.signal,
+    }
+  );
+
+  return handleResponse<GetGenerationStatusResponse>(response);
+}
+
+// ========================
+// CREDITS API
+// ========================
+
+export interface GetCreditsRequest {
+  userId: string;
+}
+
+export interface GetCreditsResponse {
+  credits: number;
+  userId: string;
+}
+
+export async function getCredits(
+  request: GetCreditsRequest,
+  options?: RequestOptions
+): Promise<GetCreditsResponse> {
+  const response = await fetch(`${API_BASE}/credits?userId=${request.userId}`, {
+    method: 'GET',
+    signal: options?.signal,
+  });
+
+  return handleResponse<GetCreditsResponse>(response);
+}
+
+export interface GetCreditHistoryRequest {
+  userId: string;
+  limit?: number;
+}
+
+export interface GetCreditHistoryResponse {
+  transactions: CreditTransactionDTO[];
+  total: number;
+}
+
+export async function getCreditHistory(
+  request: GetCreditHistoryRequest,
+  options?: RequestOptions
+): Promise<GetCreditHistoryResponse> {
+  const params = new URLSearchParams({
+    userId: request.userId,
+    ...(request.limit && { limit: request.limit.toString() }),
+  });
+
+  const response = await fetch(`${API_BASE}/credits/history?${params}`, {
+    method: 'GET',
+    signal: options?.signal,
+  });
+
+  return handleResponse<GetCreditHistoryResponse>(response);
+}
+
+// ========================
+// PAYMENTS API
+// ========================
+
+export interface CreateCheckoutRequest {
+  userId: string;
+  email: string;
+  packId: 'pack_10' | 'pack_25' | 'pack_50' | 'pack_100';
+  successUrl?: string;
+  cancelUrl?: string;
+}
+
+export interface CreateCheckoutResponse {
+  success: boolean;
+  checkoutUrl: string;
+  sessionId: string;
+  order: {
+    packId: string;
+    credits: number;
+  };
+}
+
+export async function createCheckoutSession(
+  request: CreateCheckoutRequest,
+  options?: RequestOptions
+): Promise<CreateCheckoutResponse> {
+  const response = await fetch(`${API_BASE}/payments/create-checkout`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(request),
+    signal: options?.signal,
+  });
+
+  return handleResponse<CreateCheckoutResponse>(response);
+}
+
+// ========================
+// HD UNLOCK API
+// ========================
+
+export interface CreateHDUnlockRequest {
+  userId: string;
+  email: string;
+  generationId: string;
+  successUrl?: string;
+  cancelUrl?: string;
+}
+
+export interface CreateHDUnlockResponse {
+  success: boolean;
+  checkoutUrl?: string;
+  sessionId?: string;
+  alreadyUnlocked?: boolean;
+  message?: string;
+}
+
+export async function createHDUnlockSession(
+  request: CreateHDUnlockRequest,
+  options?: RequestOptions
+): Promise<CreateHDUnlockResponse> {
+  const response = await fetch(`${API_BASE}/hd-unlock/create-checkout`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(request),
+    signal: options?.signal,
+  });
+
+  return handleResponse<CreateHDUnlockResponse>(response);
+}
+
+export interface ConfirmHDUnlockRequest {
+  sessionId: string;
+  generationId: string;
+}
+
+export interface ConfirmHDUnlockResponse {
+  success: boolean;
+  generationId: string;
+  imageUrl: string;
+  downloadUrl: string;
+  message?: string;
+}
+
+export async function confirmHDUnlock(
+  request: ConfirmHDUnlockRequest,
+  options?: RequestOptions
+): Promise<ConfirmHDUnlockResponse> {
+  const response = await fetch(`${API_BASE}/hd-unlock/confirm`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(request),
+    signal: options?.signal,
+  });
+
+  return handleResponse<ConfirmHDUnlockResponse>(response);
+}

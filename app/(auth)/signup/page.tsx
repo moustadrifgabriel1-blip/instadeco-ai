@@ -1,45 +1,17 @@
 'use client';
 
 import { useState } from 'react';
-import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, updateProfile } from 'firebase/auth';
-import { auth, db } from '@/lib/firebase/config';
-import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
+import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
-import { translateFirebaseError } from '@/lib/utils/error-messages';
 
 export default function SignupPage() {
   const router = useRouter();
+  const supabase = createClient();
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-
-  const createUserProfile = async (userId: string, email: string, displayName?: string) => {
-    try {
-      // Vérifier si le profil existe déjà (cas Google OAuth reconnexion)
-      const userRef = doc(db, 'users', userId);
-      const existingDoc = await getDoc(userRef);
-      
-      if (existingDoc.exists()) {
-        console.log('[Signup] ✅ User profile already exists, skipping creation');
-        return;
-      }
-      
-      console.log('[Signup] Creating user profile for:', userId);
-      await setDoc(userRef, {
-        email,
-        fullName: displayName || fullName || '',
-        credits: 3, // 3 crédits gratuits à l'inscription
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      });
-      console.log('[Signup] ✅ User profile created successfully with 3 credits');
-    } catch (error) {
-      console.error('[Signup] ❌ Error creating user profile:', error);
-      throw error;
-    }
-  };
 
   const handleEmailSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,19 +19,29 @@ export default function SignupPage() {
     setError('');
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      
-      // Mettre à jour le profil
-      await updateProfile(userCredential.user, {
-        displayName: fullName,
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName,
+          },
+        },
       });
 
-      // Créer le profil dans Firestore
-      await createUserProfile(userCredential.user.uid, email, fullName);
+      if (signUpError) {
+        if (signUpError.message.includes('already registered')) {
+          setError('Cet email est déjà utilisé');
+        } else {
+          setError(signUpError.message);
+        }
+        return;
+      }
 
+      // Le profil est créé automatiquement via le trigger Supabase
       router.push('/generate');
     } catch (err: unknown) {
-      setError(translateFirebaseError(err));
+      setError('Une erreur est survenue');
     } finally {
       setLoading(false);
     }
@@ -70,20 +52,20 @@ export default function SignupPage() {
     setError('');
 
     try {
-      const provider = new GoogleAuthProvider();
-      const userCredential = await signInWithPopup(auth, provider);
+      const { error: signInError } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
 
-      // Créer le profil dans Firestore
-      await createUserProfile(
-        userCredential.user.uid,
-        userCredential.user.email!,
-        userCredential.user.displayName || undefined
-      );
-
-      router.push('/generate');
+      if (signInError) {
+        setError(signInError.message);
+        setLoading(false);
+      }
+      // La redirection est gérée par Supabase
     } catch (err: unknown) {
-      setError(translateFirebaseError(err));
-    } finally {
+      setError('Une erreur est survenue');
       setLoading(false);
     }
   };
