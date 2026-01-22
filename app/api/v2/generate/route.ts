@@ -79,8 +79,13 @@ export async function POST(req: Request) {
       }
 
       // Erreur générique
+      console.error('[Generate V2] ❌ Domain error:', result.error);
       return NextResponse.json(
-        { error: 'Erreur lors de la génération' },
+        { 
+          error: `Échec de la génération d'image: ${result.error.message}`,
+          code: result.error.code || 'IMAGE_GENERATION_FAILED',
+          details: result.error.message,
+        },
         { status: 500 }
       );
     }
