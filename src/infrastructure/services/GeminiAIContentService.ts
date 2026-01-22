@@ -209,150 +209,259 @@ ${content.slice(0, 2000)}`;
   private buildPrompt(options: ArticleGenerationOptions): string {
     const minWords = options.minWords ?? 1800;
 
-    return `Tu es un expert en décoration d'intérieur et en rédaction SEO professionnelle. 
-Rédige un article de blog UNIQUE, COMPLET et PARFAITEMENT OPTIMISÉ pour: "${options.theme}"
+    return `Tu es un EXPERT en décoration d'intérieur et un RÉDACTEUR SEO de niveau élite.
+Rédige un article VIRAL, UNIQUE et parfaitement OPTIMISÉ pour: "${options.theme}"
 
-## CONTEXTE & OBJECTIF
-- Site: InstaDeco AI - Plateforme IA de décoration (Suisse, France, Belgique)
-- But: Article SEO unique, naturel, non-détectable comme généré par IA
-- Session: ${options.sessionType}
-${options.additionalInstructions ? `- Instructions: ${options.additionalInstructions}` : ''}
+═══════════════════════════════════════════════════════════════════
+                     I. CONTEXTE STRATÉGIQUE
+═══════════════════════════════════════════════════════════════════
 
-## ⚠️ RÈGLES D'UNICITÉ ABSOLUES
-1. JAMAIS utiliser de titres génériques type "Guide complet", "Tout savoir sur"
-2. TOUJOURS créer un angle UNIQUE et ORIGINAL
-3. VARIER systématiquement le vocabulaire (bannir répétitions)
-4. Créer un titre ACCROCHEUR et SPÉCIFIQUE (max 60 car, incluant mot-clé)
+🏠 **Site**: InstaDeco AI - Plateforme IA de décoration (Suisse, France, Belgique)
+🎯 **Objectif**: Article SEO viral + conversion vers l'outil IA
+📅 **Session**: ${options.sessionType}
+${options.additionalInstructions ? `📝 **Instructions**: ${options.additionalInstructions}` : ''}
 
-## 📐 STRUCTURE OBLIGATOIRE (Format HTML)
+═══════════════════════════════════════════════════════════════════
+                 II. LES 5 PILIERS SEO OBLIGATOIRES
+═══════════════════════════════════════════════════════════════════
 
-### 1. TITRE H1 (unique, accrocheur, 50-60 caractères)
-Exemple: "5 Secrets pour Transformer Votre Salon en Havre Scandinave"
+### 1️⃣ INTENTION DE RECHERCHE
+Identifie ce que l'utilisateur veut VRAIMENT: 
+- Tutoriel pratique? Inspiration? Comparatif? Solution à un problème?
+- Réponds EXACTEMENT à cette intention dès le début.
 
-### 2. INTRODUCTION CAPTIVANTE (120-150 mots)
-- Accrocher le lecteur dès la 1ère phrase
-- Introduire naturellement le mot-clé
-- Poser une question ou problème concret
-- Annoncer la valeur ajoutée de l'article
+### 2️⃣ HIÉRARCHIE Hn STRICTE
+- **H1**: Titre unique (MOT-CLÉ OBLIGATOIRE, 50-60 caractères)
+- **H2**: Grandes sections (5-7 sections)
+- **H3**: Sous-parties détaillées
+- **JAMAIS** de saut H2→H4
 
-### 3. SOMMAIRE INTERACTIF (HTML)
-\`\`\`html
-<div class="sommaire">
-<h2>Sommaire</h2>
+### 3️⃣ CHAMP SÉMANTIQUE RICHE
+N'utilise PAS que "${options.theme}" - intègre tout l'univers lexical:
+- 8-10 synonymes et variantes
+- Termes techniques décoration
+- Questions "comment", "pourquoi", "quel"
+
+### 4️⃣ MAILLAGE INTERNE
+Inclure 3-5 liens vers d'autres articles du blog (thèmes décoration connexes).
+Format: <a href="/blog/[slug-pertinent]">Texte d'ancrage naturel</a>
+
+### 5️⃣ URL & MÉTADONNÉES
+- URL courte et claire (slug optimisé)
+- Meta description = mini-pub (150-160 car.) avec mot-clé + incitation au clic
+
+═══════════════════════════════════════════════════════════════════
+                III. RÉDACTION VIRALE (POUR L'HUMAIN)
+═══════════════════════════════════════════════════════════════════
+
+### 🎣 L'INTRODUCTION "TOBOGGAN" (150-180 mots)
+
+**Structure PAS (Problème - Agitation - Solution):**
+
+1. **LE HOOK** (1ère phrase CRUCIALE):
+   - Soit une vérité choquante/statistique
+   - Soit une question qui fait mouche
+   - Soit un problème ultra-concret
+   
+   Exemples de hooks efficaces:
+   ❌ "La décoration scandinave est très populaire"
+   ✅ "73% des Français abandonnent leur projet déco faute d'inspiration"
+   ✅ "Votre salon vous déprime? Vous n'êtes pas seul."
+
+2. **L'EMPATHIE** (montrer qu'on comprend):
+   "Je sais exactement ce que vous ressentez quand..."
+   "Comme vous, j'ai galéré pendant des mois à..."
+
+3. **LA PROMESSE** (ce qu'ils vont obtenir):
+   "Dans cet article, vous allez découvrir les X secrets/techniques/astuces qui..."
+
+### ✂️ STYLE "SNACKABLE" (Facile à digérer)
+
+- **Paragraphes COURTS**: 3-4 lignes MAX
+- **Phrases SIMPLES**: Sujet + Verbe + Complément
+- **Tutoiement OU Vouvoiement** (cohérent, pas de mélange!)
+- **Questions rhétoriques** régulières pour maintenir l'engagement
+- **Espaces blancs** généreux (50% de la page)
+
+### 💎 VALEUR AJOUTÉE CONCRÈTE
+
+Chaque section DOIT contenir:
+- Des **chiffres précis** (prix, dimensions, délais)
+- Des **exemples concrets** (marques, produits, études de cas)
+- Des **conseils actionnables** immédiatement
+- Zéro blabla générique!
+
+═══════════════════════════════════════════════════════════════════
+                  IV. DESIGN & UX DE L'ARTICLE
+═══════════════════════════════════════════════════════════════════
+
+### 📐 PATTERN INTERRUPTS (Rupteurs visuels)
+Toutes les 200-300 mots, change le format:
+
+1. **Listes à puces/numérotées** pour les étapes/conseils
+2. **Citations/Blockquotes** pour les conseils d'experts:
+   <blockquote class="expert-tip">
+   <p>"Conseil expert ou statistique importante"</p>
+   </blockquote>
+
+3. **Encadrés "À Retenir"** pour les points clés:
+   <div class="key-takeaway">
+   <strong>💡 À retenir:</strong>
+   <p>Résumé du point essentiel en 1-2 phrases</p>
+   </div>
+
+4. **Encadrés "Astuce Pro"** pour les tips avancés:
+   <div class="pro-tip">
+   <strong>🎯 Astuce Pro:</strong>
+   <p>Conseil avancé pour ceux qui veulent aller plus loin</p>
+   </div>
+
+5. **Images** avec ALT SEO optimisé:
+   <figure class="article-image">
+   <img src="placeholder.jpg" alt="${options.theme} - description détaillée incluant mot-clé" loading="lazy">
+   <figcaption>Légende descriptive et engageante</figcaption>
+   </figure>
+
+═══════════════════════════════════════════════════════════════════
+                      V. STRUCTURE EXACTE
+═══════════════════════════════════════════════════════════════════
+
+## FORMAT HTML OBLIGATOIRE:
+
+### 1. INTRODUCTION (Hook + PAS) - 150-180 mots
+<p class="intro-hook"><strong>[HOOK PERCUTANT]</strong></p>
+<p>[Empathie + contexte du problème]</p>
+<p>[Promesse de l'article + annonce structure]</p>
+
+### 2. SOMMAIRE CLIQUABLE (obligatoire pour UX + Google)
+<nav class="article-toc" aria-label="Sommaire">
+<h2>📋 Ce que vous allez découvrir</h2>
 <ol>
-<li><a href="#section1">Titre Section 1</a></li>
-<li><a href="#section2">Titre Section 2</a></li>
-[...]
+<li><a href="#section-1">[Titre accrocheur section 1]</a></li>
+<li><a href="#section-2">[Titre accrocheur section 2]</a></li>
+[... 5-7 items]
 </ol>
+</nav>
+
+### 3. CORPS DE L'ARTICLE (5-7 sections H2)
+<h2 id="section-1">🏠 [Titre H2 avec emoji pertinent]</h2>
+<p>[Intro de section - pourquoi c'est important]</p>
+
+<h3>[Sous-point H3]</h3>
+<p>[Contenu avec <strong>mots-clés en gras</strong>]</p>
+
+<div class="key-takeaway">
+<strong>💡 À retenir:</strong>
+<p>[Point clé de cette section]</p>
 </div>
-\`\`\`
 
-### 4. CORPS DE L'ARTICLE (4-7 sections)
-- **Chaque H2** avec id (ex: id="section1")
-- **Sous-titres H3** pour structurer
-- **Paragraphes courts** (3-4 lignes max)
-- **Listes à puces** pour la lisibilité
-- **Gras** sur mots-clés importants
-- **Exemples concrets** (prix, marques, dimensions)
-- **Emojis subtils** pour dynamiser (🏠 ✨ 💡)
+[Répéter pour chaque section avec variété de formats]
 
-### 5. IMAGES SUGGESTIONS (balises)
-Insérer 4-5 emplacements images avec:
-\`\`\`html
-<img src="placeholder" alt="Description SEO détaillée incluant mot-clé" title="Titre image">
-<figcaption>Légende descriptive</figcaption>
-\`\`\`
+### 4. CTA CONTEXTUEL MILIEU D'ARTICLE (après section 3)
+<div class="cta-contextual">
+<p>Envie de voir le résultat sur VOTRE pièce? <strong><a href="https://instadeco.app/generate">Testez InstaDeco AI gratuitement</a></strong> et visualisez votre futur intérieur en 30 secondes!</p>
+</div>
 
-### 6. FAQ OPTIMISÉE (4-5 Q/R, Schema.org)
-\`\`\`html
-<div class="faq" itemscope itemtype="https://schema.org/FAQPage">
-<h2>Questions Fréquentes</h2>
-<div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-<h3 itemprop="name">Question précise et naturelle ?</h3>
+### 5. FAQ SCHEMA.ORG (5-6 questions, UNIQUES)
+<section class="faq-section" itemscope itemtype="https://schema.org/FAQPage">
+<h2 id="faq">❓ Questions Fréquentes</h2>
+
+<article class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+<h3 itemprop="name">[Question naturelle longue-traîne en rapport avec ${options.theme}]</h3>
 <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-<p itemprop="text">Réponse détaillée et utile (50-100 mots)</p>
+<p itemprop="text">[Réponse complète et utile - 50-100 mots - avec valeur ajoutée]</p>
 </div>
-</div>
-[répéter 4-5 fois]
-</div>
-\`\`\`
+</article>
+[Répéter 5-6 fois avec des questions DIFFÉRENTES et pertinentes]
+</section>
 
-### 7. CONCLUSION + CTA (100-120 mots)
-- Résumer les points clés
-- Appel action naturel vers InstaDeco AI
-- Encourager à essayer la plateforme
-- Lien: "Essayez InstaDeco AI gratuitement"
+### 6. CONCLUSION + CTA FINAL (100-150 mots)
+<section class="conclusion">
+<h2 id="conclusion">✨ En résumé</h2>
+<p>[Rappel des 3 points clés]</p>
+<p>[Ouverture/prochaine étape]</p>
 
-### 8. SUGGESTIONS MAILLAGE INTERNE (3-5 liens)
-\`\`\`html
-<div class="articles-lies">
-<h3>Articles complémentaires</h3>
+<div class="cta-final">
+<h3>🚀 Passez à l'action maintenant!</h3>
+<p>Ne restez pas avec un intérieur qui ne vous ressemble pas. <strong><a href="https://instadeco.app/generate" class="cta-button">Essayez InstaDeco AI gratuitement →</a></strong></p>
+<p><em>3 crédits offerts • Sans engagement • Résultat en 30 secondes</em></p>
+</div>
+</section>
+
+### 7. ARTICLES LIÉS (Maillage interne)
+<nav class="related-articles">
+<h3>📚 Pour aller plus loin</h3>
 <ul>
-<li><a href="/blog/[slug-suggeré]">Titre article lié pertinent</a></li>
-[répéter 3-5 fois avec vrais thèmes décoration]
+<li><a href="/blog/decoration-scandinave-salon">Décoration scandinave : le guide ultime</a></li>
+<li><a href="/blog/couleurs-tendance-2026">Les couleurs tendance 2026 pour votre intérieur</a></li>
+<li><a href="/blog/amenager-petit-espace">Comment aménager un petit espace avec style</a></li>
 </ul>
-</div>
-\`\`\`
+</nav>
 
-## ✍️ STYLE ANTI-DÉTECTION IA
+═══════════════════════════════════════════════════════════════════
+                  VI. STYLE ANTI-DÉTECTION IA
+═══════════════════════════════════════════════════════════════════
 
-### À FAIRE:
-✅ Varier longueur phrases (courtes/moyennes/longues)
-✅ Utiliser tournures personnelles ("je recommande", "d'expérience")
-✅ Inclure anecdotes, chiffres précis, exemples concrets
-✅ Poser questions rhétoriques au lecteur
-✅ Utiliser connecteurs naturels ("cependant", "par ailleurs", "en outre")
-✅ Insérer expressions idiomatiques françaises
-✅ Citer sources crédibles (sites déco reconnus)
+### ✅ À FAIRE ABSOLUMENT:
+- Varier longueur des phrases (très courte, moyenne, longue)
+- Utiliser "je", "nous", "d'expérience", "personnellement"
+- Intégrer anecdotes crédibles et exemples vécus
+- Insérer expressions françaises idiomatiques
+- Poser des questions au lecteur
+- Utiliser l'humour subtilement
+- Mentionner des marques/produits réels
+- Citer des sources crédibles (Elle Déco, Côté Maison, Houzz)
 
-### À ÉVITER:
-❌ Répétitions de mots/structures
-❌ Transitions robotiques
-❌ Listes à puces systématiques sans prose
-❌ Ton trop formel ou académique
-❌ Formules génériques ("il est important de", "n'hésitez pas")
+### ❌ À ÉVITER À TOUT PRIX:
+- Répétitions de structure ou vocabulaire
+- "Il est important de noter que..."
+- "N'hésitez pas à..."
+- "En conclusion,"
+- Transitions robotiques identiques
+- Listes à puces sans prose entre elles
+- Ton académique ou trop formel
 
-## 🎯 OPTIMISATION SEO AVANCÉE
+═══════════════════════════════════════════════════════════════════
+                    VII. CONTRAINTES TECHNIQUES
+═══════════════════════════════════════════════════════════════════
 
-### Mot-clé principal: "${options.theme}"
-- **Densité cible**: 1.5-2% (naturelle, pas forcée)
-- **Placements**: H1, intro (1ère phrase), 2 H2, conclusion, meta
-- **LSI keywords**: intégrer 8-10 synonymes/variantes
-- **Questions longue traîne**: répondre à 3-4 "comment", "pourquoi", "quel"
-
-### Balises sémantiques:
-- <strong> pour mots-clés importants
-- <em> pour nuances/emphases
-- <mark> pour points essentiels (à retenir)
-
-## 📏 CONTRAINTES TECHNIQUES
-
-- **Longueur minimale**: ${minWords} mots (sans HTML)
-- **Phrases**: 15-25 mots en moyenne (varier !)
+- **Longueur minimale**: ${minWords} mots (texte brut, hors HTML)
+- **Phrases**: 10-30 mots (VARIER!)
 - **Paragraphes**: 50-80 mots max
-- **Lisibilité**: Score Flesch > 60 (accessible)
+- **Lisibilité**: Score Flesch > 60
+- **Mot-clé principal**: "${options.theme}"
+- **Densité mot-clé**: 1.5-2% (naturelle)
 
-## 📤 FORMAT SORTIE (JSON STRICT)
+═══════════════════════════════════════════════════════════════════
+                      VIII. FORMAT DE SORTIE
+═══════════════════════════════════════════════════════════════════
 
-Réponds UNIQUEMENT avec JSON valide (PAS de markdown, PAS de \`\`\`):
+Réponds UNIQUEMENT avec ce JSON valide (PAS de \`\`\`, PAS de markdown autour):
 
 {
-  "title": "Titre H1 unique et accrocheur",
-  "content": "<p>Introduction...</p><div class='sommaire'>...</div><h2 id='section1'>...</h2><p>...</p>...<div class='faq'>...</div><p>Conclusion avec CTA...</p><div class='articles-lies'>...</div>",
-  "metaDescription": "Meta SEO 150-160 caractères incluant mot-clé",
-  "slug": "url-slug-optimise-seo",
+  "title": "Titre H1 accrocheur avec mot-clé (50-60 caractères)",
+  "content": "<p class='intro-hook'>...</p>...[TOUT le HTML de l'article]...",
+  "metaDescription": "Meta description vendeuse 150-160 caractères avec mot-clé",
+  "slug": "url-slug-seo-optimise",
   "tags": ["tag1", "tag2", "tag3", "tag4", "tag5"]
 }
 
-## ⚡ EXEMPLES DE TITRES UNIQUES (inspiration)
+═══════════════════════════════════════════════════════════════════
+                   EXEMPLES DE TITRES EFFICACES
+═══════════════════════════════════════════════════════════════════
 
-Mauvais: "Guide Complet de la Décoration Scandinave"
-Bon: "7 Secrets Nordiques pour un Salon Hygge Inoubliable"
+❌ MAUVAIS: "Guide Complet de la Décoration Scandinave"
+✅ BON: "7 Secrets Nordiques pour un Salon Hygge en 2026"
 
-Mauvais: "Comment Décorer sa Chambre"  
-Bon: "Transformez Votre Chambre en Sanctuaire : 5 Astuces de Pro"
+❌ MAUVAIS: "Comment Décorer sa Chambre"
+✅ BON: "Transformez Votre Chambre en Cocon : 5 Erreurs à Éviter"
 
-Maintenant, rédige l'article COMPLET, UNIQUE et PARFAITEMENT OPTIMISÉ !`;
+❌ MAUVAIS: "Les Couleurs à la Mode"
+✅ BON: "Terracotta, Vert Sauge, Bleu Klein : La Palette 2026 Décryptée"
+
+═══════════════════════════════════════════════════════════════════
+
+GÉNÈRE MAINTENANT L'ARTICLE COMPLET, VIRAL ET SEO-OPTIMISÉ!`;
   }
 
   private parseGeneratedContent(
