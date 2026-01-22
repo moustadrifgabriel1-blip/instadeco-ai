@@ -84,10 +84,15 @@ export default function CGVPage() {
           </p>
 
           <h3 className="text-lg font-medium text-gray-800 mt-4 mb-2">3.2 Capacité juridique</h3>
-          <p className="text-gray-700 mb-4">
-            Le Service est réservé aux personnes physiques majeures (<strong>18 ans et plus</strong>) 
-            ayant la capacité juridique de contracter. En créant un compte, l&apos;Utilisateur déclare être majeur.
-          </p>
+          <div className="bg-red-50 border border-red-200 p-4 rounded-lg mb-4">
+            <p className="text-gray-700">
+              <strong className="text-red-700">⚠️ SERVICE RÉSERVÉ AUX PERSONNES MAJEURES (18 ANS ET PLUS)</strong>
+            </p>
+            <p className="text-gray-700 mt-2">
+              L&apos;Utilisateur doit avoir la capacité juridique de contracter. En créant un compte et en utilisant 
+              le Service, l&apos;Utilisateur déclare et garantit être âgé d&apos;au moins 18 ans.
+            </p>
+          </div>
 
           <h3 className="text-lg font-medium text-gray-800 mt-4 mb-2">3.3 Crédits offerts</h3>
           <p className="text-gray-700">
@@ -109,7 +114,8 @@ export default function CGVPage() {
                 <tr>
                   <th className="px-4 py-2 text-left font-semibold">Pack</th>
                   <th className="px-4 py-2 text-left font-semibold">Crédits</th>
-                  <th className="px-4 py-2 text-left font-semibold">Prix</th>
+                  <th className="px-4 py-2 text-left font-semibold">Prix EUR</th>
+                  <th className="px-4 py-2 text-left font-semibold">Prix CHF</th>
                   <th className="px-4 py-2 text-left font-semibold">Prix/crédit</th>
                 </tr>
               </thead>
@@ -118,25 +124,29 @@ export default function CGVPage() {
                   <td className="px-4 py-2">Pack Starter</td>
                   <td className="px-4 py-2">10 crédits</td>
                   <td className="px-4 py-2 font-medium">9,90 €</td>
-                  <td className="px-4 py-2">0,99 €</td>
+                  <td className="px-4 py-2 font-medium">9,90 CHF</td>
+                  <td className="px-4 py-2">0,99 € / 0,99 CHF</td>
                 </tr>
                 <tr className="border-b bg-blue-50">
                   <td className="px-4 py-2">Pack Pro <span className="text-xs bg-blue-600 text-white px-2 py-0.5 rounded">Populaire</span></td>
                   <td className="px-4 py-2">25 crédits</td>
                   <td className="px-4 py-2 font-medium">19,90 €</td>
-                  <td className="px-4 py-2">0,80 €</td>
+                  <td className="px-4 py-2 font-medium">19,90 CHF</td>
+                  <td className="px-4 py-2">0,80 € / 0,80 CHF</td>
                 </tr>
                 <tr className="border-b">
                   <td className="px-4 py-2">Pack 50</td>
                   <td className="px-4 py-2">50 crédits</td>
                   <td className="px-4 py-2 font-medium">34,90 €</td>
-                  <td className="px-4 py-2">0,70 €</td>
+                  <td className="px-4 py-2 font-medium">34,90 CHF</td>
+                  <td className="px-4 py-2">0,70 € / 0,70 CHF</td>
                 </tr>
                 <tr className="border-b bg-green-50">
                   <td className="px-4 py-2">Pack 100 <span className="text-xs bg-green-600 text-white px-2 py-0.5 rounded">Meilleure offre</span></td>
                   <td className="px-4 py-2">100 crédits</td>
                   <td className="px-4 py-2 font-medium">59,90 €</td>
-                  <td className="px-4 py-2">0,60 €</td>
+                  <td className="px-4 py-2 font-medium">59,90 CHF</td>
+                  <td className="px-4 py-2">0,60 € / 0,60 CHF</td>
                 </tr>
               </tbody>
             </table>
@@ -144,7 +154,7 @@ export default function CGVPage() {
 
           <h3 className="text-lg font-medium text-gray-800 mt-4 mb-2">4.2 Téléchargement HD</h3>
           <p className="text-gray-700 mb-4">
-            Le téléchargement en haute définition d&apos;une image générée est facturé <strong>1,99 €</strong> 
+            Le téléchargement en haute définition d&apos;une image générée est facturé <strong>1,99 € / 1,99 CHF</strong> 
             par image (paiement unique par image).
           </p>
 

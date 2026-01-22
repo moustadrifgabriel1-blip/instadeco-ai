@@ -338,12 +338,17 @@ export default function PrivacyPolicyPage() {
         {/* Mineurs */}
         <section className="bg-white rounded-lg shadow-sm p-6 mb-6">
           <h2 className="text-2xl font-semibold text-gray-900 mb-4">9. Protection des mineurs</h2>
-          <p className="text-gray-700">
-            Notre service est réservé aux personnes âgées de <strong>18 ans et plus</strong>. 
-            Nous ne collectons pas sciemment de données personnelles de mineurs. 
-            Si vous êtes parent ou tuteur et pensez que votre enfant nous a fourni des données personnelles, 
-            veuillez nous contacter pour demander leur suppression.
-          </p>
+          <div className="bg-red-50 border border-red-200 p-4 rounded-lg">
+            <p className="text-gray-700">
+              <strong className="text-red-700">⚠️ SERVICE RÉSERVÉ AUX PERSONNES MAJEURES (18 ANS ET PLUS)</strong>
+            </p>
+            <p className="text-gray-700 mt-2">
+              Notre service est strictement réservé aux personnes âgées de <strong>18 ans et plus</strong>. 
+              Nous ne collectons pas sciemment de données personnelles de mineurs. 
+              Si vous êtes parent ou tuteur et pensez que votre enfant nous a fourni des données personnelles, 
+              veuillez nous contacter immédiatement pour demander leur suppression.
+            </p>
+          </div>
         </section>
 
         {/* Réclamations */}
