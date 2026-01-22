@@ -1,8 +1,8 @@
 # 🏠 InstaDeco AI - Contrat de Contexte Global
 
 **Date de création :** 16 janvier 2026  
-**Dernière mise à jour :** 20 janvier 2026  
-**Version :** 2.0.0  
+**Dernière mise à jour :** 22 janvier 2026  
+**Version :** 2.1.0  
 **Type de projet :** SaaS B2C - Décoration d'intérieur par IA  
 **🏗️ Architecture :** Hexagonale (Ports & Adapters)  
 **🎨 Branding :** InstaDeco AI  
@@ -13,25 +13,26 @@
 
 1. [Vision et Positionnement](#vision-et-positionnement)
 2. [Architecture Technique](#architecture-technique)
-3. [Architecture Hexagonale](#architecture-hexagonale)
-4. [Structure de la Base de Données](#structure-de-la-base-de-données)
-5. [Endpoints API V2](#endpoints-api-v2)
-6. [Couches du Code](#couches-du-code)
-7. [Flux Utilisateur Principal](#flux-utilisateur-principal)
-8. [Système de Crédits et Paiements](#système-de-crédits-et-paiements)
-9. [Sécurité et Validation](#sécurité-et-validation)
-10. [Variables d'Environnement](#variables-denvironnement)
+3. [État d'Avancement (Journal de Bord)](#état-davancement-journal-de-bord)
+4. [Architecture Hexagonale](#architecture-hexagonale)
+5. [Structure de la Base de Données](#structure-de-la-base-de-données)
+6. [Endpoints API V2](#endpoints-api-v2)
+7. [Couches du Code](#couches-du-code)
+8. [Flux Utilisateur Principal](#flux-utilisateur-principal)
+9. [Système de Crédits et Paiements](#système-de-crédits-et-paiements)
+10. [Sécurité et Validation](#sécurité-et-validation)
+11. [Variables d'Environnement](#variables-denvironnement)
 
 ---
 
 ## 🎯 Vision et Positionnement
 
 ### Concept
-**InstaDeco AI** permet aux utilisateurs de transformer leurs photos de pièces en rendus décorés professionnels grâce à l'IA générative (Flux.1 + ControlNet via Replicate.ai).
+**InstaDeco AI** permet aux utilisateurs de transformer leurs photos de pièces en rendus décorés professionnels grâce à l'IA générative (Flux.1 + ControlNet via **Fal.ai**).
 
 ### Proposition de Valeur
-- ✅ **Rapide** : Génération en moins de 30 secondes
-- ✅ **Précis** : Respect de la structure spatiale (ControlNet Canny/Depth)
+- ✅ **Rapide** : Génération en moins de 10 secondes (optimisé avec Fal.ai)
+- ✅ **Précis** : Respect de la structure spatiale (ControlNet Depth via Fal.ai)
 - ✅ **Flexible** : 10+ styles de décoration (Bohème, Minimaliste, Industriel, etc.)
 - ✅ **Accessible** : Modèle de crédits sans abonnement
 
@@ -54,7 +55,7 @@
 | **Base de Données** | Supabase (PostgreSQL + Row Level Security) |
 | **Authentification** | Supabase Auth (Email + OAuth Google) |
 | **Stockage Fichiers** | Supabase Storage (Images utilisateurs + générations) |
-| **IA Générative** | Replicate.ai - Flux.1 Canny Pro + ControlNet |
+| **IA Générative** | **Fal.ai** - Flux.1 [dev] + ControlNet (Depth) |
 | **Paiements** | Stripe (Checkout Sessions + Webhooks) |
 | **Validation** | Zod (Schemas TypeScript-first) |
 | **Architecture** | Hexagonale (Ports & Adapters) |
@@ -66,12 +67,10 @@
 - Streaming SSR pour UX optimale
 - API Routes pour endpoints backend
 
-**Pourquoi Replicate.ai + Flux.1 ?**
-- **Prix compétitif** : $0.05 par image
-- Flux.1 Canny Pro : Meilleure qualité avec ControlNet intégré
-- API simple avec SDK officiel (predictions)
-- Respect parfait de la géométrie de la pièce (Canny edge detection)
-- Commercial use autorisé
+**Pourquoi Fal.ai + Flux.1 ?**
+- **Migration (Jan 2026)** : Passage de Replicate à Fal.ai pour meilleure performance et alignement configuration.
+- Modèle : `fal-ai/flux/dev/controlnet`
+- Optimisation : Latence très faible et files d'attente optimisées.
 
 **Pourquoi Supabase ?**
 - PostgreSQL robuste avec types forts
@@ -85,6 +84,29 @@
 - Testabilité améliorée (mocks faciles)
 - Indépendance des frameworks
 - Facilité de maintenance et évolution
+
+---
+
+## 📅 État d'Avancement (Journal de Bord)
+
+### ✅ Récemment Complété (22 Janvier 2026)
+1.  **Migration Auth & DB** : Finalisation du passage de Firebase à Supabase.
+2.  **Fix RLS** : Correction des politiques "Infinite Recursion" sur Supabase.
+3.  **Fix Header UI** : Le composant `Header` affiche correctement les crédits (récupération API + Fallback direct).
+4.  **Migration IA** : Remplacement complet de Replicate par **Fal.ai**.
+    *   Adapter : `FalImageGeneratorService.ts`
+    *   Config : `FAL_KEY` configurée (Local + Vercel).
+    *   Client : Usage de `@fal-ai/client`.
+
+### 🚧 En Cours de Débogage
+1.  **Erreur Génération 500** : Le processus de génération lève une erreur interne.
+    *   *Hypothèse* : Conflit lors de la déduction de crédits ou format de réponse Fal.ai inattendu.
+    *   *Action* : Code mis à jour pour logger l'erreur précise.
+
+### 🔜 Prochaines Étapes
+1.  Identifier la cause exacte de l'erreur 500 (via logs Vercel ou test client).
+2.  Valider le flux complet : Upload -> Génération -> Déduction Crédit -> Affichage.
+3.  Nettoyage du code mort (ancien code Replicate/Firebase).
 
 ---
 
