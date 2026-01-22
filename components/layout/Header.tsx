@@ -25,6 +25,9 @@ export function Header() {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, credits, loading } = useAuth();
+  
+  // Debug log pour voir l'état de l'authentification
+  console.log('[Header] Auth State:', { user: user?.id, credits, loading });
 
   const isActive = (href: string) => {
     if (href === '/') {

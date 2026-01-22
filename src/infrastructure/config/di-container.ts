@@ -12,7 +12,8 @@ import { SupabaseCreditRepository } from '../repositories/supabase/SupabaseCredi
 import { SupabaseStyleRepository } from '../repositories/supabase/SupabaseStyleRepository';
 
 // Services
-import { ReplicateImageGeneratorService } from '../services/replicate/ReplicateImageGeneratorService';
+// import { ReplicateImageGeneratorService } from '../services/replicate/ReplicateImageGeneratorService';
+import { FalImageGeneratorService } from '../services/fal/FalImageGeneratorService';
 import { StripePaymentService } from '../services/stripe/StripePaymentService';
 import { SupabaseStorageService } from '../services/supabase/SupabaseStorageService';
 import { ConsoleLoggerService } from '../services/logger/ConsoleLoggerService';
@@ -89,7 +90,9 @@ class DIContainer {
 
   get imageGeneratorService(): IImageGeneratorService {
     if (!this._imageGenerator) {
-      this._imageGenerator = new ReplicateImageGeneratorService();
+      // Switch from Replicate to Fal.ai
+      // this._imageGenerator = new ReplicateImageGeneratorService();
+      this._imageGenerator = new FalImageGeneratorService();
     }
     return this._imageGenerator;
   }

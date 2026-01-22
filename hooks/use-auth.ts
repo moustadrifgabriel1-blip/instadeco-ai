@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { User, Session } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
+import { getCredits } from '@/src/presentation/api/client';
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
@@ -16,10 +17,15 @@ export function useAuth() {
   useEffect(() => {
     // Récupérer la session initiale
     const getInitialSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        setSession(session);
+        setUser(session?.user ?? null);
+      } catch (error) {
+        console.error('Error getting session:', error);
+      } finally {
+        setLoading(false);
+      }
     };
 
     getInitialSession();
@@ -46,23 +52,28 @@ export function useAuth() {
       return;
     }
 
-    // Récupérer les crédits initiaux
-    const fetchCredits = async () => {
-      const { data: profile, error } = await supabase
-        .from('profiles')
-        .select('credits')
-        .eq('id', user.id)
-        .single();
-
-      if (error) {
-        console.error('[Auth] Error fetching credits:', error);
-        return;
+    // Récupérer les crédits via l'API (bypass RLS)
+    const fetchCreditsData = async () => {
+      try {
+        const response = await getCredits({ userId: user.id });
+        setCredits(response.credits);
+      } catch (error) {
+        console.error('[Auth] Error fetching credits from API:', error);
+        
+        // Fallback: Essayer via Supabase direct (si RLS fonctionne)
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('credits')
+          .eq('id', user.id)
+          .single();
+          
+        if (profile) {
+          setCredits(profile.credits);
+        }
       }
-
-      setCredits(profile?.credits || 0);
     };
 
-    fetchCredits();
+    fetchCreditsData();
 
     // S'abonner aux changements en temps réel
     const channel = supabase
