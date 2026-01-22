@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { ArticleCard } from '@/components/features/blog';
+import { formatBlogTitle } from '@/lib/utils';
 
 import { SupabaseBlogArticleRepository } from '@/src/infrastructure/repositories/SupabaseBlogArticleRepository';
 import { GetBlogArticleBySlugUseCase } from '@/src/application/use-cases/blog/GetBlogArticleBySlugUseCase';
@@ -67,25 +68,20 @@ async function getArticle(slug: string): Promise<ArticleData | null> {
       return null;
     }
 
-    // Mapper manuellement ou utiliser le Mapper existant pour conformer à l'interface
-    // Ici on adapte l'entité au format attendu par la page
-    const articleDTO = BlogArticleMapper.toDTO(result.article);
+    // result.article est déjà un DTO, pas besoin de Mapper
+    const articleDTO = result.article;
     
     // Convertir les dates en string pour l'interface locale
     const articleData: ArticleData = {
       ...articleDTO,
-      publishedAt: typeof result.article.publishedAt === 'string' 
-        ? result.article.publishedAt 
-        : new Date(result.article.publishedAt).toISOString(),
-      internalLinks: result.article.internalLinks || [],
+      publishedAt: articleDTO.publishedAt,
+      internalLinks: [],
       // Mapper les articles liés
       relatedArticles: result.relatedArticles?.map(related => {
-        const relatedDTO = BlogArticleMapper.toDTO(related);
+        // related est déjà un DTO compatible
         return {
-          ...relatedDTO,
-          publishedAt: typeof related.publishedAt === 'string'
-            ? related.publishedAt
-            : new Date(related.publishedAt).toISOString()
+          ...related,
+          publishedAt: related.publishedAt
         };
       })
     };
@@ -113,12 +109,12 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
   }
 
   return {
-    title: `${article.title} | InstaDeco AI`,
+    title: `${formatBlogTitle(article.title)} | InstaDeco AI`,
     description: article.metaDescription,
     keywords: article.tags,
     authors: [{ name: 'InstaDeco AI' }],
     openGraph: {
-      title: article.title,
+      title: formatBlogTitle(article.title),
       description: article.metaDescription,
       type: 'article',
       url: `https://instadeco.app/blog/${article.slug}`,
@@ -128,7 +124,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
     },
     twitter: {
       card: 'summary_large_image',
-      title: article.title,
+      title: formatBlogTitle(article.title),
       description: article.metaDescription,
     },
     alternates: {
@@ -192,7 +188,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           {/* Header */}
           <header className="mb-8">
             <h1 className="text-3xl md:text-4xl font-bold mb-4 leading-tight">
-              {article.title}
+              {formatBlogTitle(article.title)}
             </h1>
 
             <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-6">
@@ -332,7 +328,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           __html: JSON.stringify({
             '@context': 'https://schema.org',
             '@type': 'BlogPosting',
-            headline: article.title,
+            headline: formatBlogTitle(article.title),
             description: article.metaDescription,
             url: `https://instadeco.ai/blog/${article.slug}`,
             datePublished: article.publishedAt,

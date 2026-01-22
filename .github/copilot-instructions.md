@@ -10,8 +10,8 @@ Ce projet est un **SaaS B2C de décoration d'intérieur par IA** utilisant Flux.
 
 - **Frontend:** Next.js 14 (App Router), TypeScript, Tailwind CSS
 - **UI Components:** Shadcn/UI (Radix UI)
-- **Backend:** Next.js API Routes + Firebase Functions
-- **Database:** Firebase Firestore + Firebase Auth + Firebase Storage
+- **Backend:** Next.js API Routes + Supabase (PostgreSQL + Auth + Storage)
+- **Database:** Supabase
 - **IA Générative:** Fal.ai (Flux.1 [dev] + ControlNet)
 - **Paiements:** Stripe (modèle de crédits)
 - **Validation:** Zod

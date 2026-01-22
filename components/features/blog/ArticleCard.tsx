@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { CalendarDays, Clock, Tag } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { formatBlogTitle } from '@/lib/utils';
 
 export interface ArticleCardProps {
   id: string;
@@ -48,7 +49,7 @@ export function ArticleCard({
             <span>{readingTimeMinutes} min de lecture</span>
           </div>
           <h2 className="text-xl font-semibold group-hover:text-primary transition-colors line-clamp-2">
-            {title}
+            {formatBlogTitle(title)}
           </h2>
         </CardHeader>
         
