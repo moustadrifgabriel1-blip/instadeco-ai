@@ -118,12 +118,16 @@ export class FalImageGeneratorService implements IImageGeneratorService {
 
   /**
    * Génération avec le modèle spécialisé AI-Home (recommandé pour la déco)
+   * Avec système de retry pour les erreurs temporaires
    */
   private async generateWithAIHome(
     options: ImageGenerationOptions,
     styleSlug: string,
-    roomType: string
+    roomType: string,
+    retryCount = 0
   ): Promise<Result<ImageGenerationResult>> {
+    const MAX_RETRIES = 2;
+    
     try {
       const startTime = Date.now();
 
@@ -135,6 +139,8 @@ export class FalImageGeneratorService implements IImageGeneratorService {
         style,
         architectureType,
         colorPalette,
+        imageUrl: options.controlImageUrl?.substring(0, 80) + '...',
+        retry: retryCount,
       });
 
       const result: any = await fal.subscribe('half-moon-ai/ai-home/style', {
@@ -143,10 +149,8 @@ export class FalImageGeneratorService implements IImageGeneratorService {
           architecture_type: architectureType,
           style: style,
           color_palette: colorPalette,
-          input_image_strength: 0.85, // Préserve bien la structure
-          enhanced_rendering: true, // Meilleure qualité
+          input_image_strength: 0.85,
           output_format: 'jpeg',
-          additional_elements: '', // Pourrait être utilisé pour ajouter des éléments
         },
         logs: true,
         onQueueUpdate: (update) => {
@@ -179,8 +183,16 @@ export class FalImageGeneratorService implements IImageGeneratorService {
         seed: 0,
       });
 
-    } catch (error) {
-      console.error('[Fal.ai] ❌ AI-Home generation failed:', error);
+    } catch (error: any) {
+      console.error('[Fal.ai] ❌ AI-Home generation failed:', error?.message || error);
+      
+      // Retry sur les erreurs 500 (Internal Server Error)
+      if (error?.status === 500 && retryCount < MAX_RETRIES) {
+        console.log(`[Fal.ai] 🔄 Retrying AI-Home (attempt ${retryCount + 2}/${MAX_RETRIES + 1})...`);
+        await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2s before retry
+        return this.generateWithAIHome(options, styleSlug, roomType, retryCount + 1);
+      }
+      
       const message = error instanceof Error ? error.message : 'Unknown error';
       return failure(new Error(`AI-Home generation failed: ${message}`));
     }
