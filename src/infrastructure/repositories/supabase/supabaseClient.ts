@@ -85,11 +85,11 @@ export interface GenerationRow {
   id: string;
   user_id: string;
   style_slug: string;
-  room_type: string;
+  room_type_slug: string;
   input_image_url: string;
   output_image_url: string | null;
   status: string;
-  prompt: string | null;
+  custom_prompt: string | null;
   hd_unlocked: boolean;
   stripe_session_id: string | null;
   created_at: string;

@@ -9,9 +9,10 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { Menu, X, Sparkles, BookOpen, CreditCard, Home, Wand2 } from 'lucide-react';
+import { Menu, X, Sparkles, BookOpen, CreditCard, Home, Wand2, User as UserIcon, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/hooks/use-auth';
 
 const navigationItems = [
   { href: '/', label: 'Accueil', icon: Home },
@@ -23,6 +24,7 @@ const navigationItems = [
 export function Header() {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, credits, loading } = useAuth();
 
   const isActive = (href: string) => {
     if (href === '/') {
@@ -63,16 +65,38 @@ export function Header() {
 
           {/* CTA Desktop */}
           <div className="hidden md:flex items-center gap-3">
-            <Link href="/login">
-              <Button variant="ghost" size="sm">
-                Connexion
-              </Button>
-            </Link>
-            <Link href="/signup">
-              <Button size="sm">
-                Essai gratuit
-              </Button>
-            </Link>
+            {loading ? (
+              <div className="h-9 w-24 bg-muted animate-pulse rounded-md" />
+            ) : user ? (
+              <>
+                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/5 text-primary rounded-full text-sm font-medium border border-primary/10">
+                  <span className="font-bold">{credits}</span>
+                  <span className="text-xs opacity-70">crédits</span>
+                  <Link href="/pricing" className="ml-1 p-0.5 hover:bg-primary/10 rounded-full transition-colors">
+                    <Plus className="h-3 w-3" />
+                  </Link>
+                </div>
+                <Link href="/dashboard">
+                  <Button variant="ghost" size="sm" className="gap-2">
+                    <UserIcon className="h-4 w-4" />
+                    Mon Compte
+                  </Button>
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link href="/login">
+                  <Button variant="ghost" size="sm">
+                    Connexion
+                  </Button>
+                </Link>
+                <Link href="/signup">
+                  <Button size="sm">
+                    Essai gratuit
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
