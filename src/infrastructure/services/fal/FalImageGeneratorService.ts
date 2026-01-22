@@ -156,15 +156,17 @@ export class FalImageGeneratorService implements IImageGeneratorService {
         },
       });
 
-      console.log('[Fal.ai] ✅ AI-Home success! Result:', {
-        hasImage: !!result?.image,
-        status: result?.status,
-      });
-
       const inferenceTime = Date.now() - startTime;
 
-      // Le modèle AI-Home retourne { image: { url: ... }, status: ... }
-      const imageUrl = result?.image?.url || result?.data?.image?.url;
+      // fal.subscribe retourne { data: { image: { url: ... }, status: ... }, requestId: ... }
+      const data = result?.data || result;
+      const imageUrl = data?.image?.url;
+
+      console.log('[Fal.ai] ✅ AI-Home success! Result:', {
+        hasImage: !!imageUrl,
+        status: data?.status,
+        requestId: result?.requestId,
+      });
       
       if (!imageUrl) {
         console.error('[Fal.ai] ❌ No image URL in AI-Home response:', JSON.stringify(result, null, 2));
@@ -210,17 +212,16 @@ export class FalImageGeneratorService implements IImageGeneratorService {
         },
       });
 
-      console.log('[Fal.ai] ✅ Flux Kontext success!');
-
       const inferenceTime = Date.now() - startTime;
 
-      // Flux Kontext retourne { images: [{ url: ... }] }
+      // fal.subscribe retourne { data: { images: [{ url: ... }] }, requestId: ... }
+      const data = result?.data || result;
       let imageUrl = '';
-      if (result?.images && result.images.length > 0) {
-        imageUrl = result.images[0].url;
-      } else if (result?.data?.images && result.data.images.length > 0) {
-        imageUrl = result.data.images[0].url;
+      if (data?.images && data.images.length > 0) {
+        imageUrl = data.images[0].url;
       }
+
+      console.log('[Fal.ai] ✅ Flux Kontext success!', { hasImage: !!imageUrl });
 
       if (!imageUrl) {
         console.error('[Fal.ai] ❌ No image URL in Kontext response:', JSON.stringify(result, null, 2));
@@ -230,7 +231,7 @@ export class FalImageGeneratorService implements IImageGeneratorService {
       return success({
         imageUrl,
         inferenceTime,
-        seed: result?.seed ?? 0,
+        seed: data?.seed ?? 0,
       });
 
     } catch (error) {
