@@ -14,9 +14,9 @@ const footerLinks = {
     { href: '/blog', label: 'Blog' },
   ],
   legal: [
-    { href: '/mentions-legales', label: 'Mentions légales' },
-    { href: '/confidentialite', label: 'Confidentialité' },
-    { href: '/cgv', label: 'CGV' },
+    { href: '/legal/mentions-legales', label: 'Mentions légales' },
+    { href: '/legal/privacy', label: 'Confidentialité' },
+    { href: '/legal/cgv', label: 'CGV' },
   ],
   social: [
     { href: 'https://twitter.com/instadeco_ai', label: 'Twitter' },

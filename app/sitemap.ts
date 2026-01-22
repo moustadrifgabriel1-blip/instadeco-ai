@@ -52,6 +52,30 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   // ============================================
+  // PAGES LÉGALES
+  // ============================================
+  const legalPages: MetadataRoute.Sitemap = [
+    {
+      url: `${BASE_URL}/legal/mentions-legales`,
+      lastModified: now,
+      changeFrequency: 'yearly',
+      priority: 0.3,
+    },
+    {
+      url: `${BASE_URL}/legal/privacy`,
+      lastModified: now,
+      changeFrequency: 'yearly',
+      priority: 0.3,
+    },
+    {
+      url: `${BASE_URL}/legal/cgv`,
+      lastModified: now,
+      changeFrequency: 'yearly',
+      priority: 0.3,
+    },
+  ];
+
+  // ============================================
   // ARTICLES DE BLOG (DYNAMIQUE)
   // ============================================
   let articlePages: MetadataRoute.Sitemap = [];
@@ -87,5 +111,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  return [...staticPages, ...blogIndexPage, ...articlePages];
+  return [...staticPages, ...legalPages, ...blogIndexPage, ...articlePages];
 }
