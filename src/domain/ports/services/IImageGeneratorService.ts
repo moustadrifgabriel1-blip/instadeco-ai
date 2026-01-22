@@ -15,6 +15,10 @@ export interface ImageGenerationResult {
 export interface ImageGenerationOptions {
   prompt: string;
   controlImageUrl: string;
+  /** Style de décoration (moderne, minimaliste, etc.) */
+  styleSlug?: string;
+  /** Type de pièce (salon, chambre, etc.) */
+  roomType?: string;
   width?: number;
   height?: number;
   numInferenceSteps?: number;
@@ -24,7 +28,7 @@ export interface ImageGenerationOptions {
 
 /**
  * Port Service - Image Generator
- * Interface pour la génération d'images par IA (Replicate)
+ * Interface pour la génération d'images par IA (Fal.ai)
  */
 export interface IImageGeneratorService {
   /**

@@ -98,10 +98,13 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error('[Generate V2] ❌ Erreur:', error);
 
+    // DEBUG: Retourner l'erreur détaillée pour comprendre le problème
     return NextResponse.json(
       {
-        error: 'Erreur serveur',
-        details: error instanceof Error ? error.message : 'Erreur inconnue',
+        error: 'Erreur serveur critique',
+        details: error instanceof Error ? error.message : String(error),
+        // Ne pas exposer la stack trace en production sauf si nécessaire pour debug
+        // stack: error instanceof Error ? error.stack : undefined 
       },
       { status: 500 }
     );

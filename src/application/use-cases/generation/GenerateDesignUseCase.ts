@@ -132,6 +132,8 @@ export class GenerateDesignUseCase {
     const genResult = await this.imageGenerator.generate({
       prompt: input.prompt,
       controlImageUrl: inputImageUrl,
+      styleSlug: input.styleSlug,
+      roomType: input.roomType,
       width: 1024,
       height: 1024,
       numInferenceSteps: 28,
