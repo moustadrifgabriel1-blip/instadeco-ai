@@ -118,6 +118,7 @@ export async function POST(req: Request) {
 
 /**
  * Construit le prompt pour la génération basé sur le style et le type de pièce
+ * IMPORTANT: Le prompt insiste sur la préservation de la structure architecturale
  */
 function buildPrompt(style: string, roomType: string): string {
   const styleDescriptions: Record<string, string> = {
@@ -147,9 +148,24 @@ function buildPrompt(style: string, roomType: string): string {
   const styleDesc = styleDescriptions[style] || style;
   const roomDesc = roomDescriptions[roomType] || roomType;
 
-  return `Professional interior design photo of a ${roomDesc} with ${styleDesc}. 
-High-end architectural photography, natural lighting, 8K resolution, photorealistic, 
-magazine quality, interior design showcase. The room maintains its exact structure, 
-walls, windows, and doors positions while being completely redesigned with new 
-furniture, decor, lighting fixtures, and materials matching the specified style.`;
+  return `Redesign this ${roomDesc} with ${styleDesc}.
+
+CRITICAL CONSTRAINTS - MUST PRESERVE:
+- Keep EXACT same room dimensions and proportions
+- Keep ALL windows in their EXACT positions, sizes, and shapes
+- Keep ALL doors in their EXACT positions and sizes  
+- Keep ALL walls in their EXACT positions - DO NOT add, remove, or modify any walls
+- Keep the ceiling height and floor area unchanged
+- Keep any built-in architectural features (columns, beams, alcoves)
+
+ONLY CHANGE:
+- Replace furniture with new ${styleDesc} pieces
+- Change wall colors/textures (but keep walls in place)
+- Add decorative elements (rugs, curtains, plants, art)
+- Update lighting fixtures
+- Change flooring material/color
+
+The architectural shell of the room must remain IDENTICAL to the original photo. Only the interior design elements (furniture, decor, materials) should change to match the ${style} style.
+
+Professional interior design photography, natural lighting, photorealistic, magazine quality.`;
 }

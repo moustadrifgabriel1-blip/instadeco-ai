@@ -149,7 +149,7 @@ export class FalImageGeneratorService implements IImageGeneratorService {
           architecture_type: architectureType,
           style: style,
           color_palette: colorPalette,
-          input_image_strength: 0.85,
+          input_image_strength: 0.90, // 90% - préserve fortement la structure (murs, fenêtres, portes)
           output_format: 'jpeg',
         },
         logs: true,
