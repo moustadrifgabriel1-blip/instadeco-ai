@@ -13,6 +13,7 @@ export interface Generation {
   readonly prompt: string | null;
   readonly hdUnlocked: boolean;
   readonly stripeSessionId: string | null;
+  readonly providerId?: string; // ID externe (Fal.ai, Replicate...)
   readonly createdAt: Date;
   readonly updatedAt: Date;
 }
@@ -36,4 +37,5 @@ export interface UpdateGenerationInput {
   outputImageUrl?: string;
   hdUnlocked?: boolean;
   stripeSessionId?: string;
+  providerId?: string;
 }
