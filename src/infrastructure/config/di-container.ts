@@ -129,8 +129,10 @@ class DIContainer {
 
   get getGenerationStatusUseCase(): GetGenerationStatusUseCase {
     return new GetGenerationStatusUseCase(
-      this.generationRepository,      this.imageGeneratorService, // Nouveau paramètre
-      this.storageService, // Nouveau paramètre      this.logger,
+      this.generationRepository,
+      this.imageGeneratorService,
+      this.storageService,
+      this.logger,
     );
   }
 

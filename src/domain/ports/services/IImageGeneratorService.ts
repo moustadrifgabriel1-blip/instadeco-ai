@@ -5,6 +5,8 @@ import { Result } from '@/src/shared/types/Result';
  */
 export interface ImageGenerationResult {
   imageUrl: string;
+  providerId?: string; // ID pour le suivi async
+  status?: 'pending' | 'processing' | 'succeeded' | 'failed';
   seed?: number;
   inferenceTime?: number;
 }
@@ -39,14 +41,14 @@ export interface IImageGeneratorService {
   /**
    * Vérifie le statut d'une génération en cours
    */
-  checkStatus(predictionId: string): Promise<Result<{
-    status: 'starting' | 'processing' | 'succeeded' | 'failed';
-    output?: string;
-    error?: string;
+  checkStatus?(predictionId: string): Promise<Result<{
+    status: 'starting' | 'processing' | 'succeeded' | 'failed' | string;
+    output?: any;
+    logs?: string;
   }>>;
 
   /**
    * Annule une génération en cours
    */
-  cancel(predictionId: string): Promise<Result<void>>;
+  cancel?(predictionId: string): Promise<Result<void>>;
 }

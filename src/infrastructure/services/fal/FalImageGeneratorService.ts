@@ -210,11 +210,6 @@ export class FalImageGeneratorService implements IImageGeneratorService {
     return 'salon';
   }
 
-  // Méthodes non utilisées avec fal.subscribe (attente synchrone)
-  async checkStatus(predictionId: string): Promise<Result<any>> {
-    return success({ status: 'succeeded' });
-  }
-
   async cancel(predictionId: string): Promise<Result<void>> {
     return success(undefined);
   }
