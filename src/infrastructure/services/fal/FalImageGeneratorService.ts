@@ -144,32 +144,55 @@ export class FalImageGeneratorService implements IImageGeneratorService {
   // Vérifier le statut d'un job
   async checkStatus(predictionId: string): Promise<Result<any>> {
     try {
+      console.log('[Fal.ai] 🔄 Checking status for:', predictionId);
+      
+      // Tentative avec requestId (camelCase)
       const status = await fal.queue.status('half-moon-ai/ai-home/style', {
         requestId: predictionId,
-        logs: true // Récupérer les logs
+        logs: true
       });
 
-      console.log('[Fal.ai] 🔄 Status check:', { predictionId, status: (status as any).status });
+      // Gestion de différentes structures de réponse possibles
+      const statusData = (status as any).data || status;
+      const statusCode = (statusData?.status || 'UNKNOWN').toUpperCase();
 
-      if ((status as any).status === 'COMPLETED') {
+      console.log('[Fal.ai] 📊 Status received:', { predictionId, statusCode });
+
+      if (statusCode === 'COMPLETED' || statusCode === 'SUCCEEDED' || statusCode === 'OK') {
          const result = await fal.queue.result('half-moon-ai/ai-home/style', {
            requestId: predictionId
          });
          
          const data = (result as any).data || result;
-         const imageUrl = data?.image?.url;
+         // Parfois l'image est directement dans data, parfois dans images
+         const imageUrl = data?.image?.url || data?.images?.[0]?.url;
+
+         if (!imageUrl) {
+            console.error('[Fal.ai] ❌ No image URL in result:', data);
+            return failure(new Error('No image URL in result'));
+         }
          
          return success({ 
            status: 'succeeded',
            output: { imageUrl }
          });
-      } else if ((status as any).status === 'IN_PROGRESS' || (status as any).status === 'IN_QUEUE') {
-        return success({ status: 'processing' });
+      } else if (['IN_PROGRESS', 'IN_QUEUE', 'QUEUED', 'PENDING', 'RUNNING', 'STARTING'].includes(statusCode)) {
+        return success({ status: 'processing', logs: statusData.logs });
+      } else if (statusCode === 'FAILED' || statusCode === 'ERROR') {
+        const errorMsg = statusData.error || 'Fal.ai job failed';
+        return failure(new Error(errorMsg));
       } else {
-        return failure(new Error(`Fal.ai job failed with status: ${(status as any).status}`));
+        console.warn('[Fal.ai] ⚠️ Unknown status:', statusCode);
+        // On suppose que ça continue
+        return success({ status: 'processing' });
       }
     } catch (error) {
       console.error('[Fal.ai] ❌ Status check failed:', error);
+      // On ne retourne pas failure pour ne pas casser le polling, on attend le prochain tick
+      // Mais si c'est une 404, on devrait peut-être arrêter
+      if ((error as any)?.message?.includes('404')) {
+         return failure(new Error('Job not found (404)'));
+      }
       return failure(error instanceof Error ? error : new Error('Status check failed'));
     }
   }
