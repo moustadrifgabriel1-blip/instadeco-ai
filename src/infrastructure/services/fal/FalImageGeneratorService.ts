@@ -98,163 +98,84 @@ export class FalImageGeneratorService implements IImageGeneratorService {
     const styleSlug = options.styleSlug || this.extractStyleFromPrompt(options.prompt);
     const roomType = options.roomType || this.extractRoomFromPrompt(options.prompt);
 
-    console.log('[Fal.ai] 🎨 Starting generation:', {
+    console.log('[Fal.ai] 🎨 Starting generation (Queue Mode):', {
       styleSlug,
       roomType,
       imageUrl: options.controlImageUrl?.substring(0, 50) + '...',
       model: 'half-moon-ai/ai-home/style'
     });
 
-    // Essayer d'abord avec le modèle spécialisé AI-Home
-    const aiHomeResult = await this.generateWithAIHome(options, styleSlug, roomType);
-    if (aiHomeResult.success) {
-      return aiHomeResult;
-    }
-
-    console.warn('[Fal.ai] ⚠️ AI-Home failed, trying Flux Kontext fallback...');
-    
-    // Fallback sur Flux Kontext
-    return this.generateWithFluxKontext(options);
-  }
-
-  /**
-   * Génération avec le modèle spécialisé AI-Home (recommandé pour la déco)
-   * Avec système de retry pour les erreurs temporaires
-   */
-  private async generateWithAIHome(
-    options: ImageGenerationOptions,
-    styleSlug: string,
-    roomType: string,
-    retryCount = 0
-  ): Promise<Result<ImageGenerationResult>> {
-    const MAX_RETRIES = 2;
-    
     try {
-      const startTime = Date.now();
-
       const style = STYLE_MAPPING[styleSlug] || 'modern-interior';
       const architectureType = ROOM_MAPPING[roomType] || 'living room-interior';
       const colorPalette = COLOR_PALETTES[styleSlug] || COLOR_PALETTES['default'];
 
-      console.log('[Fal.ai] 🏠 AI-Home params:', {
-        style,
-        architectureType,
-        colorPalette,
-        imageUrl: options.controlImageUrl?.substring(0, 80) + '...',
-        retry: retryCount,
-      });
-
-      const result: any = await fal.subscribe('half-moon-ai/ai-home/style', {
+      // Utiliser fal.queue.submit au lieu de fal.subscribe
+      const { request_id } = await fal.queue.submit('half-moon-ai/ai-home/style', {
         input: {
           input_image_url: options.controlImageUrl,
           architecture_type: architectureType,
           style: style,
           color_palette: colorPalette,
-          input_image_strength: 0.90, // 90% - préserve fortement la structure (murs, fenêtres, portes)
-          num_inference_steps: 25, // Optimisation vitesse (standard ~28)
+          input_image_strength: 0.90,
+          num_inference_steps: 25,
           output_format: 'jpeg',
         },
-        logs: true,
-        onQueueUpdate: (update) => {
-          if (update.status === 'IN_PROGRESS') {
-            console.log('[Fal.ai] 🔄 Processing...');
-          }
-        },
+        webhookUrl: process.env.NEXT_PUBLIC_APP_URL ? `${process.env.NEXT_PUBLIC_APP_URL}/api/v2/webhooks/fal` : undefined,
       });
 
-      const inferenceTime = Date.now() - startTime;
+      console.log('[Fal.ai] ✅ Job submitted successfully:', { request_id });
 
-      // fal.subscribe retourne { data: { image: { url: ... }, status: ... }, requestId: ... }
-      const data = result?.data || result;
-      const imageUrl = data?.image?.url;
-
-      console.log('[Fal.ai] ✅ AI-Home success! Result:', {
-        hasImage: !!imageUrl,
-        status: data?.status,
-        requestId: result?.requestId,
-      });
-      
-      if (!imageUrl) {
-        console.error('[Fal.ai] ❌ No image URL in AI-Home response:', JSON.stringify(result, null, 2));
-        return failure(new Error('AI-Home model returned no image URL'));
-      }
-
+      // Retourner le pending status
       return success({
-        imageUrl,
-        inferenceTime,
+        imageUrl: '', // Sera rempli plus tard
+        providerId: request_id, 
+        status: 'pending',
+        inferenceTime: 0,
         seed: 0,
       });
 
     } catch (error: any) {
-      console.error('[Fal.ai] ❌ AI-Home generation failed:', error?.message || error);
-      
-      // Retry sur les erreurs 500 (Internal Server Error)
-      if (error?.status === 500 && retryCount < MAX_RETRIES) {
-        console.log(`[Fal.ai] 🔄 Retrying AI-Home (attempt ${retryCount + 2}/${MAX_RETRIES + 1})...`);
-        await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2s before retry
-        return this.generateWithAIHome(options, styleSlug, roomType, retryCount + 1);
-      }
-      
-      const message = error instanceof Error ? error.message : 'Unknown error';
-      return failure(new Error(`AI-Home generation failed: ${message}`));
+      console.error('[Fal.ai] ❌ Generation submission failed:', error?.message || error);
+      return failure(new Error(`Fal.ai submission failed: ${error?.message || error}`));
     }
   }
 
-  /**
-   * Fallback: Génération avec Flux Kontext pour l'édition d'images
-   */
-  private async generateWithFluxKontext(options: ImageGenerationOptions): Promise<Result<ImageGenerationResult>> {
+  // Vérifier le statut d'un job
+  async checkStatus(predictionId: string): Promise<Result<any>> {
     try {
-      const startTime = Date.now();
-
-      console.log('[Fal.ai] 🔄 Flux Kontext fallback with prompt:', options.prompt.substring(0, 100) + '...');
-
-      const result: any = await fal.subscribe('fal-ai/flux-pro/kontext', {
-        input: {
-          prompt: options.prompt,
-          image_url: options.controlImageUrl,
-          guidance_scale: options.guidanceScale || 3.5,
-          num_images: 1,
-          output_format: 'jpeg',
-          safety_tolerance: '5', // Plus permissif pour les designs d'intérieur
-        },
-        logs: true,
-        onQueueUpdate: (update) => {
-          if (update.status === 'IN_PROGRESS') {
-            console.log('[Fal.ai] 🔄 Kontext processing...');
-          }
-        },
+      const status = await fal.queue.status('half-moon-ai/ai-home/style', {
+        requestId: predictionId,
+        logs: true // Récupérer les logs
       });
 
-      const inferenceTime = Date.now() - startTime;
+      console.log('[Fal.ai] 🔄 Status check:', { predictionId, status: (status as any).status });
 
-      // fal.subscribe retourne { data: { images: [{ url: ... }] }, requestId: ... }
-      const data = result?.data || result;
-      let imageUrl = '';
-      if (data?.images && data.images.length > 0) {
-        imageUrl = data.images[0].url;
+      if ((status as any).status === 'COMPLETED') {
+         const result = await fal.queue.result('half-moon-ai/ai-home/style', {
+           requestId: predictionId
+         });
+         
+         const data = (result as any).data || result;
+         const imageUrl = data?.image?.url;
+         
+         return success({ 
+           status: 'succeeded',
+           output: { imageUrl }
+         });
+      } else if ((status as any).status === 'IN_PROGRESS' || (status as any).status === 'IN_QUEUE') {
+        return success({ status: 'processing' });
+      } else {
+        return failure(new Error(`Fal.ai job failed with status: ${(status as any).status}`));
       }
-
-      console.log('[Fal.ai] ✅ Flux Kontext success!', { hasImage: !!imageUrl });
-
-      if (!imageUrl) {
-        console.error('[Fal.ai] ❌ No image URL in Kontext response:', JSON.stringify(result, null, 2));
-        return failure(new Error('Flux Kontext returned no image URL'));
-      }
-
-      return success({
-        imageUrl,
-        inferenceTime,
-        seed: data?.seed ?? 0,
-      });
-
     } catch (error) {
-      console.error('[Fal.ai] ❌ Flux Kontext fallback failed:', error);
-      const message = error instanceof Error ? error.message : 'Unknown error';
-      return failure(new Error(`All Fal.ai generation methods failed: ${message}`));
+      console.error('[Fal.ai] ❌ Status check failed:', error);
+      return failure(error instanceof Error ? error : new Error('Status check failed'));
     }
   }
 
+  /* SUPPRESSION DE generateWithAIHome et generateWithFluxKontext pour le moment car passage en mode Queue */
+  
   /**
    * Extraire le style depuis le prompt (fallback si non fourni)
    */

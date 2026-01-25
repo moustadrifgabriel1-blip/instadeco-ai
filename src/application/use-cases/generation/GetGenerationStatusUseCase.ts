@@ -1,6 +1,8 @@
 import { Result, success, failure } from '@/src/shared/types/Result';
 import { Generation } from '@/src/domain/entities/Generation';
 import { IGenerationRepository } from '@/src/domain/ports/repositories/IGenerationRepository';
+import { IImageGeneratorService } from '@/src/domain/ports/services/IImageGeneratorService';
+import { IStorageService } from '@/src/domain/ports/services/IStorageService';
 import { ILoggerService } from '@/src/domain/ports/services/ILoggerService';
 import { GenerationNotFoundError } from '@/src/domain/errors/GenerationNotFoundError';
 import { DomainError } from '@/src/domain/errors/DomainError';
@@ -15,10 +17,14 @@ export interface GetGenerationStatusInput {
 
 /**
  * Use Case: Récupérer le statut d'une génération
+ * Si le statut local est 'pending' ou 'processing', on vérifie auprès du provider (Fal.ai)
+ * et on met à jour si terminé.
  */
 export class GetGenerationStatusUseCase {
   constructor(
     private readonly generationRepo: IGenerationRepository,
+    private readonly imageGenerator: IImageGeneratorService,
+    private readonly storage: IStorageService,
     private readonly logger: ILoggerService,
   ) {}
 
@@ -48,6 +54,42 @@ export class GetGenerationStatusUseCase {
         ownedBy: generation.userId,
       });
       return failure(new GenerationNotFoundError(input.generationId));
+    }
+
+    // Si statut complet ou échoué, retourner directement
+    if (generation.status === 'completed' || generation.status === 'failed') {
+      return success(generation);
+    }
+
+    // Si en attente et providerId existe, vérifier le statut externe
+    if ((generation.status === 'pending' || generation.status === 'processing') && generation.providerId) {
+      if (typeof this.imageGenerator.checkStatus === 'function') {
+        const statusCheck = await this.imageGenerator.checkStatus(generation.providerId);
+        
+        if (statusCheck.success) {
+          const { status, output } = statusCheck.data;
+          
+          if (status === 'succeeded' && output?.imageUrl) {
+            // Télécharger et stocker l'image finale
+            const uploadResult = await this.storage.uploadFromUrl(output.imageUrl, {
+              bucket: 'output-images',
+              fileName: `${generation.userId}/${generation.id}.jpg`,
+              contentType: 'image/jpeg',
+            });
+
+            if (uploadResult.success) {
+              const updatedGen = await this.generationRepo.update(generation.id, {
+                 status: 'completed',
+                 outputImageUrl: uploadResult.data.url
+              });
+              if (updatedGen.success) return success(updatedGen.data);
+            }
+          } else if (status === 'failed') {
+            const updatedGen = await this.generationRepo.update(generation.id, { status: 'failed' });
+             if (updatedGen.success) return success(updatedGen.data);
+          }
+        }
+      }
     }
 
     return success(generation);

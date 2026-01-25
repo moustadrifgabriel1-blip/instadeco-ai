@@ -128,7 +128,7 @@ export class GenerateDesignUseCase {
     // 5. Mettre à jour le statut à "processing"
     await this.generationRepo.update(generation.id, { status: 'processing' });
 
-    // 6. Lancer la génération IA
+    // 6. Lancer la génération IA (Async)
     const genResult = await this.imageGenerator.generate({
       prompt: input.prompt,
       controlImageUrl: inputImageUrl,
@@ -136,46 +136,35 @@ export class GenerateDesignUseCase {
       roomType: input.roomType,
       width: 1024,
       height: 1024,
-      numInferenceSteps: 28,
+      numInferenceSteps: 25,
       guidanceScale: 3.5,
     });
 
     if (!genResult.success) {
-      // Marquer comme failed mais ne pas rembourser (le crédit est consommé)
+      // Marquer comme failed
       await this.generationRepo.update(generation.id, { status: 'failed' });
-      this.logger.error('AI generation failed', genResult.error as Error, {
+      this.logger.error('AI generation submission failed', genResult.error as Error, {
         generationId: generation.id,
       });
-      return failure(new ImageGenerationError('La génération IA a échoué'));
+      return failure(new ImageGenerationError('La génération IA a échoué au lancement'));
     }
 
-    // 7. Upload l'image générée
-    const outputUploadResult = await this.storage.uploadFromUrl(genResult.data.imageUrl, {
-      bucket: 'output-images',
-      fileName: `${input.userId}/${generation.id}.jpg`,
-      contentType: 'image/jpeg',
-    });
-
-    if (!outputUploadResult.success) {
-      await this.generationRepo.update(generation.id, { status: 'failed' });
-      this.logger.error('Failed to upload output image', outputUploadResult.error as Error);
-      return failure(new ImageGenerationError('Échec de la sauvegarde de l\'image générée'));
-    }
-
-    // 8. Mettre à jour avec le résultat final
+    // 7. Mettre à jour avec le providerId
+    // On ne stocke pas encore l'image car elle n'est pas prête
     const updateResult = await this.generationRepo.update(generation.id, {
-      status: 'completed',
-      outputImageUrl: outputUploadResult.data.url,
+      status: 'pending', // Pending pour indiquer que c'est en attente externe
+      providerId: genResult.data.providerId,
     });
 
-    if (!updateResult.success) {
-      this.logger.error('Failed to update generation', updateResult.error as Error);
-      return failure(new ImageGenerationError('Échec de la mise à jour'));
+     if (!updateResult.success) {
+      this.logger.error('Failed to update generation with providerId', updateResult.error as Error);
+      return failure(new ImageGenerationError('Échec de la mise à jour (providerId)'));
     }
 
     const duration = Date.now() - startTime;
-    this.logger.info('Design generation completed', {
+    this.logger.info('Design generation submitted', {
       generationId: generation.id,
+      providerId: genResult.data.providerId,
       userId: input.userId,
       duration,
     });
