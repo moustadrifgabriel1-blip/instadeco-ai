@@ -79,10 +79,6 @@ export function ArticleCard({
             {metaDescription}
           </p>
         </CardContent>
-      </Link>
-    </Card>
-  );
-}
 
         <CardFooter className="pt-0 flex flex-wrap gap-2">
           {tags.slice(0, 3).map((tag) => (
@@ -98,6 +94,9 @@ export function ArticleCard({
           )}
         </CardFooter>
       </Link>
+    </Card>
+  );
+}
     </Card>
   );
 }
