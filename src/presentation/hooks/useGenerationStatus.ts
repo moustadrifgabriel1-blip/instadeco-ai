@@ -87,6 +87,7 @@ export function useGenerationStatus(
   // Effet pour le polling
   useEffect(() => {
     if (!generationId || !enabled) {
+      setGeneration(null);
       setIsLoading(false);
       return;
     }

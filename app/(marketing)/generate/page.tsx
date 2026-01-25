@@ -443,7 +443,7 @@ function GenerateContent() {
           )}
 
           {/* Result */}
-          {generatedImage && (
+          {generatedImage && imagePreview && (
             <div className="space-y-10">
               {/* Before/After */}
               <div className="grid md:grid-cols-2 gap-5">
