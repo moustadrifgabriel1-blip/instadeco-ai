@@ -89,24 +89,27 @@
 
 ## 📅 État d'Avancement (Journal de Bord)
 
-### ✅ Récemment Complété (22 Janvier 2026)
+### ✅ Récemment Complété (24 Janvier 2026)
 1.  **Migration Auth & DB** : Finalisation du passage de Firebase à Supabase.
 2.  **Fix RLS** : Correction des politiques "Infinite Recursion" sur Supabase.
-3.  **Fix Header UI** : Le composant `Header` affiche correctement les crédits (récupération API + Fallback direct).
+3.  **Fix Header UI** : Le composant `Header` affiche correctement les crédits.
 4.  **Migration IA** : Remplacement complet de Replicate par **Fal.ai**.
     *   Adapter : `FalImageGeneratorService.ts`
     *   Config : `FAL_KEY` configurée (Local + Vercel).
-    *   Client : Usage de `@fal-ai/client`.
+5.  **Nettoyage Code Mort** : Suppression des références Firebase/Replicate.
+    *   Dépendance `replicate` supprimée de package.json
+    *   Scripts obsolètes supprimés
+    *   Documentation obsolète supprimée
+6.  **Blog SEO** : Intégration complète avec génération automatique d'articles.
 
 ### 🚧 En Cours de Débogage
 1.  **Erreur Génération 500** : Le processus de génération lève une erreur interne.
-    *   *Hypothèse* : Conflit lors de la déduction de crédits ou format de réponse Fal.ai inattendu.
-    *   *Action* : Code mis à jour pour logger l'erreur précise.
+    *   *Action* : Vérifier les logs Vercel pour identifier la cause exacte.
 
 ### 🔜 Prochaines Étapes
-1.  Identifier la cause exacte de l'erreur 500 (via logs Vercel ou test client).
+1.  Identifier la cause exacte de l'erreur 500 (via logs Vercel).
 2.  Valider le flux complet : Upload -> Génération -> Déduction Crédit -> Affichage.
-3.  Nettoyage du code mort (ancien code Replicate/Firebase).
+3.  Soumettre le sitemap à Google Search Console et Bing.
 
 ---
 

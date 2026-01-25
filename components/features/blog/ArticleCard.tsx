@@ -5,6 +5,7 @@
  */
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { CalendarDays, Clock, Tag } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -37,27 +38,51 @@ export function ArticleCard({
     year: 'numeric',
   });
 
+  const mainTag = tags[0] || 'decoration';
+  // Utilisation de source.unsplash.com pour des images thématiques dynamiques
+  const imageUrl = `https://source.unsplash.com/800x600/?interior,${encodeURIComponent(mainTag)},renovation`;
+
   return (
-    <Card className={`group hover:shadow-lg transition-all duration-300 ${featured ? 'border-primary/50 bg-primary/5' : ''}`}>
-      <Link href={`/blog/${slug}`} className="block">
-        <CardHeader className="pb-3">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-            <CalendarDays className="h-4 w-4" />
+    <Card className={`group flex flex-col h-full overflow-hidden hover:shadow-xl transition-all duration-300 ${featured ? 'border-primary/50 bg-primary/5' : ''}`}>
+      <Link href={`/blog/${slug}`} className="block flex-1 flex flex-col">
+        {/* Image de couverture */}
+        <div className="relative aspect-video w-full overflow-hidden bg-muted">
+           <Image
+             src={imageUrl}
+             alt={title}
+             fill
+             className="object-cover group-hover:scale-105 transition-transform duration-700"
+             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+             priority={featured}
+           />
+           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+           {tags.length > 0 && (
+             <Badge className="absolute top-4 left-4 bg-background/90 text-foreground hover:bg-background/100 backdrop-blur shadow-sm">
+               {tags[0]}
+             </Badge>
+           )}
+        </div>
+
+        <CardHeader className="pb-3 pt-5">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground mb-3 font-medium uppercase tracking-wider">
             <time dateTime={publishedAt}>{formattedDate}</time>
-            <span className="text-muted-foreground/50">•</span>
-            <Clock className="h-4 w-4" />
-            <span>{readingTimeMinutes} min de lecture</span>
+            <span>•</span>
+            <span>{readingTimeMinutes} min</span>
           </div>
-          <h2 className="text-xl font-semibold group-hover:text-primary transition-colors line-clamp-2">
+          <h2 className="text-xl font-bold font-serif leading-tight group-hover:text-primary transition-colors line-clamp-2">
             {formatBlogTitle(title)}
           </h2>
         </CardHeader>
         
-        <CardContent className="pb-4">
-          <p className="text-muted-foreground line-clamp-3">
+        <CardContent className="pb-4 flex-1">
+          <p className="text-muted-foreground line-clamp-3 text-sm leading-relaxed">
             {metaDescription}
           </p>
         </CardContent>
+      </Link>
+    </Card>
+  );
+}
 
         <CardFooter className="pt-0 flex flex-wrap gap-2">
           {tags.slice(0, 3).map((tag) => (

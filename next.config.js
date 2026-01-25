@@ -21,6 +21,10 @@ const nextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'tocgrsdlegabfkykhdrz.supabase.co',
+      },
+      {
+        protocol: 'https',
         hostname: 'v3.fal.media',
       },
       {
@@ -33,27 +37,11 @@ const nextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'firebasestorage.googleapis.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'storage.googleapis.com',
-      },
-      {
-        protocol: 'https',
-        hostname: '*.firebasestorage.app',
-      },
-      {
-        protocol: 'https',
-        hostname: 'replicate.delivery',
-      },
-      {
-        protocol: 'https',
-        hostname: 'replicate.com',
-      },
-      {
-        protocol: 'https',
         hostname: 'api.dicebear.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'source.unsplash.com',
       },
       {
         protocol: 'https',

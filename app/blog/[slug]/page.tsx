@@ -7,13 +7,14 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { CalendarDays, Clock, ChevronLeft, Tag, Share2 } from 'lucide-react';
+import Image from 'next/image';
+import { CalendarDays, Clock, ChevronLeft, Tag, Share2, User } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { ArticleCard } from '@/components/features/blog';
-import { formatBlogTitle } from '@/lib/utils';
+import { formatBlogTitle, cn } from '@/lib/utils';
 
 import { SupabaseBlogArticleRepository } from '@/src/infrastructure/repositories/SupabaseBlogArticleRepository';
 import { GetBlogArticleBySlugUseCase } from '@/src/application/use-cases/blog/GetBlogArticleBySlugUseCase';
@@ -99,7 +100,8 @@ async function getArticle(slug: string): Promise<ArticleData | null> {
 
 // Génération des métadonnées dynamiques
 export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
-  const { slug } = await params;
+  const resolvedParams = await params;
+  const slug = decodeURIComponent(resolvedParams.slug);
   const article = await getArticle(slug);
 
   if (!article) {
@@ -108,24 +110,28 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
     };
   }
 
+  const mainTag = article.tags[0] || 'deco';
+  const imageUrl = `https://source.unsplash.com/1200x630/?interior,${encodeURIComponent(mainTag)}`;
+
   return {
-    title: `${formatBlogTitle(article.title)} | InstaDeco AI`,
+    title: `${formatBlogTitle(article.title)} | Blog InstaDeco`,
     description: article.metaDescription,
     keywords: article.tags,
-    authors: [{ name: 'InstaDeco AI' }],
     openGraph: {
-      title: formatBlogTitle(article.title),
-      description: article.metaDescription,
       type: 'article',
-      url: `https://instadeco.app/blog/${article.slug}`,
+      title: article.title,
+      description: article.metaDescription,
       publishedTime: article.publishedAt,
-      authors: ['InstaDeco AI'],
       tags: article.tags,
+      images: [imageUrl],
+      url: `https://instadeco.app/blog/${article.slug}`,
+      authors: ['InstaDeco AI'],
     },
     twitter: {
       card: 'summary_large_image',
-      title: formatBlogTitle(article.title),
+      title: article.title,
       description: article.metaDescription,
+      images: [imageUrl],
     },
     alternates: {
       canonical: `https://instadeco.app/blog/${article.slug}`,
@@ -196,7 +202,8 @@ function ArticleContent({ content }: { content: string }) {
         [&_.conclusion>h2]:text-2xl
         
         [&_.article-image]:rounded-lg [&_.article-image]:overflow-hidden [&_.article-image]:my-6
-        [&_.article-image_img]:w-full [&_.article-image_img]:h-auto [&_.article-image_img]:rounded-lg"
+        [&_.article-image_img]:w-full [&_.article-image_img]:h-auto [&_.article-image_img]:rounded-lg
+        prose-img:rounded-xl prose-img:shadow-lg prose-img:w-full prose-img:object-cover"
       dangerouslySetInnerHTML={{ __html: content }}
     />
   );
@@ -218,159 +225,142 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
     year: 'numeric',
   });
 
-  return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Navigation */}
-      <nav className="mb-8">
-        <Link
-          href="/blog"
-          className="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors"
-        >
-          <ChevronLeft className="h-4 w-4 mr-1" />
-          Retour au blog
-        </Link>
-      </nav>
+  const mainTag = article.tags[0] || 'decoration';
+  const heroImageUrl = `https://source.unsplash.com/1200x600/?interior,${encodeURIComponent(mainTag)},renovation`;
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        {/* Article principal */}
-        <article className="lg:col-span-3">
-          {/* Header */}
-          <header className="mb-8">
-            <h1 className="text-3xl md:text-4xl font-bold mb-4 leading-tight">
+  return (
+    <div className="min-h-screen bg-background pb-20">
+      {/* Hero Header avec Image */}
+      <div className="relative h-[400px] md:h-[500px] w-full overflow-hidden">
+        <Image 
+          src={heroImageUrl} 
+          alt={article.title}
+          fill
+          priority
+          className="object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-black/30" />
+        
+        <div className="absolute bottom-0 left-0 w-full z-10">
+          <div className="container mx-auto px-4 pb-12">
+            <Link
+              href="/blog"
+              className="inline-flex items-center text-sm font-medium text-white/90 hover:text-white mb-6 bg-black/30 backdrop-blur-sm px-4 py-1.5 rounded-full border border-white/10 transition-colors hover:bg-black/40"
+            >
+              <ChevronLeft className="h-4 w-4 mr-1" />
+              Retour au blog
+            </Link>
+
+            <div className="flex flex-wrap gap-2 mb-6">
+              {article.tags.map((tag) => (
+                <Badge key={tag} className="bg-primary/90 hover:bg-primary text-white border-none text-sm px-3 py-1 backdrop-blur-sm shadow-sm">
+                  {tag}
+                </Badge>
+              ))}
+            </div>
+
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-tight max-w-4xl tracking-tight drop-shadow-sm">
               {formatBlogTitle(article.title)}
             </h1>
 
-            <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-6">
-              <div className="flex items-center gap-1">
+            <div className="flex flex-wrap items-center gap-6 text-sm md:text-base font-medium text-white/90">
+               <div className="flex items-center gap-2">
+                 <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-white border border-white/20">
+                    <User className="w-4 h-4" />
+                 </div>
+                 <span>InstaDeco Team</span>
+               </div>
+               <div className="w-px h-4 bg-white/30 hidden sm:block"></div>
+               <div className="flex items-center gap-2">
                 <CalendarDays className="h-4 w-4" />
                 <time dateTime={article.publishedAt}>{formattedDate}</time>
               </div>
-              <div className="flex items-center gap-1">
+              <div className="w-px h-4 bg-white/30 hidden sm:block"></div>
+              <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4" />
                 <span>{article.readingTimeMinutes} min de lecture</span>
               </div>
-              <div className="flex items-center gap-1">
-                <span>{article.wordCount.toLocaleString('fr-FR')} mots</span>
-              </div>
             </div>
-
-            {/* Tags */}
-            <div className="flex flex-wrap gap-2">
-              {article.tags.map((tag) => (
-                <Link key={tag} href={`/blog?tag=${encodeURIComponent(tag)}`}>
-                  <Badge variant="secondary" className="hover:bg-primary hover:text-primary-foreground transition-colors">
-                    <Tag className="h-3 w-3 mr-1" />
-                    {tag}
-                  </Badge>
-                </Link>
-              ))}
-            </div>
-          </header>
-
-          <Separator className="my-6" />
-
-          {/* Contenu */}
-          <div className="mb-8">
-            <ArticleContent content={article.content} />
           </div>
+        </div>
+      </div>
 
-          <Separator className="my-6" />
-
-          {/* Actions */}
-          <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
-            <Link href="/blog">
-              <Button variant="outline">
-                <ChevronLeft className="h-4 w-4 mr-2" />
-                Tous les articles
-              </Button>
-            </Link>
-
-            <Button variant="outline" size="sm">
-              <Share2 className="h-4 w-4 mr-2" />
-              Partager
+      <div className="container mx-auto px-4 -mt-8 relative z-20">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+          {/* Sidebar Left (Share) - Visible Desktop */}
+          <div className="hidden lg:flex lg:col-span-1 flex-col gap-4 mt-20 sticky top-24 h-fit items-center">
+            <div className="text-xs font-semibold text-muted-foreground uppercase tracking-widest rotate-180 py-4 writing-mode-vertical">Partager</div>
+            <Button size="icon" variant="secondary" className="rounded-full h-10 w-10 shadow-sm" title="Partager">
+              <Share2 className="w-4 h-4" />
             </Button>
           </div>
 
-          {/* CTA */}
-          <Card className="bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20">
-            <CardContent className="p-6 text-center">
-              <h2 className="text-xl font-semibold mb-2">
-                Prêt à transformer votre intérieur ?
-              </h2>
-              <p className="text-muted-foreground mb-4">
-                Utilisez notre IA pour visualiser votre décoration idéale en quelques clics.
-              </p>
-              <Link href="/generate">
-                <Button size="lg">
-                  Essayer InstaDeco AI gratuitement
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-        </article>
+          {/* Article principal */}
+          <article className="lg:col-span-8 bg-background rounded-t-3xl shadow-xl lg:shadow-none lg:rounded-none p-6 lg:p-0">
+            
+            {/* Contenu */}
+            <div className="py-2">
+              <ArticleContent content={article.content} />
+            </div>
 
-        {/* Sidebar */}
-        <aside className="lg:col-span-1 space-y-6">
-          {/* Articles liés */}
-          {article.relatedArticles && article.relatedArticles.length > 0 && (
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg">Articles similaires</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {article.relatedArticles.slice(0, 3).map((related) => (
-                  <Link
-                    key={related.slug}
-                    href={`/blog/${related.slug}`}
-                    className="block group"
-                  >
-                    <h3 className="font-medium text-sm group-hover:text-primary transition-colors line-clamp-2">
-                      {related.title}
-                    </h3>
-                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                      {related.metaDescription}
-                    </p>
-                  </Link>
-                ))}
+            <Separator className="my-12" />
+
+            {/* CTA Contextuel */}
+            <Card className="bg-primary/5 border-primary/20 overflow-hidden relative isolate">
+              <div className="absolute -right-16 -top-16 w-64 h-64 bg-primary/10 rounded-full blur-3xl -z-10"></div>
+              <CardContent className="p-8 sm:p-10 text-center">
+                <h2 className="text-2xl font-bold mb-3 font-serif">
+                  Cet article vous a inspiré ?
+                </h2>
+                <p className="text-muted-foreground mb-8 max-w-xl mx-auto text-lg">
+                  Passez de la théorie à la pratique. Testez ces idées de décoration sur vos propres photos avec notre IA.
+                </p>
+                <Link href="/generate">
+                   <Button size="lg" className="rounded-full px-8 text-lg h-12 shadow-lg shadow-primary/25 hover:scale-105 transition-transform">
+                     Créer ma décoration maintenant
+                   </Button>
+                </Link>
               </CardContent>
             </Card>
-          )}
+          </article>
 
-          {/* CTA Sidebar */}
-          <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg">
-                Transformez votre intérieur
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
-                Visualisez votre décoration idéale en quelques clics grâce à notre IA.
-              </p>
-              <Link
-                href="/generate"
-                className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors w-full"
-              >
-                Essayer InstaDeco AI
-              </Link>
-            </CardContent>
-          </Card>
-        </aside>
+          {/* Sidebar Right (Related) */}
+          <aside className="lg:col-span-3 space-y-8 mt-8 lg:mt-20">
+             {/* Articles liés */}
+             {article.relatedArticles && article.relatedArticles.length > 0 && (
+               <div className="space-y-6 sticky top-24">
+                 <h3 className="font-bold text-xl font-serif border-b pb-2">
+                   À lire aussi
+                 </h3>
+                 <div className="space-y-6">
+                   {article.relatedArticles.slice(0, 3).map(related => (
+                     <Link key={related.slug} href={`/blog/${related.slug}`} className="group block space-y-3">
+                       <div className="relative aspect-[3/2] rounded-xl overflow-hidden shadow-sm">
+                         <Image 
+                           src={`https://source.unsplash.com/400x300/?interior,${related.tags[0] || 'design'}`}
+                           alt={related.title}
+                           fill
+                           className="object-cover group-hover:scale-110 transition-transform duration-700"
+                         />
+                         <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors" />
+                       </div>
+                       <div>
+                         <div className="text-xs text-primary font-medium mb-1 uppercase tracking-wide">
+                            {related.tags[0]}
+                         </div>
+                         <h4 className="font-bold leading-snug group-hover:text-primary transition-colors">
+                           {formatBlogTitle(related.title)}
+                         </h4>
+                       </div>
+                     </Link>
+                   ))}
+                 </div>
+               </div>
+             )}
+          </aside>
+        </div>
       </div>
 
-      {/* Articles liés (version mobile/grand écran) */}
-      {article.relatedArticles && article.relatedArticles.length > 0 && (
-        <section className="mt-12 lg:hidden">
-          <h2 className="text-2xl font-bold mb-6">Articles similaires</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {article.relatedArticles.slice(0, 4).map((related) => (
-              <ArticleCard key={related.id} {...related} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Schema.org - Article */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -396,6 +386,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                 url: 'https://instadeco.ai/logo.png',
               },
             },
+            image: heroImageUrl,
             mainEntityOfPage: {
               '@type': 'WebPage',
               '@id': `https://instadeco.ai/blog/${article.slug}`,

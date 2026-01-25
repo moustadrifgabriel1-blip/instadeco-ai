@@ -36,6 +36,7 @@ const STYLE_MAPPING: Record<string, string> = {
 const ROOM_MAPPING: Record<string, string> = {
   'salon': 'living room-interior',
   'chambre': 'bedroom-interior',
+  'chambre-enfant': 'kids bedroom-interior',
   'cuisine': 'kitchen-interior',
   'salle-de-bain': 'bathroom-interior',
   'bureau': 'home office-interior',
@@ -150,6 +151,7 @@ export class FalImageGeneratorService implements IImageGeneratorService {
           style: style,
           color_palette: colorPalette,
           input_image_strength: 0.90, // 90% - préserve fortement la structure (murs, fenêtres, portes)
+          num_inference_steps: 25, // Optimisation vitesse (standard ~28)
           output_format: 'jpeg',
         },
         logs: true,
@@ -269,6 +271,7 @@ export class FalImageGeneratorService implements IImageGeneratorService {
     const lowerPrompt = prompt.toLowerCase();
     const roomKeywords: Record<string, string> = {
       'living room': 'salon',
+      'kids bedroom': 'chambre-enfant',
       'bedroom': 'chambre',
       'kitchen': 'cuisine',
       'bathroom': 'salle-de-bain',

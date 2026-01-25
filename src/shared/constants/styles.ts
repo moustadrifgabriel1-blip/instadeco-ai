@@ -4,6 +4,7 @@
 export const ROOM_TYPES = [
   { id: 'salon', slug: 'salon', name: 'Salon', icon: '🛋️' },
   { id: 'chambre', slug: 'chambre', name: 'Chambre', icon: '🛏️' },
+  { id: 'chambre-enfant', slug: 'chambre-enfant', name: 'Chambre d\'enfant', icon: '🧸' },
   { id: 'cuisine', slug: 'cuisine', name: 'Cuisine', icon: '🍳' },
   { id: 'salle-de-bain', slug: 'salle-de-bain', name: 'Salle de bain', icon: '🚿' },
   { id: 'bureau', slug: 'bureau', name: 'Bureau', icon: '💼' },

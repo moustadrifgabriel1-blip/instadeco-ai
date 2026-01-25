@@ -137,6 +137,7 @@ function buildPrompt(style: string, roomType: string): string {
   const roomDescriptions: Record<string, string> = {
     salon: 'living room',
     chambre: 'bedroom',
+    'chambre-enfant': 'children bedroom, kids room, playful decor',
     cuisine: 'kitchen',
     'salle-de-bain': 'bathroom',
     bureau: 'home office',

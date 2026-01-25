@@ -111,5 +111,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  return [...staticPages, ...legalPages, ...blogIndexPage, ...articlePages];
+  // ============================================
+  // PAGES VILLES (SEO LOCAL)
+  // ============================================
+  const { CITIES } = await import('@/src/shared/constants/cities');
+  
+  const cityPages: MetadataRoute.Sitemap = CITIES.map((city) => ({
+    url: `${BASE_URL}/architecte-interieur/${city.slug}`,
+    lastModified: now,
+    changeFrequency: 'monthly' as const,
+    priority: 0.6,
+  }));
+
+  return [...staticPages, ...legalPages, ...blogIndexPage, ...articlePages, ...cityPages];
 }

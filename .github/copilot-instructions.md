@@ -185,8 +185,7 @@ STRIPE_SECRET_KEY=...
 - **Schéma DB:** Voir section "Structure de la Base de Données" dans CONTEXT.md
 - **Endpoints API:** Voir section "Endpoints API" dans CONTEXT.md
 - **Next.js Docs:** https://nextjs.org/docs
-- **Firebase Docs:** https://firebase.google.com/docs
-- **Firestore Docs:** https://firebase.google.com/docs/firestore
+- **Supabase Docs:** https://supabase.com/docs
 - **Fal.ai Docs:** https://fal.ai/docs
 - **Shadcn/UI:** https://ui.shadcn.com
 
