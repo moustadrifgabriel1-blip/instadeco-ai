@@ -16,23 +16,36 @@ export class SupabaseGenerationRepository implements IGenerationRepository {
    * Convertit une row Supabase en entité Generation
    */
   private toEntity(row: GenerationRow): Generation {
+    // Hack: Récupérer le providerId stocké dans output_image_url pendant le pending
+    let providerId: string | undefined;
+    let outputImageUrl = row.output_image_url;
+    
+    if (outputImageUrl && outputImageUrl.startsWith('PENDING_PID:')) {
+      providerId = outputImageUrl.replace('PENDING_PID:', '');
+      outputImageUrl = null;
+    }
+
     return {
       id: row.id,
       userId: row.user_id,
       styleSlug: row.style_slug,
       roomType: row.room_type_slug,
       inputImageUrl: row.input_image_url,
-      outputImageUrl: row.output_image_url,
+      outputImageUrl: outputImageUrl,
       status: row.status as Generation['status'],
       prompt: row.custom_prompt,
       hdUnlocked: row.hd_unlocked,
       stripeSessionId: row.stripe_session_id,
+      providerId: providerId,
       createdAt: new Date(row.created_at),
       updatedAt: new Date(row.updated_at),
     };
   }
 
   async create(input: CreateGenerationInput): Promise<Result<Generation>> {
+    // Hack: Stocker le providerId dans output_image_url temporairement
+    const outputOverview = input.providerId ? `PENDING_PID:${input.providerId}` : null;
+
     const { data, error } = await this.supabase
       .from('generations')
       .insert({
@@ -43,6 +56,7 @@ export class SupabaseGenerationRepository implements IGenerationRepository {
         custom_prompt: input.prompt,
         status: 'pending',
         hd_unlocked: false,
+        output_image_url: outputOverview,
       })
       .select()
       .single();
@@ -96,6 +110,11 @@ export class SupabaseGenerationRepository implements IGenerationRepository {
     if (input.outputImageUrl !== undefined) updateData.output_image_url = input.outputImageUrl;
     if (input.hdUnlocked !== undefined) updateData.hd_unlocked = input.hdUnlocked;
     if (input.stripeSessionId !== undefined) updateData.stripe_session_id = input.stripeSessionId;
+
+    // Hack: Stocker le providerId dans output_image_url si fourni et pas d'image finale
+    if (input.providerId && !input.outputImageUrl) {
+       updateData.output_image_url = `PENDING_PID:${input.providerId}`;
+    }
 
     const { data, error } = await this.supabase
       .from('generations')

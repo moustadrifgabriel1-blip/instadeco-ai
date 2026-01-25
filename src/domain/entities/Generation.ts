@@ -30,6 +30,7 @@ export interface CreateGenerationInput {
   roomType: string;
   inputImageUrl: string;
   prompt: string;
+  providerId?: string;
 }
 
 export interface UpdateGenerationInput {

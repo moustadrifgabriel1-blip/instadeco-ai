@@ -63,7 +63,36 @@ function GenerateContent() {
 
   // États dérivés
   const isGenerating = generateState.isLoading || (generationId && !isComplete && !isFailed);
-  const progress = generateState.progress;
+  const [progress, setProgress] = useState(0);
+  
+  // Effet pour animer la progression
+  useEffect(() => {
+    if (generateState.isLoading) {
+      // Phase initiale (upload, préparation)
+      setProgress(generateState.progress);
+    } else if (generationId && !isComplete && !isFailed) {
+      // Phase de polling (génération IA)
+      // On démarre à ce que useGenerate a laissé (ex: 5%)
+      setProgress(prev => Math.max(prev, generateState.progress));
+      
+      const interval = setInterval(() => {
+        setProgress(prev => {
+          if (prev >= 95) return prev;
+          // Avance doucement (progression logarithmique)
+          const remaining = 95 - prev;
+          const increment = Math.max(0.1, remaining / 100);
+          return prev + increment;
+        });
+      }, 200);
+      
+      return () => clearInterval(interval);
+    } else if (isComplete) {
+      setProgress(100);
+    } else if (isFailed) {
+      setProgress(0);
+    }
+  }, [generateState.isLoading, generateState.progress, generationId, isComplete, isFailed]);
+
   const generatedImage = statusGeneration?.outputImageUrl || null;
   const error = generateState.error || hdError || (isFailed ? 'La génération a échoué' : null);
 
