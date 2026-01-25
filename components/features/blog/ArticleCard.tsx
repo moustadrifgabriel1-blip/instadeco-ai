@@ -97,9 +97,6 @@ export function ArticleCard({
     </Card>
   );
 }
-    </Card>
-  );
-}
 
 /**
  * Version squelette pour le chargement
