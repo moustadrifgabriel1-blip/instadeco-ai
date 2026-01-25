@@ -30,7 +30,22 @@ interface ApiResponse<T> {
  * Helper pour gérer les erreurs fetch
  */
 async function handleResponse<T>(response: Response): Promise<T> {
-  const data = await response.json();
+  const contentType = response.headers.get("content-type");
+  let data;
+
+  try {
+    const text = await response.text();
+    try {
+      data = JSON.parse(text);
+    } catch {
+      // Si ce n'est pas du JSON, c'est probablement une erreur serveur (504, 500 html)
+      console.error('[API Client] Non-JSON response:', text.substring(0, 200));
+      throw new Error(response.status === 504 ? 'Le serveur a mis trop de temps à répondre. Veuillez réessayer.' : `Erreur serveur inattendue (${response.status})`);
+    }
+  } catch (error) {
+    if (error instanceof Error) throw error;
+    throw new Error('Erreur de communication avec le serveur');
+  }
 
   if (!response.ok) {
     throw new Error(data.error || `Erreur HTTP ${response.status}`);

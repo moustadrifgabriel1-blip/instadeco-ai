@@ -15,6 +15,9 @@ const generateRequestSchema = z.object({
   userId: z.string().min(1, 'Authentification requise'),
 });
 
+export const maxDuration = 60; // Set max duration to 60 seconds (Hobby limit usually 10s, Pro 300s)
+export const dynamic = 'force-dynamic';
+
 /**
  * POST /api/v2/generate
  * 
@@ -22,13 +25,22 @@ const generateRequestSchema = z.object({
  * Utilise le Use Case GenerateDesignUseCase
  */
 export async function POST(req: Request) {
+  const startTime = Date.now();
+  console.log('[Generate V2] 🚀 Starting generation request');
+  
   try {
     const body = await req.json();
+    console.log('[Generate V2] 📦 Request received', { 
+      userId: body.userId || 'anonymous',
+      style: body.style,
+      roomType: body.roomType 
+    });
 
     // Validation avec Zod
     const validation = generateRequestSchema.safeParse(body);
     
     if (!validation.success) {
+      console.warn('[Generate V2] ⚠️ Validation failed', validation.error.flatten());
       return NextResponse.json(
         { 
           error: 'Validation échouée',
@@ -40,9 +52,11 @@ export async function POST(req: Request) {
 
     const { imageUrl, roomType, style, userId } = validation.data;
 
+    console.log('[Generate V2] 🎨 Building prompt...');
     // Construire le prompt basé sur le style et le type de pièce
     const prompt = buildPrompt(style, roomType);
 
+    console.log('[Generate V2] 🚀 Executing use case...');
     // Exécuter le Use Case
     const result = await useCases.generateDesign.execute({
       userId,
@@ -51,6 +65,9 @@ export async function POST(req: Request) {
       imageBase64: imageUrl, // Le storage service gère base64 et URL
       prompt,
     });
+    
+    const duration = Date.now() - startTime;
+    console.log(`[Generate V2] 🏁 Use case finished in ${duration}ms`, { success: result.success });
 
     // Gérer le résultat
     if (!result.success) {
