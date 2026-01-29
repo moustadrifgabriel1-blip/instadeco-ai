@@ -15,39 +15,98 @@ export const ROOM_TYPES = [
 
 export type RoomTypeSlug = typeof ROOM_TYPES[number]['slug'];
 
-/**
- * Styles de décoration disponibles avec descriptions
- */
-export const STYLES = [
-  { id: 'original', slug: 'original', name: 'Garder mon style', desc: 'Améliorer sans changer de style' },
-  { id: 'moderne', slug: 'moderne', name: 'Moderne', desc: 'Élégance contemporaine sophistiquée' },
-  { id: 'minimaliste', slug: 'minimaliste', name: 'Minimaliste', desc: 'Simplicité scandinave épurée' },
-  { id: 'boheme', slug: 'boheme', name: 'Bohème', desc: 'Chaleur éclectique globe-trotter' },
-  { id: 'industriel', slug: 'industriel', name: 'Industriel', desc: 'Loft urbain brut et raffiné' },
-  { id: 'classique', slug: 'classique', name: 'Classique', desc: 'Élégance traditionnelle intemporelle' },
-  { id: 'japandi', slug: 'japandi', name: 'Japandi', desc: 'Zen japonais & cocooning nordique' },
-  { id: 'midcentury', slug: 'midcentury', name: 'Mid-Century', desc: 'Rétro iconique années 50-60' },
-  { id: 'coastal', slug: 'coastal', name: 'Coastal', desc: 'Bord de mer relaxant et lumineux' },
-  { id: 'farmhouse', slug: 'farmhouse', name: 'Farmhouse', desc: 'Charme rustique contemporain' },
-  { id: 'artdeco', slug: 'artdeco', name: 'Art Déco', desc: 'Glamour opulent années 1920' },
-  { id: 'ludique', slug: 'ludique', name: 'Ludique / Enfant', desc: 'Univers joyeux, coloré et créatif' },
-] as const;
+// Type pour un style de décoration individuel
+export type DecorStyle = {
+  id: string;
+  slug: string;
+  name: string;
+  desc: string;
+};
 
-export type StyleSlug = typeof STYLES[number]['slug'];
+// Type pour une catégorie avec ses styles
+export type DecorStyleCategory = {
+  category: string;
+  styles: DecorStyle[];
+};
+
+/**
+ * Styles de décoration organisés par catégories
+ * Populaires en France, Belgique et Suisse
+ */
+export const STYLE_CATEGORIES_WITH_STYLES: DecorStyleCategory[] = [
+  {
+    category: 'Tendances',
+    styles: [
+      { id: 'original', slug: 'original', name: 'Garder mon style', desc: 'Améliorer sans changer' },
+      { id: 'moderne', slug: 'moderne', name: 'Moderne', desc: 'Lignes épurées, élégance contemporaine' },
+      { id: 'minimaliste', slug: 'minimaliste', name: 'Minimaliste', desc: 'Essentiel et apaisant' },
+      { id: 'japandi', slug: 'japandi', name: 'Japandi', desc: 'Zen japonais & hygge nordique' },
+    ]
+  },
+  {
+    category: 'Classiques',
+    styles: [
+      { id: 'haussmannien', slug: 'haussmannien', name: 'Haussmannien', desc: 'Parisien chic avec moulures' },
+      { id: 'classique', slug: 'classique', name: 'Classique', desc: 'Élégance traditionnelle française' },
+      { id: 'artdeco', slug: 'artdeco', name: 'Art Déco', desc: 'Glamour géométrique années 20' },
+      { id: 'midcentury', slug: 'midcentury', name: 'Mid-Century', desc: 'Rétro iconique 50-60' },
+    ]
+  },
+  {
+    category: 'Chaleureux',
+    styles: [
+      { id: 'scandinave', slug: 'scandinave', name: 'Scandinave', desc: 'Cocooning nordique lumineux' },
+      { id: 'boheme', slug: 'boheme', name: 'Bohème', desc: 'Chaleur éclectique colorée' },
+      { id: 'provencal', slug: 'provencal', name: 'Provençal', desc: 'Charme du Sud de la France' },
+      { id: 'chalet', slug: 'chalet', name: 'Chalet Alpin', desc: 'Montagne cosy suisse/savoyard' },
+    ]
+  },
+  {
+    category: 'Urbains',
+    styles: [
+      { id: 'industriel', slug: 'industriel', name: 'Industriel', desc: 'Loft urbain brut et moderne' },
+      { id: 'contemporain', slug: 'contemporain', name: 'Contemporain', desc: 'Design actuel audacieux' },
+      { id: 'loft', slug: 'loft', name: 'Loft New-Yorkais', desc: 'Grand espace urbain chic' },
+    ]
+  },
+  {
+    category: 'Nature & Détente',
+    styles: [
+      { id: 'coastal', slug: 'coastal', name: 'Bord de mer', desc: 'Vacances, bleu et blanc' },
+      { id: 'farmhouse', slug: 'farmhouse', name: 'Campagne chic', desc: 'Rustique élégant' },
+      { id: 'nature', slug: 'nature', name: 'Nature', desc: 'Organique, bois et plantes' },
+      { id: 'zen', slug: 'zen', name: 'Zen', desc: 'Sérénité et méditation' },
+    ]
+  },
+  {
+    category: 'Luxe & Audace',
+    styles: [
+      { id: 'luxe', slug: 'luxe', name: 'Luxe', desc: 'Prestige et matériaux nobles' },
+      { id: 'baroque', slug: 'baroque', name: 'Baroque', desc: 'Opulent et théâtral' },
+      { id: 'eclectique', slug: 'eclectique', name: 'Éclectique', desc: 'Mix audacieux de styles' },
+    ]
+  },
+  {
+    category: 'Spécialisés',
+    styles: [
+      { id: 'ludique', slug: 'ludique', name: 'Enfant / Ludique', desc: 'Joyeux et stimulant' },
+      { id: 'ado', slug: 'ado', name: 'Ado / Jeune', desc: 'Moderne et personnalisé' },
+    ]
+  },
+];
+
+// Liste plate pour compatibilité
+export const STYLES: DecorStyle[] = STYLE_CATEGORIES_WITH_STYLES.flatMap(cat => cat.styles);
+
+export type StyleSlug = string;
 
 /**
  * Catégories de styles (pour le regroupement UI)
  */
-export const STYLE_CATEGORIES = [
-  { slug: 'moderne', name: 'Moderne' },
-  { slug: 'classique', name: 'Classique' },
-  { slug: 'contemporain', name: 'Contemporain' },
-  { slug: 'minimaliste', name: 'Minimaliste' },
-  { slug: 'industriel', name: 'Industriel' },
-  { slug: 'scandinave', name: 'Scandinave' },
-  { slug: 'boheme', name: 'Bohème' },
-  { slug: 'luxe', name: 'Luxe' },
-] as const;
+export const STYLE_CATEGORIES = STYLE_CATEGORIES_WITH_STYLES.map(cat => ({
+  slug: cat.category.toLowerCase().replace(/[^a-z]/g, ''),
+  name: cat.category,
+}));
 
-export type StyleCategorySlug = typeof STYLE_CATEGORIES[number]['slug'];
+export type StyleCategorySlug = string;
 

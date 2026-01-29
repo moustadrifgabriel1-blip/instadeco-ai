@@ -3,13 +3,13 @@
 import { useCallback, useState, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import Image from 'next/image';
-import { Plus, X, ArrowRight, Download, Check } from 'lucide-react';
+import { Plus, X, ArrowRight, Download, Check, ChevronDown } from 'lucide-react';
 import { ProtectedRoute } from '@/components/features/protected-route';
 import { useAuth } from '@/hooks/use-auth';
 import { useGenerate } from '@/src/presentation/hooks/useGenerate';
 import { useHDUnlock } from '@/src/presentation/hooks/useHDUnlock';
 import { useGenerationStatus } from '@/src/presentation/hooks/useGenerationStatus';
-import { STYLES, ROOM_TYPES } from '@/src/shared/constants';
+import { STYLE_CATEGORIES_WITH_STYLES, ROOM_TYPES } from '@/src/shared/constants';
 
 // Modes de transformation
 const TRANSFORM_MODES = [
@@ -257,7 +257,10 @@ function GenerateContent() {
     }
   };
 
-  const selectedStyleInfo = STYLES.find(s => s.id === selectedStyle);
+  // Trouver le style sélectionné
+  const selectedStyleInfo = STYLE_CATEGORIES_WITH_STYLES
+    .flatMap(cat => cat.styles)
+    .find(s => s.id === selectedStyle);
 
   return (
     <div className="min-h-screen bg-[#fbfbfd]">
@@ -397,32 +400,58 @@ function GenerateContent() {
                   </div>
                 </div>
 
-                {/* Style */}
-                <div className="text-center">
-                  <label className="block text-[12px] font-medium text-[#86868b] uppercase tracking-[.1em] mb-4">
+                {/* Style - Organisé par catégories */}
+                <div>
+                  <label className="block text-[12px] font-medium text-[#86868b] uppercase tracking-[.1em] mb-4 text-center">
                     Style de décoration
                   </label>
-                  <div className="flex flex-wrap justify-center gap-2">
-                    {STYLES.map((style) => (
-                      <button
-                        key={style.id}
-                        onClick={() => setSelectedStyle(style.id)}
-                        className={`
-                          group relative px-5 py-2.5 rounded-full text-[14px] font-medium transition-all duration-200
-                          ${selectedStyle === style.id
-                            ? 'bg-[#1d1d1f] text-white'
-                            : 'bg-[#f5f5f7] text-[#1d1d1f] hover:bg-[#e8e8ed]'
-                          }
-                        `}
-                        title={style.desc}
+                  
+                  {/* Style sélectionné en preview */}
+                  {selectedStyleInfo && (
+                    <div className="mb-4 text-center">
+                      <span className="inline-flex items-center gap-2 px-4 py-2 bg-[#1d1d1f] text-white rounded-full text-[14px] font-medium">
+                        <Check className="w-4 h-4" />
+                        {selectedStyleInfo.name}
+                      </span>
+                      <p className="mt-2 text-[13px] text-[#86868b]">{selectedStyleInfo.desc}</p>
+                    </div>
+                  )}
+                  
+                  {/* Grille de catégories */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
+                    {STYLE_CATEGORIES_WITH_STYLES.map((category) => (
+                      <div 
+                        key={category.category} 
+                        className="bg-white rounded-2xl border border-black/5 overflow-hidden"
                       >
-                        {style.name}
-                      </button>
+                        <div className="px-4 py-2 bg-[#f5f5f7] border-b border-black/5">
+                          <h3 className="text-[12px] font-semibold text-[#86868b] uppercase tracking-wider">
+                            {category.category}
+                          </h3>
+                        </div>
+                        <div className="p-2">
+                          {category.styles.map((style) => (
+                            <button
+                              key={style.id}
+                              onClick={() => setSelectedStyle(style.id)}
+                              className={`
+                                w-full text-left px-3 py-2 rounded-xl transition-all duration-200
+                                ${selectedStyle === style.id
+                                  ? 'bg-[#1d1d1f] text-white'
+                                  : 'hover:bg-[#f5f5f7] text-[#1d1d1f]'
+                                }
+                              `}
+                            >
+                              <div className="font-medium text-[14px]">{style.name}</div>
+                              <div className={`text-[11px] ${selectedStyle === style.id ? 'text-white/70' : 'text-[#86868b]'}`}>
+                                {style.desc}
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
                     ))}
                   </div>
-                  <p className="mt-3 text-[13px] text-[#86868b]">
-                    {selectedStyleInfo?.desc}
-                  </p>
                 </div>
               </div>
 

@@ -157,21 +157,43 @@ function buildPrompt(style: string, roomType: string, transformMode: string = 'f
   // ============================================================================
   
   const styleDescriptions: Record<string, string> = {
+    // Tendances
     original: 'the existing style, enhanced and improved',
     moderne: 'modern minimalist with clean lines, neutral colors, contemporary furniture',
-    scandinave: 'Scandinavian with light wood, white walls, cozy textiles, hygge atmosphere',
-    industriel: 'industrial loft with exposed brick, metal fixtures, raw materials',
-    boheme: 'bohemian with layered textiles, plants, warm colors, eclectic decor',
-    minimaliste: 'ultra minimalist with essential furniture only, monochrome palette',
-    luxe: 'luxury with premium materials, elegant furniture, sophisticated lighting',
-    classique: 'classic French with ornate details, rich fabrics, traditional elegance',
-    contemporain: 'contemporary with artistic elements, bold accents, designer pieces',
-    japandi: 'Japandi combining Japanese minimalism with Scandinavian warmth',
-    artdeco: 'Art Deco with geometric patterns, gold accents, glamorous atmosphere',
-    farmhouse: 'modern farmhouse with rustic wood, shiplap, cozy textiles',
-    coastal: 'coastal with light blues, whites, natural textures, beachy atmosphere',
-    midcentury: 'mid-century modern with organic shapes, teak wood, retro colors',
-    ludique: 'playful with vibrant colors, creative shapes, fun elements',
+    minimaliste: 'ultra minimalist with essential furniture only, monochrome palette, zen simplicity',
+    japandi: 'Japandi combining Japanese zen minimalism with Scandinavian warmth and hygge',
+    
+    // Classiques
+    haussmannien: 'Parisian Haussmann style with ornate crown moldings, herringbone parquet floors, marble fireplaces, high ceilings, classic French windows',
+    classique: 'classic French elegance with rich fabrics, carved wood furniture, chandeliers, refined traditional decor',
+    artdeco: 'Art Deco with geometric patterns, gold and brass accents, velvet fabrics, glamorous 1920s atmosphere',
+    midcentury: 'mid-century modern with organic curves, teak and walnut wood, iconic 50s-60s designer furniture',
+    
+    // Chaleureux
+    scandinave: 'Scandinavian with light oak wood, white walls, cozy wool textiles, candles, hygge atmosphere',
+    boheme: 'bohemian with layered textiles, macramé, indoor plants, warm terracotta colors, eclectic global decor',
+    provencal: 'Provençal French country with lavender accents, terracotta tiles, whitewashed walls, wrought iron, olive wood',
+    chalet: 'Alpine chalet style with warm wood paneling, stone fireplace, sheepskin rugs, mountain lodge atmosphere',
+    
+    // Urbains
+    industriel: 'industrial loft with exposed brick walls, black metal fixtures, Edison bulbs, raw concrete, leather accents',
+    contemporain: 'contemporary design with bold artistic elements, statement pieces, cutting-edge designer furniture',
+    loft: 'New York loft style with high ceilings, large windows, open space, urban sophistication, metal and glass',
+    
+    // Nature & Détente  
+    coastal: 'coastal with ocean blues, sandy whites, driftwood, nautical accents, breezy seaside atmosphere',
+    farmhouse: 'modern farmhouse with rustic reclaimed wood, shiplap walls, linen textiles, vintage charm',
+    nature: 'biophilic design with abundant plants, natural wood, stone, organic shapes, earth tones, botanical prints',
+    zen: 'zen sanctuary with bamboo, water elements, meditation space, natural materials, peaceful minimalism',
+    
+    // Luxe & Audace
+    luxe: 'luxury design with marble, brass, velvet, premium materials, elegant proportions, sophisticated lighting',
+    baroque: 'opulent baroque with gilded mirrors, rich velvet, crystal chandeliers, dramatic ornate details',
+    eclectique: 'eclectic bold mix with contrasting styles, statement art, unexpected color combinations, curated chaos',
+    
+    // Spécialisés
+    ludique: 'playful children space with vibrant colors, creative shapes, fun patterns, safe and stimulating design',
+    ado: 'modern teen room with cool aesthetics, personal expression, gaming/study zones, trendy urban style',
   };
 
   const roomDescriptions: Record<string, string> = {
