@@ -96,18 +96,18 @@ export class FalImageGeneratorService implements IImageGeneratorService {
       const fullPrompt = `A professional architectural photograph of a ${roomPrompt} designed in ${styleSlug} style. ${stylePrompt}. The image features real-world, commercially available furniture designs (similar to West Elm, CB2, Restoration Hardware, IKEA) with realistic proportions and functional placement. Avoid generic 3D model furniture. Realistic textures, natural lighting. Shot on a 50mm lens, f/2.8, ISO 200. Architectural Digest quality, 8k resolution, photorealistic, highly detailed, volumetric lighting, perfect composition, no distortion.`;
 
       // 2. Submit to Queue
-      // NOTE: We use control_loras instead of controlnets because Fal's 'flux-general' endpoint
-      // supports the 'preprocess' parameter within control_loras (which effectively wraps ControlNets/ControlLoras),
-      // allowing us to generate the depth map on the fly. Passing raw RGB to controlnets without preprocessing causes artifacts.
+      // NOTE: Using easycontrols with "depth" control method - this is the simplest and most reliable
+      // approach for structure-preserving generation on Fal.ai's flux-general endpoint.
+      // EasyControl handles depth map generation internally.
       const { request_id } = await fal.queue.submit(MODEL_PATH, {
         input: {
           prompt: fullPrompt,
-          control_loras: [
+          easycontrols: [
             {
-              path: "https://huggingface.co/XLabs-AI/flux-controlnet-depth-v3/resolve/main/flux-depth-controlnet-v3.safetensors?download=true",
-              control_image_url: options.controlImageUrl,
-              scale: 1.0, 
-              preprocess: "depth" // CRITICAL: Converts photo to depth map before generation
+              control_method_url: "depth", // Built-in depth control
+              image_url: options.controlImageUrl,
+              image_control_type: "spatial", // "spatial" for structure, "subject" for style
+              scale: 1.0
             }
           ],
           image_size: "landscape_4_3", 
