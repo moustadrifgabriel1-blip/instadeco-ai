@@ -59,6 +59,8 @@ export interface GenerateDesignInput {
   roomType: string;
   imageBase64: string;
   prompt: string;
+  /** Mode de transformation: full_redesign, rearrange, keep_layout, decor_only */
+  transformMode?: 'full_redesign' | 'rearrange' | 'keep_layout' | 'decor_only';
 }
 
 /**
@@ -181,6 +183,7 @@ export class GenerateDesignUseCase {
       controlImageUrl: inputImageUrl,
       styleSlug: input.styleSlug,
       roomType: input.roomType,
+      transformMode: input.transformMode || 'full_redesign',
       width: imageWidth,
       height: imageHeight,
       numInferenceSteps: 25,

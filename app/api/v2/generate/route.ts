@@ -65,6 +65,7 @@ export async function POST(req: Request) {
       roomType,
       imageBase64: imageUrl, // Le storage service gère base64 et URL
       prompt,
+      transformMode: transformMode as 'full_redesign' | 'rearrange' | 'keep_layout' | 'decor_only',
     });
     
     const duration = Date.now() - startTime;

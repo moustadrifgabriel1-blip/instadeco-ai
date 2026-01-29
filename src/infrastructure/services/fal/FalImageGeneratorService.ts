@@ -106,24 +106,25 @@ export class FalImageGeneratorService implements IImageGeneratorService {
 
     const styleSlug = options.styleSlug || 'moderne';
     const roomType = options.roomType || 'salon';
+    const transformMode = options.transformMode || 'full_redesign';
 
     console.log('[Fal.ai] 🎨 Starting generation (Flux ControlNet):', {
       styleSlug,
       roomType,
+      transformMode,
       model: MODEL_PATH,
       inputWidth: options.width,
       inputHeight: options.height,
     });
 
     try {
-      // 1. Build the prompt
-      const stylePrompt = STYLE_PROMPTS[styleSlug] || STYLE_PROMPTS['moderne'];
-      const roomPrompt = ROOM_PROMPTS[roomType] || 'interior room';
+      // 1. Utiliser le prompt personnalisé fourni (inclut les instructions du transformMode)
+      // Le prompt est construit par l'API route avec buildPrompt() qui gère les différents modes
+      let fullPrompt = options.prompt;
       
-      // "Perfect" Prompt Structure for Flux.1 [dev]
-      // Flux responds well to natural language and specific high-quality photography keywords.
-      // INSTRUCTION Update: Added constraint for "real-world furniture".
-      const fullPrompt = `A professional architectural photograph of a ${roomPrompt} designed in ${styleSlug} style. ${stylePrompt}. The image features real-world, commercially available furniture designs (similar to West Elm, CB2, Restoration Hardware, IKEA) with realistic proportions and functional placement. Avoid generic 3D model furniture. Realistic textures, natural lighting. Shot on a 50mm lens, f/2.8, ISO 200. Architectural Digest quality, 8k resolution, photorealistic, highly detailed, volumetric lighting, perfect composition, no distortion.`;
+      // Ajouter les mots-clés de qualité photo à la fin
+      const qualityKeywords = 'Professional architectural photograph, shot on 50mm lens, f/2.8, ISO 200, realistic textures, natural lighting, 8k resolution, photorealistic, highly detailed.';
+      fullPrompt = `${fullPrompt}\n\n${qualityKeywords}`;
 
       // 2. Déterminer le format d'image optimal basé sur l'image source
       const imageSize = getOptimalImageSize(options.width || 1024, options.height || 1024);
@@ -141,7 +142,14 @@ export class FalImageGeneratorService implements IImageGeneratorService {
               control_method_url: "depth", // Built-in depth control
               image_url: options.controlImageUrl,
               image_control_type: "spatial", // "spatial" for structure, "subject" for style
-              scale: 1.0
+              // Ajuster le scale selon le mode:
+              // - rearrange: plus haut (1.2) car on veut garder les meubles identiques
+              // - decor_only: haut (1.1) car on garde les meubles
+              // - keep_layout: moyen (1.0) car on change le style mais garde les positions
+              // - full_redesign: plus bas (0.85) car on transforme tout
+              scale: transformMode === 'rearrange' ? 1.2 : 
+                     transformMode === 'decor_only' ? 1.1 : 
+                     transformMode === 'keep_layout' ? 1.0 : 0.85
             }
           ],
           image_size: imageSize, 
