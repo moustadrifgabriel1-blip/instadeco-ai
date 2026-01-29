@@ -29,6 +29,7 @@ export const STYLES = [
   { id: 'coastal', slug: 'coastal', name: 'Coastal', desc: 'Bord de mer relaxant et lumineux' },
   { id: 'farmhouse', slug: 'farmhouse', name: 'Farmhouse', desc: 'Charme rustique contemporain' },
   { id: 'artdeco', slug: 'artdeco', name: 'Art Déco', desc: 'Glamour opulent années 1920' },
+  { id: 'ludique', slug: 'ludique', name: 'Ludique / Enfant', desc: 'Univers joyeux, coloré et créatif' },
 ] as const;
 
 export type StyleSlug = typeof STYLES[number]['slug'];

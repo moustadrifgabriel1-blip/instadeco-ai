@@ -22,6 +22,7 @@ const STYLE_PROMPTS: Record<string, string> = {
   'coastal': 'coastal hamptons style, light and airy, white wood paneling, linen fabrics, soft blue and sand tones, beach house vibe, natural light, elegant and relaxed atmosphere',
   'farmhouse': 'modern farmhouse interior, rustic wooden beams, shiplap walls, comfortable overstuffed furniture, neutral warm tones, vintage accessories, cozy and inviting, country living style',
   'artdeco': 'art deco interior, geometric patterns, velvet furniture, brass and gold metallic accents, rich jewel tones, emerald green, symmetry, glamorous and opulent atmosphere, great gatsby style',
+  'ludique': 'playful kids room interior, vibrant but harmonious colors, creative furniture shapes, educational decor, soft rugs, organized toy storage, whimsical atmosphere, safe and cozy for children',
   // Fallbacks
   'scandinave': 'scandinavian interior design, hygge atmosphere, light wood, white walls, functional design, cozy textiles, clean and bright',
   'luxe': 'ultra luxury interior design, marble floors, silk drapes, custom furniture, gold leaf details, expensive materials, penthouse vibe, cinematic lighting',
