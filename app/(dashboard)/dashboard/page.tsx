@@ -141,6 +141,80 @@ export default function DashboardPageV2() {
     }
   };
 
+  // Fonction pour ajouter le filigrane sur l'image
+  const addWatermarkToImage = async (imageUrl: string): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const img = document.createElement('img');
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        if (!ctx) {
+          reject(new Error('Canvas context not available'));
+          return;
+        }
+        
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+        
+        // Filigrane principal
+        const mainText = 'InstaDeco';
+        const fontSize = Math.max(img.width / 8, 60);
+        ctx.font = `bold ${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        const centerX = img.width / 2;
+        const centerY = img.height / 2;
+        
+        ctx.save();
+        ctx.translate(centerX, centerY);
+        ctx.rotate(-15 * Math.PI / 180);
+        
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+        ctx.shadowBlur = 10;
+        ctx.shadowOffsetX = 2;
+        ctx.shadowOffsetY = 2;
+        
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+        ctx.fillText(mainText, 0, 0);
+        
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
+        ctx.lineWidth = 2;
+        ctx.strokeText(mainText, 0, 0);
+        
+        ctx.restore();
+        
+        // Mention IA
+        const aiText = 'Généré par IA';
+        const aiFontSize = Math.max(img.width / 50, 12);
+        ctx.font = `${aiFontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'bottom';
+        
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+        ctx.shadowBlur = 3;
+        ctx.shadowOffsetX = 1;
+        ctx.shadowOffsetY = 1;
+        
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+        ctx.fillText(aiText, img.width - 15, img.height - 10);
+        
+        canvas.toBlob((blob) => {
+          if (blob) {
+            resolve(URL.createObjectURL(blob));
+          } else {
+            reject(new Error('Failed to create blob'));
+          }
+        }, 'image/jpeg', 0.92);
+      };
+      img.onerror = () => reject(new Error('Failed to load image'));
+      img.src = imageUrl;
+    });
+  };
+
   const handleDownload = async (generationId: string, outputUrl: string, isHD: boolean = false) => {
     if (!outputUrl) return;
     
@@ -155,12 +229,23 @@ export default function DashboardPageV2() {
 
     // Téléchargement standard avec filigrane
     try {
+      // Appliquer le filigrane avant téléchargement
+      const watermarkedUrl = await addWatermarkToImage(outputUrl);
+      
+      const link = document.createElement('a');
+      link.href = watermarkedUrl;
+      link.download = `instadeco-${generationId}.jpg`;
+      link.click();
+      
+      // Libérer l'URL blob
+      setTimeout(() => URL.revokeObjectURL(watermarkedUrl), 1000);
+    } catch (error) {
+      console.error('Erreur téléchargement:', error);
+      // Fallback: télécharger sans filigrane si erreur
       const link = document.createElement('a');
       link.href = outputUrl;
       link.download = `instadeco-${generationId}.jpg`;
       link.click();
-    } catch (error) {
-      console.error('Erreur téléchargement:', error);
     }
   };
 
