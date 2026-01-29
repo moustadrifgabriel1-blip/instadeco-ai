@@ -46,11 +46,17 @@ export class SupabaseGenerationRepository implements IGenerationRepository {
     // Hack: Stocker le providerId dans output_image_url temporairement
     const outputOverview = input.providerId ? `PENDING_PID:${input.providerId}` : null;
 
+    // FIX: La base de données a une contrainte CHECK stricte sur style_slug qui ne connaît pas les nouveaux styles (ex: 'ludique').
+    // Pour éviter le crash 500, on mappe les styles inconnus sur 'moderne' dans la DB.
+    // L'IA utilise le prompt complet donc le style visuel sera correct même si le slug DB est 'moderne'.
+    const ALLOWED_DB_STYLES = ['moderne', 'minimaliste', 'boheme', 'industriel', 'classique', 'japandi', 'midcentury', 'coastal', 'farmhouse', 'artdeco'];
+    const safeStyleSlug = ALLOWED_DB_STYLES.includes(input.styleSlug) ? input.styleSlug : 'moderne';
+
     const { data, error } = await this.supabase
       .from('generations')
       .insert({
         user_id: input.userId,
-        style_slug: input.styleSlug,
+        style_slug: safeStyleSlug,
         room_type_slug: input.roomType,
         input_image_url: input.inputImageUrl,
         custom_prompt: input.prompt,
