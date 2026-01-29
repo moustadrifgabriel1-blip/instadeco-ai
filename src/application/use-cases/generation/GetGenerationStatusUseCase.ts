@@ -64,13 +64,18 @@ export class GetGenerationStatusUseCase {
     // Si en attente et providerId existe, vérifier le statut externe
     if ((generation.status === 'pending' || generation.status === 'processing') && generation.providerId) {
       if (typeof this.imageGenerator.checkStatus === 'function') {
+        this.logger.debug('Checking external status', { providerId: generation.providerId });
+        
         const statusCheck = await this.imageGenerator.checkStatus(generation.providerId);
         
         if (statusCheck.success) {
           const { status, output } = statusCheck.data;
+          this.logger.debug('External status response', { status, hasOutput: !!output?.imageUrl });
           
           if (status === 'succeeded' && output?.imageUrl) {
             // Télécharger et stocker l'image finale
+            this.logger.info('Generation succeeded, uploading image...', { generationId: generation.id });
+            
             const uploadResult = await this.storage.uploadFromUrl(output.imageUrl, {
               bucket: 'output-images',
               fileName: `${generation.userId}/${generation.id}.jpg`,
@@ -78,16 +83,37 @@ export class GetGenerationStatusUseCase {
             });
 
             if (uploadResult.success) {
+              this.logger.info('Image uploaded, updating DB...', { url: uploadResult.data.url });
+              
               const updatedGen = await this.generationRepo.update(generation.id, {
                  status: 'completed',
                  outputImageUrl: uploadResult.data.url
               });
-              if (updatedGen.success) return success(updatedGen.data);
+              
+              if (updatedGen.success) {
+                this.logger.info('Generation completed successfully!', { generationId: generation.id });
+                return success(updatedGen.data);
+              } else {
+                this.logger.error('Failed to update generation in DB', updatedGen.error as Error);
+              }
+            } else {
+              this.logger.error('Failed to upload output image', uploadResult.error as Error);
+              // CRITICAL FIX: Return the Fal.ai URL directly if Supabase upload fails
+              // This prevents the generation from being stuck forever
+              this.logger.warn('Fallback: Using Fal.ai URL directly');
+              const fallbackUpdate = await this.generationRepo.update(generation.id, {
+                status: 'completed',
+                outputImageUrl: output.imageUrl
+              });
+              if (fallbackUpdate.success) return success(fallbackUpdate.data);
             }
           } else if (status === 'failed') {
+            this.logger.error('External generation failed');
             const updatedGen = await this.generationRepo.update(generation.id, { status: 'failed' });
              if (updatedGen.success) return success(updatedGen.data);
           }
+        } else {
+          this.logger.error('External status check failed', statusCheck.error as Error);
         }
       }
     }

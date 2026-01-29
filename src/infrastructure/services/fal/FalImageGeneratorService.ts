@@ -138,7 +138,7 @@ export class FalImageGeneratorService implements IImageGeneratorService {
 
   async checkStatus(predictionId: string): Promise<Result<any>> {
     try {
-      // console.log('[Fal.ai] 🔄 Checking status for:', predictionId);
+      console.log('[Fal.ai] 🔄 Checking status for:', predictionId);
       
       const status = await fal.queue.status(MODEL_PATH, {
         requestId: predictionId,
@@ -148,23 +148,27 @@ export class FalImageGeneratorService implements IImageGeneratorService {
       const statusData = (status as any).data || status;
       const statusCode = (statusData?.status || 'UNKNOWN').toUpperCase();
 
-      if (process.env.NODE_ENV === 'development') {
-        console.log(`[Fal.ai] Status: ${statusCode} (${predictionId})`);
-      }
+      console.log(`[Fal.ai] Status: ${statusCode} (${predictionId})`);
 
       if (statusCode === 'COMPLETED' || statusCode === 'SUCCEEDED' || statusCode === 'OK') {
+         console.log('[Fal.ai] ✅ Job completed, fetching result...');
+         
          const result = await fal.queue.result(MODEL_PATH, {
            requestId: predictionId
          });
          
          const data = (result as any).data || result;
+         console.log('[Fal.ai] Result data keys:', Object.keys(data || {}));
+         
          // Flux returns 'images': [{url: ...}]
          const imageUrl = data?.images?.[0]?.url || data?.image?.url;
 
          if (!imageUrl) {
-            console.error('[Fal.ai] ❌ No image URL in result:', data);
+            console.error('[Fal.ai] ❌ No image URL in result:', JSON.stringify(data).slice(0, 500));
             return failure(new Error('No image URL in result'));
          }
+         
+         console.log('[Fal.ai] ✅ Image URL found:', imageUrl.slice(0, 80) + '...');
          
          return success({ 
            status: 'succeeded',
