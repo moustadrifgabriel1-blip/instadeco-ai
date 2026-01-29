@@ -140,6 +140,7 @@ export async function POST(req: Request) {
  */
 function buildPrompt(style: string, roomType: string, transformMode: string = 'full_redesign'): string {
   const styleDescriptions: Record<string, string> = {
+    original: 'keeping the same existing style, improving organization and aesthetics',
     moderne: 'modern minimalist design with clean lines, neutral colors, contemporary furniture',
     scandinave: 'Scandinavian design with light wood, white walls, cozy textiles, hygge atmosphere',
     industriel: 'industrial loft design with exposed brick, metal fixtures, raw materials',
@@ -171,89 +172,111 @@ function buildPrompt(style: string, roomType: string, transformMode: string = 'f
   const styleDesc = styleDescriptions[style] || style;
   const roomDesc = roomDescriptions[roomType] || roomType;
 
-  // Base constraints that apply to all modes
-  const baseConstraints = `
-CRITICAL CONSTRAINTS - MUST PRESERVE:
-- Keep EXACT same room dimensions and proportions
-- Keep ALL windows in their EXACT positions, sizes, and shapes
-- Keep ALL doors in their EXACT positions and sizes  
-- Keep ALL walls in their EXACT positions - DO NOT add, remove, or modify any walls
-- Keep the ceiling height and floor area unchanged
-- Keep any built-in architectural features (columns, beams, alcoves)`;
+  // Architecture constraints (same for all modes)
+  const architectureConstraints = `ARCHITECTURAL CONSTRAINTS (NEVER CHANGE):
+- Room dimensions, walls, ceiling height
+- Window positions, sizes, shapes
+- Door positions and sizes
+- Built-in features (columns, beams, alcoves)`;
 
-  // Mode-specific prompts
+  // Completely different prompts for each mode - no mixing
   switch (transformMode) {
     case 'rearrange':
-      return `Rearrange the furniture in this ${roomDesc} to create a better layout and flow.
+      // MODE: SAME FURNITURE, DIFFERENT POSITIONS
+      return `TASK: FURNITURE REARRANGEMENT ONLY
 
-${baseConstraints}
+This is a ${roomDesc}. Your ONLY task is to move the existing furniture to new positions.
 
-KEEP EXACTLY THE SAME:
-- All the existing furniture pieces (same style, same colors)
-- The same decorative objects and accessories
-- Wall colors and flooring
+${architectureConstraints}
 
-ONLY CHANGE:
-- Move furniture to different positions for better arrangement
-- Optimize the space layout for functionality and aesthetics
-- Create better conversation areas and traffic flow
-- Suggest a fresh furniture arrangement that makes the room feel new
+CRITICAL - KEEP IDENTICAL:
+✓ Every single furniture piece (exact same sofa, exact same table, exact same chairs)
+✓ Furniture colors, styles, and materials - NO CHANGES
+✓ Wall color, flooring, rugs - NO CHANGES
+✓ Decor items and accessories - keep them all
+✓ The overall style of the room - NO STYLE CHANGE
 
-The goal is to show a new furniture arrangement using the EXACT SAME furniture the person already owns.
-Professional interior design photography, natural lighting, photorealistic.`;
+YOUR ONLY TASK - REARRANGE POSITIONS:
+→ Move the sofa to a different wall or angle
+→ Reposition chairs and tables for better flow
+→ Create a new layout that feels fresh
+→ Optimize traffic paths and conversation areas
+
+DO NOT: Change any furniture style, color, or material. The furniture must look EXACTLY the same, just in different positions.
+
+Professional photography, same lighting atmosphere as original.`;
 
     case 'keep_layout':
-      return `Redesign this ${roomDesc} with ${styleDesc} style while keeping the exact same furniture layout.
+      // MODE: SAME POSITIONS, NEW STYLE FURNITURE
+      return `TASK: STYLE CHANGE WITH SAME LAYOUT
 
-${baseConstraints}
+This is a ${roomDesc}. Transform to ${styleDesc} style while keeping furniture in EXACT SAME POSITIONS.
 
-KEEP EXACTLY THE SAME:
-- Furniture positions and arrangement (keep everything in the same spot)
-- Room layout and traffic flow
+${architectureConstraints}
 
-CHANGE ONLY:
-- Replace each furniture piece with a ${style} style equivalent in the SAME POSITION
-- Update wall colors and textures to match ${style} style
-- Add ${style} decorative elements
-- Update lighting fixtures to match ${style}
+CRITICAL - KEEP IDENTICAL:
+✓ Every furniture position - sofa stays where sofa is, table stays where table is
+✓ Layout and arrangement - nothing moves
+✓ Room flow and spacing
 
-Professional interior design photography, natural lighting, photorealistic, magazine quality.`;
+YOUR TASK - REPLACE WITH ${style.toUpperCase()} STYLE:
+→ Replace sofa with ${style} style sofa IN THE SAME SPOT
+→ Replace table with ${style} style table IN THE SAME SPOT
+→ Replace each piece with ${style} equivalent AT THE SAME LOCATION
+→ Update wall colors to match ${style}
+→ Add ${style} decor elements
+
+The furniture layout must be a perfect overlay - only the style changes, not the arrangement.
+
+Professional interior photography, ${styleDesc}, magazine quality.`;
 
     case 'decor_only':
-      return `Update the decor of this ${roomDesc} to ${styleDesc} style while keeping all existing furniture.
+      // MODE: SAME FURNITURE, ADD DECOR
+      return `TASK: DECOR REFRESH ONLY
 
-${baseConstraints}
+This is a ${roomDesc}. Keep ALL furniture exactly as-is. Only add/change decorative elements.
 
-KEEP EXACTLY THE SAME:
-- All existing furniture pieces in their current positions
-- Main furniture items (sofa, bed, table, etc.)
+${architectureConstraints}
 
-CHANGE ONLY:
-- Wall colors and textures
-- Decorative items (cushions, throws, vases, plants)
-- Art and wall decorations
-- Rugs and textiles
-- Lighting fixtures and lamps
-- Small accessories and styling
+CRITICAL - KEEP 100% IDENTICAL:
+✓ ALL furniture pieces - exact same items in exact same positions
+✓ Sofa, chairs, tables, bed, cabinets - UNCHANGED
+✓ Furniture colors and materials - UNCHANGED
 
-The furniture must remain identical. Only refresh the room with new ${style} decor elements.
-Professional interior design photography, natural lighting, photorealistic.`;
+YOUR ONLY TASK - UPDATE DECOR TO ${style.toUpperCase()} STYLE:
+→ Change wall color/texture
+→ Add/replace cushions, throws, blankets
+→ Add/replace plants and vases
+→ Add/replace wall art and frames
+→ Add/replace rugs and textiles
+→ Update curtains/drapes
+→ Add ${style} accessories and styling
+
+The main furniture must be IDENTICAL to the original. Only small decor items and surfaces change.
+
+Professional interior photography, ${styleDesc} decor styling.`;
 
     case 'full_redesign':
     default:
-      return `Redesign this ${roomDesc} with ${styleDesc}.
+      // MODE: COMPLETE TRANSFORMATION
+      return `TASK: COMPLETE INTERIOR REDESIGN
 
-${baseConstraints}
+This is a ${roomDesc}. Complete transformation to ${styleDesc} style.
 
-ONLY CHANGE:
-- Replace furniture with new ${styleDesc} pieces
-- Change wall colors/textures (but keep walls in place)
-- Add decorative elements (rugs, curtains, plants, art)
-- Update lighting fixtures
-- Change flooring material/color
+${architectureConstraints}
 
-The architectural shell of the room must remain IDENTICAL to the original photo. Only the interior design elements (furniture, decor, materials) should change to match the ${style} style.
+YOU CAN CHANGE EVERYTHING EXCEPT ARCHITECTURE:
+→ Replace ALL furniture with new ${styleDesc} pieces
+→ New furniture arrangement and layout
+→ New wall colors, textures, wallpaper
+→ New flooring material or color
+→ New lighting fixtures
+→ Complete ${style} decor: rugs, art, plants, accessories
+→ New color palette matching ${style}
 
-Professional interior design photography, natural lighting, photorealistic, magazine quality.`;
+Create a stunning ${style} interior that looks like a professional design project.
+The room structure stays the same, but everything inside transforms.
+
+Professional interior design photography, ${styleDesc}, architectural digest quality, 8k, photorealistic.`;
   }
 }

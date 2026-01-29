@@ -12,6 +12,7 @@ const MODEL_PATH = 'fal-ai/flux-general';
 
 // Enhanced prompts for Flux to ensure "World-Class Interior Design" quality
 const STYLE_PROMPTS: Record<string, string> = {
+  'original': 'same existing interior style, improved organization, better lighting, enhanced aesthetics while preserving the current design character and furniture style',
   'moderne': 'modern interior design, sleek lines, contemporary italian furniture, neutral color palette, warm lighting, high-end finishing, architectural digest style, 8k, photorealistic',
   'minimaliste': 'minimalist interior design, wabi-sabi influence, clean lines, decluttered space, natural materials, light oak wood, soft white walls, serene atmosphere, high quality textures',
   'boheme': 'bohemian chic interior, eclectic decor, rattan furniture, layered textiles, persian rugs, indoor plants, warm earth tones, cozy atmosphere, macrame details, natural lighting',

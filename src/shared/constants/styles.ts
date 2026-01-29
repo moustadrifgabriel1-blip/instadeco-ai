@@ -19,6 +19,7 @@ export type RoomTypeSlug = typeof ROOM_TYPES[number]['slug'];
  * Styles de décoration disponibles avec descriptions
  */
 export const STYLES = [
+  { id: 'original', slug: 'original', name: 'Garder mon style', desc: 'Améliorer sans changer de style' },
   { id: 'moderne', slug: 'moderne', name: 'Moderne', desc: 'Élégance contemporaine sophistiquée' },
   { id: 'minimaliste', slug: 'minimaliste', name: 'Minimaliste', desc: 'Simplicité scandinave épurée' },
   { id: 'boheme', slug: 'boheme', name: 'Bohème', desc: 'Chaleur éclectique globe-trotter' },
