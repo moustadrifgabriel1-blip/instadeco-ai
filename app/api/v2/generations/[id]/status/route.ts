@@ -41,6 +41,8 @@ export async function GET(
     const { id } = paramsValidation.data;
     const { userId } = queryValidation.success ? queryValidation.data : { userId: undefined };
 
+    console.log('[StatusAPI] Request for generation:', id);
+
     // Exécuter le Use Case
     const result = await useCases.getGenerationStatus.execute({
       generationId: id,
@@ -48,6 +50,7 @@ export async function GET(
     });
 
     if (!result.success) {
+      console.error('[StatusAPI] UseCase failed:', result.error);
       return NextResponse.json(
         { error: result.error.message },
         { status: result.error.statusCode }
@@ -56,6 +59,8 @@ export async function GET(
 
     // Mapper vers DTO
     const generationDTO = GenerationMapper.toDTO(result.data);
+
+    console.log('[StatusAPI] Returning status:', generationDTO.status, 'hasOutput:', !!generationDTO.outputImageUrl);
 
     return NextResponse.json({
       generation: generationDTO,
