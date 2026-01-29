@@ -21,8 +21,8 @@ const TRANSFORM_MODES = [
   },
   { 
     id: 'rearrange', 
-    name: 'Réarranger les meubles', 
-    desc: 'Garder vos meubles, nouvelle disposition',
+    name: 'Nouvelle disposition', 
+    desc: 'Même style, agencement différent',
     icon: '🔄'
   },
   { 

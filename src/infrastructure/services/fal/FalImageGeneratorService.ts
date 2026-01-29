@@ -143,13 +143,13 @@ export class FalImageGeneratorService implements IImageGeneratorService {
               image_url: options.controlImageUrl,
               image_control_type: "spatial", // "spatial" for structure, "subject" for style
               // Ajuster le scale selon le mode:
-              // - rearrange: plus haut (1.2) car on veut garder les meubles identiques
-              // - decor_only: haut (1.1) car on garde les meubles
-              // - keep_layout: moyen (1.0) car on change le style mais garde les positions
-              // - full_redesign: plus bas (0.85) car on transforme tout
-              scale: transformMode === 'rearrange' ? 1.2 : 
-                     transformMode === 'decor_only' ? 1.1 : 
-                     transformMode === 'keep_layout' ? 1.0 : 0.85
+              // - rearrange: PLUS BAS (0.4) pour donner liberté de déplacer les meubles
+              // - decor_only: très haut (1.2) car on garde TOUT sauf la déco
+              // - keep_layout: haut (1.0) car on garde les positions exactes
+              // - full_redesign: moyen (0.7) pour transformer tout en gardant la structure de base
+              scale: transformMode === 'rearrange' ? 0.4 : 
+                     transformMode === 'decor_only' ? 1.2 : 
+                     transformMode === 'keep_layout' ? 1.0 : 0.7
             }
           ],
           image_size: imageSize, 

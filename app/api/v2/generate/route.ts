@@ -183,29 +183,29 @@ function buildPrompt(style: string, roomType: string, transformMode: string = 'f
   // Completely different prompts for each mode - no mixing
   switch (transformMode) {
     case 'rearrange':
-      // MODE: SAME FURNITURE, DIFFERENT POSITIONS
-      return `TASK: FURNITURE REARRANGEMENT ONLY
+      // MODE: SUGGEST A NEW FURNITURE ARRANGEMENT
+      return `TASK: SUGGEST A NEW FURNITURE LAYOUT
 
-This is a ${roomDesc}. Your ONLY task is to move the existing furniture to new positions.
+This is a ${roomDesc}. Create a completely NEW furniture arrangement with SIMILAR style furniture.
 
 ${architectureConstraints}
 
-CRITICAL - KEEP IDENTICAL:
-✓ Every single furniture piece (exact same sofa, exact same table, exact same chairs)
-✓ Furniture colors, styles, and materials - NO CHANGES
-✓ Wall color, flooring, rugs - NO CHANGES
-✓ Decor items and accessories - keep them all
-✓ The overall style of the room - NO STYLE CHANGE
+IMPORTANT GUIDELINES:
+→ Use SIMILAR style furniture (same aesthetic, similar colors)
+→ Create a DIFFERENT layout - move things around significantly
+→ The sofa should be in a DIFFERENT position than the original
+→ Tables and chairs should be rearranged
+→ Create better flow and conversation areas
+→ Make the room feel fresh and reorganized
 
-YOUR ONLY TASK - REARRANGE POSITIONS:
-→ Move the sofa to a different wall or angle
-→ Reposition chairs and tables for better flow
-→ Create a new layout that feels fresh
-→ Optimize traffic paths and conversation areas
+KEEP THE SAME:
+✓ The overall aesthetic and color palette
+✓ The type of furniture (keep a sofa if there was a sofa, keep a bed if bedroom)
+✓ Wall colors and flooring
+✓ The cozy/modern/etc atmosphere
 
-DO NOT: Change any furniture style, color, or material. The furniture must look EXACTLY the same, just in different positions.
-
-Professional photography, same lighting atmosphere as original.`;
+This is a "what if I reorganized my room" visualization.
+Professional interior photography, natural lighting, photorealistic.`;
 
     case 'keep_layout':
       // MODE: SAME POSITIONS, NEW STYLE FURNITURE
