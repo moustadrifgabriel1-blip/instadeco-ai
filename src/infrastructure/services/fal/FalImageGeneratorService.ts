@@ -99,7 +99,7 @@ export class FalImageGeneratorService implements IImageGeneratorService {
             {
               path: "https://huggingface.co/XLabs-AI/flux-controlnet-depth-v3/resolve/main/flux-depth-controlnet-v3.safetensors?download=true",
               control_image_url: options.controlImageUrl,
-              conditioning_scale: 0.65
+              conditioning_scale: 1.0
             }
           ],
           image_size: "landscape_4_3", 
