@@ -452,12 +452,12 @@ function GenerateContent() {
                     Création en cours...
                   </p>
                   <p className="mt-1 text-[14px] text-[#86868b]">
-                    {progress}%
+                    {Math.round(progress)}%
                   </p>
                   <div className="w-40 h-[3px] bg-[#e8e8ed] rounded-full mt-4 overflow-hidden">
                     <div 
                       className="h-full bg-[#1d1d1f] rounded-full transition-all duration-700 ease-out"
-                      style={{ width: `${progress}%` }}
+                      style={{ width: `${Math.round(progress)}%` }}
                     />
                   </div>
                 </div>
