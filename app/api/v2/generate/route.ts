@@ -180,13 +180,55 @@ function buildPrompt(style: string, roomType: string, transformMode: string = 'f
 - Door positions and sizes
 - Built-in features (columns, beams, alcoves)`;
 
+  // Specific room furniture requirements
+  const roomFurnitureRequirements: Record<string, string> = {
+    salon: 'This is a LIVING ROOM - must contain: sofa/couch, coffee table, seating area. NO beds.',
+    chambre: 'This is a BEDROOM - must contain: bed with headboard, nightstands, bedside lamps. NO sofas or couches.',
+    'chambre-enfant': 'This is a CHILDREN BEDROOM - must contain: child-sized bed or bunk bed, toy storage, playful furniture. NO adult beds or sofas.',
+    cuisine: 'This is a KITCHEN - must contain: cabinets, countertops, sink, appliances. NO beds or sofas.',
+    'salle-de-bain': 'This is a BATHROOM - must contain: sink, toilet, shower or bathtub. NO beds or sofas.',
+    bureau: 'This is a HOME OFFICE - must contain: desk, office chair, shelving or storage. NO beds.',
+    'salle-a-manger': 'This is a DINING ROOM - must contain: dining table, dining chairs. NO beds or sofas.',
+    entree: 'This is an ENTRYWAY - must contain: console table, coat rack or hooks, mirror. NO beds.',
+    terrasse: 'This is a TERRACE/PATIO - must contain: outdoor furniture, plants. NO indoor furniture.',
+  };
+
+  const roomFurniture = roomFurnitureRequirements[roomType] || `This is a ${roomDesc}.`;
+
+  // SPECIAL CASE: Style "original" (Garder mon style) - keep existing furniture style
+  if (style === 'original') {
+    return `TASK: ENHANCE EXISTING ROOM - KEEP SAME STYLE
+
+${roomFurniture}
+
+${architectureConstraints}
+
+CRITICAL REQUIREMENTS:
+✓ Keep the SAME type of furniture (if there's a bed, keep a bed - if there's a sofa, keep a sofa)
+✓ Keep SIMILAR furniture styles and colors to what's already there
+✓ Keep the general layout and arrangement
+✓ Improve organization, declutter, and enhance aesthetics
+✓ Better lighting and atmosphere
+✓ Add tasteful decorative elements that match existing style
+
+DO NOT:
+✗ Change a bedroom into a living room or vice versa
+✗ Replace beds with sofas or sofas with beds
+✗ Completely change the furniture style
+✗ Change the room's primary function
+
+The goal is to show how the SAME ROOM could look with better organization, lighting, and subtle improvements while keeping its identity.
+
+Professional interior photography, natural lighting, photorealistic, magazine quality.`;
+  }
+
   // Completely different prompts for each mode - no mixing
   switch (transformMode) {
     case 'rearrange':
       // MODE: SUGGEST A NEW FURNITURE ARRANGEMENT
       return `TASK: SUGGEST A NEW FURNITURE LAYOUT
 
-This is a ${roomDesc}. Create a completely NEW furniture arrangement with SIMILAR style furniture.
+${roomFurniture}
 
 ${architectureConstraints}
 
@@ -211,7 +253,9 @@ Professional interior photography, natural lighting, photorealistic.`;
       // MODE: SAME POSITIONS, NEW STYLE FURNITURE
       return `TASK: STYLE CHANGE WITH SAME LAYOUT
 
-This is a ${roomDesc}. Transform to ${styleDesc} style while keeping furniture in EXACT SAME POSITIONS.
+${roomFurniture}
+
+Transform to ${styleDesc} style while keeping furniture in EXACT SAME POSITIONS.
 
 ${architectureConstraints}
 
@@ -235,7 +279,9 @@ Professional interior photography, ${styleDesc}, magazine quality.`;
       // MODE: SAME FURNITURE, ADD DECOR
       return `TASK: DECOR REFRESH ONLY
 
-This is a ${roomDesc}. Keep ALL furniture exactly as-is. Only add/change decorative elements.
+${roomFurniture}
+
+Keep ALL furniture exactly as-is. Only add/change decorative elements.
 
 ${architectureConstraints}
 
@@ -262,7 +308,9 @@ Professional interior photography, ${styleDesc} decor styling.`;
       // MODE: COMPLETE TRANSFORMATION
       return `TASK: COMPLETE INTERIOR REDESIGN
 
-This is a ${roomDesc}. Complete transformation to ${styleDesc} style.
+${roomFurniture}
+
+Complete transformation to ${styleDesc} style.
 
 ${architectureConstraints}
 
