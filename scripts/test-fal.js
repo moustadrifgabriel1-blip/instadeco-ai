@@ -20,11 +20,12 @@ async function test() {
     const result = await fal.subscribe('fal-ai/flux-general', {
       input: {
         prompt: "Cinematic photo of a spacious living room, modern interior design, sleek lines, contemporary italian furniture, neutral color palette, warm lighting, high-end finishing, architectural digest style, 8k, photorealistic. Highly detailed, 8k resolution, professional interior design photography, architectural digest, sharp focus, perfect lighting.",
-        controlnets: [
+        control_loras: [
           {
             path: "https://huggingface.co/XLabs-AI/flux-controlnet-depth-v3/resolve/main/flux-depth-controlnet-v3.safetensors?download=true",
             control_image_url: imageUrl,
-            conditioning_scale: 0.65
+            scale: 1.0,
+            preprocess: "depth"
           }
         ],
         num_inference_steps: 28,

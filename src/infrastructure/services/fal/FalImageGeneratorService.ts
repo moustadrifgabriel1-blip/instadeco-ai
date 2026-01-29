@@ -92,14 +92,18 @@ export class FalImageGeneratorService implements IImageGeneratorService {
       const fullPrompt = `Cinematic photo of a ${roomPrompt}, ${stylePrompt}. Highly detailed, 8k resolution, professional interior design photography, architectural digest, sharp focus, perfect lighting.`;
 
       // 2. Submit to Queue
+      // NOTE: We use control_loras instead of controlnets because Fal's 'flux-general' endpoint
+      // supports the 'preprocess' parameter within control_loras (which effectively wraps ControlNets/ControlLoras),
+      // allowing us to generate the depth map on the fly. Passing raw RGB to controlnets without preprocessing causes artifacts.
       const { request_id } = await fal.queue.submit(MODEL_PATH, {
         input: {
           prompt: fullPrompt,
-          controlnets: [
+          control_loras: [
             {
               path: "https://huggingface.co/XLabs-AI/flux-controlnet-depth-v3/resolve/main/flux-depth-controlnet-v3.safetensors?download=true",
               control_image_url: options.controlImageUrl,
-              conditioning_scale: 1.0
+              scale: 1.0, 
+              preprocess: "depth" // CRITICAL: Converts photo to depth map before generation
             }
           ],
           image_size: "landscape_4_3", 
