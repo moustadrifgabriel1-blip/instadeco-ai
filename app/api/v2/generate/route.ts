@@ -136,32 +136,48 @@ export async function POST(req: Request) {
 }
 
 /**
- * Construit le prompt pour la génération basé sur le style, le type de pièce et le mode
- * IMPORTANT: Le prompt insiste sur la préservation de la structure architecturale
+ * ============================================================================
+ * SYSTÈME DE PROMPTS - GESTION DE TOUTES LES COMBINAISONS
+ * ============================================================================
+ * 
+ * MATRICE DES COMBINAISONS:
+ * - 4 modes: full_redesign, rearrange, keep_layout, decor_only
+ * - 9 types de pièce: salon, chambre, chambre-enfant, cuisine, salle-de-bain, bureau, salle-a-manger, entree, terrasse
+ * - 12+ styles: original, moderne, minimaliste, boheme, industriel, classique, japandi, midcentury, coastal, farmhouse, artdeco, ludique
+ * 
+ * RÈGLES CLÉS:
+ * 1. Le TYPE DE PIÈCE doit TOUJOURS être respecté (chambre = lit, salon = canapé)
+ * 2. Le STYLE s'applique différemment selon le mode
+ * 3. Le MODE définit ce qui peut changer et ce qui doit rester
  */
 function buildPrompt(style: string, roomType: string, transformMode: string = 'full_redesign'): string {
+  
+  // ============================================================================
+  // 1. DICTIONNAIRES DE BASE
+  // ============================================================================
+  
   const styleDescriptions: Record<string, string> = {
-    original: 'keeping the same existing style, improving organization and aesthetics',
-    moderne: 'modern minimalist design with clean lines, neutral colors, contemporary furniture',
-    scandinave: 'Scandinavian design with light wood, white walls, cozy textiles, hygge atmosphere',
-    industriel: 'industrial loft design with exposed brick, metal fixtures, raw materials',
-    boheme: 'bohemian design with layered textiles, plants, warm colors, eclectic decor',
-    minimaliste: 'ultra minimalist design with essential furniture only, monochrome palette',
-    luxe: 'luxury design with premium materials, elegant furniture, sophisticated lighting',
-    classique: 'classic French design with ornate details, rich fabrics, traditional elegance',
-    contemporain: 'contemporary design with artistic elements, bold accents, designer pieces',
-    japandi: 'Japandi design combining Japanese minimalism with Scandinavian warmth',
-    artdeco: 'Art Deco design with geometric patterns, gold accents, glamorous atmosphere',
-    farmhouse: 'modern farmhouse with rustic wood, shiplap, cozy textiles, country charm',
-    coastal: 'coastal design with light blues, whites, natural textures, beachy atmosphere',
+    original: 'the existing style, enhanced and improved',
+    moderne: 'modern minimalist with clean lines, neutral colors, contemporary furniture',
+    scandinave: 'Scandinavian with light wood, white walls, cozy textiles, hygge atmosphere',
+    industriel: 'industrial loft with exposed brick, metal fixtures, raw materials',
+    boheme: 'bohemian with layered textiles, plants, warm colors, eclectic decor',
+    minimaliste: 'ultra minimalist with essential furniture only, monochrome palette',
+    luxe: 'luxury with premium materials, elegant furniture, sophisticated lighting',
+    classique: 'classic French with ornate details, rich fabrics, traditional elegance',
+    contemporain: 'contemporary with artistic elements, bold accents, designer pieces',
+    japandi: 'Japandi combining Japanese minimalism with Scandinavian warmth',
+    artdeco: 'Art Deco with geometric patterns, gold accents, glamorous atmosphere',
+    farmhouse: 'modern farmhouse with rustic wood, shiplap, cozy textiles',
+    coastal: 'coastal with light blues, whites, natural textures, beachy atmosphere',
     midcentury: 'mid-century modern with organic shapes, teak wood, retro colors',
-    ludique: 'playful kids room with vibrant colors, creative shapes, fun educational elements',
+    ludique: 'playful with vibrant colors, creative shapes, fun elements',
   };
 
   const roomDescriptions: Record<string, string> = {
     salon: 'living room',
     chambre: 'bedroom',
-    'chambre-enfant': 'children bedroom, kids room, playful decor',
+    'chambre-enfant': 'children bedroom',
     cuisine: 'kitchen',
     'salle-de-bain': 'bathroom',
     bureau: 'home office',
@@ -170,162 +186,252 @@ function buildPrompt(style: string, roomType: string, transformMode: string = 'f
     terrasse: 'terrace',
   };
 
+  // ============================================================================
+  // 2. CONTRAINTES PAR TYPE DE PIÈCE (meubles obligatoires)
+  // ============================================================================
+  
+  const roomConstraints: Record<string, { mustHave: string; mustNot: string; keyFurniture: string }> = {
+    salon: {
+      mustHave: 'sofa/couch, coffee table, seating area, TV console or bookshelf',
+      mustNot: 'beds, cribs, kitchen appliances',
+      keyFurniture: 'sofa and armchairs'
+    },
+    chambre: {
+      mustHave: 'adult bed with headboard, nightstands, wardrobe or dresser',
+      mustNot: 'sofas, dining tables, office desks as main furniture',
+      keyFurniture: 'bed with bedding'
+    },
+    'chambre-enfant': {
+      mustHave: 'child bed or bunk bed, toy storage, playful furniture, desk for homework',
+      mustNot: 'adult-sized beds, bar furniture, office equipment',
+      keyFurniture: 'child-sized bed and play area'
+    },
+    cuisine: {
+      mustHave: 'kitchen cabinets, countertops, sink, stove/oven, refrigerator',
+      mustNot: 'beds, sofas, bathroom fixtures',
+      keyFurniture: 'kitchen island or dining counter'
+    },
+    'salle-de-bain': {
+      mustHave: 'sink with vanity, toilet, shower or bathtub, mirror',
+      mustNot: 'beds, sofas, kitchen appliances, dining furniture',
+      keyFurniture: 'vanity and shower/tub'
+    },
+    bureau: {
+      mustHave: 'desk, office chair, bookshelves or storage, good lighting',
+      mustNot: 'beds as main furniture, kitchen appliances',
+      keyFurniture: 'desk and ergonomic chair'
+    },
+    'salle-a-manger': {
+      mustHave: 'dining table, dining chairs (4-8), sideboard or buffet',
+      mustNot: 'beds, sofas as main seating, bathroom fixtures',
+      keyFurniture: 'dining table with chairs'
+    },
+    entree: {
+      mustHave: 'console table, mirror, coat hooks or rack, shoe storage',
+      mustNot: 'beds, large sofas, kitchen appliances',
+      keyFurniture: 'entryway console and mirror'
+    },
+    terrasse: {
+      mustHave: 'outdoor furniture, plants, weather-resistant materials',
+      mustNot: 'indoor upholstered furniture, beds, kitchen appliances',
+      keyFurniture: 'outdoor seating and plants'
+    },
+  };
+
+  // ============================================================================
+  // 3. CONSTRUCTION DES ÉLÉMENTS DU PROMPT
+  // ============================================================================
+  
   const styleDesc = styleDescriptions[style] || style;
   const roomDesc = roomDescriptions[roomType] || roomType;
+  const constraints = roomConstraints[roomType] || {
+    mustHave: 'appropriate furniture for the room type',
+    mustNot: 'furniture inappropriate for this room',
+    keyFurniture: 'main furniture pieces'
+  };
 
-  // Architecture constraints (same for all modes)
-  const architectureConstraints = `ARCHITECTURAL CONSTRAINTS (NEVER CHANGE):
+  const isOriginalStyle = style === 'original';
+
+  // Contraintes architecturales (communes à tous les modes)
+  const architectureBlock = `
+🏗️ ARCHITECTURE (NEVER CHANGE):
 - Room dimensions, walls, ceiling height
-- Window positions, sizes, shapes
+- Window positions, sizes, shapes  
 - Door positions and sizes
 - Built-in features (columns, beams, alcoves)`;
 
-  // Specific room furniture requirements
-  const roomFurnitureRequirements: Record<string, string> = {
-    salon: 'This is a LIVING ROOM - must contain: sofa/couch, coffee table, seating area. NO beds.',
-    chambre: 'This is a BEDROOM - must contain: bed with headboard, nightstands, bedside lamps. NO sofas or couches.',
-    'chambre-enfant': 'This is a CHILDREN BEDROOM - must contain: child-sized bed or bunk bed, toy storage, playful furniture. NO adult beds or sofas.',
-    cuisine: 'This is a KITCHEN - must contain: cabinets, countertops, sink, appliances. NO beds or sofas.',
-    'salle-de-bain': 'This is a BATHROOM - must contain: sink, toilet, shower or bathtub. NO beds or sofas.',
-    bureau: 'This is a HOME OFFICE - must contain: desk, office chair, shelving or storage. NO beds.',
-    'salle-a-manger': 'This is a DINING ROOM - must contain: dining table, dining chairs. NO beds or sofas.',
-    entree: 'This is an ENTRYWAY - must contain: console table, coat rack or hooks, mirror. NO beds.',
-    terrasse: 'This is a TERRACE/PATIO - must contain: outdoor furniture, plants. NO indoor furniture.',
-  };
+  // Contraintes de type de pièce (communes à tous les modes)
+  const roomTypeBlock = `
+🏠 ROOM TYPE: ${roomDesc.toUpperCase()}
+✓ MUST INCLUDE: ${constraints.mustHave}
+✗ MUST NOT INCLUDE: ${constraints.mustNot}
+🔑 KEY FURNITURE: ${constraints.keyFurniture}`;
 
-  const roomFurniture = roomFurnitureRequirements[roomType] || `This is a ${roomDesc}.`;
+  // ============================================================================
+  // 4. GÉNÉRATION DU PROMPT SELON MODE + STYLE
+  // ============================================================================
 
-  // SPECIAL CASE: Style "original" (Garder mon style) - keep existing furniture style
-  if (style === 'original') {
-    return `TASK: ENHANCE EXISTING ROOM - KEEP SAME STYLE
+  // ----- MODE: FULL_REDESIGN -----
+  if (transformMode === 'full_redesign') {
+    if (isOriginalStyle) {
+      // full_redesign + original = améliorer sans changer de style
+      return `TASK: ENHANCE AND IMPROVE THIS ${roomDesc.toUpperCase()}
 
-${roomFurniture}
+Keep the existing style but make it look professionally designed and organized.
 
-${architectureConstraints}
+${roomTypeBlock}
+${architectureBlock}
 
-CRITICAL REQUIREMENTS:
-✓ Keep the SAME type of furniture (if there's a bed, keep a bed - if there's a sofa, keep a sofa)
-✓ Keep SIMILAR furniture styles and colors to what's already there
-✓ Keep the general layout and arrangement
-✓ Improve organization, declutter, and enhance aesthetics
+WHAT TO DO:
+✓ Keep the same general style and color palette
+✓ Upgrade furniture to higher quality versions of similar style
+✓ Improve organization and declutter
 ✓ Better lighting and atmosphere
-✓ Add tasteful decorative elements that match existing style
+✓ Add tasteful decorative elements
+✓ Make the space feel more polished and intentional
 
-DO NOT:
-✗ Change a bedroom into a living room or vice versa
-✗ Replace beds with sofas or sofas with beds
-✗ Completely change the furniture style
-✗ Change the room's primary function
+WHAT NOT TO DO:
+✗ Don't change the fundamental style (modern stays modern, rustic stays rustic)
+✗ Don't change room function (bedroom stays bedroom)
+✗ Don't remove key furniture pieces, upgrade them
 
-The goal is to show how the SAME ROOM could look with better organization, lighting, and subtle improvements while keeping its identity.
+Result: The same room, but looking like a professional interior designer organized and upgraded it.
+Professional photography, natural lighting, magazine quality, 8k.`;
+    } else {
+      // full_redesign + specific style = transformation complète
+      return `TASK: COMPLETE ${style.toUpperCase()} TRANSFORMATION
 
-Professional interior photography, natural lighting, photorealistic, magazine quality.`;
+Transform this ${roomDesc} into a stunning ${styleDesc} design.
+
+${roomTypeBlock}
+${architectureBlock}
+
+COMPLETE TRANSFORMATION:
+→ Replace ALL furniture with ${style} style pieces
+→ New furniture arrangement optimized for the space
+→ Wall colors and textures matching ${style} aesthetic
+→ Flooring update if needed (wood, tiles, carpet)
+→ ${style} lighting fixtures
+→ Complete ${style} decor: rugs, art, plants, textiles
+→ Color palette: typical ${style} colors
+
+Create a magazine-worthy ${style} ${roomDesc}.
+Professional interior photography, ${styleDesc}, architectural digest quality, 8k, photorealistic.`;
+    }
   }
 
-  // Completely different prompts for each mode - no mixing
-  switch (transformMode) {
-    case 'rearrange':
-      // MODE: SUGGEST A NEW FURNITURE ARRANGEMENT
-      return `TASK: SUGGEST A NEW FURNITURE LAYOUT
+  // ----- MODE: REARRANGE -----
+  if (transformMode === 'rearrange') {
+    // rearrange = nouvelle disposition, le style influence peu
+    return `TASK: NEW FURNITURE ARRANGEMENT FOR THIS ${roomDesc.toUpperCase()}
 
-${roomFurniture}
+Show a completely different furniture layout while keeping similar style furniture.
 
-${architectureConstraints}
+${roomTypeBlock}
+${architectureBlock}
 
-IMPORTANT GUIDELINES:
-→ Use SIMILAR style furniture (same aesthetic, similar colors)
-→ Create a DIFFERENT layout - move things around significantly
-→ The sofa should be in a DIFFERENT position than the original
-→ Tables and chairs should be rearranged
-→ Create better flow and conversation areas
+YOUR TASK - REARRANGE:
+→ Move the ${constraints.keyFurniture} to a DIFFERENT position/wall
+→ Create a completely new layout
+→ Optimize traffic flow and functionality
 → Make the room feel fresh and reorganized
 
 KEEP THE SAME:
-✓ The overall aesthetic and color palette
-✓ The type of furniture (keep a sofa if there was a sofa, keep a bed if bedroom)
+✓ Similar style and aesthetic (${isOriginalStyle ? 'match existing style' : 'inspired by ' + style})
+✓ Similar furniture types (${constraints.keyFurniture})
+✓ General color palette
 ✓ Wall colors and flooring
-✓ The cozy/modern/etc atmosphere
 
-This is a "what if I reorganized my room" visualization.
-Professional interior photography, natural lighting, photorealistic.`;
+DO NOT:
+✗ Keep furniture in the same positions - MOVE EVERYTHING
+✗ Change room type (${roomDesc} must stay a ${roomDesc})
 
-    case 'keep_layout':
-      // MODE: SAME POSITIONS, NEW STYLE FURNITURE
-      return `TASK: STYLE CHANGE WITH SAME LAYOUT
-
-${roomFurniture}
-
-Transform to ${styleDesc} style while keeping furniture in EXACT SAME POSITIONS.
-
-${architectureConstraints}
-
-CRITICAL - KEEP IDENTICAL:
-✓ Every furniture position - sofa stays where sofa is, table stays where table is
-✓ Layout and arrangement - nothing moves
-✓ Room flow and spacing
-
-YOUR TASK - REPLACE WITH ${style.toUpperCase()} STYLE:
-→ Replace sofa with ${style} style sofa IN THE SAME SPOT
-→ Replace table with ${style} style table IN THE SAME SPOT
-→ Replace each piece with ${style} equivalent AT THE SAME LOCATION
-→ Update wall colors to match ${style}
-→ Add ${style} decor elements
-
-The furniture layout must be a perfect overlay - only the style changes, not the arrangement.
-
-Professional interior photography, ${styleDesc}, magazine quality.`;
-
-    case 'decor_only':
-      // MODE: SAME FURNITURE, ADD DECOR
-      return `TASK: DECOR REFRESH ONLY
-
-${roomFurniture}
-
-Keep ALL furniture exactly as-is. Only add/change decorative elements.
-
-${architectureConstraints}
-
-CRITICAL - KEEP 100% IDENTICAL:
-✓ ALL furniture pieces - exact same items in exact same positions
-✓ Sofa, chairs, tables, bed, cabinets - UNCHANGED
-✓ Furniture colors and materials - UNCHANGED
-
-YOUR ONLY TASK - UPDATE DECOR TO ${style.toUpperCase()} STYLE:
-→ Change wall color/texture
-→ Add/replace cushions, throws, blankets
-→ Add/replace plants and vases
-→ Add/replace wall art and frames
-→ Add/replace rugs and textiles
-→ Update curtains/drapes
-→ Add ${style} accessories and styling
-
-The main furniture must be IDENTICAL to the original. Only small decor items and surfaces change.
-
-Professional interior photography, ${styleDesc} decor styling.`;
-
-    case 'full_redesign':
-    default:
-      // MODE: COMPLETE TRANSFORMATION
-      return `TASK: COMPLETE INTERIOR REDESIGN
-
-${roomFurniture}
-
-Complete transformation to ${styleDesc} style.
-
-${architectureConstraints}
-
-YOU CAN CHANGE EVERYTHING EXCEPT ARCHITECTURE:
-→ Replace ALL furniture with new ${styleDesc} pieces
-→ New furniture arrangement and layout
-→ New wall colors, textures, wallpaper
-→ New flooring material or color
-→ New lighting fixtures
-→ Complete ${style} decor: rugs, art, plants, accessories
-→ New color palette matching ${style}
-
-Create a stunning ${style} interior that looks like a professional design project.
-The room structure stays the same, but everything inside transforms.
-
-Professional interior design photography, ${styleDesc}, architectural digest quality, 8k, photorealistic.`;
+This shows "what if I reorganized my ${roomDesc}" with furniture in new positions.
+Professional photography, natural lighting, realistic.`;
   }
+
+  // ----- MODE: KEEP_LAYOUT -----
+  if (transformMode === 'keep_layout') {
+    if (isOriginalStyle) {
+      // keep_layout + original = pas de changement majeur (améliorer qualité)
+      return `TASK: ENHANCE THIS ${roomDesc.toUpperCase()} - KEEP EXACT LAYOUT
+
+Improve the room while keeping everything in the exact same position.
+
+${roomTypeBlock}
+${architectureBlock}
+
+KEEP 100% IDENTICAL:
+✓ Every furniture position - nothing moves
+✓ Furniture types and general style
+✓ Room layout and arrangement
+
+SUBTLE IMPROVEMENTS ALLOWED:
+→ Better lighting quality
+→ Cleaner, more organized look
+→ Higher quality textures and materials
+→ Professional staging and styling
+
+Result: Same room, same layout, but photographed like a professional interior shoot.
+Professional photography, perfect lighting, magazine quality.`;
+    } else {
+      // keep_layout + specific style = même positions, nouveau style
+      return `TASK: ${style.toUpperCase()} STYLE - SAME LAYOUT
+
+Transform this ${roomDesc} to ${styleDesc} while keeping furniture in EXACT SAME POSITIONS.
+
+${roomTypeBlock}
+${architectureBlock}
+
+CRITICAL - POSITIONS DON'T MOVE:
+✓ ${constraints.keyFurniture} stays in exact same spot
+✓ Every piece of furniture keeps its position
+✓ Layout and spacing remain identical
+
+STYLE TRANSFORMATION:
+→ Replace each furniture with ${style} style equivalent IN SAME POSITION
+→ Sofa → ${style} style sofa (same spot)
+→ Table → ${style} style table (same spot)
+→ Wall colors updated to ${style} palette
+→ ${style} decor elements added
+
+The layout is a perfect overlay of the original - only the style changes.
+Professional photography, ${styleDesc}, magazine quality.`;
+    }
+  }
+
+  // ----- MODE: DECOR_ONLY -----
+  if (transformMode === 'decor_only') {
+    const decorStyle = isOriginalStyle ? 'matching the existing aesthetic' : `in ${style} style`;
+    
+    return `TASK: DECOR REFRESH ONLY - ${roomDesc.toUpperCase()}
+
+Keep ALL furniture exactly as-is. Only update decorative elements ${decorStyle}.
+
+${roomTypeBlock}
+${architectureBlock}
+
+🚫 DO NOT CHANGE (KEEP 100% IDENTICAL):
+- ${constraints.keyFurniture} - same items, same positions
+- All major furniture pieces
+- Furniture colors and materials
+- Furniture arrangement
+
+✅ ONLY CHANGE THESE DECOR ELEMENTS:
+→ Wall color/paint ${isOriginalStyle ? '(subtle refresh)' : '(to match ' + style + ')'}
+→ Throw pillows and blankets
+→ Plants and vases
+→ Wall art and frames
+→ Rugs and textiles
+→ Curtains/drapes
+→ Decorative accessories
+→ Table styling (books, candles, trays)
+
+The main furniture is IDENTICAL. Only styling and decor items change.
+Professional photography, beautiful styling, ${isOriginalStyle ? 'enhanced version' : styleDesc + ' decor'}.`;
+  }
+
+  // ----- FALLBACK (should not reach here) -----
+  return `Professional ${roomDesc} interior design, ${styleDesc}, photorealistic, 8k quality.`;
 }
+
