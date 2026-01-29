@@ -102,16 +102,13 @@ export class FalImageGeneratorService implements IImageGeneratorService {
               conditioning_scale: 0.65
             }
           ],
-          image_size: "landscape_4_3", // or just rely on control image aspect ratio if possible, but flux-general defines image_size.
-          // Fal flux-general usually resizes to match input control image if not specified? 
-          // Let's stick to default or provide standard size if needed. 
-          // Actually, for interior design, usually we want to keep aspect ratio.
+          image_size: "landscape_4_3", 
           
-          num_inference_steps: 28, // Standard for Flux Dev
-          guidance_scale: 3.5, // Flux Dev works best with low guidance (2.5 - 5.0)
+          num_inference_steps: 28, 
+          guidance_scale: 3.5, 
           enable_safety_checker: false,
           output_format: "jpeg"
-        },
+        } as any,
         webhookUrl: process.env.NEXT_PUBLIC_APP_URL ? `${process.env.NEXT_PUBLIC_APP_URL}/api/v2/webhooks/fal` : undefined,
       });
 
