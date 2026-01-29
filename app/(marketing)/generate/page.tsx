@@ -20,6 +20,12 @@ const TRANSFORM_MODES = [
     icon: '✨'
   },
   { 
+    id: 'rearrange', 
+    name: 'Réarranger les meubles', 
+    desc: 'Garder vos meubles, nouvelle disposition',
+    icon: '🔄'
+  },
+  { 
     id: 'keep_layout', 
     name: 'Garder la disposition', 
     desc: 'Nouveaux meubles, même emplacement',
@@ -138,6 +144,7 @@ function GenerateContent() {
       imageFile,
       roomType: selectedRoomType,
       style: selectedStyle,
+      transformMode: selectedMode,
     });
   };
 

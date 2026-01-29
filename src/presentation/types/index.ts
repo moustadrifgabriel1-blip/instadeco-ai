@@ -44,6 +44,7 @@ export interface GenerateDesignInput {
   imageFile: File | string; // File ou base64/URL
   roomType: string;
   style: string;
+  transformMode?: string; // Mode de transformation (full_redesign, rearrange, keep_layout, decor_only)
 }
 
 /**

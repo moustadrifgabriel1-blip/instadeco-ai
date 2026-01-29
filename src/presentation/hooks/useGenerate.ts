@@ -96,6 +96,7 @@ export function useGenerate(): UseGenerateReturn {
           imageUrl,
           roomType: input.roomType,
           style: input.style,
+          transformMode: input.transformMode,
         });
 
         setState({

@@ -13,6 +13,7 @@ const generateRequestSchema = z.object({
   roomType: z.string().default('salon'),
   style: z.string().default('moderne'),
   userId: z.string().min(1, 'Authentification requise'),
+  transformMode: z.string().default('full_redesign'),
 });
 
 export const maxDuration = 60; // Set max duration to 60 seconds (Hobby limit usually 10s, Pro 300s)
@@ -50,11 +51,11 @@ export async function POST(req: Request) {
       );
     }
 
-    const { imageUrl, roomType, style, userId } = validation.data;
+    const { imageUrl, roomType, style, userId, transformMode } = validation.data;
 
-    console.log('[Generate V2] 🎨 Building prompt...');
-    // Construire le prompt basé sur le style et le type de pièce
-    const prompt = buildPrompt(style, roomType);
+    console.log('[Generate V2] 🎨 Building prompt with mode:', transformMode);
+    // Construire le prompt basé sur le style, le type de pièce et le mode
+    const prompt = buildPrompt(style, roomType, transformMode);
 
     console.log('[Generate V2] 🚀 Executing use case...');
     // Exécuter le Use Case
@@ -134,10 +135,10 @@ export async function POST(req: Request) {
 }
 
 /**
- * Construit le prompt pour la génération basé sur le style et le type de pièce
+ * Construit le prompt pour la génération basé sur le style, le type de pièce et le mode
  * IMPORTANT: Le prompt insiste sur la préservation de la structure architecturale
  */
-function buildPrompt(style: string, roomType: string): string {
+function buildPrompt(style: string, roomType: string, transformMode: string = 'full_redesign'): string {
   const styleDescriptions: Record<string, string> = {
     moderne: 'modern minimalist design with clean lines, neutral colors, contemporary furniture',
     scandinave: 'Scandinavian design with light wood, white walls, cozy textiles, hygge atmosphere',
@@ -148,7 +149,11 @@ function buildPrompt(style: string, roomType: string): string {
     classique: 'classic French design with ornate details, rich fabrics, traditional elegance',
     contemporain: 'contemporary design with artistic elements, bold accents, designer pieces',
     japandi: 'Japandi design combining Japanese minimalism with Scandinavian warmth',
-    'art-deco': 'Art Deco design with geometric patterns, gold accents, glamorous atmosphere',
+    artdeco: 'Art Deco design with geometric patterns, gold accents, glamorous atmosphere',
+    farmhouse: 'modern farmhouse with rustic wood, shiplap, cozy textiles, country charm',
+    coastal: 'coastal design with light blues, whites, natural textures, beachy atmosphere',
+    midcentury: 'mid-century modern with organic shapes, teak wood, retro colors',
+    ludique: 'playful kids room with vibrant colors, creative shapes, fun educational elements',
   };
 
   const roomDescriptions: Record<string, string> = {
@@ -166,15 +171,79 @@ function buildPrompt(style: string, roomType: string): string {
   const styleDesc = styleDescriptions[style] || style;
   const roomDesc = roomDescriptions[roomType] || roomType;
 
-  return `Redesign this ${roomDesc} with ${styleDesc}.
-
+  // Base constraints that apply to all modes
+  const baseConstraints = `
 CRITICAL CONSTRAINTS - MUST PRESERVE:
 - Keep EXACT same room dimensions and proportions
 - Keep ALL windows in their EXACT positions, sizes, and shapes
 - Keep ALL doors in their EXACT positions and sizes  
 - Keep ALL walls in their EXACT positions - DO NOT add, remove, or modify any walls
 - Keep the ceiling height and floor area unchanged
-- Keep any built-in architectural features (columns, beams, alcoves)
+- Keep any built-in architectural features (columns, beams, alcoves)`;
+
+  // Mode-specific prompts
+  switch (transformMode) {
+    case 'rearrange':
+      return `Rearrange the furniture in this ${roomDesc} to create a better layout and flow.
+
+${baseConstraints}
+
+KEEP EXACTLY THE SAME:
+- All the existing furniture pieces (same style, same colors)
+- The same decorative objects and accessories
+- Wall colors and flooring
+
+ONLY CHANGE:
+- Move furniture to different positions for better arrangement
+- Optimize the space layout for functionality and aesthetics
+- Create better conversation areas and traffic flow
+- Suggest a fresh furniture arrangement that makes the room feel new
+
+The goal is to show a new furniture arrangement using the EXACT SAME furniture the person already owns.
+Professional interior design photography, natural lighting, photorealistic.`;
+
+    case 'keep_layout':
+      return `Redesign this ${roomDesc} with ${styleDesc} style while keeping the exact same furniture layout.
+
+${baseConstraints}
+
+KEEP EXACTLY THE SAME:
+- Furniture positions and arrangement (keep everything in the same spot)
+- Room layout and traffic flow
+
+CHANGE ONLY:
+- Replace each furniture piece with a ${style} style equivalent in the SAME POSITION
+- Update wall colors and textures to match ${style} style
+- Add ${style} decorative elements
+- Update lighting fixtures to match ${style}
+
+Professional interior design photography, natural lighting, photorealistic, magazine quality.`;
+
+    case 'decor_only':
+      return `Update the decor of this ${roomDesc} to ${styleDesc} style while keeping all existing furniture.
+
+${baseConstraints}
+
+KEEP EXACTLY THE SAME:
+- All existing furniture pieces in their current positions
+- Main furniture items (sofa, bed, table, etc.)
+
+CHANGE ONLY:
+- Wall colors and textures
+- Decorative items (cushions, throws, vases, plants)
+- Art and wall decorations
+- Rugs and textiles
+- Lighting fixtures and lamps
+- Small accessories and styling
+
+The furniture must remain identical. Only refresh the room with new ${style} decor elements.
+Professional interior design photography, natural lighting, photorealistic.`;
+
+    case 'full_redesign':
+    default:
+      return `Redesign this ${roomDesc} with ${styleDesc}.
+
+${baseConstraints}
 
 ONLY CHANGE:
 - Replace furniture with new ${styleDesc} pieces
@@ -186,4 +255,5 @@ ONLY CHANGE:
 The architectural shell of the room must remain IDENTICAL to the original photo. Only the interior design elements (furniture, decor, materials) should change to match the ${style} style.
 
 Professional interior design photography, natural lighting, photorealistic, magazine quality.`;
+  }
 }

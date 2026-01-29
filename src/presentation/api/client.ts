@@ -63,6 +63,7 @@ export interface GenerateDesignRequest {
   imageUrl: string;
   roomType: string;
   style: string;
+  transformMode?: string;
 }
 
 export interface GenerateDesignResponse {
