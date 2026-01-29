@@ -11,6 +11,46 @@ import { DomainError } from '@/src/domain/errors/DomainError';
 import { CREDIT_COSTS } from '@/src/shared/constants/pricing';
 
 /**
+ * Extraire les dimensions d'une image à partir de son base64 (JPEG/PNG)
+ * Utilise les headers binaires pour éviter de charger l'image complète
+ */
+function getImageDimensionsFromBase64(base64: string): { width: number; height: number } | null {
+  try {
+    // Nettoyer le prefix data:image/...;base64,
+    const base64Data = base64.replace(/^data:image\/\w+;base64,/, '');
+    const buffer = Buffer.from(base64Data, 'base64');
+    
+    // PNG: dimensions aux octets 16-23
+    if (buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4E && buffer[3] === 0x47) {
+      const width = buffer.readUInt32BE(16);
+      const height = buffer.readUInt32BE(20);
+      return { width, height };
+    }
+    
+    // JPEG: chercher le marqueur SOF0/SOF2
+    if (buffer[0] === 0xFF && buffer[1] === 0xD8) {
+      let offset = 2;
+      while (offset < buffer.length) {
+        if (buffer[offset] !== 0xFF) break;
+        const marker = buffer[offset + 1];
+        // SOF0 (0xC0), SOF1 (0xC1), SOF2 (0xC2)
+        if (marker >= 0xC0 && marker <= 0xC2) {
+          const height = buffer.readUInt16BE(offset + 5);
+          const width = buffer.readUInt16BE(offset + 7);
+          return { width, height };
+        }
+        const length = buffer.readUInt16BE(offset + 2);
+        offset += 2 + length;
+      }
+    }
+    
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Input pour la génération de design
  */
 export interface GenerateDesignInput {
@@ -77,7 +117,14 @@ export class GenerateDesignUseCase {
       return failure(new InsufficientCreditsError(currentCredits, requiredCredits));
     }
 
-    // 2. Upload l'image source
+    // 2. Extraire les dimensions de l'image source
+    const imageDimensions = getImageDimensionsFromBase64(input.imageBase64);
+    const imageWidth = imageDimensions?.width || 1024;
+    const imageHeight = imageDimensions?.height || 1024;
+    
+    this.logger.info('Detected image dimensions', { imageWidth, imageHeight });
+
+    // 3. Upload l'image source
     const uploadResult = await this.storage.uploadFromBase64(input.imageBase64, {
       bucket: 'input-images',
       fileName: `${input.userId}/${Date.now()}.jpg`,
@@ -91,7 +138,7 @@ export class GenerateDesignUseCase {
 
     const inputImageUrl = uploadResult.data.url;
 
-    // 3. Créer l'entrée en base
+    // 4. Créer l'entrée en base
     const createInput: CreateGenerationInput = {
       userId: input.userId,
       styleSlug: input.styleSlug,
@@ -128,14 +175,14 @@ export class GenerateDesignUseCase {
     // 5. Mettre à jour le statut à "processing"
     await this.generationRepo.update(generation.id, { status: 'processing' });
 
-    // 6. Lancer la génération IA (Async)
+    // 7. Lancer la génération IA (Async)
     const genResult = await this.imageGenerator.generate({
       prompt: input.prompt,
       controlImageUrl: inputImageUrl,
       styleSlug: input.styleSlug,
       roomType: input.roomType,
-      width: 1024,
-      height: 1024,
+      width: imageWidth,
+      height: imageHeight,
       numInferenceSteps: 25,
       guidanceScale: 3.5,
     });

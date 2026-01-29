@@ -45,6 +45,33 @@ const ROOM_PROMPTS: Record<string, string> = {
 };
 
 /**
+ * Détermine le format d'image optimal pour Fal.ai basé sur le ratio de l'image source
+ * Fal.ai supporte: square_hd, square, portrait_4_3, portrait_16_9, landscape_4_3, landscape_16_9
+ */
+function getOptimalImageSize(width: number, height: number): string | { width: number; height: number } {
+  const ratio = width / height;
+  
+  // Portrait (hauteur > largeur)
+  if (ratio < 0.9) {
+    if (ratio < 0.65) {
+      return "portrait_16_9"; // ratio ~0.56
+    }
+    return "portrait_4_3"; // ratio ~0.75
+  }
+  
+  // Paysage (largeur > hauteur)
+  if (ratio > 1.1) {
+    if (ratio > 1.5) {
+      return "landscape_16_9"; // ratio ~1.78
+    }
+    return "landscape_4_3"; // ratio ~1.33
+  }
+  
+  // Carré (~1:1)
+  return "square_hd";
+}
+
+/**
  * Adapter: Fal.ai Image Generator Service
  * Uses 'fal-ai/flux/dev/controlnet' for State-of-the-Art Interior Design generation.
  * This model respects the input structure (ControlNet Depth) while applying the requested style with high fidelity.
@@ -82,7 +109,9 @@ export class FalImageGeneratorService implements IImageGeneratorService {
     console.log('[Fal.ai] 🎨 Starting generation (Flux ControlNet):', {
       styleSlug,
       roomType,
-      model: MODEL_PATH
+      model: MODEL_PATH,
+      inputWidth: options.width,
+      inputHeight: options.height,
     });
 
     try {
@@ -95,7 +124,11 @@ export class FalImageGeneratorService implements IImageGeneratorService {
       // INSTRUCTION Update: Added constraint for "real-world furniture".
       const fullPrompt = `A professional architectural photograph of a ${roomPrompt} designed in ${styleSlug} style. ${stylePrompt}. The image features real-world, commercially available furniture designs (similar to West Elm, CB2, Restoration Hardware, IKEA) with realistic proportions and functional placement. Avoid generic 3D model furniture. Realistic textures, natural lighting. Shot on a 50mm lens, f/2.8, ISO 200. Architectural Digest quality, 8k resolution, photorealistic, highly detailed, volumetric lighting, perfect composition, no distortion.`;
 
-      // 2. Submit to Queue
+      // 2. Déterminer le format d'image optimal basé sur l'image source
+      const imageSize = getOptimalImageSize(options.width || 1024, options.height || 1024);
+      console.log('[Fal.ai] 📐 Using image size:', imageSize);
+
+      // 3. Submit to Queue
       // NOTE: Using easycontrols with "depth" control method - this is the simplest and most reliable
       // approach for structure-preserving generation on Fal.ai's flux-general endpoint.
       // EasyControl handles depth map generation internally.
@@ -110,7 +143,7 @@ export class FalImageGeneratorService implements IImageGeneratorService {
               scale: 1.0
             }
           ],
-          image_size: "landscape_4_3", 
+          image_size: imageSize, 
           
           num_inference_steps: 28, 
           guidance_scale: 3.5, 

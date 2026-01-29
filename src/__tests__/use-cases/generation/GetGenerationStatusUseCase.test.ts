@@ -7,16 +7,38 @@ import {
 } from '@/src/__tests__/mocks';
 import { success, failure } from '@/src/shared/types/Result';
 import { GenerationNotFoundError } from '@/src/domain/errors/GenerationNotFoundError';
+import { IImageGeneratorService } from '@/src/domain/ports/services/IImageGeneratorService';
+import { IStorageService } from '@/src/domain/ports/services/IStorageService';
+
+// Mock pour le service de génération d'images
+const createMockImageGeneratorService = (): IImageGeneratorService => ({
+  generate: vi.fn().mockResolvedValue(success({ imageUrl: '', providerId: 'test-id', status: 'pending' })),
+  checkStatus: vi.fn().mockResolvedValue(success({ status: 'succeeded', output: { imageUrl: 'https://example.com/image.jpg' } })),
+});
+
+// Mock pour le service de stockage
+const createMockStorageService = (): IStorageService => ({
+  uploadFromBuffer: vi.fn().mockResolvedValue(success({ url: 'https://storage.example.com/image.jpg', path: 'image.jpg' })),
+  uploadFromBase64: vi.fn().mockResolvedValue(success({ url: 'https://storage.example.com/image.jpg', path: 'image.jpg' })),
+  uploadFromUrl: vi.fn().mockResolvedValue(success({ url: 'https://storage.example.com/image.jpg', path: 'image.jpg' })),
+  getPublicUrl: vi.fn().mockReturnValue(success('https://storage.example.com/image.jpg')),
+  delete: vi.fn().mockResolvedValue(success(undefined)),
+  createSignedUrl: vi.fn().mockResolvedValue(success('https://signed.example.com/image.jpg')),
+});
 
 describe('GetGenerationStatusUseCase', () => {
   let useCase: GetGenerationStatusUseCase;
   let mockGenerationRepo: ReturnType<typeof createMockGenerationRepository>;
+  let mockImageGenerator: IImageGeneratorService;
+  let mockStorage: IStorageService;
   let mockLogger: ReturnType<typeof createMockLogger>;
 
   beforeEach(() => {
     mockGenerationRepo = createMockGenerationRepository();
+    mockImageGenerator = createMockImageGeneratorService();
+    mockStorage = createMockStorageService();
     mockLogger = createMockLogger();
-    useCase = new GetGenerationStatusUseCase(mockGenerationRepo, mockLogger);
+    useCase = new GetGenerationStatusUseCase(mockGenerationRepo, mockImageGenerator, mockStorage, mockLogger);
   });
 
   describe('execute', () => {
