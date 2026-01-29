@@ -61,20 +61,28 @@ export class GetGenerationStatusUseCase {
       return success(generation);
     }
 
+    // Log pour debug
+    console.log('[GetStatus] Generation state:', {
+      id: generation.id,
+      status: generation.status,
+      providerId: generation.providerId,
+      hasProviderId: !!generation.providerId
+    });
+
     // Si en attente et providerId existe, vérifier le statut externe
     if ((generation.status === 'pending' || generation.status === 'processing') && generation.providerId) {
       if (typeof this.imageGenerator.checkStatus === 'function') {
-        this.logger.debug('Checking external status', { providerId: generation.providerId });
+        console.log('[GetStatus] Checking Fal.ai status for:', generation.providerId);
         
         const statusCheck = await this.imageGenerator.checkStatus(generation.providerId);
         
         if (statusCheck.success) {
           const { status, output } = statusCheck.data;
-          this.logger.debug('External status response', { status, hasOutput: !!output?.imageUrl });
+          console.log('[GetStatus] Fal.ai response:', { status, hasOutput: !!output?.imageUrl });
           
           if (status === 'succeeded' && output?.imageUrl) {
             // Télécharger et stocker l'image finale
-            this.logger.info('Generation succeeded, uploading image...', { generationId: generation.id });
+            console.log('[GetStatus] SUCCESS! Uploading image to Supabase...');
             
             const uploadResult = await this.storage.uploadFromUrl(output.imageUrl, {
               bucket: 'output-images',
@@ -83,7 +91,7 @@ export class GetGenerationStatusUseCase {
             });
 
             if (uploadResult.success) {
-              this.logger.info('Image uploaded, updating DB...', { url: uploadResult.data.url });
+              console.log('[GetStatus] Image uploaded, updating DB...', uploadResult.data.url);
               
               const updatedGen = await this.generationRepo.update(generation.id, {
                  status: 'completed',
@@ -91,16 +99,16 @@ export class GetGenerationStatusUseCase {
               });
               
               if (updatedGen.success) {
-                this.logger.info('Generation completed successfully!', { generationId: generation.id });
+                console.log('[GetStatus] ✅ Generation completed successfully!');
                 return success(updatedGen.data);
               } else {
-                this.logger.error('Failed to update generation in DB', updatedGen.error as Error);
+                console.error('[GetStatus] ❌ Failed to update generation in DB', updatedGen.error);
               }
             } else {
-              this.logger.error('Failed to upload output image', uploadResult.error as Error);
+              console.error('[GetStatus] ❌ Failed to upload output image', uploadResult.error);
               // CRITICAL FIX: Return the Fal.ai URL directly if Supabase upload fails
               // This prevents the generation from being stuck forever
-              this.logger.warn('Fallback: Using Fal.ai URL directly');
+              console.log('[GetStatus] Fallback: Using Fal.ai URL directly');
               const fallbackUpdate = await this.generationRepo.update(generation.id, {
                 status: 'completed',
                 outputImageUrl: output.imageUrl
@@ -108,12 +116,12 @@ export class GetGenerationStatusUseCase {
               if (fallbackUpdate.success) return success(fallbackUpdate.data);
             }
           } else if (status === 'failed') {
-            this.logger.error('External generation failed');
+            console.error('[GetStatus] ❌ External generation failed');
             const updatedGen = await this.generationRepo.update(generation.id, { status: 'failed' });
              if (updatedGen.success) return success(updatedGen.data);
           }
         } else {
-          this.logger.error('External status check failed', statusCheck.error as Error);
+          console.error('[GetStatus] ❌ External status check failed', statusCheck.error);
         }
       }
     }
