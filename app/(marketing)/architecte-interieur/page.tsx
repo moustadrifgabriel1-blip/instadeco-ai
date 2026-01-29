@@ -32,11 +32,11 @@ export default function CitiesIndexPage() {
     <div className="container mx-auto py-12 px-4 md:px-6">
       <div className="text-center mb-16 space-y-4">
         <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
-          L'Architecte d'Intérieur IA <br className="hidden md:block" />
+          L&apos;Architecte d&apos;Intérieur IA <br className="hidden md:block" />
           <span className="text-primary">partout chez vous</span>
         </h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-          Découvrez comment notre technologie s'adapte aux spécificités architecturales de votre région. 
+          Découvrez comment notre technologie s&apos;adapte aux spécificités architecturales de votre région. 
           Du charme Haussmannien aux briques du Nord, réinventez votre intérieur.
         </p>
       </div>
@@ -80,7 +80,7 @@ export default function CitiesIndexPage() {
       <div className="mt-20 pt-10 border-t text-center">
         <h3 className="text-2xl font-bold mb-6">Vous ne trouvez pas votre ville ?</h3>
         <p className="text-muted-foreground mb-8">
-          Notre IA fonctionne partout, même si votre ville n'est pas listée ici. 
+          Notre IA fonctionne partout, même si votre ville n&apos;est pas listée ici. 
           Essayez-la dès maintenant avec une photo de votre pièce.
         </p>
         <Link href="/generate">
