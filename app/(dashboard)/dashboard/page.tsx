@@ -9,30 +9,30 @@ import { createClient } from '@/lib/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { SmartGenerationCard } from '@/components/features/smart-generation-card';
 import { 
   Loader2, 
-  ImageIcon, 
-  Sparkles, 
-  LogOut, 
-  CreditCard, 
   Download, 
-  Home,
+  Sparkles, 
+  Check, 
+  ImageIcon,
+  LayoutDashboard,
+  CreditCard,
+  Shield,
+  LogOut,
   User,
-  Lock,
+  Settings,
   ChevronDown,
-  X,
-  Check,
-  AlertCircle,
+  Coins,
   Clock,
+  AlertCircle,
   Filter,
-  Coins
+  Lock
 } from 'lucide-react';
-
-// Import des nouveaux hooks
 import { useGenerations } from '@/src/presentation/hooks/useGenerations';
 import { useCredits } from '@/src/presentation/hooks/useCredits';
 import { useHDUnlock } from '@/src/presentation/hooks/useHDUnlock';
-import { STYLES, ROOM_TYPES } from '@/src/shared/constants';
+import { STYLES, ROOM_TYPES } from '@/src/shared/constants/styles';
 
 // ============================================
 // TYPES
@@ -127,6 +127,17 @@ export default function DashboardPageV2() {
       setPasswordError('Erreur lors du changement de mot de passe');
     } finally {
       setIsChangingPassword(false);
+    }
+  };
+
+  const handleUnlock = async (generationId: string) => {
+    try {
+      const checkoutUrl = await unlock({ generationId });
+      if (checkoutUrl) {
+        window.location.href = checkoutUrl;
+      }
+    } catch (error) {
+      console.error('Erreur unlock:', error);
     }
   };
 
@@ -350,71 +361,51 @@ export default function DashboardPageV2() {
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {filteredGenerations.map((gen) => (
-                      <Card key={gen.id} className="overflow-hidden">
-                        <div className="relative aspect-[4/3] bg-[#f5f5f7]">
-                          {gen.outputImageUrl ? (
-                            <Image
-                              src={gen.outputImageUrl}
-                              alt={`${getStyleName(gen.styleSlug)} - ${getRoomName(gen.roomType)}`}
-                              fill
-                              className="object-cover"
-                            />
-                          ) : gen.inputImageUrl ? (
-                            <Image
-                              src={gen.inputImageUrl}
-                              alt="Image originale"
-                              fill
-                              className="object-cover opacity-50"
-                            />
-                          ) : (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <ImageIcon className="w-12 h-12 text-[#d2d2d7]" />
+                      <div key={gen.id}>
+                        <SmartGenerationCard 
+                          generation={gen} 
+                          onStatusChange={(updated) => {
+                             if (updated.status === 'completed' || updated.status === 'failed') {
+                                refetchGenerations();
+                             }
+                          }}
+                        >
+                         <div className="flex justify-end mt-2 px-1">
+                          {gen.status === 'completed' && gen.outputImageUrl && (
+                            <div className="flex items-center gap-2">
+                                <Button
+                                  variant="ghost" 
+                                  size="sm"
+                                  onClick={() => handleDownload(gen.id, gen.outputImageUrl!, false)}
+                                >
+                                  <Download className="w-4 h-4 mr-2" />
+                                  SD
+                                </Button>
+                                {!gen.hdUnlocked ? (
+                                  <Button
+                                    size="sm"
+                                    onClick={() => handleUnlock(gen.id)}
+                                    disabled={isUnlocking}
+                                  >
+                                    <Sparkles className="w-4 h-4 mr-2" />
+                                    HD (1 crédit)
+                                  </Button>
+                                ) : (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="text-green-600 border-green-200 bg-green-50"
+                                    onClick={() => handleDownload(gen.id, gen.outputImageUrl!, false)}
+                                  >
+                                    <Check className="w-4 h-4 mr-2" />
+                                    HD
+                                  </Button>
+                                )}
                             </div>
                           )}
-                          <div className="absolute top-2 right-2">
-                            {getStatusBadge(gen.status)}
-                          </div>
                         </div>
-                        <CardContent className="p-4">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <p className="text-sm font-medium text-[#1d1d1f]">
-                                {getStyleName(gen.styleSlug)}
-                              </p>
-                              <p className="text-xs text-[#86868b]">
-                                {getRoomName(gen.roomType)}
-                              </p>
-                            </div>
-                            {gen.status === 'completed' && gen.outputImageUrl && (
-                              <div className="flex items-center gap-2">
-                                <button
-                                  onClick={() => handleDownload(gen.id, gen.outputImageUrl!, false)}
-                                  className="p-2 hover:bg-[#f5f5f7] rounded-lg transition-colors"
-                                  title="Télécharger"
-                                >
-                                  <Download className="w-4 h-4 text-[#86868b]" />
-                                </button>
-                                {!gen.hdUnlocked && (
-                                  <button
-                                    onClick={() => handleDownload(gen.id, gen.outputImageUrl!, true)}
-                                    disabled={isUnlocking}
-                                    className="px-3 py-1 bg-[#1d1d1f] text-white text-xs rounded-full hover:bg-black transition-colors disabled:opacity-50"
-                                  >
-                                    HD
-                                  </button>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                          <p className="text-xs text-[#86868b] mt-2">
-                            {new Date(gen.createdAt).toLocaleDateString('fr-FR', {
-                              day: 'numeric',
-                              month: 'short',
-                              year: 'numeric',
-                            })}
-                          </p>
-                        </CardContent>
-                      </Card>
+                        </SmartGenerationCard>
+                      </div>
                     ))}
                   </div>
                 )}

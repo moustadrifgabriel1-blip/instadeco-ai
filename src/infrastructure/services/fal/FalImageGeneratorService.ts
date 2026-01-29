@@ -6,66 +6,47 @@ import {
   ImageGenerationResult 
 } from '@/src/domain/ports/services/IImageGeneratorService';
 
-/**
- * Mapping des styles de l'app vers les styles Fal.ai AI-Home
- * Modèle: half-moon-ai/ai-home/style
- */
-const STYLE_MAPPING: Record<string, string> = {
-  'moderne': 'modern-interior',
-  'minimaliste': 'minimalistic-interior',
-  'boheme': 'bohemian-interior',
-  'industriel': 'industrial-interior',
-  'classique': 'luxury-interior', // Plus proche que vintage
-  'japandi': 'japanese-interior',
-  'midcentury': 'mid century-interior',
-  'coastal': 'tropical-interior', // Proche du coastal
-  'farmhouse': 'farmhouse-interior',
-  'artdeco': 'art deco-interior',
-  // Styles supplémentaires supportés
-  'scandinave': 'scandinavian-interior',
-  'luxe': 'luxury-interior',
-  'zen': 'zen-interior',
-  'cozy': 'cozy-interior',
-  'vintage': 'vintage-interior',
-  'loft': 'loft-interior',
+// --- CONSTANTS & MAPPINGS ---
+
+const MODEL_PATH = 'fal-ai/flux-general';
+
+// Enhanced prompts for Flux to ensure "World-Class Interior Design" quality
+const STYLE_PROMPTS: Record<string, string> = {
+  'moderne': 'modern interior design, sleek lines, contemporary italian furniture, neutral color palette, warm lighting, high-end finishing, architectural digest style, 8k, photorealistic',
+  'minimaliste': 'minimalist interior design, wabi-sabi influence, clean lines, decluttered space, natural materials, light oak wood, soft white walls, serene atmosphere, high quality textures',
+  'boheme': 'bohemian chic interior, eclectic decor, rattan furniture, layered textiles, persian rugs, indoor plants, warm earth tones, cozy atmosphere, macrame details, natural lighting',
+  'industriel': 'industrial loft style, exposed brick walls, metal accents, leather furniture, concrete floors, high ceilings, factory windows, raw materials, urban chic aesthetic, dramatic lighting',
+  'classique': 'luxury classic interior, haussmannian style, moldings on walls, velvet upholstery, crystal chandelier, gold accents, marble fireplace, sophisticated antique furniture, timeless elegance',
+  'japandi': 'japandi style, blend of japanese rustic minimalism and scandinavian functionality, light wood, low profile furniture, beige and grey tones, organic shapes, zen atmosphere, soft textures',
+  'midcentury': 'mid-century modern interior, eames era furniture, teak wood, organic curves, geometric patterns, olive green and mustard yellow accents, retro mood, clean architectural lines',
+  'coastal': 'coastal hamptons style, light and airy, white wood paneling, linen fabrics, soft blue and sand tones, beach house vibe, natural light, elegant and relaxed atmosphere',
+  'farmhouse': 'modern farmhouse interior, rustic wooden beams, shiplap walls, comfortable overstuffed furniture, neutral warm tones, vintage accessories, cozy and inviting, country living style',
+  'artdeco': 'art deco interior, geometric patterns, velvet furniture, brass and gold metallic accents, rich jewel tones, emerald green, symmetry, glamorous and opulent atmosphere, great gatsby style',
+  // Fallbacks
+  'scandinave': 'scandinavian interior design, hygge atmosphere, light wood, white walls, functional design, cozy textiles, clean and bright',
+  'luxe': 'ultra luxury interior design, marble floors, silk drapes, custom furniture, gold leaf details, expensive materials, penthouse vibe, cinematic lighting',
+  'zen': 'zen sanctuary interior, bamboo accents, pebble stones, water feature, minimal furniture, meditation space, soft diffused lighting, peaceful',
+  'cozy': 'ultra cozy interior, warm fireplace, fluffy blankets, soft lighting, reading nook, warm wood tones, inviting atmosphere, hygge',
+  'vintage': 'vintage retro interior, curated antique pieces, wallpaper with floral patterns, velvet textures, nostalgic atmosphere, wes anderson style',
+  'loft': 'new york loft style, open plan, huge windows, exposed pipes, concrete ceiling, artistic decor, spacious and urban',
 };
 
-/**
- * Mapping des types de pièces de l'app vers les architecture_type Fal.ai
- */
-const ROOM_MAPPING: Record<string, string> = {
-  'salon': 'living room-interior',
-  'chambre': 'bedroom-interior',
-  'chambre-enfant': 'kids bedroom-interior',
-  'cuisine': 'kitchen-interior',
-  'salle-de-bain': 'bathroom-interior',
-  'bureau': 'home office-interior',
-  'salle-a-manger': 'dining room-interior',
-  'entree': 'other-interior',
-  'terrasse': 'courtyard-exterior',
-};
-
-/**
- * Palettes de couleurs suggérées par style
- */
-const COLOR_PALETTES: Record<string, string> = {
-  'moderne': 'muted sands',
-  'minimaliste': 'arctic mist',
-  'boheme': 'golden beige',
-  'industriel': 'earthy neutrals',
-  'classique': 'refined blues',
-  'japandi': 'muted horizon',
-  'midcentury': 'retro rust',
-  'coastal': 'ocean breeze',
-  'farmhouse': 'earthy tones',
-  'artdeco': 'golden sapphire',
-  'default': 'surprise me',
+const ROOM_PROMPTS: Record<string, string> = {
+  'salon': 'spacious living room',
+  'chambre': 'master bedroom',
+  'chambre-enfant': 'kids bedroom, playful but organized',
+  'cuisine': 'gourmet kitchen with island',
+  'salle-de-bain': 'luxury spa bathroom',
+  'bureau': 'home office workspace',
+  'salle-a-manger': 'dining room with large table',
+  'entree': 'entryway hallway',
+  'terrasse': 'outdoor terrace patio',
 };
 
 /**
  * Adapter: Fal.ai Image Generator Service
- * Utilise le modèle spécialisé half-moon-ai/ai-home/style pour la décoration d'intérieur
- * Avec fallback sur fal-ai/flux-pro/kontext si nécessaire
+ * Uses 'fal-ai/flux/dev/controlnet' for State-of-the-Art Interior Design generation.
+ * This model respects the input structure (ControlNet Depth) while applying the requested style with high fidelity.
  */
 export class FalImageGeneratorService implements IImageGeneratorService {
   private isConfigured = false;
@@ -82,7 +63,7 @@ export class FalImageGeneratorService implements IImageGeneratorService {
         credentials: key,
       });
       this.isConfigured = true;
-      console.log('[Fal.ai] ✅ Client configured successfully');
+      console.log('[Fal.ai] ✅ Client configured successfully (Flux Dev + ControlNet)');
     } else {
       console.error('[Fal.ai] ❌ CRITICAL: FAL_KEY environment variable is missing!');
       this.isConfigured = false;
@@ -94,41 +75,50 @@ export class FalImageGeneratorService implements IImageGeneratorService {
       return failure(new Error('Fal.ai client not configured. Missing FAL_KEY environment variable.'));
     }
 
-    // Extraire le style et le type de pièce depuis le prompt ou les options
-    const styleSlug = options.styleSlug || this.extractStyleFromPrompt(options.prompt);
-    const roomType = options.roomType || this.extractRoomFromPrompt(options.prompt);
+    const styleSlug = options.styleSlug || 'moderne';
+    const roomType = options.roomType || 'salon';
 
-    console.log('[Fal.ai] 🎨 Starting generation (Queue Mode):', {
+    console.log('[Fal.ai] 🎨 Starting generation (Flux ControlNet):', {
       styleSlug,
       roomType,
-      imageUrl: options.controlImageUrl?.substring(0, 50) + '...',
-      model: 'half-moon-ai/ai-home/style'
+      model: MODEL_PATH
     });
 
     try {
-      const style = STYLE_MAPPING[styleSlug] || 'modern-interior';
-      const architectureType = ROOM_MAPPING[roomType] || 'living room-interior';
-      const colorPalette = COLOR_PALETTES[styleSlug] || COLOR_PALETTES['default'];
+      // 1. Build the prompt
+      const stylePrompt = STYLE_PROMPTS[styleSlug] || STYLE_PROMPTS['moderne'];
+      const roomPrompt = ROOM_PROMPTS[roomType] || 'interior room';
+      
+      const fullPrompt = `Cinematic photo of a ${roomPrompt}, ${stylePrompt}. Highly detailed, 8k resolution, professional interior design photography, architectural digest, sharp focus, perfect lighting.`;
 
-      // Utiliser fal.queue.submit au lieu de fal.subscribe
-      const { request_id } = await fal.queue.submit('half-moon-ai/ai-home/style', {
+      // 2. Submit to Queue
+      const { request_id } = await fal.queue.submit(MODEL_PATH, {
         input: {
-          input_image_url: options.controlImageUrl,
-          architecture_type: architectureType,
-          style: style,
-          color_palette: colorPalette,
-          input_image_strength: 0.90,
-          num_inference_steps: 25,
-          output_format: 'jpeg',
+          prompt: fullPrompt,
+          controlnets: [
+            {
+              path: "https://huggingface.co/XLabs-AI/flux-controlnet-depth-v3/resolve/main/flux-depth-controlnet-v3.safetensors?download=true",
+              control_image_url: options.controlImageUrl,
+              conditioning_scale: 0.65
+            }
+          ],
+          image_size: "landscape_4_3", // or just rely on control image aspect ratio if possible, but flux-general defines image_size.
+          // Fal flux-general usually resizes to match input control image if not specified? 
+          // Let's stick to default or provide standard size if needed. 
+          // Actually, for interior design, usually we want to keep aspect ratio.
+          
+          num_inference_steps: 28, // Standard for Flux Dev
+          guidance_scale: 3.5, // Flux Dev works best with low guidance (2.5 - 5.0)
+          enable_safety_checker: false,
+          output_format: "jpeg"
         },
         webhookUrl: process.env.NEXT_PUBLIC_APP_URL ? `${process.env.NEXT_PUBLIC_APP_URL}/api/v2/webhooks/fal` : undefined,
       });
 
       console.log('[Fal.ai] ✅ Job submitted successfully:', { request_id });
 
-      // Retourner le pending status
       return success({
-        imageUrl: '', // Sera rempli plus tard
+        imageUrl: '',
         providerId: request_id, 
         status: 'pending',
         inferenceTime: 0,
@@ -141,31 +131,30 @@ export class FalImageGeneratorService implements IImageGeneratorService {
     }
   }
 
-  // Vérifier le statut d'un job
   async checkStatus(predictionId: string): Promise<Result<any>> {
     try {
-      console.log('[Fal.ai] 🔄 Checking status for:', predictionId);
+      // console.log('[Fal.ai] 🔄 Checking status for:', predictionId);
       
-      // Tentative avec requestId (camelCase)
-      const status = await fal.queue.status('half-moon-ai/ai-home/style', {
+      const status = await fal.queue.status(MODEL_PATH, {
         requestId: predictionId,
-        logs: true
+        logs: false // Reduce verbosity
       });
 
-      // Gestion de différentes structures de réponse possibles
       const statusData = (status as any).data || status;
       const statusCode = (statusData?.status || 'UNKNOWN').toUpperCase();
 
-      console.log('[Fal.ai] 📊 Status received:', { predictionId, statusCode });
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[Fal.ai] Status: ${statusCode} (${predictionId})`);
+      }
 
       if (statusCode === 'COMPLETED' || statusCode === 'SUCCEEDED' || statusCode === 'OK') {
-         const result = await fal.queue.result('half-moon-ai/ai-home/style', {
+         const result = await fal.queue.result(MODEL_PATH, {
            requestId: predictionId
          });
          
          const data = (result as any).data || result;
-         // Parfois l'image est directement dans data, parfois dans images
-         const imageUrl = data?.image?.url || data?.images?.[0]?.url;
+         // Flux returns 'images': [{url: ...}]
+         const imageUrl = data?.images?.[0]?.url || data?.image?.url;
 
          if (!imageUrl) {
             console.error('[Fal.ai] ❌ No image URL in result:', data);
@@ -182,55 +171,15 @@ export class FalImageGeneratorService implements IImageGeneratorService {
         const errorMsg = statusData.error || 'Fal.ai job failed';
         return failure(new Error(errorMsg));
       } else {
-        console.warn('[Fal.ai] ⚠️ Unknown status:', statusCode);
-        // On suppose que ça continue
         return success({ status: 'processing' });
       }
     } catch (error) {
       console.error('[Fal.ai] ❌ Status check failed:', error);
-      // On ne retourne pas failure pour ne pas casser le polling, on attend le prochain tick
-      // Mais si c'est une 404, on devrait peut-être arrêter
       if ((error as any)?.message?.includes('404')) {
          return failure(new Error('Job not found (404)'));
       }
       return failure(error instanceof Error ? error : new Error('Status check failed'));
     }
-  }
-
-  /* SUPPRESSION DE generateWithAIHome et generateWithFluxKontext pour le moment car passage en mode Queue */
-  
-  /**
-   * Extraire le style depuis le prompt (fallback si non fourni)
-   */
-  private extractStyleFromPrompt(prompt: string): string {
-    const lowerPrompt = prompt.toLowerCase();
-    const styles = Object.keys(STYLE_MAPPING);
-    return styles.find(s => lowerPrompt.includes(s)) || 'moderne';
-  }
-
-  /**
-   * Extraire le type de pièce depuis le prompt (fallback si non fourni)
-   */
-  private extractRoomFromPrompt(prompt: string): string {
-    const lowerPrompt = prompt.toLowerCase();
-    const roomKeywords: Record<string, string> = {
-      'living room': 'salon',
-      'kids bedroom': 'chambre-enfant',
-      'bedroom': 'chambre',
-      'kitchen': 'cuisine',
-      'bathroom': 'salle-de-bain',
-      'office': 'bureau',
-      'dining': 'salle-a-manger',
-      'entryway': 'entree',
-      'terrace': 'terrasse',
-    };
-    
-    for (const [keyword, roomType] of Object.entries(roomKeywords)) {
-      if (lowerPrompt.includes(keyword)) {
-        return roomType;
-      }
-    }
-    return 'salon';
   }
 
   async cancel(predictionId: string): Promise<Result<void>> {

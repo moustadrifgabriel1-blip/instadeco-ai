@@ -14,6 +14,7 @@ interface GenerationCardProps {
   status: 'pending' | 'processing' | 'completed' | 'failed';
   createdAt: string;
   errorMessage?: string;
+  children?: React.ReactNode;
 }
 
 export function GenerationCard({
@@ -25,6 +26,7 @@ export function GenerationCard({
   status,
   createdAt,
   errorMessage,
+  children
 }: GenerationCardProps) {
   const handleDownload = async (url: string) => {
     try {
@@ -152,6 +154,7 @@ export function GenerationCard({
           })}</span>
           <span className="text-gray-400 hidden sm:inline">ID: {id.slice(0, 8)}</span>
         </div>
+        {children && <div className="mt-3 pt-3 border-t">{children}</div>}
       </CardContent>
     </Card>
   );
