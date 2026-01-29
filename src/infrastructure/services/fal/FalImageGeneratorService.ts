@@ -91,7 +91,8 @@ export class FalImageGeneratorService implements IImageGeneratorService {
       
       // "Perfect" Prompt Structure for Flux.1 [dev]
       // Flux responds well to natural language and specific high-quality photography keywords.
-      const fullPrompt = `A professional architectural photograph of a ${roomPrompt} designed in ${styleSlug} style. ${stylePrompt}. The image features high-end furniture, realistic textures, and natural lighting. Shot on a 50mm lens, f/2.8, ISO 200. Architectural Digest quality, 8k resolution, photorealistic, highly detailed, volumetric lighting, perfect composition, no distortion.`;
+      // INSTRUCTION Update: Added constraint for "real-world furniture".
+      const fullPrompt = `A professional architectural photograph of a ${roomPrompt} designed in ${styleSlug} style. ${stylePrompt}. The image features real-world, commercially available furniture designs (similar to West Elm, CB2, Restoration Hardware, IKEA) with realistic proportions and functional placement. Avoid generic 3D model furniture. Realistic textures, natural lighting. Shot on a 50mm lens, f/2.8, ISO 200. Architectural Digest quality, 8k resolution, photorealistic, highly detailed, volumetric lighting, perfect composition, no distortion.`;
 
       // 2. Submit to Queue
       // NOTE: We use control_loras instead of controlnets because Fal's 'flux-general' endpoint
