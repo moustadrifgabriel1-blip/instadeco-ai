@@ -62,7 +62,7 @@ export function HowItWorks() {
             3 étapes simples
           </h2>
           <p className="text-lg text-[#6B6B6B]">
-            Transformez n'importe quelle pièce en quelques clics
+            Transformez n&apos;importe quelle pièce en quelques clics
           </p>
         </div>
 

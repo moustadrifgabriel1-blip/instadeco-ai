@@ -94,7 +94,7 @@ export function Testimonials() {
             Ils ont transformé leur intérieur
           </h2>
           <p className="text-lg text-[#6B6B6B]">
-            Découvrez ce que nos utilisateurs pensent d'InstaDeco
+            Découvrez ce que nos utilisateurs pensent d&apos;InstaDeco
           </p>
         </div>
 
@@ -136,7 +136,7 @@ export function Testimonials() {
 
             {/* Quote */}
             <blockquote className="text-lg md:text-xl text-[#2D2D2D] mb-6 max-w-2xl mx-auto leading-relaxed">
-              "{testimonials[currentIndex].content}"
+              &ldquo;{testimonials[currentIndex].content}&rdquo;
             </blockquote>
 
             {/* Author */}
