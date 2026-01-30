@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import { useCases } from '@/src/infrastructure/config/di-container';
+import { logAuditEvent } from '@/lib/security/audit-logger';
 
 /**
  * POST /api/v2/webhooks/stripe
@@ -18,6 +19,12 @@ export async function POST(req: Request) {
 
     if (!signature) {
       console.error('[Stripe Webhook V2] ❌ Signature manquante');
+      await logAuditEvent({
+        eventType: 'payment_failed',
+        eventStatus: 'failure',
+        errorMessage: 'Signature Stripe manquante',
+        metadata: { reason: 'missing_signature' },
+      });
       return NextResponse.json(
         { error: 'Signature Stripe manquante' },
         { status: 400 }
@@ -32,6 +39,14 @@ export async function POST(req: Request) {
 
     if (!result.success) {
       console.error('[Stripe Webhook V2] ❌ Erreur:', result.error.message);
+      
+      // Log l'échec du webhook
+      await logAuditEvent({
+        eventType: 'payment_failed',
+        eventStatus: 'failure',
+        errorMessage: result.error.message,
+        metadata: { code: result.error.code },
+      });
       
       // Pour les webhooks, on retourne 200 même en cas d'erreur métier
       // pour éviter les retries de Stripe sur des erreurs non récupérables
@@ -53,6 +68,15 @@ export async function POST(req: Request) {
     const { eventType, processed, action } = result.data;
 
     console.log(`[Stripe Webhook V2] ✅ Event ${eventType} traité:`, { processed, action });
+    
+    // Log le succès du paiement si c'était un checkout
+    if (eventType === 'checkout.session.completed' && processed) {
+      await logAuditEvent({
+        eventType: action?.includes('hd') ? 'hd_unlock' : 'payment_success',
+        eventStatus: 'success',
+        metadata: { eventType, action },
+      });
+    }
 
     return NextResponse.json({
       received: true,

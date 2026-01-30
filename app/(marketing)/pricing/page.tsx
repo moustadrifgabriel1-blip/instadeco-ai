@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useRef } from 'react';
-import { Check } from 'lucide-react';
+import { useState } from 'react';
+import { Check, Sparkles, Clock, CreditCard, Image, Download, Palette, Building2, HelpCircle, ChevronDown, Heart } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
 import { usePurchaseCredits } from '@/src/presentation/hooks/usePurchaseCredits';
@@ -10,32 +10,102 @@ import { CreditPackId } from '@/src/presentation/types';
 const PRICING_PLANS = [
   {
     id: 'pack_10' as CreditPackId,
-    name: 'Starter',
+    name: 'Découverte',
     credits: 10,
     price: 9.99,
     popular: false,
+    emoji: '🌱',
+    description: 'Parfait pour tester',
   },
   {
     id: 'pack_25' as CreditPackId,
-    name: 'Pro',
+    name: 'Créatif',
     credits: 25,
     price: 19.99,
     popular: true,
+    emoji: '✨',
+    description: 'Le plus choisi',
   },
   {
     id: 'pack_50' as CreditPackId,
-    name: 'Unlimited',
+    name: 'Pro',
     credits: 50,
     price: 34.99,
     popular: false,
+    emoji: '🚀',
+    description: 'Pour les passionnés',
   },
 ];
 
-export default function PricingPageV2() {
+// FAQ exhaustive pour réduire le SAV
+const FAQ_ITEMS = [
+  {
+    category: 'credits',
+    icon: CreditCard,
+    question: "Combien coûte une génération d'image ?",
+    answer: "1 crédit = 1 génération. C'est aussi simple que ça ! Chaque génération vous donne une image en haute qualité (1024×1024 pixels) que vous pouvez télécharger immédiatement."
+  },
+  {
+    category: 'credits',
+    icon: Clock,
+    question: "Mes crédits expirent-ils ?",
+    answer: "Non, jamais ! 🎉 Vos crédits restent sur votre compte indéfiniment. Utilisez-les quand vous voulez, à votre rythme. Pas de pression, pas de date limite."
+  },
+  {
+    category: 'quality',
+    icon: Image,
+    question: "Quelle est la qualité des images générées ?",
+    answer: "Toutes les images sont en haute définition (1024×1024 pixels). Vous pouvez aussi débloquer la version HD+ (2048×2048) pour seulement 1,99€ par image - parfait pour l'impression grand format !"
+  },
+  {
+    category: 'usage',
+    icon: Building2,
+    question: "Puis-je utiliser les images pour mon activité pro ?",
+    answer: "Absolument ! Toutes les images que vous générez vous appartiennent. Vous pouvez les utiliser pour vos projets personnels, votre portfolio, vos clients, vos réseaux sociaux... Aucune restriction d'usage commercial."
+  },
+  {
+    category: 'quality',
+    icon: Palette,
+    question: "Comment choisir le bon style pour ma pièce ?",
+    answer: "On propose 12 styles différents (Moderne, Scandinave, Japandi, Bohème...). Notre conseil : choisissez le style qui correspond à l'ambiance que vous voulez créer, et ajustez l'intensité de transformation selon vos goûts. Le mode 'Décor uniquement' garde vos meubles et change juste la déco !"
+  },
+  {
+    category: 'usage',
+    icon: Download,
+    question: "Comment télécharger mes créations ?",
+    answer: "Super simple ! Une fois l'image générée, cliquez sur 'Télécharger' et c'est fait. L'image se sauvegarde automatiquement sur votre appareil. Vous retrouvez aussi tout votre historique dans votre tableau de bord."
+  },
+  {
+    category: 'payment',
+    icon: CreditCard,
+    question: "Quels moyens de paiement acceptez-vous ?",
+    answer: "On accepte toutes les cartes bancaires (Visa, Mastercard, American Express), ainsi qu'Apple Pay et Google Pay. Paiement 100% sécurisé via Stripe, leader mondial du paiement en ligne."
+  },
+  {
+    category: 'payment',
+    icon: HelpCircle,
+    question: "Puis-je obtenir un remboursement ?",
+    answer: "Oui ! Si vous n'avez pas utilisé vos crédits, vous pouvez demander un remboursement intégral sous 14 jours après l'achat. Il suffit de nous contacter par email. Les crédits déjà utilisés ne sont pas remboursables."
+  },
+  {
+    category: 'quality',
+    icon: Sparkles,
+    question: "Que faire si le résultat ne me plaît pas ?",
+    answer: "L'IA est créative ! Si un résultat ne vous convient pas, relancez simplement une génération avec les mêmes paramètres : vous obtiendrez une nouvelle proposition. Vous pouvez aussi ajuster l'intensité de transformation ou changer de style."
+  },
+  {
+    category: 'usage',
+    icon: Image,
+    question: "Quels types de photos fonctionnent le mieux ?",
+    answer: "Pour de meilleurs résultats : prenez une photo bien éclairée, de face (pas d'angle extrême), et qui montre bien l'espace. Évitez les photos floues ou trop sombres. Les pièces vides ou peu meublées donnent plus de liberté à l'IA !"
+  },
+];
+
+export default function PricingPage() {
   const { user } = useAuth();
   const router = useRouter();
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
   
-  // Nouveau hook pour acheter des crédits
   const { purchase, isLoading, error } = usePurchaseCredits();
 
   const handleSelectPlan = async (planId: CreditPackId) => {
@@ -56,44 +126,28 @@ export default function PricingPageV2() {
   };
 
   return (
-    <div className="min-h-screen bg-[#fbfbfd]">
-      {/* Header */}
-      <header className="border-b border-[#d2d2d7] bg-white/80 backdrop-blur-xl sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between">
-          <a href="/" className="text-lg sm:text-[21px] font-semibold text-[#1d1d1f]">
-            InstaDeco
-          </a>
-          <nav className="flex items-center gap-3 sm:gap-6">
-            <a href="/generate" className="text-sm sm:text-[14px] text-[#1d1d1f] hover:opacity-70 transition-opacity">
-              Générer
-            </a>
-            {user ? (
-              <a
-                href="/dashboard"
-                className="text-sm sm:text-[14px] bg-[#1d1d1f] text-white px-3 sm:px-4 py-2 rounded-full hover:bg-[#424245] transition-colors touch-manipulation min-h-[44px] flex items-center"
-              >
-                <span className="hidden sm:inline">Mon Compte</span>
-                <span className="sm:hidden">Compte</span>
-              </a>
-            ) : (
-              <a
-                href="/login"
-                className="text-sm sm:text-[14px] bg-[#1d1d1f] text-white px-3 sm:px-4 py-2 rounded-full hover:bg-[#424245] transition-colors touch-manipulation min-h-[44px] flex items-center"
-              >
-                Connexion
-              </a>
-            )}
-          </nav>
+    <div className="min-h-screen bg-gradient-to-b from-[#FFF8F5] via-[#FFFBF9] to-white">
+      {/* Hero avec touches de couleur */}
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-16 md:py-20 text-center relative">
+        {/* Décoration subtile */}
+        <div className="absolute top-10 left-10 w-20 h-20 bg-[#FFE4D9] rounded-full blur-3xl opacity-60" />
+        <div className="absolute top-20 right-16 w-16 h-16 bg-[#E8F4E5] rounded-full blur-2xl opacity-50" />
+        
+        <div className="inline-flex items-center gap-2 bg-[#FFF0EB] text-[#D4603C] px-4 py-2 rounded-full text-sm font-medium mb-6">
+          <Heart className="w-4 h-4" />
+          Sans abonnement, sans engagement
         </div>
-      </header>
-
-      {/* Hero */}
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-16 md:py-20 text-center">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[56px] font-semibold tracking-[-0.025em] text-[#1d1d1f] leading-[1.1] sm:leading-[1.07] mb-3 sm:mb-4">
-          Tarifs simples et transparents
+        
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[56px] font-semibold tracking-[-0.025em] text-[#2D2D2D] leading-[1.1] sm:leading-[1.07] mb-4">
+          Des tarifs simples,<br />
+          <span className="bg-gradient-to-r from-[#E07B54] to-[#D4603C] bg-clip-text text-transparent">
+            comme votre déco
+          </span>
         </h1>
-        <p className="text-base sm:text-lg md:text-[21px] text-[#86868b] max-w-2xl mx-auto px-2">
-          Pas d&apos;abonnement. Achetez des crédits et utilisez-les quand vous voulez.
+        <p className="text-base sm:text-lg md:text-[21px] text-[#6B6B6B] max-w-2xl mx-auto">
+          Achetez des crédits une fois, utilisez-les pour toujours.
+          <br className="hidden sm:block" />
+          Pas de surprise, pas d&apos;abonnement caché.
         </p>
       </div>
 
@@ -107,8 +161,8 @@ export default function PricingPageV2() {
       )}
 
       {/* Pricing Cards */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-20">
-        {/* Desktop: Grille normale */}
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 pb-16">
+        {/* Desktop */}
         <div className="hidden md:grid md:grid-cols-3 gap-6">
           {PRICING_PLANS.map((plan) => (
             <PricingCard 
@@ -120,8 +174,8 @@ export default function PricingPageV2() {
           ))}
         </div>
 
-        {/* Mobile: Carrousel avec swipe */}
-        <div className="md:hidden overflow-hidden">
+        {/* Mobile Carousel */}
+        <div className="md:hidden">
           <MobileCarousel 
             plans={PRICING_PLANS} 
             onSelect={handleSelectPlan}
@@ -129,69 +183,122 @@ export default function PricingPageV2() {
           />
         </div>
 
-        {/* FAQ Section */}
-        <div className="mt-20 max-w-3xl mx-auto">
-          <h2 className="text-[32px] font-semibold text-[#1d1d1f] text-center mb-12">
-            Questions fréquentes
-          </h2>
-          
-          <div className="space-y-6">
-            <div className="bg-white rounded-[20px] p-6 shadow-[0_2px_16px_rgba(0,0,0,0.08)]">
-              <h3 className="text-[19px] font-semibold text-[#1d1d1f] mb-2">
-                Les crédits expirent-ils ?
-              </h3>
-              <p className="text-[15px] text-[#86868b]">
-                Non ! Vos crédits n&apos;expirent jamais. Utilisez-les quand vous voulez.
-              </p>
+        {/* Reassurance */}
+        <div className="flex flex-wrap justify-center gap-6 mt-10 text-sm text-[#6B6B6B]">
+          <div className="flex items-center gap-2">
+            <div className="w-5 h-5 rounded-full bg-[#E8F4E5] flex items-center justify-center">
+              <Check className="w-3 h-3 text-[#4CAF50]" />
             </div>
-
-            <div className="bg-white rounded-[20px] p-6 shadow-[0_2px_16px_rgba(0,0,0,0.08)]">
-              <h3 className="text-[19px] font-semibold text-[#1d1d1f] mb-2">
-                Puis-je obtenir un remboursement ?
-              </h3>
-              <p className="text-[15px] text-[#86868b]">
-                Les crédits non utilisés peuvent être remboursés sous 14 jours.
-              </p>
+            Paiement sécurisé
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-5 h-5 rounded-full bg-[#E8F4E5] flex items-center justify-center">
+              <Check className="w-3 h-3 text-[#4CAF50]" />
             </div>
-
-            <div className="bg-white rounded-[20px] p-6 shadow-[0_2px_16px_rgba(0,0,0,0.08)]">
-              <h3 className="text-[19px] font-semibold text-[#1d1d1f] mb-2">
-                Combien coûte une génération ?
-              </h3>
-              <p className="text-[15px] text-[#86868b]">
-                1 crédit = 1 génération d&apos;image en haute qualité (1024x1024px).
-              </p>
+            Crédits sans expiration
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-5 h-5 rounded-full bg-[#E8F4E5] flex items-center justify-center">
+              <Check className="w-3 h-3 text-[#4CAF50]" />
             </div>
-
-            <div className="bg-white rounded-[20px] p-6 shadow-[0_2px_16px_rgba(0,0,0,0.08)]">
-              <h3 className="text-[19px] font-semibold text-[#1d1d1f] mb-2">
-                Comment fonctionne le paiement ?
-              </h3>
-              <p className="text-[15px] text-[#86868b]">
-                Paiement sécurisé via Stripe. Carte bancaire, Apple Pay et Google Pay acceptés.
-              </p>
-            </div>
+            Remboursement 14j
           </div>
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="border-t border-[#d2d2d7] py-12">
+      {/* FAQ Section - Design épuré et chaleureux */}
+      <div className="bg-white py-16 sm:py-20">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 bg-[#FFF0EB] text-[#D4603C] px-4 py-2 rounded-full text-sm font-medium mb-4">
+              <HelpCircle className="w-4 h-4" />
+              Tout ce qu&apos;il faut savoir
+            </div>
+            <h2 className="text-2xl sm:text-3xl md:text-[36px] font-semibold text-[#2D2D2D] mb-3">
+              Questions fréquentes
+            </h2>
+            <p className="text-[#6B6B6B]">
+              On répond à toutes vos questions pour que vous puissiez créer en toute sérénité
+            </p>
+          </div>
+          
+          <div className="space-y-3">
+            {FAQ_ITEMS.map((item, index) => (
+              <div 
+                key={index}
+                className={`rounded-2xl border transition-all overflow-hidden ${
+                  openFaq === index 
+                    ? 'bg-[#FFF8F5] border-[#F5D5C8] shadow-sm' 
+                    : 'bg-white border-[#F0E8E4] hover:border-[#E8D5CC]'
+                }`}
+              >
+                <button
+                  onClick={() => setOpenFaq(openFaq === index ? null : index)}
+                  className="w-full flex items-center justify-between p-5 text-left"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
+                      openFaq === index ? 'bg-[#E07B54] text-white' : 'bg-[#FFF0EB] text-[#E07B54]'
+                    }`}>
+                      <item.icon className="w-5 h-5" />
+                    </div>
+                    <span className="font-medium text-[#2D2D2D] pr-4">{item.question}</span>
+                  </div>
+                  <ChevronDown className={`w-5 h-5 text-[#6B6B6B] transition-transform flex-shrink-0 ${
+                    openFaq === index ? 'rotate-180' : ''
+                  }`} />
+                </button>
+                
+                {openFaq === index && (
+                  <div className="px-5 pb-5 pt-0">
+                    <div className="pl-14 text-[#6B6B6B] leading-relaxed">
+                      {item.answer}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Contact si besoin */}
+          <div className="mt-10 text-center p-6 bg-gradient-to-r from-[#FFF8F5] to-[#FFF0EB] rounded-2xl border border-[#F5E6E0]">
+            <p className="text-[#2D2D2D] mb-2">
+              Vous avez encore une question ?
+            </p>
+            <a 
+              href="mailto:contact@instadeco.app" 
+              className="inline-flex items-center gap-2 text-[#E07B54] font-medium hover:underline"
+            >
+              Écrivez-nous, on répond sous 24h 💌
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer chaleureux */}
+      <footer className="bg-[#FFFBF9] border-t border-[#F5E6E0] py-12">
         <div className="max-w-7xl mx-auto px-6 text-center">
-          <p className="text-[12px] text-[#86868b]">
-            © 2026 InstaDeco. Propulsé par Flux.1 | ControlNet.
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <span className="text-2xl">✨</span>
+            <span className="font-semibold text-[#2D2D2D]">InstaDeco</span>
+          </div>
+          <p className="text-[12px] text-[#6B6B6B] mb-4">
+            Transformez votre intérieur avec l&apos;IA. Propulsé par Flux.1 + ControlNet.
           </p>
-          <div className="flex justify-center gap-6 mt-4">
-            <a href="#" className="text-[12px] text-[#86868b] hover:text-[#1d1d1f] transition-colors">
+          <div className="flex justify-center gap-6">
+            <a href="/legal/privacy" className="text-[12px] text-[#6B6B6B] hover:text-[#E07B54] transition-colors">
               Confidentialité
             </a>
-            <a href="#" className="text-[12px] text-[#86868b] hover:text-[#1d1d1f] transition-colors">
-              Conditions
+            <a href="/legal/cgv" className="text-[12px] text-[#6B6B6B] hover:text-[#E07B54] transition-colors">
+              CGV
             </a>
-            <a href="#" className="text-[12px] text-[#86868b] hover:text-[#1d1d1f] transition-colors">
+            <a href="mailto:contact@instadeco.app" className="text-[12px] text-[#6B6B6B] hover:text-[#E07B54] transition-colors">
               Contact
             </a>
           </div>
+          <p className="text-[11px] text-[#9B9B9B] mt-6">
+            © 2026 InstaDeco. Fait avec ❤️ en Suisse.
+          </p>
         </div>
       </footer>
     </div>
@@ -205,9 +312,11 @@ interface PricingPlan {
   credits: number;
   price: number;
   popular: boolean;
+  emoji: string;
+  description: string;
 }
 
-// Composant carte de prix réutilisable
+// Carte de prix avec design chaleureux
 function PricingCard({ 
   plan, 
   onSelect, 
@@ -219,70 +328,61 @@ function PricingCard({
 }) {
   return (
     <div
-      className={`relative bg-white rounded-[16px] sm:rounded-[20px] p-4 sm:p-6 md:p-8 shadow-[0_2px_16px_rgba(0,0,0,0.08)] transition-all hover:scale-[1.02] ${
-        plan.popular ? 'ring-2 ring-[#1d1d1f]' : ''
+      className={`relative bg-white rounded-3xl p-6 md:p-8 transition-all hover:scale-[1.02] hover:shadow-xl ${
+        plan.popular 
+          ? 'ring-2 ring-[#E07B54] shadow-lg shadow-[#E07B54]/10' 
+          : 'border border-[#F0E8E4] shadow-sm hover:border-[#E8D5CC]'
       }`}
     >
       {plan.popular && (
-        <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-[#1d1d1f] text-white text-[11px] sm:text-[12px] font-medium px-3 sm:px-4 py-1 rounded-full">
-          Populaire
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#E07B54] to-[#D4603C] text-white text-[12px] font-medium px-4 py-1.5 rounded-full shadow-lg">
+          ⭐ Le plus choisi
         </div>
       )}
 
-      <div className="text-center mb-5 sm:mb-6 md:mb-8">
-        <h3 className="text-xl sm:text-2xl md:text-[28px] font-semibold text-[#1d1d1f] mb-2">
+      <div className="text-center mb-6">
+        <div className="text-4xl mb-3">{plan.emoji}</div>
+        <h3 className="text-2xl font-semibold text-[#2D2D2D] mb-1">
           {plan.name}
         </h3>
-        <div className="flex items-baseline justify-center gap-1 mb-2 sm:mb-3">
-          <span className="text-3xl sm:text-4xl md:text-[48px] font-semibold text-[#1d1d1f]">
+        <p className="text-sm text-[#6B6B6B]">{plan.description}</p>
+      </div>
+
+      <div className="text-center mb-6">
+        <div className="flex items-baseline justify-center gap-1">
+          <span className="text-4xl md:text-5xl font-bold text-[#2D2D2D]">
             {plan.price}€
           </span>
         </div>
-        <p className="text-sm sm:text-base md:text-[17px] text-[#86868b]">
-          {plan.credits} crédits
+        <p className="text-[#6B6B6B] mt-1">
+          {plan.credits} crédits • <span className="text-[#E07B54] font-medium">{(plan.price / plan.credits).toFixed(2)}€/crédit</span>
         </p>
       </div>
 
-      <ul className="space-y-2.5 sm:space-y-3 md:space-y-4 mb-5 sm:mb-6 md:mb-8">
-        <li className="flex items-start gap-2.5 sm:gap-3">
-          <Check className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0 mt-0.5" />
-          <span className="text-xs sm:text-sm md:text-[15px] text-[#1d1d1f] leading-tight">
-            {plan.credits} générations d&apos;images
-          </span>
-        </li>
-        <li className="flex items-start gap-2.5 sm:gap-3">
-          <Check className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0 mt-0.5" />
-          <span className="text-xs sm:text-sm md:text-[15px] text-[#1d1d1f] leading-tight">
-            Qualité HD (1024×1024)
-          </span>
-        </li>
-        <li className="flex items-start gap-2.5 sm:gap-3">
-          <Check className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0 mt-0.5" />
-          <span className="text-xs sm:text-sm md:text-[15px] text-[#1d1d1f] leading-tight">
-            Téléchargement illimité
-          </span>
-        </li>
-        <li className="flex items-start gap-2.5 sm:gap-3">
-          <Check className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0 mt-0.5" />
-          <span className="text-xs sm:text-sm md:text-[15px] text-[#1d1d1f] leading-tight">
-            Tous les styles disponibles
-          </span>
-        </li>
-        <li className="flex items-start gap-2.5 sm:gap-3">
-          <Check className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0 mt-0.5" />
-          <span className="text-xs sm:text-sm md:text-[15px] text-[#1d1d1f] leading-tight">
-            Usage commercial
-          </span>
-        </li>
+      <ul className="space-y-3 mb-8">
+        {[
+          `${plan.credits} générations HD`,
+          'Tous les styles inclus',
+          'Téléchargement illimité',
+          'Usage commercial OK',
+          'Crédits sans expiration',
+        ].map((feature, i) => (
+          <li key={i} className="flex items-center gap-3">
+            <div className="w-5 h-5 rounded-full bg-[#E8F4E5] flex items-center justify-center flex-shrink-0">
+              <Check className="w-3 h-3 text-[#4CAF50]" />
+            </div>
+            <span className="text-sm text-[#2D2D2D]">{feature}</span>
+          </li>
+        ))}
       </ul>
 
       <button
         onClick={onSelect}
         disabled={isLoading}
-        className={`w-full py-2.5 sm:py-3 rounded-full text-sm sm:text-base md:text-[17px] font-medium transition-all touch-manipulation min-h-[44px] sm:min-h-[48px] disabled:opacity-50 ${
+        className={`w-full py-3.5 rounded-full text-base font-medium transition-all disabled:opacity-50 ${
           plan.popular
-            ? 'bg-[#1d1d1f] text-white hover:bg-[#424245] active:scale-95'
-            : 'bg-[#f5f5f7] text-[#1d1d1f] hover:bg-[#e8e8ed] active:scale-95'
+            ? 'bg-gradient-to-r from-[#E07B54] to-[#D4603C] text-white hover:shadow-lg hover:shadow-[#E07B54]/30 active:scale-95'
+            : 'bg-[#2D2D2D] text-white hover:bg-[#3D3D3D] active:scale-95'
         }`}
       >
         {isLoading ? 'Chargement...' : 'Choisir ce pack'}
@@ -291,7 +391,7 @@ function PricingCard({
   );
 }
 
-// Carrousel mobile avec swipe
+// Carrousel mobile
 function MobileCarousel({ 
   plans, 
   onSelect,
@@ -301,12 +401,10 @@ function MobileCarousel({
   onSelect: (id: CreditPackId) => void;
   isLoading: boolean;
 }) {
-  const [currentIndex, setCurrentIndex] = useState(1); // Commencer par le plan "Pro" (populaire)
+  const [currentIndex, setCurrentIndex] = useState(1);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
-  const containerRef = useRef<HTMLDivElement>(null);
 
-  // Gestion du swipe
   const handleTouchStart = (e: React.TouchEvent) => {
     setTouchStart(e.targetTouches[0].clientX);
   };
@@ -317,30 +415,24 @@ function MobileCarousel({
 
   const handleTouchEnd = () => {
     if (touchStart - touchEnd > 75) {
-      // Swipe left
       setCurrentIndex((prev) => Math.min(plans.length - 1, prev + 1));
     }
     if (touchStart - touchEnd < -75) {
-      // Swipe right
       setCurrentIndex((prev) => Math.max(0, prev - 1));
     }
   };
 
   return (
     <div className="relative">
-      {/* Conteneur du carrousel */}
       <div
-        ref={containerRef}
         className="overflow-visible"
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
         <div
-          className="flex transition-transform duration-300 ease-out pt-4 pb-2"
-          style={{
-            transform: `translateX(-${currentIndex * 100}%)`,
-          }}
+          className="flex transition-transform duration-300 ease-out pt-6 pb-2"
+          style={{ transform: `translateX(-${currentIndex * 100}%)` }}
         >
           {plans.map((plan) => (
             <div key={plan.id} className="w-full flex-shrink-0 px-4">
@@ -354,25 +446,23 @@ function MobileCarousel({
         </div>
       </div>
 
-      {/* Indicateurs de points */}
+      {/* Dots */}
       <div className="flex justify-center gap-2 mt-6">
         {plans.map((_, index) => (
           <button
             key={index}
             onClick={() => setCurrentIndex(index)}
-            className={`h-2 rounded-full transition-all touch-manipulation ${
+            className={`h-2 rounded-full transition-all ${
               index === currentIndex
-                ? 'w-8 bg-[#1d1d1f]'
-                : 'w-2 bg-[#d2d2d7] hover:bg-[#86868b]'
+                ? 'w-8 bg-[#E07B54]'
+                : 'w-2 bg-[#E8D5CC] hover:bg-[#D4A599]'
             }`}
-            aria-label={`Aller au plan ${index + 1}`}
           />
         ))}
       </div>
-
-      {/* Texte d'instruction swipe */}
-      <p className="text-center text-xs text-[#86868b] mt-3">
-        ← Glissez pour voir les autres offres →
+      
+      <p className="text-center text-xs text-[#6B6B6B] mt-3">
+        ← Glissez pour voir les offres →
       </p>
     </div>
   );

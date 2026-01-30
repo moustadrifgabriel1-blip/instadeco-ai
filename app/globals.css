@@ -2,91 +2,313 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    --background: 40 20% 98%;
-    --foreground: 30 10% 15%;
-    
-    --card: 0 0% 100%;
-    --card-foreground: 30 10% 15%;
-    
-    --popover: 0 0% 100%;
-    --popover-foreground: 30 10% 15%;
-    
-    --primary: 30 10% 15%;
-    --primary-foreground: 40 20% 98%;
-    
-    --secondary: 40 10% 94%;
-    --secondary-foreground: 30 10% 15%;
-    
-    --muted: 40 10% 94%;
-    --muted-foreground: 30 5% 45%;
-    
-    --accent: 30 20% 92%;
-    --accent-foreground: 30 10% 15%;
-    
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
+/* ============================================
+   INSTADECO AI - DESIGN SYSTEM
+   Mode Clair + Mode Sombre
+   ============================================ */
 
-    --border: 30 10% 85%;
-    --input: 30 10% 85%;
-    --ring: 30 10% 15%;
-    
-    --radius: 0.75rem;
-  }
-  .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-  }
+:root {
+  /* === PALETTE MODE CLAIR === */
+  
+  /* Terracotta - Couleur principale */
+  --terracotta: #E07B54;
+  --terracotta-dark: #C95D3A;
+  --terracotta-light: #FFE4D9;
+  
+  /* Crème - Fond secondaire */
+  --cream: #FFF8F5;
+  
+  /* Textes */
+  --text-dark: #2D2D2D;
+  --text-muted: #6B6B6B;
+  
+  /* Bordures */
+  --border-color: #F0E6E0;
+  
+  /* Blanc */
+  --white: #FFFFFF;
+  
+  /* Shadcn variables */
+  --background: 0 0% 100%;
+  --foreground: 0 0% 18%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 18%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 18%;
+  --primary: 16 70% 60%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 20 60% 96%;
+  --secondary-foreground: 0 0% 18%;
+  --muted: 20 30% 96%;
+  --muted-foreground: 0 0% 42%;
+  --accent: 20 60% 96%;
+  --accent-foreground: 0 0% 18%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 20 30% 92%;
+  --input: 20 30% 92%;
+  --ring: 16 70% 60%;
+  --radius: 0.75rem;
 }
+
+/* === MODE SOMBRE === */
+.dark {
+  --terracotta: #F0936C;
+  --terracotta-dark: #E07B54;
+  --terracotta-light: #3D2A22;
+  
+  --cream: #1A1512;
+  --text-dark: #F5F5F5;
+  --text-muted: #A0A0A0;
+  --border-color: #3D3530;
+  --white: #0F0D0C;
+  
+  /* Shadcn variables */
+  --background: 15 10% 7%;
+  --foreground: 0 0% 96%;
+  --card: 15 8% 10%;
+  --card-foreground: 0 0% 96%;
+  --popover: 15 8% 10%;
+  --popover-foreground: 0 0% 96%;
+  --primary: 16 70% 65%;
+  --primary-foreground: 15 10% 7%;
+  --secondary: 15 10% 15%;
+  --secondary-foreground: 0 0% 96%;
+  --muted: 15 10% 15%;
+  --muted-foreground: 0 0% 65%;
+  --accent: 15 10% 18%;
+  --accent-foreground: 0 0% 96%;
+  --destructive: 0 62% 50%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 15 10% 20%;
+  --input: 15 10% 20%;
+  --ring: 16 70% 65%;
+}
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: var(--border-color);
   }
   
   html {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
   }
   
   body {
-    @apply bg-background text-foreground;
-    font-feature-settings: "ss01", "ss02", "cv01", "cv02";
+    background-color: var(--white);
+    color: var(--text-dark);
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
   
-  /* Apple-style text selection */
-  ::selection {
-    background-color: rgba(0, 113, 227, 0.2);
+  /* Mode sombre - Override Tailwind bg-background */
+  .dark body,
+  .dark {
+    background-color: var(--white);
+    color: var(--text-dark);
   }
 }
 
-@layer utilities {
-  /* Smooth transitions */
-  .transition-apple {
-    transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, var(--cream) 25%, var(--white) 50%, var(--cream) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}
+
+/* ============================================
+   COMPOSANTS UTILITAIRES
+   ============================================ */
+
+/* Texte gradient terracotta */
+.text-gradient {
+  background: linear-gradient(135deg, var(--terracotta), var(--terracotta-dark));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Fond gradient hero */
+.gradient-hero {
+  background: linear-gradient(180deg, var(--cream) 0%, var(--white) 100%);
+}
+
+/* Effet glass */
+.glass {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+}
+
+/* Bouton principal */
+.btn-primary {
+  background: linear-gradient(135deg, var(--terracotta), var(--terracotta-dark));
+  color: var(--white);
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  box-shadow: 0 8px 24px rgba(224, 123, 84, 0.35);
+  transform: translateY(-2px);
+}
+
+/* Ombres */
+.shadow-warm {
+  box-shadow: 0 4px 16px rgba(224, 123, 84, 0.15);
+}
+
+.shadow-warm-lg {
+  box-shadow: 0 8px 32px rgba(224, 123, 84, 0.2);
+}
+
+.shadow-soft {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+/* Hover effects */
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+}
+
+/* Transition fluide */
+.transition-smooth {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================
+   CARDS
+   ============================================ */
+
+.card-interactive {
+  background: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.card-interactive:hover {
+  border-color: var(--terracotta-light);
+  box-shadow: 0 12px 40px rgba(224, 123, 84, 0.12);
+}
+
+.dark .card-interactive:hover {
+  box-shadow: 0 12px 40px rgba(240, 147, 108, 0.08);
+}
+
+/* ============================================
+   BADGES
+   ============================================ */
+
+.badge-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--terracotta-light);
+  color: var(--terracotta-dark);
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* ============================================
+   SCROLLBAR CUSTOM
+   ============================================ */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--cream);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--terracotta-light);
+}
+
+/* Mode sombre - scrollbar */
+.dark ::-webkit-scrollbar-track {
+  background: var(--cream);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+}
+
+/* ============================================
+   FOCUS STATES (Accessibilité)
+   ============================================ */
+
+:focus-visible {
+  outline: 2px solid var(--terracotta);
+  outline-offset: 2px;
+}
+
+/* ============================================
+   RESPONSIVE HELPERS
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

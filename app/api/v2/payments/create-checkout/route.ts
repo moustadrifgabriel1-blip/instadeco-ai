@@ -2,12 +2,13 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { useCases } from '@/src/infrastructure/config/di-container';
 import { CREDIT_PRICES } from '@/src/shared/constants/pricing';
+import { checkRateLimit, getClientIP, RATE_LIMIT_CONFIGS } from '@/lib/security/rate-limiter';
 
 /**
  * Schéma de validation pour l'achat de crédits
  */
 const purchaseRequestSchema = z.object({
-  userId: z.string().min(1, 'userId requis'),
+  userId: z.string().uuid('ID utilisateur invalide'),
   email: z.string().email('Email invalide'),
   packId: z.enum(['pack_10', 'pack_25', 'pack_50', 'pack_100']).default('pack_10'),
   successUrl: z.string().url().optional(),
@@ -40,6 +41,17 @@ const PACK_CONFIG: Record<string, { priceId: string; credits: number }> = {
  * Crée une session Stripe pour l'achat de crédits via PurchaseCreditsUseCase
  */
 export async function POST(req: Request) {
+  // Rate limiting pour éviter les abus
+  const clientIP = getClientIP(req.headers);
+  const rateLimitResult = checkRateLimit(clientIP, RATE_LIMIT_CONFIGS.checkout);
+  
+  if (!rateLimitResult.success) {
+    return NextResponse.json(
+      { error: 'Trop de requêtes. Veuillez réessayer plus tard.' },
+      { status: 429, headers: { 'Retry-After': String(rateLimitResult.retryAfter) } }
+    );
+  }
+  
   try {
     const body = await req.json();
 

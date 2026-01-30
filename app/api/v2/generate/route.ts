@@ -4,16 +4,18 @@ import { useCases } from '@/src/infrastructure/config/di-container';
 import { GenerationMapper } from '@/src/application/mappers/GenerationMapper';
 import { DomainError } from '@/src/domain/errors/DomainError';
 import { InsufficientCreditsError } from '@/src/domain/errors/InsufficientCreditsError';
+import { checkRateLimit, getClientIP, RATE_LIMIT_CONFIGS } from '@/lib/security/rate-limiter';
+import { logRateLimitExceeded, logGenerationCreated, logAuditEvent } from '@/lib/security/audit-logger';
 
 /**
  * Schéma de validation pour la génération
  */
 const generateRequestSchema = z.object({
   imageUrl: z.string().min(1, 'Image URL requise'),
-  roomType: z.string().default('salon'),
-  style: z.string().default('moderne'),
-  userId: z.string().min(1, 'Authentification requise'),
-  transformMode: z.string().default('full_redesign'),
+  roomType: z.string().max(50).regex(/^[a-z0-9-]+$/, 'Format invalide').default('salon'),
+  style: z.string().max(50).regex(/^[a-z0-9-]+$/, 'Format invalide').default('moderne'),
+  userId: z.string().uuid('ID utilisateur invalide'),
+  transformMode: z.enum(['full_redesign', 'rearrange', 'keep_layout', 'decor_only']).default('full_redesign'),
 });
 
 export const maxDuration = 60; // Set max duration to 60 seconds (Hobby limit usually 10s, Pro 300s)
@@ -28,6 +30,30 @@ export const dynamic = 'force-dynamic';
 export async function POST(req: Request) {
   const startTime = Date.now();
   console.log('[Generate V2] 🚀 Starting generation request');
+  
+  // Rate limiting
+  const clientIP = getClientIP(req.headers);
+  const rateLimitResult = checkRateLimit(clientIP, RATE_LIMIT_CONFIGS.generate);
+  
+  if (!rateLimitResult.success) {
+    console.warn(`[Generate V2] ⛔ Rate limit exceeded for IP: ${clientIP}`);
+    // Log l'abus
+    await logRateLimitExceeded(clientIP, '/api/v2/generate');
+    return NextResponse.json(
+      { 
+        error: 'Trop de requêtes. Veuillez réessayer plus tard.',
+        retryAfter: rateLimitResult.retryAfter,
+      },
+      { 
+        status: 429,
+        headers: {
+          'Retry-After': String(rateLimitResult.retryAfter),
+          'X-RateLimit-Remaining': '0',
+          'X-RateLimit-Reset': String(rateLimitResult.resetAt),
+        },
+      }
+    );
+  }
   
   try {
     const body = await req.json();
@@ -111,6 +137,9 @@ export async function POST(req: Request) {
 
     // Succès - retourner la génération
     const { generation, creditsRemaining } = result.data;
+
+    // Log audit de la génération réussie
+    await logGenerationCreated(userId, generation.id, clientIP);
 
     return NextResponse.json({
       success: true,

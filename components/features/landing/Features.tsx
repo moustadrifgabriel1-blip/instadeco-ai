@@ -1,7 +1,7 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { Zap, LayoutTemplate, Wallet, Palette, MousePointerClick, Download } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Zap, LayoutTemplate, Wallet, Palette, MousePointerClick, Download, LucideIcon } from 'lucide-react';
 
 const features = [
   {
@@ -36,31 +36,95 @@ const features = [
   }
 ];
 
-export function Features() {
+function FeatureCard({ 
+  feature, 
+  index, 
+  isVisible 
+}: { 
+  feature: { icon: LucideIcon; title: string; description: string }; 
+  index: number;
+  isVisible: boolean;
+}) {
+  const Icon = feature.icon;
+  
   return (
-    <section className="py-24 bg-secondary/30 relative overflow-hidden">
-      <div className="container px-4 md:px-6">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="text-3xl md:text-5xl font-heading font-bold mb-6">Pourquoi choisir InstaDeco ?</h2>
-          <p className="text-lg text-muted-foreground">Une technologie de pointe au service de votre créativité.</p>
+    <div
+      className={`group card-interactive p-8 transition-all duration-500 ${
+        isVisible 
+          ? 'opacity-100 translate-y-0' 
+          : 'opacity-0 translate-y-8'
+      }`}
+      style={{ transitionDelay: `${index * 100}ms` }}
+    >
+      {/* Icon */}
+      <div className="h-14 w-14 rounded-xl bg-[#FFE4D9] flex items-center justify-center mb-6 group-hover:bg-[#E07B54] transition-colors duration-300">
+        <Icon className="h-7 w-7 text-[#E07B54] group-hover:text-white transition-colors duration-300" />
+      </div>
+      
+      {/* Content */}
+      <h3 className="text-xl font-bold mb-3 text-[#2D2D2D]">
+        {feature.title}
+      </h3>
+      <p className="text-[#6B6B6B] leading-relaxed">
+        {feature.description}
+      </p>
+    </div>
+  );
+}
+
+export function Features() {
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <section ref={sectionRef} className="py-24 lg:py-32 bg-white relative overflow-hidden">
+      {/* Décorations */}
+      <div className="absolute top-20 right-[10%] w-48 h-48 bg-[#FFE4D9] rounded-full blur-3xl opacity-30" />
+      <div className="absolute bottom-20 left-[5%] w-40 h-40 bg-[#FFE4D9] rounded-full blur-3xl opacity-20" />
+      
+      <div className="container px-4 md:px-6 relative z-10">
+        {/* Header */}
+        <div className={`text-center max-w-3xl mx-auto mb-16 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <div className="badge-primary mx-auto mb-6">
+            <span>✨</span>
+            <span>Pourquoi nous choisir</span>
+          </div>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-heading font-bold mb-6 text-[#2D2D2D]">
+            Une expérience pensée pour{' '}
+            <span className="text-gradient">vous</span>
+          </h2>
+          <p className="text-lg md:text-xl text-[#6B6B6B]">
+            Une technologie de pointe au service de votre créativité.
+          </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {/* Feature cards grid */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {features.map((feature, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              className="bg-background p-8 rounded-2xl border border-border/50 hover:border-primary/20 hover:shadow-lg transition-all group"
-            >
-              <div className="h-12 w-12 bg-primary/5 rounded-xl flex items-center justify-center mb-6 group-hover:bg-primary/10 transition-colors">
-                <feature.icon className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
-              <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
-            </motion.div>
+            <FeatureCard 
+              key={index} 
+              feature={feature} 
+              index={index}
+              isVisible={isVisible}
+            />
           ))}
         </div>
       </div>

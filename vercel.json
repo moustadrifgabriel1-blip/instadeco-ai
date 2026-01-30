@@ -17,6 +17,14 @@
     {
       "path": "/api/cron/generate-articles",
       "schedule": "0 18 * * *"
+    },
+    {
+      "path": "/api/cron/check-milestones",
+      "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/maintenance-reminder",
+      "schedule": "0 8 * * *"
     }
   ],
   "headers": [

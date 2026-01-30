@@ -250,32 +250,36 @@ Le lecteur doit savoir EXACTEMENT ce qu'il gagne à lire.
 
 **⚠️ INTERDICTION FORMELLE de faire des murs de texte!**
 
-- **Paragraphes COURTS**: Maximum 3-4 lignes (50-80 mots)
-- **Phrases variées**: Mélange courtes (10 mots) et moyennes (20-25 mots)
-- **Espaces blancs**: La page doit "respirer" (50% de blanc)
+- **SOMMAIRE**: Commence TOUJOURS par un sommaire (Table des matières) avec des liens d'ancrage.
+- **FORMATTAGE MARKDOWN**: Utilise GRAS (**), ITALIQUE (*), TITRES (##, ###) pour structurer.
+- **Paragraphes COURTS**: Maximum 3-4 lignes.
+- **Phrases variées**: Mélange courtes et moyennes.
+- **Listes à puces**: Utilises-en BEAUCOUP (au moins 3 par article).
+
+### 🖼️ RÈGLE DES IMAGES IN-TEXT
+Pour casser le texte, insère des placeholders d'images tous les 300 mots.
+Syntaxe STRICTE: ![Description de l'image](IMAGE:mot_cle_anglais_simple)
+Exemple: ![Un salon moderne et lumineux](IMAGE:living_room) ou ![Une cuisine minimaliste](IMAGE:kitchen)
 
 ### 📊 RÈGLE DES "PATTERN INTERRUPTS" (Rupteurs visuels)
-**Tous les 250-300 mots, tu DOIS casser la monotonie avec UN de ces éléments:**
+**Tous les 250-300 mots, tu DOIS utiliser un de ces éléments HTML:**
 
-1. **Liste à puces ou numérotée** (3-7 items)
-2. **Citation en exergue** (Blockquote) pour une phrase choc:
+1. **Citation en exergue** (Blockquote):
    <blockquote class="expert-tip">
-   <p>"Les espaces vides ne sont pas du gaspillage, ils sont essentiels à l'harmonie visuelle." — Designer anonyme</p>
+   <p>"Citation pertinente..."</p>
    </blockquote>
 
-3. **Encadré "À Retenir"** (fond jaune):
+2. **Encadré "À Retenir"** (fond jaune):
    <div class="key-takeaway">
    <strong>💡 À retenir:</strong>
-   <p>[Résumé du point clé en 1-2 phrases]</p>
+   <p>Point clé...</p>
    </div>
 
-4. **Encadré "Astuce Pro"** (fond bleu):
+3. **Encadré "Astuce Pro"** (fond bleu):
    <div class="pro-tip">
    <strong>🎯 Astuce Pro:</strong>
-   <p>[Conseil avancé pour experts]</p>
+   <p>Conseil expert...</p>
    </div>
-
-5. **Mots en gras** pour concepts clés (PAS des phrases entières!)
 
 ## 🎭 RÈGLE 3: TON & STYLE COPYWRITING
 

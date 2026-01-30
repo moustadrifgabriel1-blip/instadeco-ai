@@ -1,84 +1,155 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { Sparkles, ArrowRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
+import { Sparkles, ArrowRight, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import Image from 'next/image';
-import { BeforeAfter } from './BeforeAfter';
+
+// Lazy load BeforeAfter
+const BeforeAfter = dynamic(() => import('./BeforeAfter').then(mod => ({ default: mod.BeforeAfter })), {
+  loading: () => (
+    <div className="w-full aspect-[4/3] rounded-2xl bg-[#FFF8F5] animate-shimmer" />
+  ),
+  ssr: false
+});
+
+// Styles disponibles pour l'animation
+const styles = ['Moderne', 'Scandinave', 'Bohème', 'Japandi', 'Industrial'];
 
 export function Hero() {
-  return (
-    <section className="relative overflow-hidden pt-12 pb-24 lg:pt-20 lg:pb-32">
-      {/* Background gradients */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-primary/5 rounded-full blur-[100px] -z-10" />
-      <div className="absolute bottom-0 right-0 w-[800px] h-[600px] bg-accent/20 rounded-full blur-[100px] -z-10" />
+  const [currentStyle, setCurrentStyle] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
 
-      <div className="container px-4 md:px-6">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="flex flex-col gap-6"
-          >
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/5 border border-primary/10 w-fit">
-              <Sparkles className="h-4 w-4 text-primary" />
-              <span className="text-sm font-medium text-primary">IA Générative Nouvelle Génération</span>
+  useEffect(() => {
+    setIsVisible(true);
+    const interval = setInterval(() => {
+      setCurrentStyle((prev) => (prev + 1) % styles.length);
+    }, 2500);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <section className="relative min-h-[90vh] flex items-center overflow-hidden gradient-hero">
+      {/* Formes décoratives */}
+      <div className="absolute top-20 left-[10%] w-72 h-72 rounded-full bg-[#FFE4D9] opacity-40 blur-3xl animate-float" />
+      <div className="absolute bottom-20 right-[15%] w-64 h-64 rounded-full bg-[#FFE4D9] opacity-30 blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+
+      <div className="container relative z-10 px-4 md:px-6 py-12">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          
+          {/* Contenu texte */}
+          <div className={`flex flex-col gap-8 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+            
+            {/* Badge */}
+            <div className="badge-primary w-fit">
+              <Sparkles className="h-4 w-4" />
+              <span>Nouveau : IA Génération 2026</span>
             </div>
             
-            <h1 className="text-4xl md:text-5xl lg:text-7xl font-heading font-bold tracking-tight text-foreground leading-[1.1]">
-              Réinventez votre <span className="text-primary italic">intérieur</span> en un clic
-            </h1>
+            {/* Titre principal */}
+            <div className="space-y-2">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold tracking-tight text-[#2D2D2D] leading-[1.1]">
+                Transformez votre espace en style{' '}
+                <span className="text-gradient italic">{styles[currentStyle]}</span>
+              </h1>
+            </div>
             
-            <p className="text-lg md:text-xl text-muted-foreground max-w-[600px] leading-relaxed">
-              Téléchargez une photo de votre pièce et laissez notre IA la transformer instantanément. 
-              Des dizaines de styles à portée de main, sans travaux ni architecte.
+            {/* Description */}
+            <p className="text-lg md:text-xl text-[#6B6B6B] max-w-xl leading-relaxed">
+              Uploadez une photo, choisissez un style, et regardez votre pièce se 
+              transformer en <span className="font-semibold text-[#E07B54]">moins de 30 secondes</span>. 
+              Sans travaux, sans architecte.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 mt-2">
-              <Button size="lg" className="h-14 px-8 text-lg rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all hover:scale-105" asChild>
-                <Link href="/generate">
-                  Commencer gratuitement
-                  <ArrowRight className="ml-2 h-5 w-5" />
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button 
+                size="lg" 
+                className="group h-14 px-8 text-lg rounded-xl btn-primary" 
+                asChild
+              >
+                <Link href="/generate" className="flex items-center gap-2">
+                  <span>Essayer gratuitement</span>
+                  <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" className="h-14 px-8 text-lg rounded-full border-2 hover:bg-accent/50" asChild>
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="h-14 px-8 text-lg rounded-xl border-2 border-[#F0E6E0] text-[#2D2D2D] hover:bg-[#FFF8F5] hover:border-[#E07B54] transition-smooth" 
+                asChild
+              >
                 <Link href="/pricing">
-                  Voir les exemples
+                  Voir une démo
                 </Link>
               </Button>
             </div>
 
-            <div className="flex items-center gap-4 text-sm text-muted-foreground mt-4">
-              <div className="flex -space-x-2">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="h-8 w-8 rounded-full border-2 border-background bg-muted overflow-hidden relative">
-                    <Image 
-                      src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${i}`} 
-                      alt="User" 
-                      fill
-                      className="object-cover"
+            {/* Social Proof */}
+            <div className="flex flex-wrap items-center gap-6 pt-4">
+              <div className="flex items-center gap-3">
+                <div className="flex -space-x-2">
+                  {[
+                    'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&crop=face',
+                    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face',
+                    'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=face',
+                    'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&crop=face'
+                  ].map((src, i) => (
+                    <img 
+                      key={i}
+                      src={src}
+                      alt={`Utilisateur ${i + 1}`}
+                      className="h-10 w-10 rounded-full border-2 border-white object-cover shadow-soft"
                     />
-                  </div>
-                ))}
+                  ))}
+                </div>
+                <div className="text-sm">
+                  <p className="font-semibold text-[#2D2D2D]">+12,000 créateurs</p>
+                  <p className="text-[#6B6B6B]">nous font confiance</p>
+                </div>
               </div>
-              <p>Déjà utilisé par +10,000 décorateurs</p>
+              
+              {/* Rating */}
+              <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-[#F0E6E0]">
+                <div className="flex">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
+                  ))}
+                </div>
+                <span className="text-sm font-medium text-[#2D2D2D]">4.9/5</span>
+              </div>
             </div>
-          </motion.div>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="relative"
-          >
-            <BeforeAfter />
-            {/* Decorative elements */}
-            <div className="absolute -top-12 -right-12 text-9xl opacity-5 pointer-events-none select-none font-heading">
-              ✦
+          {/* Visuel interactif */}
+          <div className={`relative transition-all duration-700 delay-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+            {/* Container principal */}
+            <div className="relative rounded-2xl overflow-hidden shadow-warm-lg border border-[#F0E6E0]">
+              <BeforeAfter />
             </div>
-          </motion.div>
+            
+            {/* Badge flottant */}
+            <div className="absolute -bottom-4 -left-4 glass rounded-xl px-4 py-3 shadow-warm animate-float" style={{ animationDelay: '0.5s' }}>
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-lg bg-[#E07B54] flex items-center justify-center">
+                  <Sparkles className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <p className="font-semibold text-[#2D2D2D] text-sm">IA Générative</p>
+                  <p className="text-xs text-[#6B6B6B]">Résultat en 30s</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Scroll indicator */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-[#6B6B6B] animate-pulse-soft">
+        <span className="text-sm">Découvrir</span>
+        <div className="w-6 h-10 rounded-full border-2 border-current flex items-start justify-center p-1">
+          <div className="w-1.5 h-3 rounded-full bg-current" />
         </div>
       </div>
     </section>

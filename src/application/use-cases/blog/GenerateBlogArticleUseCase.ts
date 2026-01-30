@@ -34,7 +34,7 @@ export interface IAntiAIPostProcessor {
 }
 
 export interface IInternalLinksService {
-  addLinks(content: string, currentSlug?: string): string;
+  addInternalLinks(content: string, currentArticleId?: string, sessionType?: string): Promise<{ content: string }>;
 }
 
 export class GenerateBlogArticleUseCase {
@@ -103,7 +103,9 @@ export class GenerateBlogArticleUseCase {
       }
 
       // 7. Ajouter les liens internes
-      const contentWithLinks = this.internalLinksService.addLinks(cleanedContent, slug);
+      // Note: On passe undefined pour l'ID car l'article n'est pas encore créé
+      const linkResult = await this.internalLinksService.addInternalLinks(cleanedContent, undefined, sessionType);
+      const contentWithLinks = linkResult.content;
 
       // 8. Créer l'entité article
       const article = createBlogArticle({

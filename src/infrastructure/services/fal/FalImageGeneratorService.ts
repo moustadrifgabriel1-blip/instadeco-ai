@@ -182,40 +182,88 @@ export class FalImageGeneratorService implements IImageGeneratorService {
     try {
       console.log('[Fal.ai] 🔄 Checking status for:', predictionId);
       
-      const status = await fal.queue.status(MODEL_PATH, {
-        requestId: predictionId,
-        logs: false // Reduce verbosity
+      // Utiliser l'API REST directement pour plus de contrôle
+      const FAL_KEY = process.env.FAL_KEY || process.env.FAL_API_KEY;
+      const statusUrl = `https://queue.fal.run/${MODEL_PATH}/requests/${predictionId}/status`;
+      
+      const statusResponse = await fetch(statusUrl, {
+        headers: {
+          'Authorization': `Key ${FAL_KEY}`,
+        }
       });
-
-      const statusData = (status as any).data || status;
+      
+      if (!statusResponse.ok) {
+        console.error('[Fal.ai] Status request failed:', statusResponse.status);
+        return failure(new Error(`Status check failed: ${statusResponse.status}`));
+      }
+      
+      const statusData = await statusResponse.json();
       const statusCode = (statusData?.status || 'UNKNOWN').toUpperCase();
 
       console.log(`[Fal.ai] Status: ${statusCode} (${predictionId})`);
+      console.log('[Fal.ai] Status response keys:', Object.keys(statusData || {}));
 
       if (statusCode === 'COMPLETED' || statusCode === 'SUCCEEDED' || statusCode === 'OK') {
-         console.log('[Fal.ai] ✅ Job completed, fetching result...');
-         
-         const result = await fal.queue.result(MODEL_PATH, {
-           requestId: predictionId
-         });
-         
-         const data = (result as any).data || result;
-         console.log('[Fal.ai] Result data keys:', Object.keys(data || {}));
-         
-         // Flux returns 'images': [{url: ...}]
-         const imageUrl = data?.images?.[0]?.url || data?.image?.url;
+        console.log('[Fal.ai] ✅ Job completed, fetching result...');
+        
+        // D'abord vérifier si le résultat est déjà dans la réponse de status
+        // (certaines versions de l'API retournent le résultat directement)
+        if (statusData?.images?.[0]?.url) {
+          console.log('[Fal.ai] ✅ Image found directly in status response');
+          return success({ 
+            status: 'succeeded',
+            output: { imageUrl: statusData.images[0].url }
+          });
+        }
+        
+        if (statusData?.response?.images?.[0]?.url) {
+          console.log('[Fal.ai] ✅ Image found in status.response');
+          return success({ 
+            status: 'succeeded',
+            output: { imageUrl: statusData.response.images[0].url }
+          });
+        }
+        
+        // Sinon, utiliser l'API REST pour récupérer le résultat
+        const resultUrl = `https://queue.fal.run/${MODEL_PATH}/requests/${predictionId}`;
+        
+        try {
+          const resultResponse = await fetch(resultUrl, {
+            headers: {
+              'Authorization': `Key ${FAL_KEY}`,
+            }
+          });
+          
+          const responseText = await resultResponse.text();
+          console.log('[Fal.ai] Result response status:', resultResponse.status);
+          console.log('[Fal.ai] Result response body (first 500 chars):', responseText.slice(0, 500));
+          
+          if (!resultResponse.ok) {
+            console.error('[Fal.ai] ❌ Result request failed:', resultResponse.status, responseText);
+            return failure(new Error(`Result fetch failed: ${resultResponse.status}`));
+          }
+          
+          const data = JSON.parse(responseText);
+          console.log('[Fal.ai] Result data keys:', Object.keys(data || {}));
+          
+          // Flux returns 'images': [{url: ...}]
+          const imageUrl = data?.images?.[0]?.url || data?.image?.url || data?.response?.images?.[0]?.url;
 
-         if (!imageUrl) {
+          if (!imageUrl) {
             console.error('[Fal.ai] ❌ No image URL in result:', JSON.stringify(data).slice(0, 500));
             return failure(new Error('No image URL in result'));
-         }
-         
-         console.log('[Fal.ai] ✅ Image URL found:', imageUrl.slice(0, 80) + '...');
-         
-         return success({ 
-           status: 'succeeded',
-           output: { imageUrl }
-         });
+          }
+          
+          console.log('[Fal.ai] ✅ Image URL found:', imageUrl.slice(0, 80) + '...');
+          
+          return success({ 
+            status: 'succeeded',
+            output: { imageUrl }
+          });
+        } catch (resultError: any) {
+          console.error('[Fal.ai] ❌ Error fetching result:', resultError?.message || resultError);
+          return failure(new Error(`Failed to fetch result: ${resultError?.message || resultError}`));
+        }
       } else if (['IN_PROGRESS', 'IN_QUEUE', 'QUEUED', 'PENDING', 'RUNNING', 'STARTING'].includes(statusCode)) {
         return success({ status: 'processing', logs: statusData.logs });
       } else if (statusCode === 'FAILED' || statusCode === 'ERROR') {
