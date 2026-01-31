@@ -10,6 +10,7 @@ import { Sparkles, Heart } from 'lucide-react';
 const footerLinks = {
   product: [
     { href: '/generate', label: 'Générer une image' },
+    { href: '/exemples', label: 'Exemples' },
     { href: '/pricing', label: 'Tarifs' },
     { href: '/blog', label: 'Blog' },
   ],

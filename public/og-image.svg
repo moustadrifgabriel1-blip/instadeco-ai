@@ -1,0 +1,44 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background gradient -->
+  <rect width="1200" height="630" fill="url(#gradient)"/>
+  
+  <!-- Pattern overlay -->
+  <rect width="1200" height="630" fill="url(#pattern)" opacity="0.05"/>
+  
+  <!-- Logo circle -->
+  <circle cx="600" cy="250" r="80" fill="white" fill-opacity="0.15"/>
+  <circle cx="600" cy="250" r="60" fill="white"/>
+  
+  <!-- Sparkle icon -->
+  <path d="M600 200 L596 224 L572 228 L596 232 L600 256 L604 232 L628 228 L604 224 Z" fill="#E07B54"/>
+  <path d="M580 190 L580 200" stroke="#E07B54" stroke-width="3" stroke-linecap="round"/>
+  <path d="M620 260 L620 270" stroke="#E07B54" stroke-width="3" stroke-linecap="round"/>
+  <path d="M570 198 L580 198" stroke="#E07B54" stroke-width="3" stroke-linecap="round"/>
+  <path d="M620 258 L630 258" stroke="#E07B54" stroke-width="3" stroke-linecap="round"/>
+  
+  <!-- Title -->
+  <text x="600" y="380" font-family="system-ui, -apple-system, sans-serif" font-size="56" font-weight="700" fill="white" text-anchor="middle">InstaDeco AI</text>
+  
+  <!-- Subtitle -->
+  <text x="600" y="440" font-family="system-ui, -apple-system, sans-serif" font-size="28" fill="white" fill-opacity="0.9" text-anchor="middle">Décoration d'intérieur par Intelligence Artificielle</text>
+  
+  <!-- CTA -->
+  <rect x="450" y="480" width="300" height="50" rx="25" fill="white"/>
+  <text x="600" y="513" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="600" fill="#E07B54" text-anchor="middle">Transformez votre intérieur</text>
+  
+  <!-- Decorative circles -->
+  <circle cx="100" cy="100" r="60" fill="white" fill-opacity="0.1"/>
+  <circle cx="1100" cy="530" r="80" fill="white" fill-opacity="0.08"/>
+  <circle cx="1050" cy="80" r="40" fill="white" fill-opacity="0.06"/>
+  
+  <defs>
+    <linearGradient id="gradient" x1="0" y1="0" x2="1200" y2="630">
+      <stop offset="0%" stop-color="#E07B54"/>
+      <stop offset="50%" stop-color="#D4603C"/>
+      <stop offset="100%" stop-color="#C4503C"/>
+    </linearGradient>
+    <pattern id="pattern" patternUnits="userSpaceOnUse" width="40" height="40">
+      <circle cx="20" cy="20" r="2" fill="white"/>
+    </pattern>
+  </defs>
+</svg>
