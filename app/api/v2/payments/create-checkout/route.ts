@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { useCases } from '@/src/infrastructure/config/di-container';
-import { CREDIT_PRICES } from '@/src/shared/constants/pricing';
 import { checkRateLimit, getClientIP, RATE_LIMIT_CONFIGS } from '@/lib/security/rate-limiter';
 
 /**
@@ -15,25 +14,39 @@ const purchaseRequestSchema = z.object({
   cancelUrl: z.string().url().optional(),
 });
 
-// Mapping des packIds vers les configs
-const PACK_CONFIG: Record<string, { priceId: string; credits: number }> = {
-  pack_10: {
-    priceId: CREDIT_PRICES.PACK_10.stripePriceId || '',
-    credits: CREDIT_PRICES.PACK_10.credits,
-  },
-  pack_25: {
-    priceId: CREDIT_PRICES.PACK_25.stripePriceId || '',
-    credits: CREDIT_PRICES.PACK_25.credits,
-  },
-  pack_50: {
-    priceId: CREDIT_PRICES.PACK_50.stripePriceId || '',
-    credits: CREDIT_PRICES.PACK_50.credits,
-  },
-  pack_100: {
-    priceId: CREDIT_PRICES.PACK_100.stripePriceId || '',
-    credits: CREDIT_PRICES.PACK_100.credits,
-  },
-};
+// Fonction pour obtenir la config du pack au runtime
+function getPackConfig(packId: string): { priceId: string; credits: number } | null {
+  const configs: Record<string, { priceId: string | undefined; credits: number }> = {
+    pack_10: {
+      priceId: process.env.STRIPE_PRICE_STARTER || process.env.STRIPE_PRICE_10_CREDITS,
+      credits: 10,
+    },
+    pack_25: {
+      priceId: process.env.STRIPE_PRICE_PRO || process.env.STRIPE_PRICE_25_CREDITS,
+      credits: 25,
+    },
+    pack_50: {
+      priceId: process.env.STRIPE_PRICE_UNLIMITED || process.env.STRIPE_PRICE_50_CREDITS,
+      credits: 50,
+    },
+    pack_100: {
+      priceId: process.env.STRIPE_PRICE_100_CREDITS,
+      credits: 100,
+    },
+  };
+
+  const config = configs[packId];
+  if (!config || !config.priceId) {
+    console.error(`[Payments] Missing price ID for pack: ${packId}`, {
+      STRIPE_PRICE_STARTER: process.env.STRIPE_PRICE_STARTER ? 'set' : 'missing',
+      STRIPE_PRICE_PRO: process.env.STRIPE_PRICE_PRO ? 'set' : 'missing',
+      STRIPE_PRICE_UNLIMITED: process.env.STRIPE_PRICE_UNLIMITED ? 'set' : 'missing',
+    });
+    return null;
+  }
+
+  return { priceId: config.priceId, credits: config.credits };
+}
 
 /**
  * POST /api/v2/payments/create-checkout
@@ -70,11 +83,11 @@ export async function POST(req: Request) {
 
     const { userId, email, packId, successUrl, cancelUrl } = validation.data;
 
-    // Récupérer la config du pack
-    const packConfig = PACK_CONFIG[packId];
-    if (!packConfig || !packConfig.priceId) {
+    // Récupérer la config du pack au runtime
+    const packConfig = getPackConfig(packId);
+    if (!packConfig) {
       return NextResponse.json(
-        { error: 'Pack invalide ou non configuré' },
+        { error: 'Pack invalide ou non configuré. Vérifiez les variables STRIPE_PRICE_* sur Vercel.' },
         { status: 400 }
       );
     }
