@@ -14,3 +14,4 @@ export async function GET() {
     timestamp: new Date().toISOString(),
   });
 }
+// Force redeploy 1769965248
