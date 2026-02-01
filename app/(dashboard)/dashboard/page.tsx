@@ -272,20 +272,29 @@ export default function DashboardPageV2() {
     try {
       const downloadUrl = `/api/v2/download?id=${generationId}`;
       
+      // Faire un fetch pour vérifier que l'API répond correctement
+      const response = await fetch(downloadUrl);
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Erreur de téléchargement');
+      }
+      
+      // Télécharger le blob avec le filigrane
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      
       const link = document.createElement('a');
-      link.href = downloadUrl;
+      link.href = blobUrl;
       link.download = `instadeco-${generationId}.jpg`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
     } catch (error) {
       console.error('Erreur téléchargement:', error);
-      // Fallback: télécharger l'URL directement
-      const link = document.createElement('a');
-      link.href = outputUrl;
-      link.target = '_blank';
-      link.download = `instadeco-${generationId}.jpg`;
-      link.click();
+      // SÉCURITÉ: Ne jamais permettre le téléchargement sans filigrane
+      alert('Erreur lors du téléchargement. Veuillez réessayer ou débloquer la version HD.');
     }
   };
 

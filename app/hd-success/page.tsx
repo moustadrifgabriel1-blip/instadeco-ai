@@ -28,7 +28,8 @@ function HDSuccessContent() {
     }
 
     try {
-      const response = await fetch('/api/hd-unlock/download', {
+      // Utiliser l'API V2 de confirmation HD
+      const response = await fetch('/api/v2/hd-unlock/confirm', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -42,7 +43,8 @@ function HDSuccessContent() {
       if (response.ok && data.success) {
         setStatus('success');
         setImageUrl(data.imageUrl);
-        setDownloadUrl(data.downloadUrl);
+        // Le downloadUrl passe par l'API sécurisée
+        setDownloadUrl(`/api/v2/download?id=${generationId}`);
       } else {
         setStatus('error');
         setErrorMessage(data.error || 'Erreur lors du déverrouillage');
@@ -58,18 +60,28 @@ function HDSuccessContent() {
     verifyAndUnlock();
   }, [verifyAndUnlock]);
 
-  const handleDownload = () => {
-    if (downloadUrl) {
-      window.open(downloadUrl, '_blank');
-    } else if (imageUrl) {
-      // Fallback: ouvrir l'image directement
+  const handleDownload = async () => {
+    // Télécharger via l'API sécurisée (qui gère le watermark selon hd_unlocked)
+    try {
+      const url = downloadUrl || `/api/v2/download?id=${generationId}`;
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error('Erreur de téléchargement');
+      }
+      
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
-      link.href = imageUrl;
+      link.href = blobUrl;
       link.download = `instadeco-hd-${generationId?.slice(0, 8)}.jpg`;
-      link.target = '_blank';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.error('Erreur téléchargement:', error);
+      alert('Erreur lors du téléchargement. Veuillez réessayer.');
     }
   };
 

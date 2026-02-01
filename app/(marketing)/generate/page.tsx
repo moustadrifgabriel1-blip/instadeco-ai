@@ -229,6 +229,33 @@ function GenerateContent() {
   const handleDownload = async () => {
     if (!generatedImage) return;
     
+    // SÉCURITÉ: Priorité à l'API serveur si on a un generationId
+    if (generationId) {
+      try {
+        const downloadUrl = `/api/v2/download?id=${generationId}`;
+        const response = await fetch(downloadUrl);
+        
+        if (!response.ok) {
+          throw new Error('Erreur de téléchargement');
+        }
+        
+        const blob = await response.blob();
+        const blobUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = 'instadeco-apercu.jpg';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(blobUrl);
+        return;
+      } catch (err) {
+        console.error('Erreur téléchargement via API:', err);
+        // Continuer avec le watermark Canvas en fallback
+      }
+    }
+    
+    // Fallback: Watermark côté client avec Canvas
     try {
       const watermarkedUrl = await addWatermarkToImage(generatedImage);
       const link = document.createElement('a');
@@ -238,10 +265,8 @@ function GenerateContent() {
       setTimeout(() => URL.revokeObjectURL(watermarkedUrl), 1000);
     } catch (err) {
       console.error('Erreur lors du téléchargement:', err);
-      const link = document.createElement('a');
-      link.href = generatedImage;
-      link.download = 'instadeco-apercu.jpg';
-      link.click();
+      // SÉCURITÉ: Ne jamais télécharger sans filigrane
+      alert('Erreur lors du téléchargement. Veuillez réessayer depuis votre tableau de bord.');
     }
   };
 

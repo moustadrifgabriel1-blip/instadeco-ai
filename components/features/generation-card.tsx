@@ -14,6 +14,7 @@ interface GenerationCardProps {
   status: 'pending' | 'processing' | 'completed' | 'failed';
   createdAt: string;
   errorMessage?: string;
+  hdUnlocked?: boolean;
   children?: React.ReactNode;
 }
 
@@ -26,23 +27,32 @@ export function GenerationCard({
   status,
   createdAt,
   errorMessage,
+  hdUnlocked = false,
   children
 }: GenerationCardProps) {
-  const handleDownload = async (url: string) => {
+  const handleDownload = async () => {
     try {
-      const response = await fetch(url);
+      // SÉCURITÉ: Toujours passer par l'API qui gère le filigrane
+      const downloadUrl = `/api/v2/download?id=${id}`;
+      const response = await fetch(downloadUrl);
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Erreur de téléchargement');
+      }
+      
       const blob = await response.blob();
-      const downloadUrl = window.URL.createObjectURL(blob);
+      const blobUrl = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
-      link.href = downloadUrl;
-      link.download = `instadeco-${id}.jpg`;
+      link.href = blobUrl;
+      link.download = hdUnlocked ? `instadeco-hd-${id}.jpg` : `instadeco-${id}.jpg`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      window.URL.revokeObjectURL(downloadUrl);
+      window.URL.revokeObjectURL(blobUrl);
     } catch (error) {
       console.error('Erreur téléchargement:', error);
-      alert('Erreur lors du téléchargement');
+      alert('Erreur lors du téléchargement. Veuillez réessayer.');
     }
   };
 
@@ -113,7 +123,7 @@ export function GenerationCard({
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
             <div className="flex gap-2">
               <Button
-                onClick={() => handleDownload(outputImageUrl)}
+                onClick={handleDownload}
                 size="sm"
                 className="bg-white text-gray-900 hover:bg-gray-100"
               >

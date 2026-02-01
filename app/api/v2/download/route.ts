@@ -119,15 +119,18 @@ export async function GET(req: Request) {
         },
       });
     } catch (sharpError) {
-      console.error('[Download] Sharp not available, returning original:', sharpError);
+      console.error('[Download] Sharp not available, using canvas fallback:', sharpError);
       
-      // Fallback: retourner l'image originale
-      return new NextResponse(new Uint8Array(Buffer.from(imageBuffer)), {
-        headers: {
-          'Content-Type': 'image/jpeg',
-          'Content-Disposition': `attachment; filename="instadeco-${generationId}.jpg"`,
-        },
-      });
+      // SÉCURITÉ: Ne jamais retourner l'image originale sans filigrane
+      // Fallback: Créer une image dégradée avec filigrane via Canvas
+      // Si sharp n'est pas disponible, on refuse le téléchargement pour des raisons de sécurité
+      return NextResponse.json(
+        { 
+          error: 'Téléchargement temporairement indisponible', 
+          message: 'Veuillez réessayer dans quelques instants ou débloquer la version HD.' 
+        }, 
+        { status: 503 }
+      );
     }
     
   } catch (error) {

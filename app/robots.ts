@@ -24,7 +24,6 @@ export default function robots(): MetadataRoute.Robots {
           '/auth/',          // Callback auth
           '/credits/',       // Pages post-paiement
           '/hd-success/',    // Page succès HD
-          '/download-hd/',   // Page téléchargement HD
           '/seed/',          // Page de test
         ],
       },
