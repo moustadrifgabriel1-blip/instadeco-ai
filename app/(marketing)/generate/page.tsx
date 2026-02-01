@@ -148,7 +148,7 @@ function GenerateContent() {
     });
   };
 
-  // Fonction pour ajouter le filigrane sur l'image
+  // Fonction pour ajouter le filigrane sur l'image - TRÈS VISIBLE pour encourager l'achat HD
   const addWatermarkToImage = async (imageUrl: string): Promise<string> => {
     return new Promise((resolve, reject) => {
       const img = document.createElement('img');
@@ -166,48 +166,77 @@ function GenerateContent() {
         canvas.height = img.height;
         ctx.drawImage(img, 0, 0);
         
-        // Filigrane principal
-        const mainText = 'InstaDeco';
-        const fontSize = Math.max(img.width / 8, 60);
-        ctx.font = `bold ${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        
         const centerX = img.width / 2;
         const centerY = img.height / 2;
         
+        // Bande semi-transparente en diagonale
         ctx.save();
         ctx.translate(centerX, centerY);
-        ctx.rotate(-15 * Math.PI / 180);
-        
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-        ctx.shadowBlur = 10;
-        ctx.shadowOffsetX = 2;
-        ctx.shadowOffsetY = 2;
-        
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
-        ctx.fillText(mainText, 0, 0);
-        
-        ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
-        ctx.lineWidth = 2;
-        ctx.strokeText(mainText, 0, 0);
-        
+        ctx.rotate(-25 * Math.PI / 180);
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+        ctx.fillRect(-img.width, -60, img.width * 2, 120);
         ctx.restore();
         
-        // Mention IA
-        const aiText = 'Généré par IA';
-        const aiFontSize = Math.max(img.width / 50, 12);
-        ctx.font = `${aiFontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
-        ctx.textAlign = 'right';
-        ctx.textBaseline = 'bottom';
+        // Filigrane principal - GROS et VISIBLE
+        const mainText = 'InstaDeco';
+        const mainFontSize = Math.max(img.width / 5, 100);
+        ctx.font = `900 ${mainFontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        ctx.save();
+        ctx.translate(centerX, centerY);
+        ctx.rotate(-25 * Math.PI / 180);
         
         ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-        ctx.shadowBlur = 3;
-        ctx.shadowOffsetX = 1;
-        ctx.shadowOffsetY = 1;
+        ctx.shadowBlur = 8;
+        ctx.shadowOffsetX = 3;
+        ctx.shadowOffsetY = 3;
         
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-        ctx.fillText(aiText, img.width - 15, img.height - 10);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+        ctx.fillText(mainText, 0, 0);
+        ctx.restore();
+        
+        // Filigranes répétés - haut gauche
+        const subFontSize = Math.max(img.width / 12, 40);
+        ctx.font = `bold ${subFontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+        
+        ctx.save();
+        ctx.translate(img.width * 0.2, img.height * 0.15);
+        ctx.rotate(-25 * Math.PI / 180);
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+        ctx.shadowBlur = 4;
+        ctx.fillText(mainText, 0, 0);
+        ctx.restore();
+        
+        // Filigranes répétés - bas droite
+        ctx.save();
+        ctx.translate(img.width * 0.8, img.height * 0.85);
+        ctx.rotate(-25 * Math.PI / 180);
+        ctx.fillText(mainText, 0, 0);
+        ctx.restore();
+        
+        // Badge CTA en bas
+        const ctaFontSize = Math.max(img.width / 20, 24);
+        const badgeWidth = 340;
+        const badgeHeight = 42;
+        const badgeX = centerX - badgeWidth / 2;
+        const badgeY = img.height - 52;
+        
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+        ctx.shadowBlur = 6;
+        ctx.fillStyle = 'rgba(224, 123, 84, 0.9)';
+        ctx.beginPath();
+        ctx.roundRect(badgeX, badgeY, badgeWidth, badgeHeight, 21);
+        ctx.fill();
+        
+        ctx.shadowBlur = 0;
+        ctx.font = `bold ${ctaFontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+        ctx.fillStyle = 'white';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🔓 Débloquer en HD sans filigrane', centerX, badgeY + badgeHeight / 2);
         
         canvas.toBlob((blob) => {
           if (blob) {

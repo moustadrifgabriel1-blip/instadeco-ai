@@ -68,37 +68,90 @@ export async function GET(req: Request) {
       const width = metadata.width || 1024;
       const height = metadata.height || 768;
       
-      // Créer le SVG du filigrane
-      const fontSize = Math.max(width / 8, 60);
-      const aiFontSize = Math.max(width / 50, 12);
+      // Créer le SVG du filigrane - TRÈS VISIBLE pour encourager l'achat HD
+      const mainFontSize = Math.max(width / 5, 100); // Plus grand
+      const subFontSize = Math.max(width / 12, 40);
+      const ctaFontSize = Math.max(width / 18, 28);
       
       const watermarkSvg = `
         <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
-              <feDropShadow dx="2" dy="2" stdDeviation="3" flood-color="rgba(0,0,0,0.3)"/>
+              <feDropShadow dx="3" dy="3" stdDeviation="4" flood-color="rgba(0,0,0,0.5)"/>
+            </filter>
+            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+              <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
             </filter>
           </defs>
-          <g transform="translate(${width/2}, ${height/2}) rotate(-15)">
+          
+          <!-- Bande semi-transparente en diagonale -->
+          <g transform="translate(${width/2}, ${height/2}) rotate(-25)">
+            <rect x="${-width}" y="-60" width="${width * 2}" height="120" fill="rgba(0,0,0,0.35)"/>
+          </g>
+          
+          <!-- Logo principal InstaDeco - GROS et VISIBLE -->
+          <g transform="translate(${width/2}, ${height/2}) rotate(-25)">
             <text 
               x="0" y="0" 
-              font-family="Arial, sans-serif" 
-              font-size="${fontSize}" 
-              font-weight="bold" 
-              fill="rgba(255,255,255,0.45)" 
+              font-family="Arial, Helvetica, sans-serif" 
+              font-size="${mainFontSize}" 
+              font-weight="900" 
+              fill="rgba(255,255,255,0.85)" 
               text-anchor="middle" 
               dominant-baseline="middle"
               filter="url(#shadow)"
             >InstaDeco</text>
           </g>
-          <text 
-            x="${width - 15}" y="${height - 10}" 
-            font-family="Arial, sans-serif" 
-            font-size="${aiFontSize}" 
-            fill="rgba(255,255,255,0.6)" 
-            text-anchor="end"
+          
+          <!-- Filigrane répété en haut à gauche -->
+          <g transform="translate(${width * 0.2}, ${height * 0.15}) rotate(-25)">
+            <text 
+              x="0" y="0" 
+              font-family="Arial, sans-serif" 
+              font-size="${subFontSize}" 
+              font-weight="bold" 
+              fill="rgba(255,255,255,0.5)" 
+              text-anchor="middle" 
+              dominant-baseline="middle"
+              filter="url(#shadow)"
+            >InstaDeco</text>
+          </g>
+          
+          <!-- Filigrane répété en bas à droite -->
+          <g transform="translate(${width * 0.8}, ${height * 0.85}) rotate(-25)">
+            <text 
+              x="0" y="0" 
+              font-family="Arial, sans-serif" 
+              font-size="${subFontSize}" 
+              font-weight="bold" 
+              fill="rgba(255,255,255,0.5)" 
+              text-anchor="middle" 
+              dominant-baseline="middle"
+              filter="url(#shadow)"
+            >InstaDeco</text>
+          </g>
+          
+          <!-- Badge CTA en bas -->
+          <rect 
+            x="${width/2 - 180}" y="${height - 55}" 
+            width="360" height="45" 
+            rx="22" ry="22" 
+            fill="rgba(224,123,84,0.9)"
             filter="url(#shadow)"
-          >Généré par IA</text>
+          />
+          <text 
+            x="${width/2}" y="${height - 25}" 
+            font-family="Arial, sans-serif" 
+            font-size="${ctaFontSize}" 
+            font-weight="bold" 
+            fill="white" 
+            text-anchor="middle"
+            filter="url(#glow)"
+          >🔓 Débloquer en HD sans filigrane</text>
         </svg>
       `;
       
