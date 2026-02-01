@@ -151,11 +151,12 @@ export default function RootLayout({
         <meta name="format-detection" content="telephone=no" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
+        {/* Preload LCP images for faster rendering */}
+        <link rel="preload" as="image" href="/images/before-chambre-1.jpg" fetchPriority="high" />
+        <link rel="preload" as="image" href="/images/after-chambre-1.jpg" fetchPriority="high" />
         {/* Preconnect pour améliorer LCP */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link rel="dns-prefetch" href="https://api.dicebear.com" />
-        <link rel="dns-prefetch" href="https://images.unsplash.com" />
       </head>
       <body className={`${inter.variable} ${playfair.variable} font-sans min-h-screen bg-background text-foreground antialiased selection:bg-primary/20`}>
         <div className="min-h-screen flex flex-col">

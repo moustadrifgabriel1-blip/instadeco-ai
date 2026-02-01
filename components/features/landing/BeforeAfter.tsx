@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { ReactCompareSlider, ReactCompareSliderImage } from 'react-compare-slider';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -8,14 +9,26 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 const beforeAfterPairs = [
   {
     id: 'chambre-boheme',
-    // Remplacer par les vraies images locales une fois téléchargées
     before: '/images/before-chambre-1.jpg',
     after: '/images/after-chambre-1.jpg',
     title: 'Chambre → Style Bohème Moderne',
     description: 'Sol, meubles et décoration transformés par notre IA'
   },
-  // Fallback avec images Unsplash si les locales ne sont pas dispo
 ];
+
+// Composant Image optimisé pour le slider
+function OptimizedSliderImage({ src, alt, priority = false }: { src: string; alt: string; priority?: boolean }) {
+  return (
+    <Image
+      src={src}
+      alt={alt}
+      fill
+      sizes="(max-width: 768px) 100vw, 50vw"
+      className="object-cover"
+      priority={priority}
+    />
+  );
+}
 
 export function BeforeAfter() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -41,18 +54,14 @@ export function BeforeAfter() {
       <div className="relative w-full aspect-[3/4] md:aspect-[4/3] rounded-xl overflow-hidden shadow-2xl border border-white/10">
         <ReactCompareSlider
           itemOne={
-            <ReactCompareSliderImage
-              src={currentPair.before}
-              alt="Avant décoration"
-              style={{ objectFit: 'cover', width: '100%', height: '100%' }}
-            />
+            <div className="relative w-full h-full">
+              <OptimizedSliderImage src={currentPair.before} alt="Avant décoration" priority />
+            </div>
           }
           itemTwo={
-            <ReactCompareSliderImage
-              src={currentPair.after}
-              alt="Après décoration IA"
-              style={{ objectFit: 'cover', width: '100%', height: '100%' }}
-            />
+            <div className="relative w-full h-full">
+              <OptimizedSliderImage src={currentPair.after} alt="Après décoration IA" priority />
+            </div>
           }
           className="h-full w-full"
           position={50}

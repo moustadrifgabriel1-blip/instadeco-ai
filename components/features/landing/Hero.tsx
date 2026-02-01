@@ -1,18 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
+import Image from 'next/image';
 import { Sparkles, ArrowRight, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-
-// Lazy load BeforeAfter
-const BeforeAfter = dynamic(() => import('./BeforeAfter').then(mod => ({ default: mod.BeforeAfter })), {
-  loading: () => (
-    <div className="w-full aspect-[4/3] rounded-2xl bg-[#FFF8F5] animate-shimmer" />
-  ),
-  ssr: false
-});
+import { BeforeAfter } from './BeforeAfter';
 
 // Styles disponibles pour l'animation
 const styles = ['Moderne', 'Scandinave', 'Bohème', 'Japandi', 'Industrial'];
@@ -90,17 +83,15 @@ export function Hero() {
             <div className="flex flex-wrap items-center gap-6 pt-4">
               <div className="flex items-center gap-3">
                 <div className="flex -space-x-2">
-                  {[
-                    'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&crop=face',
-                    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face',
-                    'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=face',
-                    'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&crop=face'
-                  ].map((src, i) => (
-                    <img 
+                  {[1, 2, 3, 4].map((i) => (
+                    <Image 
                       key={i}
-                      src={src}
-                      alt={`Utilisateur ${i + 1}`}
+                      src={`/images/avatar-${i}.webp`}
+                      alt={`Utilisateur ${i}`}
+                      width={40}
+                      height={40}
                       className="h-10 w-10 rounded-full border-2 border-white object-cover shadow-soft"
+                      loading="lazy"
                     />
                   ))}
                 </div>
