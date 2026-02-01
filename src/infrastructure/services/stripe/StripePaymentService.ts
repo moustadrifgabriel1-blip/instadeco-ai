@@ -17,14 +17,16 @@ export class StripePaymentService implements IPaymentService {
 
   constructor() {
     const secretKey = process.env.STRIPE_SECRET_KEY;
-    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || '';
 
     if (!secretKey) {
       throw new Error('STRIPE_SECRET_KEY is required');
     }
 
+    // Note: webhookSecret est optionnel pour les opérations de checkout
+    // mais requis pour la vérification des webhooks
     if (!webhookSecret) {
-      throw new Error('STRIPE_WEBHOOK_SECRET is required');
+      console.warn('[StripePaymentService] STRIPE_WEBHOOK_SECRET not set - webhook verification disabled');
     }
 
     this.stripe = new Stripe(secretKey, {
