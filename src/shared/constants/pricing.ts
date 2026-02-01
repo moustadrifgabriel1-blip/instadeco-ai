@@ -8,14 +8,14 @@ export const CREDIT_PRICES = {
     credits: 10,
     price: 990, // en centimes (9.90€)
     priceDisplay: '9,90 €',
-    stripePriceId: process.env.STRIPE_PRICE_10_CREDITS,
+    stripePriceId: process.env.STRIPE_PRICE_STARTER || process.env.STRIPE_PRICE_10_CREDITS,
   },
   PACK_25: {
     id: 'pack_25',
     credits: 25,
     price: 1990, // 19.90€
     priceDisplay: '19,90 €',
-    stripePriceId: process.env.STRIPE_PRICE_25_CREDITS,
+    stripePriceId: process.env.STRIPE_PRICE_PRO || process.env.STRIPE_PRICE_25_CREDITS,
     popular: true,
   },
   PACK_50: {
@@ -23,7 +23,7 @@ export const CREDIT_PRICES = {
     credits: 50,
     price: 3490, // 34.90€
     priceDisplay: '34,90 €',
-    stripePriceId: process.env.STRIPE_PRICE_50_CREDITS,
+    stripePriceId: process.env.STRIPE_PRICE_UNLIMITED || process.env.STRIPE_PRICE_50_CREDITS,
   },
   PACK_100: {
     id: 'pack_100',

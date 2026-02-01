@@ -120,14 +120,6 @@ export function GenerationCard({
                 <Download className="h-4 w-4 mr-1" />
                 Télécharger
               </Button>
-              <Button
-                onClick={() => window.open(outputImageUrl, '_blank')}
-                size="sm"
-                variant="outline"
-                className="bg-white/90 hover:bg-white"
-              >
-                Voir en grand
-              </Button>
             </div>
           </div>
         )}

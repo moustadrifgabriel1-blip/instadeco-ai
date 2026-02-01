@@ -132,12 +132,33 @@ export default function DashboardPageV2() {
 
   const handleUnlock = async (generationId: string) => {
     try {
-      const checkoutUrl = await unlock({ generationId });
-      if (checkoutUrl) {
-        window.location.href = checkoutUrl;
+      // Utiliser l'endpoint avec crédits au lieu de Stripe
+      const response = await fetch('/api/v2/hd-unlock/with-credit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ generationId }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 402) {
+          // Pas assez de crédits - rediriger vers pricing
+          alert('Crédits insuffisants. Achetez des crédits pour débloquer la HD.');
+          router.push('/pricing');
+          return;
+        }
+        throw new Error(data.error || 'Erreur lors du déblocage HD');
+      }
+
+      if (data.success) {
+        // Rafraîchir les données
+        refetchGenerations();
+        refetchCredits();
       }
     } catch (error) {
       console.error('Erreur unlock:', error);
+      alert(error instanceof Error ? error.message : 'Erreur lors du déblocage HD');
     }
   };
 
