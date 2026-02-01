@@ -232,10 +232,11 @@ const MAINTENANCE_TASKS: MaintenanceTask[] = [
   {
     id: 'check-scaling-needs',
     title: '📈 Évaluer les besoins de scaling',
-    description: 'Vérifier si les limites Supabase/Vercel approchent. Planifier les upgrades.',
+    description: 'Vérifier si les limites Supabase/Vercel approchent. Planifier les upgrades. ⚠️ Passer à Supabase Pro (25$/mois) quand: 50+ utilisateurs actifs OU 200MB+ stockage OU 500MB+ base de données.',
     frequency: 'monthly',
     category: 'infrastructure',
     priority: 'medium',
+    links: ['https://supabase.com/dashboard/project/_/settings/billing/usage', 'https://vercel.com/dashboard'],
     estimatedTime: '20 min',
   },
 ];
