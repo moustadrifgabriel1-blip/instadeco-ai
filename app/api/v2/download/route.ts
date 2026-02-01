@@ -93,7 +93,7 @@ export async function GET(req: Request) {
             <rect x="${-width}" y="-60" width="${width * 2}" height="120" fill="rgba(0,0,0,0.35)"/>
           </g>
           
-          <!-- Logo principal InstaDeco - GROS et VISIBLE -->
+          <!-- Logo principal InstaDeco AI - GROS et VISIBLE -->
           <g transform="translate(${width/2}, ${height/2}) rotate(-25)">
             <text 
               x="0" y="0" 
@@ -104,7 +104,7 @@ export async function GET(req: Request) {
               text-anchor="middle" 
               dominant-baseline="middle"
               filter="url(#shadow)"
-            >InstaDeco</text>
+            >InstaDeco AI</text>
           </g>
           
           <!-- Filigrane répété en haut à gauche -->
@@ -118,7 +118,7 @@ export async function GET(req: Request) {
               text-anchor="middle" 
               dominant-baseline="middle"
               filter="url(#shadow)"
-            >InstaDeco</text>
+            >InstaDeco AI</text>
           </g>
           
           <!-- Filigrane répété en bas à droite -->
@@ -128,6 +128,12 @@ export async function GET(req: Request) {
               font-family="Arial, sans-serif" 
               font-size="${subFontSize}" 
               font-weight="bold" 
+              fill="rgba(255,255,255,0.5)" 
+              text-anchor="middle" 
+              dominant-baseline="middle"
+              filter="url(#shadow)"
+            >InstaDeco AI</text>
+          </g>
               fill="rgba(255,255,255,0.5)" 
               text-anchor="middle" 
               dominant-baseline="middle"

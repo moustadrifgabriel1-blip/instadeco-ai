@@ -178,7 +178,7 @@ function GenerateContent() {
         ctx.restore();
         
         // Filigrane principal - GROS et VISIBLE
-        const mainText = 'InstaDeco';
+        const mainText = 'InstaDeco AI';
         const mainFontSize = Math.max(img.width / 5, 100);
         ctx.font = `900 ${mainFontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
         ctx.textAlign = 'center';
@@ -207,14 +207,14 @@ function GenerateContent() {
         ctx.rotate(-25 * Math.PI / 180);
         ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
         ctx.shadowBlur = 4;
-        ctx.fillText(mainText, 0, 0);
+        ctx.fillText('InstaDeco AI', 0, 0);
         ctx.restore();
         
         // Filigranes répétés - bas droite
         ctx.save();
         ctx.translate(img.width * 0.8, img.height * 0.85);
         ctx.rotate(-25 * Math.PI / 180);
-        ctx.fillText(mainText, 0, 0);
+        ctx.fillText('InstaDeco AI', 0, 0);
         ctx.restore();
         
         // Badge CTA en bas
