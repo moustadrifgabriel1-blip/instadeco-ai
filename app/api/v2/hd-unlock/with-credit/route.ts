@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, createAdminClient } from '@/lib/supabase/server';
 
 /**
  * Schéma de validation
@@ -60,15 +60,23 @@ export async function POST(req: Request) {
       });
     }
 
-    // 4. Vérifier les crédits
-    const { data: profile, error: profileError } = await supabase
+    // 4. Vérifier les crédits (utiliser admin client pour bypass RLS)
+    const adminSupabase = await createAdminClient();
+    const { data: profile, error: profileError } = await adminSupabase
       .from('profiles')
       .select('credits')
       .eq('id', user.id)
       .single();
 
+    console.log('[HD Unlock] User ID:', user.id);
+    console.log('[HD Unlock] Profile query result:', { profile, profileError });
+
     if (profileError || !profile) {
-      return NextResponse.json({ error: 'Profil introuvable' }, { status: 404 });
+      console.error('[HD Unlock] Profile error:', profileError);
+      return NextResponse.json({ 
+        error: 'Profil introuvable',
+        userId: user.id,
+      }, { status: 404 });
     }
 
     if (profile.credits < 1) {
@@ -79,8 +87,8 @@ export async function POST(req: Request) {
       }, { status: 402 });
     }
 
-    // 5. Déduire le crédit via RPC (atomique)
-    const { data: deductResult, error: deductError } = await supabase
+    // 5. Déduire le crédit via RPC (atomique) - utiliser admin client
+    const { data: deductResult, error: deductError } = await adminSupabase
       .rpc('deduct_credits', {
         p_user_id: user.id,
         p_amount: 1,
@@ -93,7 +101,7 @@ export async function POST(req: Request) {
     }
 
     // 6. Marquer la génération comme HD débloquée
-    const { error: updateError } = await supabase
+    const { error: updateError } = await adminSupabase
       .from('generations')
       .update({
         hd_unlocked: true,

@@ -150,6 +150,12 @@ export interface UseCreditHistoryReturn {
 export type CreditPackId = 'pack_10' | 'pack_25' | 'pack_50' | 'pack_100';
 
 /**
+ * Plans d'abonnement disponibles
+ */
+export type SubscriptionPlanId = 'sub_essentiel' | 'sub_pro' | 'sub_business';
+export type BillingInterval = 'monthly' | 'annual';
+
+/**
  * Détails d'un pack de crédits
  */
 export interface CreditPack {
@@ -166,6 +172,16 @@ export interface CreditPack {
  */
 export interface PurchaseCreditsInput {
   packId: CreditPackId;
+  successUrl?: string;
+  cancelUrl?: string;
+}
+
+/**
+ * Input pour souscrire à un abonnement
+ */
+export interface CreateSubscriptionInput {
+  planId: SubscriptionPlanId;
+  interval: BillingInterval;
   successUrl?: string;
   cancelUrl?: string;
 }

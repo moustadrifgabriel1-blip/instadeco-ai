@@ -129,6 +129,94 @@ export class AntiAIPostProcessor {
       pattern: /\ble meilleur moyen\b/gi,
       replacements: ['un excellent moyen', 'la solution idéale', 'une méthode efficace'],
     },
+
+    // === NOUVEAUX PATTERNS ANTI-DÉINDEXATION ===
+
+    // Transitions robotiques typiques Gemini/GPT
+    {
+      pattern: /^Commençons par\s*/gim,
+      replacements: ['', 'Parlons d\'abord de ', 'Regardons ', ''],
+    },
+    {
+      pattern: /^Passons maintenant à\s*/gim,
+      replacements: ['', 'Côté ', 'Parlons de ', ''],
+    },
+    {
+      pattern: /^Venons-en à\s*/gim,
+      replacements: ['', 'Maintenant, ', '', ''],
+    },
+    {
+      pattern: /^Penchons-nous sur\s*/gim,
+      replacements: ['', 'Regardons de plus près ', 'Intéressons-nous à ', ''],
+    },
+    {
+      pattern: /^Il est essentiel de\s*/gim,
+      replacements: ['', 'Pensez à ', 'Gardez en tête : ', ''],
+    },
+    {
+      pattern: /^N'hésitez pas à\s*/gim,
+      replacements: ['Pensez à ', 'Essayez de ', 'Vous pouvez ', ''],
+    },
+    {
+      pattern: /^Comme vous pouvez le constater\b/gim,
+      replacements: ['', 'Vous voyez, ', 'Résultat : ', ''],
+    },
+
+    // Expressions "remplissage" vides de sens
+    {
+      pattern: /\bil existe de nombreuses? options?\b/gi,
+      replacements: ['vous avez le choix', 'plusieurs pistes s\'offrent à vous', 'les options ne manquent pas'],
+    },
+    {
+      pattern: /\bc'est un élément (?:essentiel|important|crucial)\b/gi,
+      replacements: ['c\'est clé', 'ça compte vraiment', 'ne négligez pas ce point'],
+    },
+    {
+      pattern: /\bjoue un rôle (?:essentiel|important|crucial|clé)\b/gi,
+      replacements: ['compte beaucoup', 'fait toute la différence', 'pèse lourd'],
+    },
+    {
+      pattern: /\bconstitue un (?:atout|avantage) (?:majeur|considérable|non négligeable)\b/gi,
+      replacements: ['c\'est un vrai plus', 'fait la différence', 'apporte beaucoup'],
+    },
+    {
+      pattern: /\ben matière de\b/gi,
+      replacements: ['côté', 'pour ce qui est de', 'question'],
+    },
+    {
+      pattern: /\bforce est de constater\b/gi,
+      replacements: ['on voit bien', 'c\'est clair', 'le constat est simple'],
+    },
+    {
+      pattern: /\bà l'heure actuelle\b/gi,
+      replacements: ['aujourd\'hui', 'maintenant', 'de nos jours'],
+    },
+    {
+      pattern: /\bdans un premier temps\b/gi,
+      replacements: ['d\'abord', 'pour commencer', 'dans un premier temps'],
+    },
+    {
+      pattern: /\bdans un second temps\b/gi,
+      replacements: ['ensuite', 'puis', 'après ça'],
+    },
+    {
+      pattern: /\bqui plus est\b/gi,
+      replacements: ['en plus', 'mieux encore', 'bonus'],
+    },
+
+    // Adverbes trop littéraires pour du web
+    {
+      pattern: /\bsubséquemment\b/gi,
+      replacements: ['après ça', 'ensuite', 'puis'],
+    },
+    {
+      pattern: /\bconsécutivement\b/gi,
+      replacements: ['à la suite', 'après', 'coup sur coup'],
+    },
+    {
+      pattern: /\bnotamment\b/gi,
+      replacements: ['surtout', 'en particulier', 'comme'],
+    },
   ];
 
   // Variations de ponctuation pour humaniser
@@ -168,6 +256,9 @@ export class AntiAIPostProcessor {
 
     // 4. Insérer des marqueurs d'hésitation naturels (parcimonie)
     processedContent = this.addNaturalHesitations(processedContent);
+
+    // 5. Vérifier et varier la structure des paragraphes (anti-uniformité IA)
+    processedContent = this.breakUniformStructure(processedContent);
 
     // Calculer le score anti-AI (estimation basée sur les modifications)
     const score = this.calculateAntiAIScore(content, processedContent, modificationCount);
@@ -239,11 +330,13 @@ export class AntiAIPostProcessor {
       { pattern: /Vous pouvez/g, replacement: "Vous pouvez aussi", chance: 0.1 },
       { pattern: /C'est /g, replacement: "C'est vraiment ", chance: 0.08 },
       { pattern: /Il faut/g, replacement: "Il vaut mieux", chance: 0.15 },
+      { pattern: /On recommande/g, replacement: "Mon conseil :", chance: 0.2 },
+      { pattern: /Il est possible de/g, replacement: "Rien ne vous empêche de", chance: 0.15 },
     ];
 
     let result = content;
     let hesitationCount = 0;
-    const maxHesitations = 3;
+    const maxHesitations = 4;
 
     for (const { pattern, replacement, chance } of hesitations) {
       if (hesitationCount >= maxHesitations) break;
@@ -281,22 +374,79 @@ export class AntiAIPostProcessor {
     // Vérifier l'absence de patterns IA résiduels
     let remainingPatterns = 0;
     for (const { pattern } of this.aiPatterns) {
+      // Reset regex lastIndex pour éviter les faux négatifs
+      pattern.lastIndex = 0;
       if (pattern.test(processed)) {
         remainingPatterns++;
       }
+      pattern.lastIndex = 0;
     }
     score -= remainingPatterns * 3;
 
     // Bonus pour les paragraphes de longueur variée
-    const paragraphs = processed.split('\n\n').filter((p) => !p.startsWith('#'));
+    const paragraphs = processed.split('\n\n').filter((p) => !p.startsWith('#') && !p.startsWith('<'));
     if (paragraphs.length > 2) {
       const lengths = paragraphs.map((p) => p.length);
       const avgLength = lengths.reduce((a, b) => a + b, 0) / lengths.length;
       const variance = lengths.reduce((acc, len) => acc + Math.abs(len - avgLength), 0) / lengths.length;
       if (variance > 50) score += 5;
+      if (variance > 100) score += 5;
+    }
+
+    // Bonus: variété de longueur de phrases
+    if (sentences.length > 5) {
+      const sentLengths = sentences.map(s => s.split(/\s+/).length);
+      const hasShort = sentLengths.some(l => l <= 6);
+      const hasLong = sentLengths.some(l => l >= 20);
+      if (hasShort && hasLong) score += 5;
     }
 
     return Math.min(Math.max(score, 0), 100);
+  }
+
+  /**
+   * Casse la structure uniforme des paragraphes (red flag IA majeur)
+   * Les IA ont tendance à produire des paragraphes de longueur similaire.
+   */
+  private breakUniformStructure(content: string): string {
+    const parts = content.split('\n\n');
+    const result: string[] = [];
+
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i];
+      
+      // Ne pas toucher aux éléments HTML, titres, listes
+      if (part.startsWith('<') || part.startsWith('#') || part.startsWith('-') || part.startsWith('*')) {
+        result.push(part);
+        continue;
+      }
+
+      // Parfois fusionner 2 paragraphes courts consécutifs
+      if (i < parts.length - 1 && part.length < 200 && parts[i + 1].length < 200 
+          && !parts[i + 1].startsWith('<') && !parts[i + 1].startsWith('#') && Math.random() < 0.3) {
+        result.push(part + ' ' + parts[i + 1]);
+        i++; // Skip le suivant
+        continue;
+      }
+
+      // Parfois ajouter une phrase-réaction courte après un paragraphe
+      if (part.length > 300 && Math.random() < 0.15) {
+        const reactions = [
+          'Concrètement, qu\'est-ce que ça change ?',
+          'Et en pratique ?',
+          'Vous vous demandez peut-être pourquoi.',
+          'La suite va vous surprendre.',
+          'Mais ce n\'est pas tout.',
+        ];
+        result.push(part);
+        result.push(reactions[Math.floor(Math.random() * reactions.length)]);
+        continue;
+      }
+
+      result.push(part);
+    }
+
+    return result.join('\n\n');
   }
 
   private pickRandom<T>(array: T[]): T {

@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import dynamic from 'next/dynamic';
 import { CITIES, City, CountryCode } from '@/src/shared/constants/cities';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -10,6 +11,11 @@ import {
   Check, MapPin, Star, ArrowRight, Home, Zap, Palette, 
   Building, Quote, Camera, Wand2, Download
 } from 'lucide-react';
+import { JsonLd } from '@/lib/seo/json-ld';
+import { generateLocalBusinessSchema, generateBreadcrumbList, generateFAQSchema } from '@/lib/seo/schemas';
+import { getCanonicalUrl } from '@/lib/seo/config';
+
+const LeadCaptureLazy = dynamic(() => import('@/components/features/lead-capture').then(mod => ({ default: mod.LeadCapture })), { ssr: false });
 
 interface PageProps {
   params: {
@@ -136,16 +142,29 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title,
     description,
+    keywords: [
+      `architecte intérieur ${city.name}`,
+      `décoration ${city.name}`,
+      `home staging ${city.name}`,
+      `rénovation intérieur ${city.name}`,
+      `design intérieur ${city.name} ${city.zip}`,
+      `aménagement ${city.region}`,
+    ],
     openGraph: {
       title,
       description,
       type: 'website',
       locale: 'fr_FR',
-      url: `https://instadeco.ai/architecte-interieur/${city.slug}`,
-      images: [`https://source.unsplash.com/1200x630/?interior,${city.archStyle}`],
+      url: getCanonicalUrl(`/architecte-interieur/${city.slug}`),
+      images: [getCanonicalUrl('/og-image.png')],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
     },
     alternates: {
-      canonical: `https://instadeco.ai/architecte-interieur/${city.slug}`,
+      canonical: getCanonicalUrl(`/architecte-interieur/${city.slug}`),
     },
   };
 }
@@ -158,29 +177,34 @@ export default function CityPage({ params }: PageProps) {
   const archContent = getArchitectureContent(city);
   const testimonials = getTestimonials(city, terms);
 
-  // Schema.org
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'LocalBusiness',
-    name: `InstaDeco ${city.name}`,
-    image: `https://source.unsplash.com/800x600/?interior,${city.archStyle}`,
-    address: {
-      '@type': 'PostalAddress',
-      addressLocality: city.name,
-      addressRegion: city.region,
-      postalCode: city.zip,
-      addressCountry: city.country
+  // FAQ items for schema
+  const faqItems = [
+    {
+      question: `Est-ce vraiment moins cher qu'un architecte à ${city.name} ?`,
+      answer: `Oui, incomparablement. Une consultation à domicile à ${city.name} coûte entre 150€ et 300€. Notre IA réalise le même travail de visualisation pour quelques euros, instantanément.`,
     },
-    priceRange: `${terms.currency}9.99`,
-    description: `Service de décoration d'intérieur et home staging virtuel par IA à ${city.name}.`
-  };
+    {
+      question: `Puis-je l'utiliser pour vendre mon bien immobilier ?`,
+      answer: `C'est même recommandé ! Le Home Staging Virtuel permet de déclencher plus de visites en montrant le potentiel de votre bien, surtout si la déco actuelle est datée.`,
+    },
+  ];
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={[
+        generateLocalBusinessSchema({
+          name: city.name,
+          region: city.region,
+          zip: city.zip,
+          country: city.country,
+          currency: terms.currency,
+        }),
+        generateBreadcrumbList([
+          { label: 'Architecte intérieur', path: '/architecte-interieur' },
+          { label: city.name, path: `/architecte-interieur/${city.slug}` },
+        ]),
+        generateFAQSchema(faqItems),
+      ]} />
 
       {/* --- HERO SECTION --- */}
       <section className="relative pt-24 pb-32 overflow-hidden">
@@ -459,6 +483,9 @@ export default function CityPage({ params }: PageProps) {
           </div>
         </div>
       </section>
+
+      {/* Lead Capture */}
+      <LeadCaptureLazy variant="banner" delay={6000} />
     </div>
   );
 }

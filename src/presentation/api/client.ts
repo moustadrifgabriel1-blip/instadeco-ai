@@ -241,6 +241,44 @@ export async function createCheckoutSession(
 }
 
 // ========================
+// SUBSCRIPTIONS API
+// ========================
+
+export interface CreateSubscriptionRequest {
+  userId: string;
+  email: string;
+  planId: 'sub_essentiel' | 'sub_pro' | 'sub_business';
+  interval: 'monthly' | 'annual';
+  successUrl?: string;
+  cancelUrl?: string;
+}
+
+export interface CreateSubscriptionResponse {
+  success: boolean;
+  checkoutUrl: string;
+  sessionId: string;
+  subscription: {
+    planId: string;
+    interval: string;
+    creditsPerMonth: number;
+  };
+}
+
+export async function createSubscriptionSession(
+  request: CreateSubscriptionRequest,
+  options?: RequestOptions
+): Promise<CreateSubscriptionResponse> {
+  const response = await fetch(`${API_BASE}/payments/create-subscription`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(request),
+    signal: options?.signal,
+  });
+
+  return handleResponse<CreateSubscriptionResponse>(response);
+}
+
+// ========================
 // HD UNLOCK API
 // ========================
 

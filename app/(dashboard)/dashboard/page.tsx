@@ -638,20 +638,6 @@ export default function DashboardPageV2() {
           </main>
         </div>
       </div>
-
-      {/* Footer */}
-      <footer className="border-t border-[#d2d2d7] py-6 px-6 bg-[#f5f5f7] mt-12">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-[#86868b]">
-            © 2026 InstaDeco. Tous droits réservés.
-          </p>
-          <div className="flex items-center gap-6 text-xs text-[#424245]">
-            <a href="#" className="hover:text-[#1d1d1f] transition-colors">Confidentialité</a>
-            <a href="#" className="hover:text-[#1d1d1f] transition-colors">Conditions</a>
-            <a href="#" className="hover:text-[#1d1d1f] transition-colors">Contact</a>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

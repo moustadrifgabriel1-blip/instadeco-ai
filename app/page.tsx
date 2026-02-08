@@ -26,6 +26,10 @@ const FinalCTA = dynamic(() => import('@/components/features/landing/FinalCTA').
   loading: () => <div className="min-h-[200px]" />,
 });
 
+const LeadCaptureLazy = dynamic(() => import('@/components/features/lead-capture').then(mod => ({ default: mod.LeadCapture })), {
+  ssr: false,
+});
+
 export default function HomePage() {
   return (
     <main className="min-h-screen">
@@ -36,6 +40,7 @@ export default function HomePage() {
       <Stats />
       <Testimonials />
       <FinalCTA />
+      <LeadCaptureLazy variant="popup" delay={12000} />
     </main>
   );
 }

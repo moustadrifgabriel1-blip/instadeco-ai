@@ -1,15 +1,25 @@
 'use client';
 
-import { useCallback, useState, useEffect } from 'react';
+import { useCallback, useState, useEffect, useMemo } from 'react';
 import { useDropzone } from 'react-dropzone';
 import Image from 'next/image';
-import { Plus, X, ArrowRight, Download, Check, ChevronDown } from 'lucide-react';
+import { Plus, X, ArrowRight, Download, Check, ChevronDown, Sparkles, Star, Shield, Zap } from 'lucide-react';
 import { ProtectedRoute } from '@/components/features/protected-route';
 import { useAuth } from '@/hooks/use-auth';
 import { useGenerate } from '@/src/presentation/hooks/useGenerate';
 import { useHDUnlock } from '@/src/presentation/hooks/useHDUnlock';
 import { useGenerationStatus } from '@/src/presentation/hooks/useGenerationStatus';
 import { STYLE_CATEGORIES_WITH_STYLES, ROOM_TYPES } from '@/src/shared/constants';
+
+const LOADING_MESSAGES = [
+  { threshold: 0, text: 'Analyse de votre pièce...' },
+  { threshold: 15, text: 'Identification de la structure...' },
+  { threshold: 30, text: 'Application du style choisi...' },
+  { threshold: 50, text: 'Génération des détails...' },
+  { threshold: 70, text: 'Ajout des finitions...' },
+  { threshold: 85, text: 'Peaufinage du rendu...' },
+  { threshold: 95, text: 'Presque terminé...' },
+];
 
 // Modes de transformation
 const TRANSFORM_MODES = [
@@ -370,11 +380,16 @@ function GenerateContent() {
                   <Plus className="w-6 h-6 text-[#86868b]" strokeWidth={1.5} />
                 </div>
                 <p className="text-[17px] text-[#1d1d1f] font-medium tracking-[-0.01em]">
-                  {isDragActive ? 'Déposez votre image' : 'Ajouter une photo'}
+                  {isDragActive ? 'Déposez votre image' : 'Ajouter une photo de votre pièce'}
                 </p>
                 <p className="mt-2 text-[12px] text-[#86868b] tracking-[.007em]">
-                  Glissez-déposez ou cliquez • PNG, JPG, WEBP
+                  Glissez-déposez ou cliquez • PNG, JPG, WEBP • Max 10 Mo
                 </p>
+                <div className="mt-6 flex items-center justify-center gap-6 text-[11px] text-[#86868b]">
+                  <span className="flex items-center gap-1"><Zap className="w-3 h-3" /> Résultat en 10s</span>
+                  <span className="flex items-center gap-1"><Shield className="w-3 h-3" /> 100% privé</span>
+                  <span className="flex items-center gap-1"><Star className="w-3 h-3" /> 12 styles</span>
+                </div>
               </div>
             </div>
           )}
@@ -511,38 +526,42 @@ function GenerateContent() {
 
               {/* Generate Button */}
               {!isGenerating && (
-                <div className="flex justify-center pt-2">
+                <div className="flex flex-col items-center pt-2 gap-3">
                   <button
                     onClick={handleGenerate}
-                    className="group inline-flex items-center gap-2 bg-[#0071e3] text-white px-7 py-3.5 rounded-full text-[17px] font-medium hover:bg-[#0077ed] transition-all duration-200"
+                    className="group inline-flex items-center gap-2 bg-[#0071e3] text-white px-7 py-3.5 rounded-full text-[17px] font-medium hover:bg-[#0077ed] transition-all duration-200 shadow-lg shadow-[#0071e3]/20"
                   >
-                    Générer le design
+                    <Sparkles className="w-5 h-5" />
+                    Transformer ma pièce
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" strokeWidth={2} />
                   </button>
+                  <span className="text-[12px] text-[#86868b]">
+                    1 crédit sera utilisé • {credits} crédit{(credits ?? 0) > 1 ? 's' : ''} disponible{(credits ?? 0) > 1 ? 's' : ''}
+                  </span>
                 </div>
               )}
 
-              {/* Loading State */}
+              {/* Loading with dynamic messages */}
               {isGenerating && (
-                <div className="flex flex-col items-center py-6">
-                  <div className="relative w-12 h-12 mb-5">
+                <div className="flex flex-col items-center py-8">
+                  <div className="relative w-16 h-16 mb-5">
                     <div className="absolute inset-0 rounded-full border-[2.5px] border-[#e8e8ed]" />
-                    <div 
-                      className="absolute inset-0 rounded-full border-[2.5px] border-[#1d1d1f] border-t-transparent animate-spin"
-                    />
+                    <div className="absolute inset-0 rounded-full border-[2.5px] border-[#0071e3] border-t-transparent animate-spin" />
+                    <div className="absolute inset-2 rounded-full border-[2px] border-[#0071e3]/20 border-b-transparent animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }} />
                   </div>
                   <p className="text-[17px] text-[#1d1d1f] font-medium tracking-[-0.01em]">
-                    Création en cours...
+                    {LOADING_MESSAGES.filter(m => m.threshold <= Math.round(progress)).pop()?.text || 'Préparation...'}
                   </p>
-                  <p className="mt-1 text-[14px] text-[#86868b]">
-                    {Math.round(progress)}%
-                  </p>
-                  <div className="w-40 h-[3px] bg-[#e8e8ed] rounded-full mt-4 overflow-hidden">
-                    <div 
-                      className="h-full bg-[#1d1d1f] rounded-full transition-all duration-700 ease-out"
+                  <p className="mt-1 text-[14px] text-[#86868b]">{Math.round(progress)}%</p>
+                  <div className="w-48 h-[3px] bg-[#e8e8ed] rounded-full mt-4 overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-[#0071e3] to-[#34aadc] rounded-full transition-all duration-700 ease-out"
                       style={{ width: `${Math.round(progress)}%` }}
                     />
                   </div>
+                  <p className="mt-4 text-[11px] text-[#86868b] max-w-xs text-center">
+                    Propulsé par Flux.1 + ControlNet • Votre photo reste 100% privée
+                  </p>
                 </div>
               )}
 
@@ -611,55 +630,50 @@ function GenerateContent() {
                 </div>
               </div>
 
-              {/* Actions */}
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                <button
-                  onClick={handleDownload}
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-[14px] font-medium text-[#1d1d1f] bg-[#f5f5f7] hover:bg-[#e8e8ed] transition-colors"
-                >
-                  <Download className="w-4 h-4" strokeWidth={2} />
-                  Télécharger l&apos;aperçu
-                </button>
-                <button
-                  onClick={handleUnlock}
-                  disabled={isUnlocking}
-                  className="inline-flex items-center gap-2 px-7 py-3 rounded-full text-[14px] font-medium text-white bg-[#1d1d1f] hover:bg-black transition-colors disabled:opacity-50"
-                >
-                  <Check className="w-4 h-4" strokeWidth={2} />
-                  {isUnlocking ? 'Chargement...' : 'Obtenir en HD — 4,99 €'}
-                </button>
-              </div>
+              {/* Actions - HD Upsell optimized */}
+              <div className="max-w-lg mx-auto">
+                {/* Primary: HD Unlock CTA */}
+                <div className="bg-gradient-to-br from-[#1d1d1f] to-[#2d2d2f] rounded-2xl p-6 text-center mb-4">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <Sparkles className="w-5 h-5 text-amber-400" />
+                    <span className="text-white font-semibold text-[17px]">Débloquer la version HD</span>
+                  </div>
+                  <div className="flex items-center justify-center gap-4 mb-4 text-[13px] text-white/70">
+                    <span className="flex items-center gap-1"><Check className="w-3.5 h-3.5 text-[#4CAF50]" /> Sans filigrane</span>
+                    <span className="flex items-center gap-1"><Check className="w-3.5 h-3.5 text-[#4CAF50]" /> Résolution 4K</span>
+                    <span className="flex items-center gap-1"><Check className="w-3.5 h-3.5 text-[#4CAF50]" /> Usage commercial</span>
+                  </div>
+                  <button
+                    onClick={handleUnlock}
+                    disabled={isUnlocking}
+                    className="w-full inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full text-[15px] font-semibold text-[#1d1d1f] bg-gradient-to-r from-amber-300 to-amber-400 hover:from-amber-400 hover:to-amber-500 transition-all disabled:opacity-50 shadow-lg shadow-amber-400/20 active:scale-95"
+                  >
+                    {isUnlocking ? 'Chargement...' : 'Obtenir en HD — 4,99 €'}
+                  </button>
+                  <p className="text-[11px] text-white/40 mt-2">Paiement unique • Téléchargement immédiat</p>
+                </div>
 
-              <p className="text-center text-[12px] text-[#86868b]">
-                Version HD : sans filigrane, résolution 4K.
-              </p>
-
-              <div className="flex justify-center">
-                <button
-                  onClick={removeImage}
-                  className="text-[14px] text-[#0071e3] hover:underline"
-                >
-                  Essayer avec une autre photo
-                </button>
+                {/* Secondary: Free download */}
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                  <button
+                    onClick={handleDownload}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-[13px] font-medium text-[#86868b] bg-[#f5f5f7] hover:bg-[#e8e8ed] transition-colors"
+                  >
+                    <Download className="w-3.5 h-3.5" strokeWidth={2} />
+                    Télécharger l&apos;aperçu (avec filigrane)
+                  </button>
+                  <button
+                    onClick={removeImage}
+                    className="text-[13px] text-[#0071e3] hover:underline"
+                  >
+                    Essayer un autre style
+                  </button>
+                </div>
               </div>
             </div>
           )}
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="border-t border-[#d2d2d7] py-6 px-6 bg-[#f5f5f7]">
-        <div className="max-w-[980px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-[12px] text-[#86868b]">
-            © 2026 InstaDeco. Propulsé par Flux.1 ControlNet.
-          </p>
-          <div className="flex items-center gap-6 text-[12px] text-[#424245]">
-            <a href="#" className="hover:text-[#1d1d1f] transition-colors">Confidentialité</a>
-            <a href="#" className="hover:text-[#1d1d1f] transition-colors">Conditions</a>
-            <a href="#" className="hover:text-[#1d1d1f] transition-colors">Contact</a>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

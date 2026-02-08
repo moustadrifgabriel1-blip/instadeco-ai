@@ -44,7 +44,7 @@ export class InternalLinksService {
     },
     {
       keyword: 'galerie de réalisations',
-      url: '/gallery',
+      url: '/exemples',
       anchor: 'notre galerie de réalisations',
     },
     {

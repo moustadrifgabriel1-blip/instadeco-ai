@@ -109,13 +109,13 @@ export async function GET(request: NextRequest) {
 
     console.log(`Cron: Génération article pour "${selectedTheme.primaryKeyword}"`);
 
-    // 6. Générer le contenu via IA
+    // 6. Générer le contenu via IA (2000+ mots pour un contenu substantiel)
     const generatedContent = await aiService.generateArticle({
       theme: selectedTheme.primaryKeyword,
       sessionType: getSessionTypeFromTime(),
-      minWords: 1200,
-      temperature: 0.7,
-      additionalInstructions: `Mots-clés secondaires à intégrer: ${selectedTheme.secondaryKeywords.join(', ')}. Type de contenu: ${selectedTheme.themeType}. Cible: ${selectedTheme.targetCountry === 'ALL' ? 'Suisse, France, Belgique' : selectedTheme.targetCountry}.`,
+      minWords: 2000,
+      temperature: 0.75,
+      additionalInstructions: `Mots-clés secondaires à intégrer: ${selectedTheme.secondaryKeywords.join(', ')}. Type de contenu: ${selectedTheme.themeType}. Cible: ${selectedTheme.targetCountry === 'ALL' ? 'Suisse, France, Belgique' : selectedTheme.targetCountry}. IMPORTANT: Inclure des prix réels de produits (IKEA, Maisons du Monde, La Redoute), des dimensions concrètes, et au moins 1 tableau comparatif HTML. Le titre doit être EVERGREEN (pas de date). Chaque conseil doit être ACTIONNABLE immédiatement.`,
     });
 
     // 7. Post-traitement anti-AI

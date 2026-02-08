@@ -2,6 +2,9 @@ import './globals.css';
 import type { Metadata, Viewport } from 'next';
 import { Inter, Playfair_Display } from 'next/font/google';
 import { Header, Footer } from '@/components/layout';
+import { JsonLd } from '@/lib/seo/json-ld';
+import { generateOrganizationSchema, generateWebSiteSchema, generateSoftwareAppSchema } from '@/lib/seo/schemas';
+import { SEO_CONFIG } from '@/lib/seo/config';
 
 const inter = Inter({ 
   subsets: ['latin'], 
@@ -16,7 +19,7 @@ const playfair = Playfair_Display({
   preload: true,
 });
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://instadeco.app';
+const BASE_URL = SEO_CONFIG.siteUrl;
 
 export const metadata: Metadata = {
   // ============================================
@@ -102,11 +105,6 @@ export const metadata: Metadata = {
   // ============================================
   alternates: {
     canonical: BASE_URL,
-    languages: {
-      'fr-FR': BASE_URL,
-      'fr-CH': BASE_URL,
-      'fr-BE': BASE_URL,
-    },
   },
   
   // ============================================
@@ -128,7 +126,7 @@ export const metadata: Metadata = {
   // AUTRES
   // ============================================
   other: {
-    'google-site-verification': '', // À remplir avec votre code Google Search Console
+    ...(SEO_CONFIG.googleSiteVerification ? { 'google-site-verification': SEO_CONFIG.googleSiteVerification } : {}),
   },
 };
 
@@ -151,12 +149,23 @@ export default function RootLayout({
         <meta name="format-detection" content="telephone=no" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="geo.region" content="FR" />
+        <meta name="geo.region" content="CH" />
+        <meta name="geo.region" content="BE" />
         {/* Preload LCP images for faster rendering */}
         <link rel="preload" as="image" href="/images/before-chambre-1.jpg" fetchPriority="high" />
         <link rel="preload" as="image" href="/images/after-chambre-1.jpg" fetchPriority="high" />
         {/* Preconnect pour améliorer LCP */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/* RSS Feed pour le blog */}
+        <link rel="alternate" type="application/rss+xml" title="InstaDeco AI Blog" href={`${BASE_URL}/api/rss`} />
+        {/* JSON-LD Schemas globaux */}
+        <JsonLd data={[
+          generateOrganizationSchema(),
+          generateWebSiteSchema(),
+          generateSoftwareAppSchema(),
+        ]} />
       </head>
       <body className={`${inter.variable} ${playfair.variable} font-sans min-h-screen bg-background text-foreground antialiased selection:bg-primary/20`}>
         <div className="min-h-screen flex flex-col">

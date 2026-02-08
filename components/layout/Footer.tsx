@@ -2,6 +2,8 @@
  * Composant: Footer
  * 
  * Pied de page du site InstaDeco AI.
+ * Optimisé pour le maillage interne SEO avec liens
+ * vers les pages villes, styles et outils.
  */
 
 import Link from 'next/link';
@@ -13,6 +15,27 @@ const footerLinks = {
     { href: '/exemples', label: 'Exemples' },
     { href: '/pricing', label: 'Tarifs' },
     { href: '/blog', label: 'Blog' },
+    { href: '/pro', label: 'Pour les Pros' },
+  ],
+  services: [
+    { href: '/architecte-interieur', label: 'Architecte intérieur IA' },
+    { href: '/architecte-interieur/paris', label: 'Déco Paris' },
+    { href: '/architecte-interieur/lyon', label: 'Déco Lyon' },
+    { href: '/architecte-interieur/geneve', label: 'Déco Genève' },
+    { href: '/architecte-interieur/bruxelles', label: 'Déco Bruxelles' },
+  ],
+  styles: [
+    { href: '/style/moderne', label: 'Style Moderne' },
+    { href: '/style/scandinave', label: 'Style Scandinave' },
+    { href: '/style/industriel', label: 'Style Industriel' },
+    { href: '/style/japandi', label: 'Style Japandi' },
+    { href: '/style/boheme', label: 'Style Bohème' },
+  ],
+  solutions: [
+    { href: '/solution/home-staging-virtuel', label: 'Home Staging Virtuel' },
+    { href: '/solution/simulateur-decoration-interieur', label: 'Simulateur Déco' },
+    { href: '/solution/logiciel-home-staging', label: 'Logiciel Home Staging' },
+    { href: '/solution/avant-apres-decoration', label: 'Avant / Après Déco' },
   ],
   legal: [
     { href: '/legal/mentions-legales', label: 'Mentions légales' },
@@ -32,7 +55,7 @@ export function Footer() {
   return (
     <footer className="border-t border-[#F0E6E0] bg-[#FFF8F5]">
       <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-8 mb-12">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center gap-2 font-bold text-xl mb-4 group">
@@ -57,6 +80,57 @@ export function Footer() {
             <h3 className="font-semibold mb-4 text-[#2D2D2D]">Produit</h3>
             <ul className="space-y-3">
               {footerLinks.product.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-[#6B6B6B] hover:text-[#E07B54] transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Services par ville */}
+          <div>
+            <h3 className="font-semibold mb-4 text-[#2D2D2D]">Par ville</h3>
+            <ul className="space-y-3">
+              {footerLinks.services.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-[#6B6B6B] hover:text-[#E07B54] transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Styles */}
+          <div>
+            <h3 className="font-semibold mb-4 text-[#2D2D2D]">Styles</h3>
+            <ul className="space-y-3">
+              {footerLinks.styles.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-[#6B6B6B] hover:text-[#E07B54] transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Solutions */}
+          <div>
+            <h3 className="font-semibold mb-4 text-[#2D2D2D]">Solutions</h3>
+            <ul className="space-y-3">
+              {footerLinks.solutions.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
@@ -106,6 +180,26 @@ export function Footer() {
           </div>
         </div>
 
+        {/* SEO Internal Links - Villes additionnelles */}
+        <div className="border-t border-[#F0E6E0] pt-6 mb-6">
+          <p className="text-xs text-[#9B9B9B] mb-3">Décoration intérieur IA disponible dans :</p>
+          <div className="flex flex-wrap gap-x-3 gap-y-1">
+            {[
+              'marseille', 'toulouse', 'nice', 'nantes', 'montpellier', 'strasbourg',
+              'bordeaux', 'lille', 'rennes', 'lausanne', 'fribourg', 'neuchatel',
+              'liege', 'namur', 'charleroi', 'annecy', 'grenoble', 'dijon',
+            ].map((city) => (
+              <Link
+                key={city}
+                href={`/architecte-interieur/${city}`}
+                className="text-xs text-[#9B9B9B] hover:text-[#E07B54] transition-colors capitalize"
+              >
+                {city.replace(/-/g, ' ')}
+              </Link>
+            ))}
+          </div>
+        </div>
+
         {/* Copyright */}
         <div className="border-t border-[#F0E6E0] pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-[#6B6B6B]">
           <p className="flex items-center gap-1">
@@ -114,7 +208,7 @@ export function Footer() {
             pour votre intérieur.
           </p>
           <p className="text-xs">
-            Propulsé par l&apos;IA
+            Propulsé par l&apos;IA • Disponible en France, Suisse et Belgique
           </p>
         </div>
       </div>

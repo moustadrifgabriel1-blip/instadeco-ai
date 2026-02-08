@@ -62,9 +62,78 @@ const nextConfig = {
           },
         ],
       },
+      {
+        // Cache long pour les pages programmatiques SEO (style, piece, villes)
+        source: '/style/:slug*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, s-maxage=86400, stale-while-revalidate=604800',
+          },
+        ],
+      },
+      {
+        source: '/piece/:slug*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, s-maxage=86400, stale-while-revalidate=604800',
+          },
+        ],
+      },
+      {
+        source: '/architecte-interieur/:slug*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, s-maxage=86400, stale-while-revalidate=604800',
+          },
+        ],
+      },
+      {
+        // Cache modéré pour le blog (mis à jour 3x/jour)
+        source: '/blog/:slug*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, s-maxage=3600, stale-while-revalidate=86400',
+          },
+        ],
+      },
+      {
+        // RSS feed cache
+        source: '/api/rss',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, s-maxage=3600, stale-while-revalidate=86400',
+          },
+          {
+            key: 'Content-Type',
+            value: 'application/rss+xml; charset=utf-8',
+          },
+        ],
+      },
     ];
   },
-
+  // Redirects SEO: uniformisation des URLs
+  async redirects() {
+    return [
+      // Redirection www vers non-www (si applicable)
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'www.instadeco.app' }],
+        destination: 'https://instadeco.app/:path*',
+        permanent: true,
+      },
+      // Trailing slash removal
+      {
+        source: '/:path+/',
+        destination: '/:path+',
+        permanent: true,
+      },
+    ];
+  },
   webpack: (config, { isServer }) => {
     if (!isServer) {
       // Exclure complètement undici côté client
