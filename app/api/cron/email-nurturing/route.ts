@@ -7,7 +7,7 @@ const supabaseAdmin = createSupabaseClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'InstaDeco AI <onboarding@resend.dev>';
+const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'InstaDeco AI <contact@instadeco.app>';
 
 function getResend(): Resend | null {
   if (!process.env.RESEND_API_KEY) return null;

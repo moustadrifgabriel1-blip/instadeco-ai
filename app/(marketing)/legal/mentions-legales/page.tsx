@@ -28,7 +28,7 @@ export default function MentionsLegalesPage() {
             <p><strong>Titulaire :</strong> Gabriel Moustadrif</p>
             <p><strong>Adresse du siège :</strong> Route du Bon 3, 1167 Lussy-sur-Morges, Vaud, Suisse</p>
             <p><strong>Numéro IDE :</strong> CHE-145.897.362</p>
-            <p><strong>Email :</strong> <a href="mailto:moustadrifecomm@gmail.com" className="text-blue-600 hover:underline">moustadrifecomm@gmail.com</a></p>
+            <p><strong>Email :</strong> <a href="mailto:contact@instadeco.app" className="text-blue-600 hover:underline">contact@instadeco.app</a></p>
             <p><strong>Site web :</strong> <a href="https://instadeco.app" className="text-blue-600 hover:underline">https://instadeco.app</a></p>
           </div>
         </section>
@@ -38,7 +38,7 @@ export default function MentionsLegalesPage() {
           <h2 className="text-2xl font-semibold text-gray-900 mb-4">2. Directeur de la publication</h2>
           <p className="text-gray-700">
             <strong>Gabriel Moustadrif</strong><br />
-            Contact : <a href="mailto:moustadrifecomm@gmail.com" className="text-blue-600 hover:underline">moustadrifecomm@gmail.com</a>
+            Contact : <a href="mailto:contact@instadeco.app" className="text-blue-600 hover:underline">contact@instadeco.app</a>
           </p>
         </section>
 
@@ -170,8 +170,8 @@ export default function MentionsLegalesPage() {
           <h2 className="text-2xl font-semibold text-gray-900 mb-4">Contact</h2>
           <p className="text-gray-700">
             Pour toute question concernant ces mentions légales, vous pouvez nous contacter à :<br />
-            <a href="mailto:moustadrifecomm@gmail.com" className="text-blue-600 hover:underline font-medium">
-              moustadrifecomm@gmail.com
+            <a href="mailto:contact@instadeco.app" className="text-blue-600 hover:underline font-medium">
+              contact@instadeco.app
             </a>
           </p>
         </section>

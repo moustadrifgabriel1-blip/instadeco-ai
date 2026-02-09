@@ -46,7 +46,7 @@ export default function PrivacyPolicyPage() {
             <p><strong>Moustadrif E-Comm</strong></p>
             <p>Route du Bon 3, 1167 Lussy-sur-Morges, Suisse</p>
             <p>IDE : CHE-145.897.362</p>
-            <p>Email : <a href="mailto:moustadrifecomm@gmail.com" className="text-blue-600 hover:underline">moustadrifecomm@gmail.com</a></p>
+            <p>Email : <a href="mailto:contact@instadeco.app" className="text-blue-600 hover:underline">contact@instadeco.app</a></p>
           </div>
         </section>
 
@@ -280,8 +280,8 @@ export default function PrivacyPolicyPage() {
           <div className="mt-6 p-4 bg-blue-50 rounded-lg">
             <p className="text-gray-700">
               <strong>Pour exercer vos droits :</strong> Envoyez un email à{' '}
-              <a href="mailto:moustadrifecomm@gmail.com" className="text-blue-600 hover:underline">
-                moustadrifecomm@gmail.com
+              <a href="mailto:contact@instadeco.app" className="text-blue-600 hover:underline">
+                contact@instadeco.app
               </a>{' '}
               avec une copie de votre pièce d&apos;identité. Nous répondrons dans un délai de 30 jours.
             </p>
@@ -403,8 +403,8 @@ export default function PrivacyPolicyPage() {
           <h2 className="text-2xl font-semibold text-gray-900 mb-4">Contact</h2>
           <p className="text-gray-700">
             Pour toute question concernant la protection de vos données :<br />
-            <a href="mailto:moustadrifecomm@gmail.com" className="text-blue-600 hover:underline font-medium">
-              moustadrifecomm@gmail.com
+            <a href="mailto:contact@instadeco.app" className="text-blue-600 hover:underline font-medium">
+              contact@instadeco.app
             </a>
           </p>
         </section>

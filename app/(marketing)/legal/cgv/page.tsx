@@ -35,7 +35,7 @@ export default function CGVPage() {
             <p><strong>Moustadrif E-Comm</strong></p>
             <p>Route du Bon 3, 1167 Lussy-sur-Morges, Vaud, Suisse</p>
             <p>IDE : CHE-145.897.362</p>
-            <p>Email : <a href="mailto:moustadrifecomm@gmail.com" className="text-blue-600 hover:underline">moustadrifecomm@gmail.com</a></p>
+            <p>Email : <a href="mailto:contact@instadeco.app" className="text-blue-600 hover:underline">contact@instadeco.app</a></p>
           </div>
           <p className="text-gray-700 mt-4">
             En utilisant le service et en achetant des crédits, l&apos;utilisateur déclare avoir pris connaissance 
@@ -406,7 +406,7 @@ export default function CGVPage() {
             <p className="mb-4">
               Moustadrif E-Comm<br />
               Route du Bon 3, 1167 Lussy-sur-Morges, Suisse<br />
-              Email : moustadrifecomm@gmail.com
+              Email : contact@instadeco.app
             </p>
             <p className="mb-2">
               Je/Nous (*) notifie/notifions (*) par la présente ma/notre (*) rétractation du contrat 
@@ -445,8 +445,8 @@ export default function CGVPage() {
           <h2 className="text-2xl font-semibold text-gray-900 mb-4">Contact</h2>
           <p className="text-gray-700">
             Pour toute question concernant les présentes CGV :<br />
-            <a href="mailto:moustadrifecomm@gmail.com" className="text-blue-600 hover:underline font-medium">
-              moustadrifecomm@gmail.com
+            <a href="mailto:contact@instadeco.app" className="text-blue-600 hover:underline font-medium">
+              contact@instadeco.app
             </a>
           </p>
         </section>

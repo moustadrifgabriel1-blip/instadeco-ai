@@ -22,7 +22,7 @@ function getResend(): Resend | null {
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'moustadrifgabriel1@gmail.com';
 
 // Utiliser le domaine vérifié ou l'email de test Resend
-const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'InstaDeco AI <onboarding@resend.dev>';
+const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'InstaDeco AI <contact@instadeco.app>';
 
 export interface BacklinkReportData {
   totalProspects: number;
