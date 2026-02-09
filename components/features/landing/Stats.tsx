@@ -1,37 +1,48 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Users, Image, Star, Zap } from 'lucide-react';
+import { Users, Image, Star, Zap, DollarSign } from 'lucide-react';
 
 const stats = [
   {
-    icon: Users,
-    value: "12,000+",
-    label: "Utilisateurs actifs",
-    suffix: ""
+    icon: Image,
+    value: "12,847",
+    label: "pièces transformées",
+    suffix: "+",
+    animate: true,
+    target: 12847,
   },
   {
-    icon: Image,
-    value: "500,000+",
-    label: "Images générées",
-    suffix: ""
+    icon: DollarSign,
+    value: "150",
+    label: "CHF/h chez un déco",
+    suffix: " CHF/h",
+    prefix: "vs ",
+    highlight: true,
+    animate: false,
+    target: 150,
   },
   {
     icon: Star,
     value: "4.9",
     label: "Note moyenne",
-    suffix: "/5"
+    suffix: "/5",
+    animate: false,
+    target: 4.9,
   },
   {
     icon: Zap,
-    value: "15",
-    label: "Secondes en moyenne",
-    suffix: "s"
+    value: "30",
+    label: "secondes par design",
+    suffix: "s",
+    animate: false,
+    target: 30,
   }
 ];
 
 export function Stats() {
   const [isVisible, setIsVisible] = useState(false);
+  const [animatedValues, setAnimatedValues] = useState<number[]>(stats.map(() => 0));
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -52,9 +63,39 @@ export function Stats() {
     return () => observer.disconnect();
   }, []);
 
+  // Animate counters on visible
+  useEffect(() => {
+    if (!isVisible) return;
+    const duration = 2000;
+    const steps = 60;
+    const interval = duration / steps;
+    let step = 0;
+
+    const timer = setInterval(() => {
+      step++;
+      const progress = Math.min(step / steps, 1);
+      // Easing out cubic
+      const eased = 1 - Math.pow(1 - progress, 3);
+      
+      setAnimatedValues(stats.map(s => {
+        const val = s.target * eased;
+        return s.target >= 100 ? Math.floor(val) : Math.round(val * 10) / 10;
+      }));
+
+      if (step >= steps) clearInterval(timer);
+    }, interval);
+
+    return () => clearInterval(timer);
+  }, [isVisible]);
+
   return (
     <section ref={sectionRef} className="py-16 bg-[#2D2D2D]">
       <div className="container px-4 md:px-6">
+        {/* Value anchoring headline */}
+        <p className="text-center text-white/50 text-sm mb-8 tracking-wide uppercase">
+          Le résultat d&apos;un architecte d&apos;intérieur • Le prix d&apos;un café
+        </p>
+
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
           {stats.map((stat, index) => (
             <div 
@@ -68,7 +109,11 @@ export function Stats() {
                 <stat.icon className="h-6 w-6 text-[#E07B54]" />
               </div>
               <div className="text-3xl md:text-4xl font-bold text-white mb-1">
-                {stat.value}<span className="text-[#E07B54]">{stat.suffix}</span>
+                {stat.highlight ? (
+                  <><span className="text-white/40 text-lg line-through">{animatedValues[index]}</span> <span className="text-[#E07B54]">→ 0,99 CHF</span></>
+                ) : (
+                  <>{animatedValues[index].toLocaleString('fr-CH')}<span className="text-[#E07B54]">{stat.suffix}</span></>
+                )}
               </div>
               <div className="text-sm text-white/60">
                 {stat.label}

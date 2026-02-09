@@ -1,17 +1,26 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 
-export default function SignupPage() {
+function SignupForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = createClient();
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [referralCode, setReferralCode] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Pre-fill referral code from URL
+  useEffect(() => {
+    const ref = searchParams.get('ref');
+    if (ref) setReferralCode(ref.toUpperCase());
+  }, [searchParams]);
 
   const handleEmailSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,6 +48,24 @@ export default function SignupPage() {
       }
 
       // Le profil est créé automatiquement via le trigger Supabase
+      
+      // Appliquer le code de parrainage si fourni
+      if (referralCode.trim() && data?.user?.id) {
+        try {
+          await fetch('/api/v2/referral', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              referralCode: referralCode.trim().toUpperCase(),
+              newUserId: data.user.id,
+            }),
+          });
+        } catch (refErr) {
+          // Silently fail - ne pas bloquer l'inscription
+          console.error('Referral error:', refErr);
+        }
+      }
+      
       router.push('/generate');
     } catch (err: unknown) {
       setError('Une erreur est survenue');
@@ -133,6 +160,21 @@ export default function SignupPage() {
               />
             </div>
 
+            {/* Code parrainage */}
+            <div>
+              <label className="block text-[12px] font-medium text-[#86868b] uppercase tracking-[.1em] mb-2">
+                Code parrainage <span className="text-[#E07B54] font-normal lowercase">(optionnel • 3 crédits bonus)</span>
+              </label>
+              <input
+                type="text"
+                value={referralCode}
+                onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                className="w-full px-4 py-3 rounded-[12px] border border-[#d2d2d7] text-[17px] focus:outline-none focus:border-[#E07B54] transition-colors font-mono tracking-widest uppercase"
+                placeholder="EX: A1B2C3D4"
+                maxLength={8}
+              />
+            </div>
+
             <button
               type="submit"
               disabled={loading}
@@ -174,5 +216,17 @@ export default function SignupPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#fbfbfd] flex items-center justify-center">
+        <div className="animate-spin w-8 h-8 border-2 border-[#1d1d1f] border-t-transparent rounded-full" />
+      </div>
+    }>
+      <SignupForm />
+    </Suspense>
   );
 }

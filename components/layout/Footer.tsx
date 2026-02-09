@@ -13,6 +13,7 @@ import Image from 'next/image';
 const footerLinks = {
   product: [
     { href: '/generate', label: 'Générer une image' },
+    { href: '/galerie', label: 'Galerie Before/After' },
     { href: '/exemples', label: 'Exemples' },
     { href: '/pricing', label: 'Tarifs' },
     { href: '/blog', label: 'Blog' },

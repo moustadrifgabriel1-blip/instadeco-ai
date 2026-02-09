@@ -6,33 +6,33 @@ import { Zap, LayoutTemplate, Wallet, Palette, MousePointerClick, Download, Luci
 const features = [
   {
     icon: Zap,
-    title: "Ultra Rapide",
-    description: "Obtenez un rendu photoréaliste en moins de 15 secondes grâce à nos serveurs GPU haute performance."
+    title: "30 Secondes Chrono",
+    description: "Un décorateur prend 2 semaines. Vous obtenez un rendu photoréaliste en 30 secondes — résultat comparable, 150x plus rapide."
   },
   {
     icon: LayoutTemplate,
-    title: "Respect de l'Architecture",
-    description: "Notre IA analyse la structure de votre pièce (murs, fenêtres) pour préserver les volumes existants."
+    title: "Votre Pièce, Pas un Template",
+    description: "L'IA analyse VOTRE espace (murs, fenêtres, volumes) pour un résultat sur mesure. Pas un catalogue générique."
   },
   {
     icon: Wallet,
-    title: "Économique",
-    description: "Une fraction du prix d'un décorateur d'intérieur ou d'un logiciel de home staging 3D classique."
+    title: "0,99 CHF au lieu de 150 CHF/h",
+    description: "Un architecte d'intérieur coûte 150 CHF/h minimum. InstaDeco vous donne un résultat comparable pour moins d'un café."
   },
   {
     icon: Palette,
-    title: "+50 Styles Déco",
-    description: "Scandinave, Japandi, Industriel, Bohème... Explorez une infinité de combinaisons stylistiques."
+    title: "12 Styles, 0 Limite",
+    description: "Scandinave, Japandi, Industriel, Bohème... Testez tous les styles en un clic. Chez un déco, c'est 3 propositions max."
   },
   {
     icon: MousePointerClick,
-    title: "Simplicité Extrême",
-    description: "Aucune compétence technique requise. Prenez une photo, choisissez un style, et c'est tout."
+    title: "Photo → Résultat. C'est Tout.",
+    description: "Pas de logiciel 3D complexe. Prenez une photo, choisissez un style, et admirez. Votre grand-mère pourrait le faire."
   },
   {
     icon: Download,
-    title: "Qualité HD",
-    description: "Téléchargez vos rendus en haute définition, prêts à être partagés sur les réseaux ou avec vos clients."
+    title: "HD Prêt à Imprimer",
+    description: "Téléchargez en haute définition, partagez sur les réseaux, envoyez à vos artisans. Vos images, vos droits."
   }
 ];
 

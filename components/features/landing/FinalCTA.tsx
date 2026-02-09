@@ -22,10 +22,11 @@ export function FinalCTA() {
         </div>
         
         <h2 className="text-3xl md:text-5xl font-heading font-bold text-white mb-6">
-          Prêt à transformer votre intérieur ?
+          L&apos;intérieur de vos rêves pour 0,99 CHF
         </h2>
         <p className="text-xl text-white/85 max-w-2xl mx-auto mb-10">
-          Rejoignez des milliers d&apos;utilisateurs satisfaits et commencez à créer l&apos;intérieur de vos rêves dès aujourd&apos;hui.
+          Un décorateur facture 150 CHF/h et prend 2 semaines.<br />
+          InstaDeco vous donne le même résultat en 30 secondes.
         </p>
         <Button size="lg" className="h-14 px-10 text-lg rounded-full bg-white text-[#E07B54] hover:bg-white/95 font-bold shadow-2xl hover:scale-105 transition-transform border-0" asChild>
           <Link href="/generate">
@@ -34,7 +35,7 @@ export function FinalCTA() {
           </Link>
         </Button>
         <p className="mt-6 text-sm text-white/70">
-          ✨ Essai gratuit • Pas de carte requise • Annulation à tout moment
+          ✨ 3 crédits offerts à l&apos;inscription • Pas de carte requise • Résultat garanti
         </p>
       </div>
     </section>

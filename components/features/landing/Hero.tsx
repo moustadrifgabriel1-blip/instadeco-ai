@@ -37,23 +37,22 @@ export function Hero() {
             {/* Badge */}
             <div className="badge-primary w-fit">
               <Sparkles className="h-4 w-4" />
-              <span>Nouveau : IA Génération 2026</span>
+              <span>Votre architecte d&apos;intérieur à 0,99 CHF</span>
             </div>
             
             {/* Titre principal */}
             <div className="space-y-2">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold tracking-tight text-[#2D2D2D] leading-[1.1]">
-                Transformez votre espace en style
+                Redécorez votre intérieur en style
                 <br />
                 <span className="text-gradient italic inline-block min-h-[1.2em]">{styles[currentStyle]}</span>
               </h1>
             </div>
             
-            {/* Description */}
+            {/* Description - Price anchoring Sutherland */}
             <p className="text-lg md:text-xl text-[#6B6B6B] max-w-xl leading-relaxed">
-              Uploadez une photo, choisissez un style, et regardez votre pièce se 
-              transformer en <span className="font-semibold text-[#E07B54]">moins de 30 secondes</span>. 
-              Sans travaux, sans architecte.
+              Un décorateur coûte <span className="line-through">150 CHF/h</span>. InstaDeco : <span className="font-semibold text-[#E07B54]">0,99 CHF en 30 secondes</span>.
+              Résultat de designer, sans travaux, sans rendez-vous.
             </p>
 
             {/* CTA Buttons */}
@@ -97,8 +96,8 @@ export function Hero() {
                   ))}
                 </div>
                 <div className="text-sm">
-                  <p className="font-semibold text-[#2D2D2D]">+12,000 créateurs</p>
-                  <p className="text-[#6B6B6B]">nous font confiance</p>
+                  <p className="font-semibold text-[#2D2D2D]">+12 000 utilisateurs</p>
+                  <p className="text-[#6B6B6B]">pièces transformées</p>
                 </div>
               </div>
               

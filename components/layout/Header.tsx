@@ -9,7 +9,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { Menu, X, BookOpen, CreditCard, Home, Wand2, User as UserIcon, Plus, LayoutGrid, Building2 } from 'lucide-react';
+import { Menu, X, BookOpen, CreditCard, Home, Wand2, User as UserIcon, Plus, LayoutGrid, Building2, Eye } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
@@ -19,6 +19,7 @@ import { useAuth } from '@/hooks/use-auth';
 const navigationItems = [
   { href: '/', label: 'Accueil', icon: Home },
   { href: '/generate', label: 'Générer', icon: Wand2 },
+  { href: '/galerie', label: 'Galerie', icon: Eye },
   { href: '/exemples', label: 'Exemples', icon: LayoutGrid },
   { href: '/blog', label: 'Blog', icon: BookOpen },
   { href: '/pricing', label: 'Tarifs', icon: CreditCard },
