@@ -8,6 +8,8 @@ import { usePurchaseCredits } from '@/src/presentation/hooks/usePurchaseCredits'
 import { createSubscriptionSession } from '@/src/presentation/api/client';
 import { CreditPackId, SubscriptionPlanId, BillingInterval } from '@/src/presentation/types';
 
+// v2 - force rebuild (cache Vercel stale après suppression footer dupliqué)
+
 type PricingMode = 'credits' | 'subscription';
 
 const PRICING_PLANS = [

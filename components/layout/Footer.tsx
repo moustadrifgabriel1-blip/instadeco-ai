@@ -1,5 +1,5 @@
 /**
- * Composant: Footer
+ * Composant: Footer (v2 - nettoyé)
  * 
  * Pied de page du site InstaDeco AI.
  * Optimisé pour le maillage interne SEO avec liens

@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { useCases } from '@/src/infrastructure/config/di-container';
 import { GenerationMapper } from '@/src/application/mappers/GenerationMapper';
+import { sendGenerationCompleteEmail } from '@/lib/notifications/marketing-emails';
+import { createClient as createSupabaseAdmin } from '@supabase/supabase-js';
 
 /**
  * Schéma de validation
@@ -62,6 +64,24 @@ export async function GET(
 
     console.log('[StatusAPI] Returning status:', generationDTO.status, 'hasOutput:', !!generationDTO.outputImageUrl);
 
+    // Envoyer email post-génération si la génération vient de se terminer
+    // On détecte ça en vérifiant si le status est completed ET si updatedAt est récent (<30s)
+    if (generationDTO.status === 'completed' && generationDTO.outputImageUrl) {
+      const updatedAt = new Date(result.data.updatedAt || Date.now());
+      const isJustCompleted = (Date.now() - updatedAt.getTime()) < 30_000;
+      
+      if (isJustCompleted && result.data.userId) {
+        // Envoyer en arrière-plan (ne bloque pas la réponse)
+        sendPostGenerationEmail(
+          result.data.userId,
+          result.data.styleSlug || 'modern',
+          result.data.roomType || 'living_room',
+        ).catch((err) => {
+          console.error('[StatusAPI] Post-generation email failed:', err);
+        });
+      }
+    }
+
     return NextResponse.json({
       generation: generationDTO,
       status: generationDTO.status,
@@ -80,4 +100,38 @@ export async function GET(
       { status: 500 }
     );
   }
+}
+
+/**
+ * Récupère le profil utilisateur et envoie l'email post-génération
+ */
+async function sendPostGenerationEmail(
+  userId: string,
+  style: string,
+  roomType: string,
+): Promise<void> {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return;
+  }
+
+  const supabaseAdmin = createSupabaseAdmin(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY,
+  );
+
+  const { data: profile } = await supabaseAdmin
+    .from('profiles')
+    .select('email, full_name, referral_code')
+    .eq('id', userId)
+    .single();
+
+  if (!profile?.email) return;
+
+  await sendGenerationCompleteEmail(
+    profile.email,
+    profile.full_name,
+    style,
+    roomType,
+    profile.referral_code || null,
+  );
 }
