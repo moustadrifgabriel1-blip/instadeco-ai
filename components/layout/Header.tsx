@@ -9,7 +9,8 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { Menu, X, BookOpen, CreditCard, Home, Wand2, User as UserIcon, Plus, Sparkles, LayoutGrid, Building2 } from 'lucide-react';
+import { Menu, X, BookOpen, CreditCard, Home, Wand2, User as UserIcon, Plus, LayoutGrid, Building2 } from 'lucide-react';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { cn } from '@/lib/utils';
@@ -56,9 +57,14 @@ export function Header() {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 font-bold text-xl group">
-            <div className="h-9 w-9 rounded-lg bg-[#E07B54] flex items-center justify-center group-hover:scale-105 transition-transform">
-              <Sparkles className="h-5 w-5 text-white" />
-            </div>
+            <Image
+              src="/images/logo-v3-house-sparkle.svg"
+              alt="InstaDeco AI"
+              width={36}
+              height={36}
+              className="h-9 w-9 rounded-lg group-hover:scale-105 transition-transform"
+              priority
+            />
             <span className="hidden sm:inline text-[#2D2D2D]">InstaDeco</span>
             <span className="text-gradient font-extrabold">AI</span>
           </Link>

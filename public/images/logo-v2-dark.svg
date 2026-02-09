@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2D2D2D"/>
+      <stop offset="100%" style="stop-color:#1A1A1A"/>
+    </linearGradient>
+    <linearGradient id="star2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#E07B54"/>
+      <stop offset="100%" style="stop-color:#D4603C"/>
+    </linearGradient>
+  </defs>
+  <!-- Fond arrondi sombre -->
+  <rect width="512" height="512" rx="112" fill="url(#bg2)"/>
+  <!-- Sparkle principal orange -->
+  <path d="M256 90 C256 90 276 195 290 210 C304 224 422 256 422 256 C422 256 304 288 290 302 C276 316 256 422 256 422 C256 422 236 316 222 302 C208 288 90 256 90 256 C90 256 208 224 222 210 C236 195 256 90 256 90Z" fill="url(#star2)"/>
+  <!-- Petite étoile -->
+  <path d="M375 105 C375 105 383 135 388 140 C393 145 423 153 423 153 C423 153 393 161 388 166 C383 171 375 201 375 201 C375 201 367 171 362 166 C357 161 327 153 327 153 C327 153 357 145 362 140 C367 135 375 105 375 105Z" fill="#E07B54" opacity="0.6"/>
+  <!-- Mini étoile -->
+  <path d="M148 345 C148 345 153 362 156 365 C159 368 176 373 176 373 C176 373 159 378 156 381 C153 384 148 401 148 401 C148 401 143 384 140 381 C137 378 120 373 120 373 C120 373 137 368 140 365 C143 362 148 345 148 345Z" fill="#E07B54" opacity="0.4"/>
+</svg>

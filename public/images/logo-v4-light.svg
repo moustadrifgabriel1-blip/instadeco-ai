@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFF8F5"/>
+      <stop offset="100%" style="stop-color:#FFE4D9"/>
+    </linearGradient>
+    <linearGradient id="accent4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#E07B54"/>
+      <stop offset="100%" style="stop-color:#C04E2A"/>
+    </linearGradient>
+  </defs>
+  <!-- Fond clair -->
+  <rect width="512" height="512" rx="112" fill="url(#bg4)" stroke="#E07B54" stroke-width="6"/>
+  <!-- Sparkle principal -->
+  <path d="M256 85 C256 85 278 198 294 214 C310 230 425 256 425 256 C425 256 310 282 294 298 C278 314 256 427 256 427 C256 427 234 314 218 298 C202 282 87 256 87 256 C87 256 202 230 218 214 C234 198 256 85 256 85Z" fill="url(#accent4)"/>
+  <!-- Petite étoile -->
+  <path d="M385 100 C385 100 392 128 396 132 C400 136 428 143 428 143 C428 143 400 150 396 154 C392 158 385 186 385 186 C385 186 378 158 374 154 C370 150 342 143 342 143 C342 143 370 136 374 132 C378 128 385 100 385 100Z" fill="url(#accent4)" opacity="0.5"/>
+</svg>

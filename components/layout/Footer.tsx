@@ -7,7 +7,8 @@
  */
 
 import Link from 'next/link';
-import { Sparkles, Heart } from 'lucide-react';
+import { Heart } from 'lucide-react';
+import Image from 'next/image';
 
 const footerLinks = {
   product: [
@@ -59,9 +60,13 @@ export function Footer() {
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center gap-2 font-bold text-xl mb-4 group">
-              <div className="h-9 w-9 rounded-lg bg-[#E07B54] flex items-center justify-center group-hover:scale-105 transition-transform">
-                <Sparkles className="h-5 w-5 text-white" />
-              </div>
+              <Image
+                src="/images/logo-v3-house-sparkle.svg"
+                alt="InstaDeco AI"
+                width={36}
+                height={36}
+                className="h-9 w-9 rounded-lg group-hover:scale-105 transition-transform"
+              />
               <span className="text-[#2D2D2D]">InstaDeco</span>
               <span className="text-gradient font-extrabold">AI</span>
             </Link>
