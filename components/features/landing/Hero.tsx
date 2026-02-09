@@ -43,8 +43,9 @@ export function Hero() {
             {/* Titre principal */}
             <div className="space-y-2">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold tracking-tight text-[#2D2D2D] leading-[1.1]">
-                Transformez votre espace en style{' '}
-                <span className="text-gradient italic">{styles[currentStyle]}</span>
+                Transformez votre espace en style
+                <br />
+                <span className="text-gradient italic inline-block min-h-[1.2em]">{styles[currentStyle]}</span>
               </h1>
             </div>
             
