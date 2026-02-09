@@ -484,7 +484,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
               url: 'https://instadeco.app',
               logo: {
                 '@type': 'ImageObject',
-                url: 'https://instadeco.app/logo.png',
+                url: 'https://instadeco.app/images/logo-v3-house-sparkle.svg',
               },
             },
             image: heroImageUrl,

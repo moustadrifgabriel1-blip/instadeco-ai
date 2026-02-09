@@ -1,8 +1,17 @@
-<svg width="192" height="192" viewBox="0 0 192 192" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="192" height="192" rx="32" fill="#E07B54"/>
-  <path d="M96 48 L88 72.5 L63.5 80.5 L88 88.5 L96 113 L104 88.5 L128.5 80.5 L104 72.5 Z" fill="white"/>
-  <path d="M64 40 L64 56" stroke="white" stroke-width="4" stroke-linecap="round"/>
-  <path d="M128 136 L128 152" stroke="white" stroke-width="4" stroke-linecap="round"/>
-  <path d="M48 56 L64 56" stroke="white" stroke-width="4" stroke-linecap="round"/>
-  <path d="M128 136 L144 136" stroke="white" stroke-width="4" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#E07B54"/>
+      <stop offset="50%" style="stop-color:#D4603C"/>
+      <stop offset="100%" style="stop-color:#C04E2A"/>
+    </linearGradient>
+  </defs>
+  <!-- Fond arrondi -->
+  <rect width="512" height="512" rx="112" fill="url(#bg3)"/>
+  <!-- Maison stylisée -->
+  <path d="M256 140 L380 240 L370 240 L370 380 L290 380 L290 310 L222 310 L222 380 L142 380 L142 240 L132 240 Z" fill="none" stroke="white" stroke-width="16" stroke-linejoin="round" stroke-linecap="round" opacity="0.9"/>
+  <!-- Sparkle intégré au toit -->
+  <path d="M340 130 C340 130 346 150 350 154 C354 158 374 164 374 164 C374 164 354 170 350 174 C346 178 340 198 340 198 C340 198 334 178 330 174 C326 170 306 164 306 164 C306 164 326 158 330 154 C334 150 340 130 340 130Z" fill="white" opacity="0.85"/>
+  <!-- Mini sparkle -->
+  <path d="M410 200 C410 200 414 214 416 216 C418 218 432 222 432 222 C432 222 418 226 416 228 C414 230 410 244 410 244 C410 244 406 230 404 228 C402 226 388 222 388 222 C388 222 402 218 404 216 C406 214 410 200 410 200Z" fill="white" opacity="0.55"/>
 </svg>

@@ -137,7 +137,7 @@ async function sendDiscordNotification(
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       username: "InstaDeco Bot",
-      avatar_url: "https://instadeco.app/images/logo.png",
+      avatar_url: "https://instadeco.app/images/logo-v3-house-sparkle.svg",
       embeds: [embed],
     }),
   });

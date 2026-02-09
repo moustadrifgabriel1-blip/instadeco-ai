@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -67,6 +68,13 @@ export default function LoginPage() {
     <div className="min-h-screen bg-[#fbfbfd] flex items-center justify-center px-6">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
+          <Image
+            src="/images/logo-v3-house-sparkle.svg"
+            alt="InstaDeco AI"
+            width={64}
+            height={64}
+            className="mx-auto mb-4 rounded-2xl"
+          />
           <h1 className="text-[40px] font-semibold tracking-[-0.025em] text-[#1d1d1f] mb-2">
             Connexion
           </h1>

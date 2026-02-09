@@ -9,12 +9,12 @@
   <circle cx="600" cy="250" r="80" fill="white" fill-opacity="0.15"/>
   <circle cx="600" cy="250" r="60" fill="white"/>
   
-  <!-- Sparkle icon -->
-  <path d="M600 200 L596 224 L572 228 L596 232 L600 256 L604 232 L628 228 L604 224 Z" fill="#E07B54"/>
-  <path d="M580 190 L580 200" stroke="#E07B54" stroke-width="3" stroke-linecap="round"/>
-  <path d="M620 260 L620 270" stroke="#E07B54" stroke-width="3" stroke-linecap="round"/>
-  <path d="M570 198 L580 198" stroke="#E07B54" stroke-width="3" stroke-linecap="round"/>
-  <path d="M620 258 L630 258" stroke="#E07B54" stroke-width="3" stroke-linecap="round"/>
+  <!-- House icon (logo v3) -->
+  <path d="M600 210 L640 240 L637 240 L637 270 L620 270 L620 250 L580 250 L580 270 L563 270 L563 240 L560 240 Z" fill="#E07B54" stroke="none"/>
+  <!-- Sparkle on roof -->
+  <path d="M630 200 C630 200 632 208 634 210 C636 212 644 214 644 214 C644 214 636 216 634 218 C632 220 630 228 630 228 C630 228 628 220 626 218 C624 216 616 214 616 214 C616 214 624 212 626 210 C628 208 630 200 630 200Z" fill="#E07B54" opacity="0.85"/>
+  <!-- Mini sparkle -->
+  <path d="M650 220 C650 220 651 225 652 226 C653 227 658 228 658 228 C658 228 653 229 652 230 C651 231 650 236 650 236 C650 236 649 231 648 230 C647 229 642 228 642 228 C642 228 647 227 648 226 C649 225 650 220 650 220Z" fill="#E07B54" opacity="0.55"/>
   
   <!-- Title -->
   <text x="600" y="380" font-family="system-ui, -apple-system, sans-serif" font-size="56" font-weight="700" fill="white" text-anchor="middle">InstaDeco AI</text>

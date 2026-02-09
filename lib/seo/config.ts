@@ -12,7 +12,7 @@ export const SEO_CONFIG = {
   siteDescription: 'Transformez vos pièces en rendus décorés professionnels en quelques secondes grâce à l\'IA. Home staging virtuel, inspiration déco, visualisation avant travaux.',
   
   // Branding
-  logo: '/logo.png',
+  logo: '/images/logo-v3-house-sparkle.svg',
   ogImage: '/og-image.png',
   themeColor: '#E07B54',
   

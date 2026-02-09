@@ -339,7 +339,7 @@ async function sendMaintenanceReminder(tasks: MaintenanceTask[]): Promise<void> 
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       username: 'InstaDeco Ops',
-      avatar_url: 'https://instadeco.app/images/logo.png',
+      avatar_url: 'https://instadeco.app/images/logo-v3-house-sparkle.svg',
       content: `## 🛠️ InstaDeco Ops - ${formatDateSuisse(new Date())}\n\n**${tasks.length} tâches** à effectuer | **~${totalTime} min** estimées`,
       embeds: embeds.slice(0, 10), // Discord limite à 10 embeds
     }),

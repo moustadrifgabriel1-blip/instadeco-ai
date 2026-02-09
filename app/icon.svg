@@ -6,8 +6,12 @@
       <stop offset="100%" style="stop-color:#C04E2A"/>
     </linearGradient>
   </defs>
+  <!-- Fond arrondi -->
   <rect width="512" height="512" rx="112" fill="url(#bg3)"/>
+  <!-- Maison stylisée -->
   <path d="M256 140 L380 240 L370 240 L370 380 L290 380 L290 310 L222 310 L222 380 L142 380 L142 240 L132 240 Z" fill="none" stroke="white" stroke-width="16" stroke-linejoin="round" stroke-linecap="round" opacity="0.9"/>
+  <!-- Sparkle intégré au toit -->
   <path d="M340 130 C340 130 346 150 350 154 C354 158 374 164 374 164 C374 164 354 170 350 174 C346 178 340 198 340 198 C340 198 334 178 330 174 C326 170 306 164 306 164 C306 164 326 158 330 154 C334 150 340 130 340 130Z" fill="white" opacity="0.85"/>
+  <!-- Mini sparkle -->
   <path d="M410 200 C410 200 414 214 416 216 C418 218 432 222 432 222 C432 222 418 226 416 228 C414 230 410 244 410 244 C410 244 406 230 404 228 C402 226 388 222 388 222 C388 222 402 218 404 216 C406 214 410 200 410 200Z" fill="white" opacity="0.55"/>
 </svg>

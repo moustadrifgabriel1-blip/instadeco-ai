@@ -169,6 +169,7 @@ function emailWrapper(content: string): string {
   <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; margin-top: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
     <!-- Header -->
     <div style="background: linear-gradient(135deg, #E07B54, #D4603C); padding: 32px 24px; text-align: center;">
+      <img src="https://instadeco.app/images/logo-v3-house-sparkle.svg" alt="InstaDeco AI" width="48" height="48" style="border-radius: 12px; margin-bottom: 12px;" />
       <h1 style="color: white; font-size: 24px; margin: 0; font-weight: 700;">InstaDeco AI</h1>
       <p style="color: rgba(255,255,255,0.8); font-size: 14px; margin: 8px 0 0;">Votre architecte d'intérieur à 0,99 CHF</p>
     </div>
