@@ -560,7 +560,7 @@ function GenerateContent() {
                     />
                   </div>
                   <p className="mt-4 text-[11px] text-[#86868b] max-w-xs text-center">
-                    Propulsé par Flux.1 + ControlNet • Votre photo reste 100% privée
+                    Votre photo reste 100% privée
                   </p>
                 </div>
               )}

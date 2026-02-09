@@ -73,11 +73,6 @@ export function Footer() {
             <p className="text-sm text-[#6B6B6B] mb-4">
               Transformez vos intérieurs grâce à l&apos;intelligence artificielle.
             </p>
-            <div className="flex items-center gap-2 text-sm text-[#6B6B6B]">
-              <span>🇨🇭</span>
-              <span>🇫🇷</span>
-              <span>🇧🇪</span>
-            </div>
           </div>
 
           {/* Produit */}
@@ -211,9 +206,6 @@ export function Footer() {
             © {currentYear} InstaDeco AI. Fait avec 
             <Heart className="h-4 w-4 text-[#E07B54] fill-current" />
             pour votre intérieur.
-          </p>
-          <p className="text-xs">
-            Propulsé par l&apos;IA • Disponible en France, Suisse et Belgique
           </p>
         </div>
       </div>

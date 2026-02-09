@@ -27,7 +27,14 @@ import {
   Clock,
   AlertCircle,
   Filter,
-  Lock
+  Lock,
+  Eye,
+  EyeOff,
+  CheckCircle2,
+  XCircle,
+  Pencil,
+  Save,
+  X
 } from 'lucide-react';
 import { useGenerations } from '@/src/presentation/hooks/useGenerations';
 import { useCredits } from '@/src/presentation/hooks/useCredits';
@@ -64,6 +71,16 @@ export default function DashboardPageV2() {
   const [passwordError, setPasswordError] = useState('');
   const [passwordSuccess, setPasswordSuccess] = useState('');
   const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Profile editing state
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [displayName, setDisplayName] = useState('');
+  const [profileSaving, setProfileSaving] = useState(false);
+  const [profileSuccess, setProfileSuccess] = useState('');
+  const [profileError, setProfileError] = useState('');
 
   // ============================================
   // AUTH CHECK
@@ -71,6 +88,10 @@ export default function DashboardPageV2() {
   useEffect(() => {
     if (!authLoading && !user) {
       router.push('/login');
+    }
+    // Initialiser le nom
+    if (user) {
+      setDisplayName(user.user_metadata?.display_name || user.user_metadata?.full_name || '');
     }
   }, [user, authLoading, router]);
 
@@ -98,8 +119,19 @@ export default function DashboardPageV2() {
       return;
     }
     
-    if (newPassword.length < 6) {
-      setPasswordError('Le mot de passe doit contenir au moins 6 caractères');
+    if (newPassword.length < 8) {
+      setPasswordError('Le mot de passe doit contenir au moins 8 caractères');
+      return;
+    }
+
+    // Vérification complexité
+    const hasUpperCase = /[A-Z]/.test(newPassword);
+    const hasLowerCase = /[a-z]/.test(newPassword);
+    const hasNumber = /[0-9]/.test(newPassword);
+    const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(newPassword);
+    
+    if (!hasUpperCase || !hasLowerCase || !hasNumber) {
+      setPasswordError('Le mot de passe doit contenir au moins 1 majuscule, 1 minuscule et 1 chiffre');
       return;
     }
     
@@ -124,10 +156,52 @@ export default function DashboardPageV2() {
       setNewPassword('');
       setConfirmPassword('');
     } catch (error: unknown) {
-      setPasswordError('Erreur lors du changement de mot de passe');
+      const authError = error as { message?: string };
+      setPasswordError(authError.message || 'Erreur lors du changement de mot de passe');
     } finally {
       setIsChangingPassword(false);
     }
+  };
+
+  const handleSaveProfile = async () => {
+    setProfileSaving(true);
+    setProfileError('');
+    setProfileSuccess('');
+    
+    try {
+      const { error } = await supabase.auth.updateUser({
+        data: { 
+          display_name: displayName.trim(),
+          full_name: displayName.trim(),
+        }
+      });
+      
+      if (error) throw error;
+      
+      setProfileSuccess('Profil mis à jour !');
+      setIsEditingProfile(false);
+      setTimeout(() => setProfileSuccess(''), 3000);
+    } catch (error: unknown) {
+      const authError = error as { message?: string };
+      setProfileError(authError.message || 'Erreur lors de la mise à jour');
+    } finally {
+      setProfileSaving(false);
+    }
+  };
+
+  // Password strength checker
+  const getPasswordStrength = (pwd: string): { score: number; label: string; color: string } => {
+    let score = 0;
+    if (pwd.length >= 8) score++;
+    if (pwd.length >= 12) score++;
+    if (/[A-Z]/.test(pwd)) score++;
+    if (/[a-z]/.test(pwd)) score++;
+    if (/[0-9]/.test(pwd)) score++;
+    if (/[!@#$%^&*(),.?":{}|<>]/.test(pwd)) score++;
+    
+    if (score <= 2) return { score: 1, label: 'Faible', color: 'bg-red-500' };
+    if (score <= 4) return { score: 2, label: 'Moyen', color: 'bg-amber-500' };
+    return { score: 3, label: 'Fort', color: 'bg-green-500' };
   };
 
   const handleUnlock = async (generationId: string) => {
@@ -548,29 +622,108 @@ export default function DashboardPageV2() {
 
             {/* Account Tab */}
             {activeTab === 'account' && (
-              <div>
+              <div className="space-y-6">
                 <h1 className="text-2xl font-semibold text-[#1d1d1f] mb-6">Mon compte</h1>
+                
+                {/* Profil Card */}
                 <Card>
-                  <CardHeader>
-                    <CardTitle>Informations</CardTitle>
-                    <CardDescription>Vos informations de compte</CardDescription>
+                  <CardHeader className="flex flex-row items-center justify-between">
+                    <div>
+                      <CardTitle>Profil</CardTitle>
+                      <CardDescription>Vos informations personnelles</CardDescription>
+                    </div>
+                    {!isEditingProfile ? (
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => setIsEditingProfile(true)}
+                        className="gap-2"
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
+                        Modifier
+                      </Button>
+                    ) : (
+                      <div className="flex gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => {
+                            setIsEditingProfile(false);
+                            setDisplayName(user?.user_metadata?.display_name || user?.user_metadata?.full_name || '');
+                          }}
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          onClick={handleSaveProfile}
+                          disabled={profileSaving}
+                          className="gap-2"
+                        >
+                          {profileSaving ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          ) : (
+                            <Save className="w-3.5 h-3.5" />
+                          )}
+                          Sauvegarder
+                        </Button>
+                      </div>
+                    )}
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div>
-                      <label className="text-sm font-medium text-[#86868b]">Email</label>
-                      <p className="text-[#1d1d1f]">{user.email}</p>
+                    {profileSuccess && (
+                      <div className="flex items-center gap-2 text-sm text-green-600 bg-green-50 px-3 py-2 rounded-lg">
+                        <CheckCircle2 className="w-4 h-4" />
+                        {profileSuccess}
+                      </div>
+                    )}
+                    {profileError && (
+                      <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">
+                        <XCircle className="w-4 h-4" />
+                        {profileError}
+                      </div>
+                    )}
+                    
+                    <div className="grid gap-4">
+                      <div>
+                        <label className="text-sm font-medium text-[#86868b] mb-1 block">Nom d&apos;affichage</label>
+                        {isEditingProfile ? (
+                          <Input
+                            value={displayName}
+                            onChange={(e) => setDisplayName(e.target.value)}
+                            placeholder="Votre nom"
+                            className="max-w-sm"
+                          />
+                        ) : (
+                          <p className="text-[#1d1d1f]">
+                            {user?.user_metadata?.display_name || user?.user_metadata?.full_name || <span className="text-[#86868b] italic">Non renseigné</span>}
+                          </p>
+                        )}
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-[#86868b] mb-1 block">Email</label>
+                        <p className="text-[#1d1d1f]">{user?.email}</p>
+                      </div>
                     </div>
-                    <div>
-                      <label className="text-sm font-medium text-[#86868b]">ID utilisateur</label>
-                      <p className="text-[#1d1d1f] text-sm font-mono">{user.id}</p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-[#86868b]">Crédits disponibles</label>
-                      <p className="text-[#1d1d1f]">{credits} crédits</p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-[#86868b]">Nombre de créations</label>
-                      <p className="text-[#1d1d1f]">{generations.length} images</p>
+                  </CardContent>
+                </Card>
+
+                {/* Stats Card */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Statistiques</CardTitle>
+                    <CardDescription>Votre activité sur InstaDeco</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-gradient-to-br from-[#FFF8F5] to-[#FFF0EB] rounded-xl p-4 text-center">
+                        <div className="text-2xl font-bold text-[#E07B54]">{credits}</div>
+                        <div className="text-sm text-[#6B6B6B] mt-1">Crédits disponibles</div>
+                      </div>
+                      <div className="bg-gradient-to-br from-[#F0F7FF] to-[#E8F0FE] rounded-xl p-4 text-center">
+                        <div className="text-2xl font-bold text-[#0071e3]">{generations.length}</div>
+                        <div className="text-sm text-[#6B6B6B] mt-1">Créations</div>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -583,42 +736,137 @@ export default function DashboardPageV2() {
                 <h1 className="text-2xl font-semibold text-[#1d1d1f] mb-6">Sécurité</h1>
                 <Card>
                   <CardHeader>
-                    <CardTitle>Changer le mot de passe</CardTitle>
-                    <CardDescription>Mettez à jour votre mot de passe</CardDescription>
+                    <CardTitle className="flex items-center gap-2">
+                      <Shield className="w-5 h-5 text-[#E07B54]" />
+                      Changer le mot de passe
+                    </CardTitle>
+                    <CardDescription>
+                      Choisissez un mot de passe fort pour protéger votre compte
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <form onSubmit={handleChangePassword} className="space-y-4">
+                    <form onSubmit={handleChangePassword} className="space-y-5">
+                      {/* New password */}
                       <div>
-                        <label className="block text-sm font-medium text-[#86868b] mb-1">
+                        <label className="block text-sm font-medium text-[#86868b] mb-1.5">
                           Nouveau mot de passe
                         </label>
-                        <Input
-                          type="password"
-                          value={newPassword}
-                          onChange={(e) => setNewPassword(e.target.value)}
-                          placeholder="••••••••"
-                        />
+                        <div className="relative">
+                          <Input
+                            type={showNewPassword ? 'text' : 'password'}
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                            placeholder="Min. 8 caractères"
+                            className="pr-10"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowNewPassword(!showNewPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#86868b] hover:text-[#1d1d1f] transition-colors"
+                          >
+                            {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          </button>
+                        </div>
+                        
+                        {/* Password strength indicator */}
+                        {newPassword.length > 0 && (
+                          <div className="mt-2 space-y-2">
+                            <div className="flex gap-1">
+                              {[1, 2, 3].map((level) => (
+                                <div
+                                  key={level}
+                                  className={`h-1.5 flex-1 rounded-full transition-all ${
+                                    getPasswordStrength(newPassword).score >= level
+                                      ? getPasswordStrength(newPassword).color
+                                      : 'bg-gray-200'
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                            <p className={`text-xs font-medium ${
+                              getPasswordStrength(newPassword).score === 1 ? 'text-red-500' :
+                              getPasswordStrength(newPassword).score === 2 ? 'text-amber-500' : 'text-green-500'
+                            }`}>
+                              Force : {getPasswordStrength(newPassword).label}
+                            </p>
+                            
+                            {/* Critères */}
+                            <div className="grid grid-cols-2 gap-1 text-xs">
+                              <div className={`flex items-center gap-1.5 ${newPassword.length >= 8 ? 'text-green-600' : 'text-[#86868b]'}`}>
+                                {newPassword.length >= 8 ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
+                                8 caractères min.
+                              </div>
+                              <div className={`flex items-center gap-1.5 ${/[A-Z]/.test(newPassword) ? 'text-green-600' : 'text-[#86868b]'}`}>
+                                {/[A-Z]/.test(newPassword) ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
+                                1 majuscule
+                              </div>
+                              <div className={`flex items-center gap-1.5 ${/[a-z]/.test(newPassword) ? 'text-green-600' : 'text-[#86868b]'}`}>
+                                {/[a-z]/.test(newPassword) ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
+                                1 minuscule
+                              </div>
+                              <div className={`flex items-center gap-1.5 ${/[0-9]/.test(newPassword) ? 'text-green-600' : 'text-[#86868b]'}`}>
+                                {/[0-9]/.test(newPassword) ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
+                                1 chiffre
+                              </div>
+                              <div className={`flex items-center gap-1.5 ${/[!@#$%^&*(),.?":{}|<>]/.test(newPassword) ? 'text-green-600' : 'text-[#86868b]'}`}>
+                                {/[!@#$%^&*(),.?":{}|<>]/.test(newPassword) ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
+                                1 caractère spécial
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
+
+                      {/* Confirm password */}
                       <div>
-                        <label className="block text-sm font-medium text-[#86868b] mb-1">
+                        <label className="block text-sm font-medium text-[#86868b] mb-1.5">
                           Confirmer le mot de passe
                         </label>
-                        <Input
-                          type="password"
-                          value={confirmPassword}
-                          onChange={(e) => setConfirmPassword(e.target.value)}
-                          placeholder="••••••••"
-                        />
+                        <div className="relative">
+                          <Input
+                            type={showConfirmPassword ? 'text' : 'password'}
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            placeholder="Retapez le mot de passe"
+                            className="pr-10"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#86868b] hover:text-[#1d1d1f] transition-colors"
+                          >
+                            {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          </button>
+                        </div>
+                        {confirmPassword.length > 0 && newPassword !== confirmPassword && (
+                          <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                            <XCircle className="w-3 h-3" />
+                            Les mots de passe ne correspondent pas
+                          </p>
+                        )}
+                        {confirmPassword.length > 0 && newPassword === confirmPassword && (
+                          <p className="text-xs text-green-500 mt-1 flex items-center gap-1">
+                            <CheckCircle2 className="w-3 h-3" />
+                            Les mots de passe correspondent
+                          </p>
+                        )}
                       </div>
+
                       {passwordError && (
-                        <p className="text-sm text-red-500">{passwordError}</p>
+                        <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">
+                          <XCircle className="w-4 h-4 flex-shrink-0" />
+                          {passwordError}
+                        </div>
                       )}
                       {passwordSuccess && (
-                        <p className="text-sm text-green-500">{passwordSuccess}</p>
+                        <div className="flex items-center gap-2 text-sm text-green-600 bg-green-50 px-3 py-2 rounded-lg">
+                          <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+                          {passwordSuccess}
+                        </div>
                       )}
                       <Button
                         type="submit"
-                        disabled={isChangingPassword}
+                        disabled={isChangingPassword || newPassword.length < 8 || newPassword !== confirmPassword}
                         className="w-full"
                       >
                         {isChangingPassword ? (
@@ -627,7 +875,10 @@ export default function DashboardPageV2() {
                             Modification...
                           </>
                         ) : (
-                          'Changer le mot de passe'
+                          <>
+                            <Lock className="w-4 h-4 mr-2" />
+                            Changer le mot de passe
+                          </>
                         )}
                       </Button>
                     </form>
