@@ -127,6 +127,7 @@ export const metadata: Metadata = {
   // ============================================
   other: {
     ...(SEO_CONFIG.googleSiteVerification ? { 'google-site-verification': SEO_CONFIG.googleSiteVerification } : {}),
+    'p:domain_verify': 'cafe11f55ab96fa778747680609afb75',
   },
 };
 
