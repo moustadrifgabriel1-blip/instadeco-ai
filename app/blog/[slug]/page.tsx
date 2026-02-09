@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { ArticleCard } from '@/components/features/blog';
+import { ShareButton } from '@/components/features/blog/ShareButton';
 import { formatBlogTitle, cn } from '@/lib/utils';
 import { sanitizeHtml, sanitizeJsonLd } from '@/lib/security/sanitize';
 
@@ -199,13 +200,26 @@ function ArticleContent({ content, slug }: { content: string, slug: string }) {
     
     // Remplacement des placeholders IMAGE:keyword
     if (src.startsWith('IMAGE:')) {
-      const keyword = src.replace('IMAGE:', '');
+      const keyword = src.replace('IMAGE:', '').trim().toLowerCase();
       src = getBlogImageUrl(keyword, slug, 800, 500);
     }
+    
+    // Vérifier que l'URL est valide (éviter les URLs cassées)
+    if (!src || src === '#' || (!src.startsWith('http') && !src.startsWith('/'))) {
+      src = getBlogImageUrl('décoration', slug, 800, 500);
+    }
+    
+    // Sécuriser alt text
+    const safeAlt = (text || 'Image de décoration intérieure').replace(/"/g, '&quot;');
 
     return `
       <figure class="my-8 rounded-xl overflow-hidden shadow-lg border border-border bg-muted/20">
-        <img src="${src}" alt="${text}" class="w-full h-auto object-cover" loading="lazy" />
+        <img 
+          src="${src}" 
+          alt="${safeAlt}" 
+          class="w-full h-auto object-cover min-h-[200px] bg-gradient-to-br from-orange-50 to-amber-50" 
+          loading="lazy"
+        />
         ${title ? `<figcaption class="text-center text-sm text-muted-foreground mt-2 py-2 italic">${title}</figcaption>` : ''}
       </figure>
     `;
@@ -324,7 +338,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           priority
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-black/30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-black/50" />
         
         <div className="absolute bottom-0 left-0 w-full z-10">
           <div className="container mx-auto px-4 pb-12">
@@ -344,7 +358,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
               ))}
             </div>
 
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-tight max-w-4xl tracking-tight drop-shadow-sm">
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-tight max-w-4xl tracking-tight [text-shadow:_0_2px_12px_rgb(0_0_0_/_40%),_0_1px_3px_rgb(0_0_0_/_60%)]">
               {formatBlogTitle(article.title)}
             </h1>
 
@@ -375,9 +389,11 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           {/* Sidebar Left (Share) - Visible Desktop */}
           <div className="hidden lg:flex lg:col-span-1 flex-col gap-4 mt-20 sticky top-24 h-fit items-center">
             <div className="text-xs font-semibold text-muted-foreground uppercase tracking-widest py-4 writing-mode-vertical">Partager</div>
-            <Button size="icon" variant="secondary" className="rounded-full h-10 w-10 shadow-sm" title="Partager">
-              <Share2 className="w-4 h-4" />
-            </Button>
+            <ShareButton 
+              title={formatBlogTitle(article.title)} 
+              url={`https://instadeco.app/blog/${article.slug}`}
+              variant="sidebar"
+            />
           </div>
 
           {/* Article principal */}

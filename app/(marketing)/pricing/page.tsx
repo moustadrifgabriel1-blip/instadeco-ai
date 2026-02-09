@@ -188,6 +188,18 @@ const FAQ_ITEMS = [
     answer: "Oui ! Si vous n'avez pas utilisé vos crédits, vous pouvez demander un remboursement intégral sous 14 jours après l'achat. Il suffit de nous contacter par email. Les crédits déjà utilisés ne sont pas remboursables."
   },
   {
+    category: 'subscription',
+    icon: Repeat,
+    question: "Comment fonctionne l'abonnement ?",
+    answer: "Vous recevez vos crédits chaque mois automatiquement. Pas de surprise, tout est transparent. Vous pouvez annuler à tout moment depuis votre espace client, sans frais ni justification. L'annuel offre 20% de réduction supplémentaire."
+  },
+  {
+    category: 'subscription',
+    icon: Crown,
+    question: "Mes crédits non utilisés sont-ils reportés ?",
+    answer: "Oui, avec les abonnements Pro et Business, vos crédits non utilisés sont reportés au mois suivant (dans la limite de 2 mois). Rien ne se perd !"
+  },
+  {
     category: 'quality',
     icon: Sparkles,
     question: "Que faire si le résultat ne me plaît pas ?",
@@ -306,7 +318,7 @@ export default function PricingPage() {
 
         {/* Toggle Crédits / Abonnements */}
         <div className="flex items-center justify-center mb-8">
-          <div className="inline-flex items-center bg-white rounded-full p-1.5 border border-[#F0E8E4] shadow-sm">
+          <div className="inline-flex items-center bg-white rounded-full p-1.5 border border-[#F0E8E4] shadow-md relative">
             <button
               onClick={() => setPricingMode('credits')}
               className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
@@ -320,7 +332,7 @@ export default function PricingPage() {
             </button>
             <button
               onClick={() => setPricingMode('subscription')}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all relative ${
                 pricingMode === 'subscription'
                   ? 'bg-gradient-to-r from-[#E07B54] to-[#D4603C] text-white shadow-md'
                   : 'text-[#6B6B6B] hover:text-[#2D2D2D]'
@@ -328,36 +340,51 @@ export default function PricingPage() {
             >
               <Repeat className="w-4 h-4" />
               Abonnements
+              <span className="absolute -top-2.5 -right-2 bg-[#4CAF50] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full animate-pulse">
+                NEW
+              </span>
             </button>
           </div>
         </div>
 
         {/* Annual/Monthly toggle (only for subscriptions) */}
         {pricingMode === 'subscription' && (
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <span className={`text-sm ${billingInterval === 'monthly' ? 'text-[#2D2D2D] font-medium' : 'text-[#6B6B6B]'}`}>
-              Mensuel
-            </span>
-            <button
-              onClick={() => setBillingInterval(billingInterval === 'monthly' ? 'annual' : 'monthly')}
-              className={`relative w-14 h-7 rounded-full transition-colors ${
-                billingInterval === 'annual' ? 'bg-[#E07B54]' : 'bg-[#D1D5DB]'
-              }`}
-            >
-              <span
-                className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${
-                  billingInterval === 'annual' ? 'translate-x-7' : ''
-                }`}
-              />
-            </button>
-            <span className={`text-sm ${billingInterval === 'annual' ? 'text-[#2D2D2D] font-medium' : 'text-[#6B6B6B]'}`}>
-              Annuel
-            </span>
-            {billingInterval === 'annual' && (
-              <span className="bg-[#E8F4E5] text-[#2E7D32] text-xs font-bold px-2.5 py-1 rounded-full">
-                -20%
+          <div className="flex flex-col items-center gap-3 mb-4">
+            <div className="flex items-center gap-3">
+              <span className={`text-sm ${billingInterval === 'monthly' ? 'text-[#2D2D2D] font-medium' : 'text-[#6B6B6B]'}`}>
+                Mensuel
               </span>
-            )}
+              <button
+                onClick={() => setBillingInterval(billingInterval === 'monthly' ? 'annual' : 'monthly')}
+                className={`relative w-14 h-7 rounded-full transition-colors ${
+                  billingInterval === 'annual' ? 'bg-[#E07B54]' : 'bg-[#D1D5DB]'
+                }`}
+              >
+                <span
+                  className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${
+                    billingInterval === 'annual' ? 'translate-x-7' : ''
+                  }`}
+                />
+              </button>
+              <span className={`text-sm ${billingInterval === 'annual' ? 'text-[#2D2D2D] font-medium' : 'text-[#6B6B6B]'}`}>
+                Annuel
+              </span>
+              {billingInterval === 'annual' && (
+                <span className="bg-[#E8F4E5] text-[#2E7D32] text-xs font-bold px-2.5 py-1 rounded-full">
+                  -20%
+                </span>
+              )}
+            </div>
+
+            {/* Savings highlight banner */}
+            <div className="bg-gradient-to-r from-[#E8F4E5] to-[#D5EDD0] rounded-full px-4 py-1.5 text-sm">
+              <span className="text-[#2E7D32] font-medium">
+                {billingInterval === 'annual' 
+                  ? '💰 Économisez jusqu\'à 192€/an avec l\'annuel' 
+                  : '✨ Jusqu\'à 60% moins cher que les packs crédits'
+                }
+              </span>
+            </div>
           </div>
         )}
 
@@ -413,6 +440,22 @@ export default function PricingPage() {
                 onSelect={handleSelectPlan}
                 isLoading={isAnyLoading}
               />
+            </div>
+
+            {/* Upsell banner credits → abonnement */}
+            <div className="mt-8 bg-gradient-to-r from-[#FFF8F5] to-[#FFF0EB] rounded-2xl p-6 border border-[#F5D5C8] text-center">
+              <p className="text-[#2D2D2D] font-medium mb-1">
+                💡 Besoin régulier ? L&apos;abonnement est <span className="text-[#E07B54] font-bold">jusqu&apos;à 60% moins cher</span>
+              </p>
+              <p className="text-sm text-[#6B6B6B] mb-3">
+                Dès 0.32€/image avec un abonnement vs 0.70€ à l&apos;unité
+              </p>
+              <button 
+                onClick={() => setPricingMode('subscription')}
+                className="inline-flex items-center gap-2 text-[#E07B54] font-semibold text-sm hover:underline"
+              >
+                Voir les abonnements <ArrowRight className="w-4 h-4" />
+              </button>
             </div>
           </>
         ) : (
@@ -591,6 +634,88 @@ export default function PricingPage() {
                 ))}
               </tbody>
             </table>
+          </div>
+        </div>
+      </div>
+
+      {/* Why Subscribe - Conversion section */}
+      <div className="bg-gradient-to-b from-white to-[#FFF8F5] py-16 sm:py-20 border-t border-[#F5E6E0]">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center gap-2 bg-[#FFF0EB] text-[#D4603C] px-4 py-2 rounded-full text-sm font-medium mb-4">
+              <Crown className="w-4 h-4" />
+              Crédits vs Abonnement
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-semibold text-[#2D2D2D] mb-3">
+              Quelle formule choisir ?
+            </h2>
+            <p className="text-[#6B6B6B] max-w-xl mx-auto">
+              Comparez les options pour trouver celle qui correspond à votre usage
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
+            {/* Credit packs */}
+            <div className="rounded-2xl border border-[#F0E8E4] bg-white p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-[#FFF0EB] flex items-center justify-center">
+                  <CreditCard className="w-5 h-5 text-[#E07B54]" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-[#2D2D2D]">Packs de crédits</h3>
+                  <p className="text-xs text-[#6B6B6B]">Achat ponctuel</p>
+                </div>
+              </div>
+              <ul className="space-y-2.5 text-sm">
+                <li className="flex items-center gap-2 text-[#2D2D2D]">
+                  <Check className="w-4 h-4 text-[#4CAF50]" /> Pas d&apos;engagement
+                </li>
+                <li className="flex items-center gap-2 text-[#2D2D2D]">
+                  <Check className="w-4 h-4 text-[#4CAF50]" /> Crédits valables à vie
+                </li>
+                <li className="flex items-center gap-2 text-[#2D2D2D]">
+                  <Check className="w-4 h-4 text-[#4CAF50]" /> Idéal projet ponctuel
+                </li>
+              </ul>
+              <div className="mt-4 pt-4 border-t border-[#F0E8E4]">
+                <p className="text-sm text-[#6B6B6B]">À partir de</p>
+                <p className="text-lg font-bold text-[#2D2D2D]">0.70€ <span className="text-sm font-normal text-[#6B6B6B]">/ image</span></p>
+              </div>
+            </div>
+
+            {/* Subscription - highlighted */}
+            <div className="rounded-2xl border-2 border-[#E07B54] bg-gradient-to-b from-white to-[#FFF8F5] p-6 relative">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#E07B54] text-white text-[11px] font-bold px-3 py-1 rounded-full">
+                Meilleure valeur
+              </div>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-[#E07B54] flex items-center justify-center">
+                  <Crown className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-[#2D2D2D]">Abonnement</h3>
+                  <p className="text-xs text-[#6B6B6B]">Mensuel ou annuel</p>
+                </div>
+              </div>
+              <ul className="space-y-2.5 text-sm">
+                <li className="flex items-center gap-2 text-[#2D2D2D]">
+                  <Check className="w-4 h-4 text-[#4CAF50]" /> <strong>Jusqu&apos;à 60% d&apos;économie</strong>
+                </li>
+                <li className="flex items-center gap-2 text-[#2D2D2D]">
+                  <Check className="w-4 h-4 text-[#4CAF50]" /> Crédits renouvelés chaque mois
+                </li>
+                <li className="flex items-center gap-2 text-[#2D2D2D]">
+                  <Check className="w-4 h-4 text-[#4CAF50]" /> HD+ inclus (plan Pro+)
+                </li>
+                <li className="flex items-center gap-2 text-[#2D2D2D]">
+                  <Check className="w-4 h-4 text-[#4CAF50]" /> Annulable à tout moment
+                </li>
+              </ul>
+              <div className="mt-4 pt-4 border-t border-[#F0E8E4]">
+                <p className="text-sm text-[#6B6B6B]">À partir de</p>
+                <p className="text-lg font-bold text-[#E07B54]">0.32€ <span className="text-sm font-normal text-[#6B6B6B]">/ image</span></p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -893,6 +1018,8 @@ function SubscriptionCard({
 }) {
   const price = interval === 'annual' ? plan.annualPrice : plan.monthlyPrice;
   const pricePerCredit = plan.pricePerCredit[interval];
+  // Calcul de l'économie vs pack crédit le moins cher (0.70€/image)
+  const savingsVsCredits = Math.round((1 - pricePerCredit / 0.70) * 100);
 
   return (
     <div
@@ -909,11 +1036,10 @@ function SubscriptionCard({
         </div>
       )}
 
-      {interval === 'annual' && (
-        <div className="absolute -top-2 -right-2 bg-[#4CAF50] text-white text-[11px] font-bold px-2.5 py-1 rounded-full shadow-md">
-          -20%
-        </div>
-      )}
+      {/* Savings badge vs credits */}
+      <div className="absolute -top-2 -right-2 bg-[#4CAF50] text-white text-[11px] font-bold px-2.5 py-1 rounded-full shadow-md">
+        -{savingsVsCredits}% vs crédits
+      </div>
 
       <div className="text-center mb-6">
         <div className="text-4xl mb-3">{plan.emoji}</div>
@@ -960,7 +1086,7 @@ function SubscriptionCard({
       </button>
 
       <p className="text-center text-xs text-[#6B6B6B] mt-3">
-        Annulable à tout moment
+        Sans engagement • Annulable à tout moment
       </p>
     </div>
   );
