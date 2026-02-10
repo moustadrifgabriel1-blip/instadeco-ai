@@ -13,7 +13,8 @@ import { SEO_CONFIG } from '@/lib/seo/config';
  * @see https://nextjs.org/docs/app/api-reference/file-conventions/metadata/sitemap
  */
 
-const BASE_URL = SEO_CONFIG.siteUrl;
+// Nettoyer l'URL de base pour retirer les espaces et retours à la ligne
+const BASE_URL = (SEO_CONFIG.siteUrl || 'https://instadeco.app').trim().replace(/\s+/g, '');
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
