@@ -1,5 +1,4 @@
 import { MetadataRoute } from 'next';
-import { SEO_CONFIG } from '@/lib/seo/config';
 
 /**
  * Sitemap dynamique pour SEO
@@ -13,8 +12,8 @@ import { SEO_CONFIG } from '@/lib/seo/config';
  * @see https://nextjs.org/docs/app/api-reference/file-conventions/metadata/sitemap
  */
 
-// Nettoyer l'URL de base pour retirer les espaces et retours à la ligne
-const BASE_URL = (SEO_CONFIG.siteUrl || 'https://instadeco.app').trim().replace(/\s+/g, '');
+// Hardcodé pour éviter les problèmes de formatage des variables d'environnement
+const BASE_URL = 'https://instadeco.app';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
