@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { useCases } from '@/src/infrastructure/config/di-container';
+import { requireAuth } from '@/lib/security/api-auth';
 
 /**
  * Schéma de validation pour la confirmation HD
@@ -13,9 +14,14 @@ const confirmHDSchema = z.object({
 /**
  * POST /api/v2/hd-unlock/confirm
  * 
- * Confirme le déblocage HD après paiement via ConfirmHDUnlockUseCase
+ * Confirme le déblocage HD après paiement via ConfirmHDUnlockUseCase.
+ * L'utilisateur doit être authentifié.
  */
 export async function POST(req: Request) {
+  // ✅ Authentification obligatoire
+  const auth = await requireAuth();
+  if (auth.error) return auth.error;
+
   try {
     const body = await req.json();
 
@@ -61,10 +67,7 @@ export async function POST(req: Request) {
     console.error('[HD Confirm V2] ❌ Erreur:', error);
 
     return NextResponse.json(
-      {
-        error: 'Erreur lors de la confirmation HD',
-        details: error instanceof Error ? error.message : 'Erreur inconnue',
-      },
+      { error: 'Erreur lors de la confirmation HD' },
       { status: 500 }
     );
   }

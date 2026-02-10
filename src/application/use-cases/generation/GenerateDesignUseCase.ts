@@ -44,6 +44,31 @@ function getImageDimensionsFromBase64(base64: string): { width: number; height: 
       }
     }
     
+    // WEBP: "RIFF" + 4 bytes size + "WEBP" + chunk type
+    if (buffer.length > 30 &&
+        buffer[0] === 0x52 && buffer[1] === 0x49 && buffer[2] === 0x46 && buffer[3] === 0x46 &&
+        buffer[8] === 0x57 && buffer[9] === 0x45 && buffer[10] === 0x42 && buffer[11] === 0x50) {
+      // VP8 lossy
+      if (buffer[12] === 0x56 && buffer[13] === 0x50 && buffer[14] === 0x38 && buffer[15] === 0x20) {
+        const width = buffer.readUInt16LE(26) & 0x3FFF;
+        const height = buffer.readUInt16LE(28) & 0x3FFF;
+        return { width, height };
+      }
+      // VP8L lossless
+      if (buffer[12] === 0x56 && buffer[13] === 0x50 && buffer[14] === 0x38 && buffer[15] === 0x4C) {
+        const bits = buffer.readUInt32LE(21);
+        const width = (bits & 0x3FFF) + 1;
+        const height = ((bits >> 14) & 0x3FFF) + 1;
+        return { width, height };
+      }
+      // VP8X extended
+      if (buffer[12] === 0x56 && buffer[13] === 0x50 && buffer[14] === 0x38 && buffer[15] === 0x58) {
+        const width = (buffer.readUIntLE(24, 3) + 1);
+        const height = (buffer.readUIntLE(27, 3) + 1);
+        return { width, height };
+      }
+    }
+    
     return null;
   } catch {
     return null;
@@ -178,9 +203,34 @@ export class GenerateDesignUseCase {
     await this.generationRepo.update(generation.id, { status: 'processing' });
 
     // 7. Lancer la génération IA (Async)
+    // Utiliser une URL signée temporaire pour que Fal.ai puisse accéder à l'image
+    let controlImageUrl = inputImageUrl;
+    
+    // Si l'URL est une URL Supabase Storage, générer une URL signée (1h)
+    if (inputImageUrl.includes('supabase')) {
+      // Extraire le path depuis l'URL publique (après /object/public/input-images/)
+      const pathMatch = inputImageUrl.match(/\/input-images\/(.+)$/);
+      if (pathMatch) {
+        const filePath = pathMatch[1];
+        const signedResult = await this.storage.createSignedUrl('input-images', filePath, 3600);
+        if (signedResult.success) {
+          controlImageUrl = signedResult.data;
+          this.logger.info('Using signed URL for Fal.ai access');
+        } else {
+          // Fallback: envoyer le base64 directement à Fal.ai
+          controlImageUrl = input.imageBase64;
+          this.logger.warn('Signed URL failed, sending base64 to Fal.ai directly');
+        }
+      } else {
+        // Fallback: envoyer le base64 directement
+        controlImageUrl = input.imageBase64;
+        this.logger.warn('Could not extract path from Supabase URL, sending base64');
+      }
+    }
+
     const genResult = await this.imageGenerator.generate({
       prompt: input.prompt,
-      controlImageUrl: inputImageUrl,
+      controlImageUrl,
       styleSlug: input.styleSlug,
       roomType: input.roomType,
       transformMode: input.transformMode || 'full_redesign',
@@ -202,7 +252,7 @@ export class GenerateDesignUseCase {
     // 7. Mettre à jour avec le providerId
     // On ne stocke pas encore l'image car elle n'est pas prête
     const updateResult = await this.generationRepo.update(generation.id, {
-      status: 'pending', // Pending pour indiquer que c'est en attente externe
+      status: 'processing', // Garder 'processing' (en attente de Fal.ai)
       providerId: genResult.data.providerId,
     });
 

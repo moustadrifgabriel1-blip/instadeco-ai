@@ -92,7 +92,7 @@ export async function generateDesign(
 // ========================
 
 export interface GetGenerationsRequest {
-  userId: string;
+  userId?: string; // Déprécié - l'auth est gérée côté serveur
   limit?: number;
 }
 
@@ -105,10 +105,8 @@ export async function getGenerations(
   request: GetGenerationsRequest,
   options?: RequestOptions
 ): Promise<GetGenerationsResponse> {
-  const params = new URLSearchParams({
-    userId: request.userId,
-    ...(request.limit && { limit: request.limit.toString() }),
-  });
+  const params = new URLSearchParams();
+  if (request.limit) params.append('limit', request.limit.toString());
 
   const response = await fetch(`${API_BASE}/generations?${params}`, {
     method: 'GET',
@@ -138,11 +136,9 @@ export async function getGenerationStatus(
   request: GetGenerationStatusRequest,
   options?: RequestOptions
 ): Promise<GetGenerationStatusResponse> {
-  const params = new URLSearchParams();
-  if (request.userId) params.append('userId', request.userId);
-
+  // L'auth est gérée côté serveur via les cookies Supabase
   const response = await fetch(
-    `${API_BASE}/generations/${request.generationId}/status?${params}`,
+    `${API_BASE}/generations/${request.generationId}/status`,
     {
       method: 'GET',
       signal: options?.signal,
@@ -157,7 +153,7 @@ export async function getGenerationStatus(
 // ========================
 
 export interface GetCreditsRequest {
-  userId: string;
+  // userId is now extracted from auth token server-side
 }
 
 export interface GetCreditsResponse {
@@ -166,10 +162,10 @@ export interface GetCreditsResponse {
 }
 
 export async function getCredits(
-  request: GetCreditsRequest,
+  request?: GetCreditsRequest,
   options?: RequestOptions
 ): Promise<GetCreditsResponse> {
-  const response = await fetch(`${API_BASE}/credits?userId=${request.userId}`, {
+  const response = await fetch(`${API_BASE}/credits`, {
     method: 'GET',
     signal: options?.signal,
   });
@@ -178,7 +174,6 @@ export async function getCredits(
 }
 
 export interface GetCreditHistoryRequest {
-  userId: string;
   limit?: number;
 }
 
@@ -192,7 +187,6 @@ export async function getCreditHistory(
   options?: RequestOptions
 ): Promise<GetCreditHistoryResponse> {
   const params = new URLSearchParams({
-    userId: request.userId,
     ...(request.limit && { limit: request.limit.toString() }),
   });
 
@@ -209,8 +203,6 @@ export async function getCreditHistory(
 // ========================
 
 export interface CreateCheckoutRequest {
-  userId: string;
-  email: string;
   packId: 'pack_10' | 'pack_25' | 'pack_50' | 'pack_100';
   successUrl?: string;
   cancelUrl?: string;
@@ -245,8 +237,6 @@ export async function createCheckoutSession(
 // ========================
 
 export interface CreateSubscriptionRequest {
-  userId: string;
-  email: string;
   planId: 'sub_essentiel' | 'sub_pro' | 'sub_business';
   interval: 'monthly' | 'annual';
   successUrl?: string;
@@ -283,8 +273,6 @@ export async function createSubscriptionSession(
 // ========================
 
 export interface CreateHDUnlockRequest {
-  userId: string;
-  email: string;
   generationId: string;
   successUrl?: string;
   cancelUrl?: string;

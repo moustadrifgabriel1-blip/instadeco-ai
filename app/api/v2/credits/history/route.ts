@@ -2,42 +2,43 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { useCases } from '@/src/infrastructure/config/di-container';
 import { CreditMapper } from '@/src/application/mappers/CreditMapper';
+import { requireAuth } from '@/lib/security/api-auth';
 
 /**
- * Schéma de validation
+ * Schéma de validation (limit uniquement, userId vient du token)
  */
 const querySchema = z.object({
-  userId: z.string().min(1, 'userId requis'),
   limit: z.coerce.number().min(1).max(100).optional().default(50),
 });
 
 /**
  * GET /api/v2/credits/history
  * 
- * Récupère l'historique des transactions de crédits via GetCreditHistoryUseCase
+ * Récupère l'historique des transactions de crédits de l'utilisateur authentifié.
  */
 export async function GET(req: Request) {
+  // ✅ Authentification obligatoire
+  const auth = await requireAuth();
+  if (auth.error) return auth.error;
+  const userId = auth.user.id;
+
   try {
     const url = new URL(req.url);
 
     const validation = querySchema.safeParse({
-      userId: url.searchParams.get('userId'),
       limit: url.searchParams.get('limit'),
     });
 
     if (!validation.success) {
       return NextResponse.json(
-        {
-          error: 'Paramètres invalides',
-          details: validation.error.flatten().fieldErrors,
-        },
+        { error: 'Paramètres invalides', details: validation.error.flatten().fieldErrors },
         { status: 400 }
       );
     }
 
-    const { userId, limit } = validation.data;
+    const { limit } = validation.data;
 
-    // Exécuter le Use Case
+    // Exécuter le Use Case avec l'ID de l'utilisateur authentifié
     const result = await useCases.getCreditHistory.execute({ userId, limit });
 
     if (!result.success) {
@@ -59,10 +60,7 @@ export async function GET(req: Request) {
     console.error('[Credits History V2] ❌ Erreur:', error);
 
     return NextResponse.json(
-      {
-        error: 'Erreur lors de la récupération de l\'historique',
-        details: error instanceof Error ? error.message : 'Erreur inconnue',
-      },
+      { error: 'Erreur lors de la récupération de l\'historique' },
       { status: 500 }
     );
   }

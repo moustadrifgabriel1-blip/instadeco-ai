@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { useCases } from '@/src/infrastructure/config/di-container';
+import { requireAuth } from '@/lib/security/api-auth';
 
 /**
  * Schéma de validation pour HD Unlock
+ * userId et email viennent du token JWT.
  */
 const hdUnlockRequestSchema = z.object({
-  userId: z.string().min(1, 'userId requis'),
-  email: z.string().email('Email invalide'),
   generationId: z.string().min(1, 'generationId requis'),
   successUrl: z.string().url().optional(),
   cancelUrl: z.string().url().optional(),
@@ -19,6 +19,12 @@ const hdUnlockRequestSchema = z.object({
  * Crée une session Stripe pour débloquer HD via UnlockHDUseCase
  */
 export async function POST(req: Request) {
+  // ✅ Authentification obligatoire
+  const auth = await requireAuth();
+  if (auth.error) return auth.error;
+  const userId = auth.user.id;
+  const email = auth.user.email!;
+
   try {
     const body = await req.json();
 
@@ -35,7 +41,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const { userId, email, generationId, successUrl, cancelUrl } = validation.data;
+    const { generationId, successUrl, cancelUrl } = validation.data;
 
     // URLs par défaut
     const origin = new URL(req.url).origin;
@@ -83,10 +89,7 @@ export async function POST(req: Request) {
     console.error('[HD Unlock V2] ❌ Erreur:', error);
 
     return NextResponse.json(
-      {
-        error: 'Erreur lors de la création de la session HD',
-        details: error instanceof Error ? error.message : 'Erreur inconnue',
-      },
+      { error: 'Erreur lors de la création de la session HD' },
       { status: 500 }
     );
   }

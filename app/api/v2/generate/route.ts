@@ -6,6 +6,7 @@ import { DomainError } from '@/src/domain/errors/DomainError';
 import { InsufficientCreditsError } from '@/src/domain/errors/InsufficientCreditsError';
 import { checkRateLimit, getClientIP, RATE_LIMIT_CONFIGS } from '@/lib/security/rate-limiter';
 import { logRateLimitExceeded, logGenerationCreated, logAuditEvent } from '@/lib/security/audit-logger';
+import { createClient } from '@/lib/supabase/server';
 
 /**
  * Schéma de validation pour la génération
@@ -14,7 +15,7 @@ const generateRequestSchema = z.object({
   imageUrl: z.string().min(1, 'Image URL requise'),
   roomType: z.string().max(50).regex(/^[a-z0-9-]+$/, 'Format invalide').default('salon'),
   style: z.string().max(50).regex(/^[a-z0-9-]+$/, 'Format invalide').default('moderne'),
-  userId: z.string().uuid('ID utilisateur invalide'),
+  userId: z.string().uuid('ID utilisateur invalide').optional(), // Optionnel : on prend l'userId de la session si absent
   transformMode: z.enum(['full_redesign', 'rearrange', 'keep_layout', 'decor_only']).default('full_redesign'),
 });
 
@@ -56,9 +57,21 @@ export async function POST(req: Request) {
   }
   
   try {
+    // 🔒 Authentification serveur obligatoire
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      console.warn('[Generate V2] ⛔ Non authentifié');
+      return NextResponse.json(
+        { error: 'Authentification requise', code: 'UNAUTHORIZED' },
+        { status: 401 }
+      );
+    }
+
     const body = await req.json();
     console.log('[Generate V2] 📦 Request received', { 
-      userId: body.userId || 'anonymous',
+      userId: user.id,
       style: body.style,
       roomType: body.roomType 
     });
@@ -77,7 +90,9 @@ export async function POST(req: Request) {
       );
     }
 
-    const { imageUrl, roomType, style, userId, transformMode } = validation.data;
+    // Toujours utiliser l'userId de la session (jamais du body)
+    const { imageUrl, roomType, style, transformMode } = validation.data;
+    const userId = user.id;
 
     console.log('[Generate V2] 🎨 Building prompt with mode:', transformMode);
     // Construire le prompt basé sur le style, le type de pièce et le mode
@@ -151,13 +166,11 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error('[Generate V2] ❌ Erreur:', error);
 
-    // DEBUG: Retourner l'erreur détaillée pour comprendre le problème
+    const isProduction = process.env.NODE_ENV === 'production';
     return NextResponse.json(
       {
         error: 'Erreur serveur critique',
-        details: error instanceof Error ? error.message : String(error),
-        // Ne pas exposer la stack trace en production sauf si nécessaire pour debug
-        // stack: error instanceof Error ? error.stack : undefined 
+        details: isProduction ? 'Une erreur interne est survenue.' : (error instanceof Error ? error.message : String(error)),
       },
       { status: 500 }
     );

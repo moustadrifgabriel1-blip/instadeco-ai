@@ -1,0 +1,486 @@
+'use client';
+
+import { useCallback, useState, useEffect, useRef } from 'react';
+import { useDropzone } from 'react-dropzone';
+import Image from 'next/image';
+import Link from 'next/link';
+import { Plus, ArrowRight, Sparkles, Shield, Zap, Star, Check, UserPlus, Gift } from 'lucide-react';
+
+// Styles populaires pour l'essai (6 max)
+const TRIAL_STYLES = [
+  { id: 'moderne', name: 'Moderne', desc: 'Lignes épurées, élégance contemporaine', icon: '✨' },
+  { id: 'scandinave', name: 'Scandinave', desc: 'Cocooning nordique lumineux', icon: '🪵' },
+  { id: 'boheme', name: 'Bohème', desc: 'Chaleur éclectique colorée', icon: '🌿' },
+  { id: 'japandi', name: 'Japandi', desc: 'Zen japonais & hygge nordique', icon: '🎋' },
+  { id: 'industriel', name: 'Industriel', desc: 'Loft urbain brut et moderne', icon: '🏭' },
+  { id: 'classique', name: 'Classique', desc: 'Élégance traditionnelle française', icon: '🏛️' },
+];
+
+const TRIAL_ROOMS = [
+  { id: 'salon', name: 'Salon', icon: '🛋️' },
+  { id: 'chambre', name: 'Chambre', icon: '🛏️' },
+  { id: 'cuisine', name: 'Cuisine', icon: '🍳' },
+  { id: 'salle-de-bain', name: 'Salle de bain', icon: '🚿' },
+  { id: 'bureau', name: 'Bureau', icon: '💼' },
+  { id: 'salle-a-manger', name: 'Salle à manger', icon: '🍽️' },
+];
+
+const LOADING_MESSAGES = [
+  { threshold: 0, text: 'Analyse de votre pièce...' },
+  { threshold: 15, text: 'Identification de la structure...' },
+  { threshold: 30, text: 'Application du style choisi...' },
+  { threshold: 50, text: 'Génération des détails...' },
+  { threshold: 70, text: 'Ajout des finitions...' },
+  { threshold: 85, text: 'Peaufinage du rendu...' },
+  { threshold: 95, text: 'Presque terminé...' },
+];
+
+export default function EssaiPage() {
+  const [step, setStep] = useState<'upload' | 'options' | 'generating' | 'result' | 'trial-used'>('upload');
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [selectedStyle, setSelectedStyle] = useState('moderne');
+  const [selectedRoom, setSelectedRoom] = useState('salon');
+  const [progress, setProgress] = useState(0);
+  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const pollingRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Vérifier si l'essai a déjà été utilisé
+  useEffect(() => {
+    const trialUsed = localStorage.getItem('instadeco_trial_used');
+    if (trialUsed) {
+      setStep('trial-used');
+    }
+  }, []);
+
+  // Nettoyage du polling
+  useEffect(() => {
+    return () => {
+      if (pollingRef.current) clearInterval(pollingRef.current);
+    };
+  }, []);
+
+  // Upload handler
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    const file = acceptedFiles[0];
+    if (file) {
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+      setStep('options');
+      setError(null);
+    }
+  }, []);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: { 'image/*': ['.jpeg', '.jpg', '.png', '.webp'] },
+    maxFiles: 1,
+    maxSize: 10 * 1024 * 1024,
+  });
+
+  // Convertir fichier en base64
+  const fileToBase64 = async (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // Lancer la génération
+  const handleGenerate = async () => {
+    if (!imageFile) return;
+
+    setStep('generating');
+    setProgress(0);
+    setError(null);
+
+    try {
+      // Convertir en base64
+      const imageBase64 = await fileToBase64(imageFile);
+
+      // Appeler l'API trial
+      const response = await fetch('/api/trial/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          imageBase64,
+          roomType: selectedRoom,
+          style: selectedStyle,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (data.code === 'TRIAL_USED') {
+          localStorage.setItem('instadeco_trial_used', 'true');
+          setStep('trial-used');
+          return;
+        }
+        throw new Error(data.error || 'Erreur lors de la génération');
+      }
+
+      const { requestId } = data;
+
+      // Animer la progression
+      const progressInterval = setInterval(() => {
+        setProgress((prev) => {
+          if (prev >= 95) return prev;
+          const remaining = 95 - prev;
+          const increment = Math.max(0.3, remaining / 50);
+          return prev + increment;
+        });
+      }, 300);
+
+      // Polling du statut
+      pollingRef.current = setInterval(async () => {
+        try {
+          const statusRes = await fetch(`/api/trial/status?requestId=${requestId}`);
+          const statusData = await statusRes.json();
+
+          if (statusData.status === 'completed' && statusData.imageUrl) {
+            clearInterval(progressInterval);
+            if (pollingRef.current) clearInterval(pollingRef.current);
+            setProgress(100);
+            setGeneratedImage(statusData.imageUrl);
+            localStorage.setItem('instadeco_trial_used', 'true');
+            setTimeout(() => setStep('result'), 500);
+          } else if (statusData.status === 'failed') {
+            clearInterval(progressInterval);
+            if (pollingRef.current) clearInterval(pollingRef.current);
+            throw new Error(statusData.error || 'La génération a échoué');
+          }
+        } catch (err: any) {
+          clearInterval(progressInterval);
+          if (pollingRef.current) clearInterval(pollingRef.current);
+          setError(err.message || 'Erreur inattendue');
+          setStep('options');
+        }
+      }, 3000);
+    } catch (err: any) {
+      setError(err.message || 'Erreur inattendue');
+      setStep('options');
+    }
+  };
+
+  const selectedStyleInfo = TRIAL_STYLES.find((s) => s.id === selectedStyle);
+
+  return (
+    <div className="min-h-screen bg-[#fbfbfd]">
+      {/* Navigation simplifiée */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#fbfbfd]/80 backdrop-blur-xl border-b border-black/5">
+        <div className="max-w-[980px] mx-auto px-6 h-12 flex items-center justify-between">
+          <a href="/" className="text-[21px] font-semibold tracking-[-0.01em] text-[#1d1d1f]">
+            InstaDeco
+          </a>
+          <Link
+            href="/signup"
+            className="text-xs font-medium text-[#fbfbfd] bg-[#E07B54] px-4 py-1.5 rounded-full hover:bg-[#d06a45] transition-colors"
+          >
+            Créer un compte gratuit
+          </Link>
+        </div>
+      </nav>
+
+      {/* Hero */}
+      <section className="pt-24 pb-8 px-6">
+        <div className="max-w-[680px] mx-auto text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#FFF3ED] text-[#E07B54] rounded-full text-sm font-medium mb-4">
+            <Gift className="w-4 h-4" />
+            Essai gratuit — Sans inscription
+          </div>
+          <h1 className="text-[40px] md:text-[48px] font-semibold tracking-[-0.025em] text-[#1d1d1f] leading-[1.08]">
+            Testez InstaDeco en 30 secondes
+          </h1>
+          <p className="mt-4 text-[17px] md:text-[19px] text-[#86868b] font-normal leading-[1.4]">
+            Uploadez une photo de votre pièce, choisissez un style, et découvrez la magie de l&apos;IA.
+          </p>
+        </div>
+      </section>
+
+      {/* Contenu principal */}
+      <section className="pb-20 px-6">
+        <div className="max-w-[800px] mx-auto">
+
+          {/* ── ÉTAPE 1 : UPLOAD ── */}
+          {step === 'upload' && (
+            <div
+              {...getRootProps()}
+              className={`
+                relative rounded-[28px] border-2 border-dashed transition-all duration-300 cursor-pointer
+                ${isDragActive
+                  ? 'border-[#E07B54] bg-[#FFF3ED]'
+                  : 'border-[#d2d2d7] hover:border-[#E07B54] bg-white'
+                }
+              `}
+            >
+              <input {...getInputProps()} />
+              <div className="py-20 px-8 text-center">
+                <div className="w-16 h-16 mx-auto mb-5 rounded-full bg-[#FFF3ED] flex items-center justify-center">
+                  <Plus className="w-7 h-7 text-[#E07B54]" strokeWidth={1.5} />
+                </div>
+                <p className="text-[19px] text-[#1d1d1f] font-semibold tracking-[-0.01em]">
+                  {isDragActive ? 'Déposez votre image ici' : 'Ajoutez une photo de votre pièce'}
+                </p>
+                <p className="mt-2 text-[14px] text-[#86868b]">
+                  Glissez-déposez ou cliquez — PNG, JPG, WEBP — Max 10 Mo
+                </p>
+                <div className="mt-6 flex items-center justify-center gap-6 text-[12px] text-[#86868b]">
+                  <span className="flex items-center gap-1"><Zap className="w-3 h-3" /> Résultat en 30s</span>
+                  <span className="flex items-center gap-1"><Shield className="w-3 h-3" /> 100% privé</span>
+                  <span className="flex items-center gap-1"><Star className="w-3 h-3" /> Gratuit</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── ÉTAPE 2 : OPTIONS ── */}
+          {step === 'options' && imagePreview && (
+            <div className="space-y-8">
+              {/* Aperçu de l'image */}
+              <div className="relative rounded-[20px] overflow-hidden bg-[#f5f5f7] shadow-sm">
+                <Image
+                  src={imagePreview}
+                  alt="Votre pièce"
+                  width={800}
+                  height={533}
+                  className="w-full h-auto max-h-[400px] object-cover"
+                  unoptimized
+                />
+                <button
+                  onClick={() => { setImageFile(null); setImagePreview(null); setStep('upload'); }}
+                  className="absolute top-3 right-3 px-3 py-1.5 bg-white/90 backdrop-blur-md rounded-full text-[12px] font-medium text-[#1d1d1f] hover:bg-white transition-colors shadow-sm"
+                >
+                  Changer de photo
+                </button>
+              </div>
+
+              {/* Type de pièce */}
+              <div className="text-center">
+                <label className="block text-[12px] font-semibold text-[#86868b] uppercase tracking-[.1em] mb-3">
+                  Type de pièce
+                </label>
+                <div className="flex flex-wrap justify-center gap-2">
+                  {TRIAL_ROOMS.map((room) => (
+                    <button
+                      key={room.id}
+                      onClick={() => setSelectedRoom(room.id)}
+                      className={`
+                        px-4 py-2 rounded-full text-[14px] font-medium transition-all duration-200
+                        ${selectedRoom === room.id
+                          ? 'bg-[#1d1d1f] text-white'
+                          : 'bg-[#f5f5f7] text-[#1d1d1f] hover:bg-[#e8e8ed]'
+                        }
+                      `}
+                    >
+                      <span className="mr-1">{room.icon}</span> {room.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Style */}
+              <div className="text-center">
+                <label className="block text-[12px] font-semibold text-[#86868b] uppercase tracking-[.1em] mb-3">
+                  Style de décoration
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-w-xl mx-auto">
+                  {TRIAL_STYLES.map((style) => (
+                    <button
+                      key={style.id}
+                      onClick={() => setSelectedStyle(style.id)}
+                      className={`
+                        p-4 rounded-2xl text-left transition-all duration-200 border-2
+                        ${selectedStyle === style.id
+                          ? 'border-[#E07B54] bg-[#FFF3ED]'
+                          : 'border-transparent bg-[#f5f5f7] hover:bg-[#e8e8ed]'
+                        }
+                      `}
+                    >
+                      <span className="text-2xl">{style.icon}</span>
+                      <p className={`font-semibold text-[14px] mt-1 ${selectedStyle === style.id ? 'text-[#E07B54]' : 'text-[#1d1d1f]'}`}>
+                        {style.name}
+                      </p>
+                      <p className="text-[11px] text-[#86868b] mt-0.5">{style.desc}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Erreur */}
+              {error && (
+                <div className="text-center py-2">
+                  <p className="text-red-500 text-[14px]">{error}</p>
+                </div>
+              )}
+
+              {/* Bouton Générer */}
+              <div className="flex flex-col items-center pt-2 gap-3">
+                <button
+                  onClick={handleGenerate}
+                  className="group inline-flex items-center gap-2 bg-[#E07B54] text-white px-8 py-4 rounded-full text-[17px] font-semibold hover:bg-[#d06a45] transition-all duration-200 shadow-lg shadow-[#E07B54]/20 active:scale-95"
+                >
+                  <Sparkles className="w-5 h-5" />
+                  Transformer ma pièce
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </button>
+                <span className="text-[12px] text-[#86868b]">
+                  100% gratuit — 1 essai disponible
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* ── ÉTAPE 3 : GÉNÉRATION EN COURS ── */}
+          {step === 'generating' && (
+            <div className="flex flex-col items-center py-16">
+              <div className="relative w-20 h-20 mb-6">
+                <div className="absolute inset-0 rounded-full border-[3px] border-[#f5f5f7]" />
+                <div className="absolute inset-0 rounded-full border-[3px] border-[#E07B54] border-t-transparent animate-spin" />
+                <div className="absolute inset-2 rounded-full border-[2px] border-[#E07B54]/20 border-b-transparent animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }} />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Sparkles className="w-6 h-6 text-[#E07B54]" />
+                </div>
+              </div>
+              <p className="text-[19px] text-[#1d1d1f] font-semibold tracking-[-0.01em]">
+                {LOADING_MESSAGES.filter((m) => m.threshold <= Math.round(progress)).pop()?.text || 'Préparation...'}
+              </p>
+              <p className="mt-1 text-[15px] text-[#86868b]">{Math.round(progress)}%</p>
+              <div className="w-56 h-[4px] bg-[#f5f5f7] rounded-full mt-5 overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-[#E07B54] to-[#e8956e] rounded-full transition-all duration-700 ease-out"
+                  style={{ width: `${Math.round(progress)}%` }}
+                />
+              </div>
+              <p className="mt-6 text-[12px] text-[#86868b]">
+                Votre photo reste 100% privée
+              </p>
+            </div>
+          )}
+
+          {/* ── ÉTAPE 4 : RÉSULTAT ── */}
+          {step === 'result' && generatedImage && imagePreview && (
+            <div className="space-y-8">
+              {/* Avant / Après */}
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <span className="block text-[12px] font-semibold text-[#86868b] uppercase tracking-[.1em]">
+                    Avant
+                  </span>
+                  <div className="rounded-[16px] overflow-hidden bg-[#f5f5f7]">
+                    <Image src={imagePreview} alt="Avant" width={600} height={400} className="w-full h-auto" unoptimized />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <span className="block text-[12px] font-semibold text-[#86868b] uppercase tracking-[.1em]">
+                    Après — {selectedStyleInfo?.name}
+                  </span>
+                  <div className="relative rounded-[16px] overflow-hidden bg-[#f5f5f7]">
+                    <Image src={generatedImage} alt="Après" width={600} height={400} className="w-full h-auto" />
+                    {/* Filigrane */}
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <span
+                        className="text-white/30 text-[36px] md:text-[52px] font-bold tracking-[.08em] rotate-[-15deg] select-none"
+                        style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.2)' }}
+                      >
+                        InstaDeco
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* CTA : Créer un compte */}
+              <div className="bg-gradient-to-br from-[#FFF8F5] to-[#FFF0E8] rounded-[24px] border border-[#F0E6E0] p-8 text-center">
+                <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-[#E07B54] flex items-center justify-center">
+                  <Gift className="w-7 h-7 text-white" />
+                </div>
+                <h2 className="text-[28px] font-bold text-[#1d1d1f] tracking-[-0.02em]">
+                  Ça vous plaît ?
+                </h2>
+                <p className="mt-2 text-[17px] text-[#6B6B6B] max-w-md mx-auto leading-relaxed">
+                  Créez votre compte gratuitement et recevez <span className="font-bold text-[#E07B54]">2 crédits offerts</span> pour transformer d&apos;autres pièces.
+                </p>
+
+                <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
+                  <Link
+                    href="/signup"
+                    className="group inline-flex items-center gap-2 bg-[#E07B54] text-white px-8 py-4 rounded-full text-[17px] font-semibold hover:bg-[#d06a45] transition-all duration-200 shadow-lg shadow-[#E07B54]/20 active:scale-95"
+                  >
+                    <UserPlus className="w-5 h-5" />
+                    Créer mon compte gratuit
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                </div>
+
+                <div className="mt-6 flex items-center justify-center gap-6 text-[13px] text-[#86868b]">
+                  <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-500" /> 2 crédits offerts</span>
+                  <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-500" /> Sans engagement</span>
+                  <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-500" /> 20+ styles</span>
+                </div>
+              </div>
+
+              {/* Info supplémentaires */}
+              <div className="grid grid-cols-3 gap-4 max-w-lg mx-auto">
+                <div className="text-center p-4 rounded-2xl bg-white border border-black/5">
+                  <p className="text-[24px] font-bold text-[#E07B54]">0,99 CHF</p>
+                  <p className="text-[12px] text-[#86868b] mt-1">par transformation</p>
+                </div>
+                <div className="text-center p-4 rounded-2xl bg-white border border-black/5">
+                  <p className="text-[24px] font-bold text-[#1d1d1f]">30s</p>
+                  <p className="text-[12px] text-[#86868b] mt-1">temps de rendu</p>
+                </div>
+                <div className="text-center p-4 rounded-2xl bg-white border border-black/5">
+                  <p className="text-[24px] font-bold text-[#1d1d1f]">20+</p>
+                  <p className="text-[12px] text-[#86868b] mt-1">styles disponibles</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── ESSAI DÉJÀ UTILISÉ ── */}
+          {step === 'trial-used' && (
+            <div className="text-center py-16">
+              <div className="w-16 h-16 mx-auto mb-5 rounded-full bg-[#FFF3ED] flex items-center justify-center">
+                <Sparkles className="w-7 h-7 text-[#E07B54]" />
+              </div>
+              <h2 className="text-[32px] font-bold text-[#1d1d1f] tracking-[-0.02em]">
+                Votre essai gratuit est terminé
+              </h2>
+              <p className="mt-3 text-[17px] text-[#86868b] max-w-md mx-auto leading-relaxed">
+                Vous avez déjà utilisé votre essai gratuit. Créez un compte pour obtenir <span className="font-bold text-[#E07B54]">2 crédits offerts</span> et continuer à transformer vos pièces.
+              </p>
+
+              <div className="mt-8 flex flex-col items-center gap-4">
+                <Link
+                  href="/signup"
+                  className="group inline-flex items-center gap-2 bg-[#E07B54] text-white px-8 py-4 rounded-full text-[17px] font-semibold hover:bg-[#d06a45] transition-all duration-200 shadow-lg shadow-[#E07B54]/20 active:scale-95"
+                >
+                  <UserPlus className="w-5 h-5" />
+                  Créer mon compte — 2 crédits offerts
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </Link>
+
+                <Link
+                  href="/pricing"
+                  className="text-[14px] text-[#86868b] hover:text-[#1d1d1f] transition-colors underline"
+                >
+                  Voir les tarifs
+                </Link>
+              </div>
+
+              <div className="mt-8 flex items-center justify-center gap-6 text-[13px] text-[#86868b]">
+                <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-500" /> 2 crédits offerts</span>
+                <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-500" /> Sans engagement</span>
+                <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-500" /> 0,99 CHF/transformation</span>
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+    </div>
+  );
+}

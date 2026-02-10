@@ -2,13 +2,13 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { useCases } from '@/src/infrastructure/config/di-container';
 import { checkRateLimit, getClientIP, RATE_LIMIT_CONFIGS } from '@/lib/security/rate-limiter';
+import { requireAuth } from '@/lib/security/api-auth';
 
 /**
  * Schéma de validation pour l'achat de crédits
+ * userId et email sont extraits du token JWT, pas du body.
  */
 const purchaseRequestSchema = z.object({
-  userId: z.string().uuid('ID utilisateur invalide'),
-  email: z.string().email('Email invalide'),
   packId: z.enum(['pack_10', 'pack_25', 'pack_50', 'pack_100']).default('pack_10'),
   successUrl: z.string().url().optional(),
   cancelUrl: z.string().url().optional(),
@@ -54,6 +54,12 @@ function getPackConfig(packId: string): { priceId: string; credits: number } | n
  * Crée une session Stripe pour l'achat de crédits via PurchaseCreditsUseCase
  */
 export async function POST(req: Request) {
+  // ✅ Authentification obligatoire
+  const auth = await requireAuth();
+  if (auth.error) return auth.error;
+  const userId = auth.user.id;
+  const email = auth.user.email!;
+
   // Rate limiting pour éviter les abus
   const clientIP = getClientIP(req.headers);
   const rateLimitResult = checkRateLimit(clientIP, RATE_LIMIT_CONFIGS.checkout);
@@ -81,7 +87,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const { userId, email, packId, successUrl, cancelUrl } = validation.data;
+    const { packId, successUrl, cancelUrl } = validation.data;
 
     // Récupérer la config du pack au runtime
     const packConfig = getPackConfig(packId);
@@ -131,10 +137,7 @@ export async function POST(req: Request) {
     console.error('[Payments V2] ❌ Erreur:', error);
 
     return NextResponse.json(
-      {
-        error: 'Erreur lors de la création de la session de paiement',
-        details: error instanceof Error ? error.message : 'Erreur inconnue',
-      },
+      { error: 'Erreur lors de la création de la session de paiement' },
       { status: 500 }
     );
   }

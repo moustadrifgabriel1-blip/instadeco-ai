@@ -1,23 +1,20 @@
 import { NextResponse } from 'next/server';
-import { createClient as createSupabaseClient } from '@supabase/supabase-js';
+import { createAdminClient } from '@/lib/supabase/server';
 import { addCredits } from '@/lib/supabase/credits';
-
-const supabaseAdmin = createSupabaseClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { requireAuth } from '@/lib/security/api-auth';
 
 /**
- * GET /api/v2/referral — Récupérer les infos de parrainage de l'utilisateur
+ * GET /api/v2/referral — Récupérer les infos de parrainage de l'utilisateur authentifié
  */
 export async function GET(req: Request) {
-  try {
-    const url = new URL(req.url);
-    const userId = url.searchParams.get('userId');
+  // ✅ Authentification obligatoire
+  const auth = await requireAuth();
+  if (auth.error) return auth.error;
+  const userId = auth.user.id;
 
-    if (!userId) {
-      return NextResponse.json({ error: 'userId requis' }, { status: 400 });
-    }
+  const supabaseAdmin = await createAdminClient();
+
+  try {
 
     // Récupérer le code de parrainage
     const { data: profile, error: profileError } = await supabaseAdmin
@@ -51,7 +48,7 @@ export async function GET(req: Request) {
 
     const referralList = referrals || [];
     const totalCreditsEarned = referralList.reduce(
-      (sum, r) => sum + (r.referrer_credits_awarded || 0), 0
+      (sum: number, r: any) => sum + (r.referrer_credits_awarded || 0), 0
     );
 
     return NextResponse.json({
@@ -68,14 +65,22 @@ export async function GET(req: Request) {
 
 /**
  * POST /api/v2/referral — Appliquer un code de parrainage (lors de l'inscription)
+ * L'utilisateur doit être authentifié. Le newUserId est extrait du token JWT.
  */
 export async function POST(req: Request) {
-  try {
-    const { referralCode, newUserId } = await req.json();
+  // ✅ Authentification obligatoire
+  const auth = await requireAuth();
+  if (auth.error) return auth.error;
+  const newUserId = auth.user.id;
 
-    if (!referralCode || !newUserId) {
+  const supabaseAdmin = await createAdminClient();
+
+  try {
+    const { referralCode } = await req.json();
+
+    if (!referralCode) {
       return NextResponse.json(
-        { error: 'referralCode et newUserId requis' },
+        { error: 'referralCode requis' },
         { status: 400 }
       );
     }

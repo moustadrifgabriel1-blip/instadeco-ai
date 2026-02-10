@@ -55,26 +55,16 @@ export function Hero() {
               Résultat de designer, sans travaux, sans rendez-vous.
             </p>
 
-            {/* CTA Buttons */}
+            {/* CTA Button */}
             <div className="flex flex-col sm:flex-row gap-4">
               <Button 
                 size="lg" 
                 className="group h-14 px-8 text-lg rounded-xl btn-primary" 
                 asChild
               >
-                <Link href="/generate" className="flex items-center gap-2">
-                  <span>Essayer gratuitement</span>
+                <Link href="/essai" className="flex items-center gap-2">
+                  <span>Tester gratuitement</span>
                   <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </Button>
-              <Button 
-                size="lg" 
-                variant="outline" 
-                className="h-14 px-8 text-lg rounded-xl border-2 border-[#F0E6E0] text-[#2D2D2D] hover:bg-[#FFF8F5] hover:border-[#E07B54] transition-smooth" 
-                asChild
-              >
-                <Link href="/pricing">
-                  Voir une démo
                 </Link>
               </Button>
             </div>

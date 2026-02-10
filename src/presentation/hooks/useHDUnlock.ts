@@ -46,8 +46,6 @@ export function useHDUnlock(): UseHDUnlockReturn {
 
       try {
         const response = await createHDUnlockSession({
-          userId: user.id,
-          email: user.email,
           generationId: input.generationId,
           successUrl: input.successUrl,
           cancelUrl: input.cancelUrl,

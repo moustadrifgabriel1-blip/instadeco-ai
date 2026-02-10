@@ -1,7 +1,8 @@
 /**
  * Utilitaire de sanitization HTML
- * Protège contre les attaques XSS lors du rendu de contenu dynamique
+ * Utilise DOMPurify pour une protection robuste contre les attaques XSS
  */
+import DOMPurify from 'isomorphic-dompurify';
 
 // Liste des balises HTML autorisées dans le contenu du blog
 const ALLOWED_TAGS = [
@@ -15,18 +16,11 @@ const ALLOWED_TAGS = [
 ];
 
 // Attributs autorisés par balise
-const ALLOWED_ATTRIBUTES: Record<string, string[]> = {
-  a: ['href', 'title', 'target', 'rel'],
-  img: ['src', 'alt', 'title', 'width', 'height', 'loading'],
-  div: ['class'],
-  span: ['class'],
-  p: ['class'],
-  blockquote: ['class'],
-  pre: ['class'],
-  code: ['class'],
-  figure: ['class'],
-  table: ['class'],
-};
+const ALLOWED_ATTR = [
+  'href', 'title', 'target', 'rel',
+  'src', 'alt', 'width', 'height', 'loading',
+  'class',
+];
 
 // Protocoles autorisés pour les URLs
 const ALLOWED_PROTOCOLS = ['http:', 'https:', 'mailto:'];
@@ -39,7 +33,6 @@ function isSafeUrl(url: string): boolean {
     const parsed = new URL(url, 'https://instadeco.app');
     return ALLOWED_PROTOCOLS.includes(parsed.protocol);
   } catch {
-    // URL relative - généralement sûre
     return !url.startsWith('javascript:') && !url.startsWith('data:');
   }
 }
@@ -60,35 +53,17 @@ export function escapeHtml(text: string): string {
 }
 
 /**
- * Sanitize le contenu HTML pour le rendre sûr
- * Version simplifiée - pour une protection complète, utiliser DOMPurify
+ * Sanitize le contenu HTML avec DOMPurify (protection XSS robuste)
  */
 export function sanitizeHtml(html: string): string {
-  // Supprimer les scripts
-  let clean = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
-  
-  // Supprimer les event handlers (onclick, onerror, etc.)
-  clean = clean.replace(/\s*on\w+\s*=\s*["'][^"']*["']/gi, '');
-  clean = clean.replace(/\s*on\w+\s*=\s*[^\s>]+/gi, '');
-  
-  // Supprimer les URLs javascript:
-  clean = clean.replace(/href\s*=\s*["']javascript:[^"']*["']/gi, 'href="#"');
-  clean = clean.replace(/src\s*=\s*["']javascript:[^"']*["']/gi, '');
-  
-  // Supprimer les URLs data: (sauf pour les images)
-  clean = clean.replace(/(?<!img[^>]*)src\s*=\s*["']data:[^"']*["']/gi, '');
-  
-  // Supprimer les iframes non autorisées
-  clean = clean.replace(/<iframe\b[^>]*>[\s\S]*?<\/iframe>/gi, '');
-  
-  // Supprimer les objects/embeds
-  clean = clean.replace(/<object\b[^>]*>[\s\S]*?<\/object>/gi, '');
-  clean = clean.replace(/<embed\b[^>]*>/gi, '');
-  
-  // Supprimer les styles inline dangereux (expression, behavior, etc.)
-  clean = clean.replace(/style\s*=\s*["'][^"']*(?:expression|behavior|javascript)[^"']*["']/gi, '');
-  
-  return clean;
+  return DOMPurify.sanitize(html, {
+    ALLOWED_TAGS,
+    ALLOWED_ATTR,
+    ALLOW_DATA_ATTR: false,
+    ADD_ATTR: ['target', 'rel'],
+    FORBID_TAGS: ['script', 'style', 'iframe', 'object', 'embed', 'form', 'input'],
+    FORBID_ATTR: ['onerror', 'onclick', 'onload', 'onmouseover', 'onfocus', 'onblur'],
+  });
 }
 
 /**
@@ -106,7 +81,6 @@ export function sanitizeUrl(url: string): string {
  */
 export function sanitizeJsonLd(obj: unknown): string {
   const json = JSON.stringify(obj);
-  // Échapper les caractères qui pourraient casser le script tag
   return json
     .replace(/</g, '\\u003c')
     .replace(/>/g, '\\u003e')

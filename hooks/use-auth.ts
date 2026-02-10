@@ -15,14 +15,17 @@ export function useAuth() {
   const supabase = createClient();
 
   useEffect(() => {
-    // Récupérer la session initiale
+    // Récupérer l'utilisateur authentifié (vérifié via le serveur Supabase)
     const getInitialSession = async () => {
       try {
+        // ✅ getUser() valide le token côté serveur au lieu de juste lire le JWT local
+        const { data: { user } } = await supabase.auth.getUser();
+        setUser(user);
+        // Récupérer la session pour les métadonnées de session
         const { data: { session } } = await supabase.auth.getSession();
         setSession(session);
-        setUser(session?.user ?? null);
       } catch (error) {
-        console.error('Error getting session:', error);
+        console.error('Error getting user:', error);
       } finally {
         setLoading(false);
       }
@@ -52,10 +55,10 @@ export function useAuth() {
       return;
     }
 
-    // Récupérer les crédits via l'API (bypass RLS)
+    // Récupérer les crédits via l'API (auth via cookie)
     const fetchCreditsData = async () => {
       try {
-        const response = await getCredits({ userId: user.id });
+        const response = await getCredits();
         setCredits(response.credits);
       } catch (error) {
         console.error('[Auth] Error fetching credits from API:', error);

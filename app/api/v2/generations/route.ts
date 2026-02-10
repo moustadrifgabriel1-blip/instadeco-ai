@@ -2,12 +2,12 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { useCases } from '@/src/infrastructure/config/di-container';
 import { GenerationMapper } from '@/src/application/mappers/GenerationMapper';
+import { createClient } from '@/lib/supabase/server';
 
 /**
  * Schéma de validation
  */
 const querySchema = z.object({
-  userId: z.string().min(1, 'userId requis'),
   limit: z.coerce.number().min(1).max(100).optional().default(20),
 });
 
@@ -18,10 +18,20 @@ const querySchema = z.object({
  */
 export async function GET(req: Request) {
   try {
+    // 🔒 Authentification serveur
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: 'Authentification requise' },
+        { status: 401 }
+      );
+    }
+
     const url = new URL(req.url);
     
     const validation = querySchema.safeParse({
-      userId: url.searchParams.get('userId'),
       limit: url.searchParams.get('limit'),
     });
 
@@ -35,7 +45,8 @@ export async function GET(req: Request) {
       );
     }
 
-    const { userId, limit } = validation.data;
+    const { limit } = validation.data;
+    const userId = user.id;
 
     // Exécuter le Use Case
     const result = await useCases.listUserGenerations.execute({

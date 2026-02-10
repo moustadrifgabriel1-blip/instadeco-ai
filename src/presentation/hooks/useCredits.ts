@@ -63,7 +63,7 @@ export function useCredits(): UseCreditsReturn {
 
     try {
       const response = await getCredits(
-        { userId: user.id },
+        {},
         { signal: abortControllerRef.current.signal }
       );
 
@@ -180,7 +180,7 @@ export function useCreditHistory(limit?: number): UseCreditHistoryReturn {
 
     try {
       const response = await getCreditHistory(
-        { userId: user.id, limit },
+        { limit },
         { signal: abortControllerRef.current.signal }
       );
 

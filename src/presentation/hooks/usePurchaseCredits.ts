@@ -45,8 +45,6 @@ export function usePurchaseCredits(): UsePurchaseCreditsReturn {
 
       try {
         const response = await createCheckoutSession({
-          userId: user.id,
-          email: user.email,
           packId: input.packId,
           successUrl: input.successUrl,
           cancelUrl: input.cancelUrl,

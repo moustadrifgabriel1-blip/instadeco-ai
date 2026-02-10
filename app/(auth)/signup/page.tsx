@@ -14,6 +14,7 @@ function SignupForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [referralCode, setReferralCode] = useState('');
+  const [acceptTerms, setAcceptTerms] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -58,7 +59,6 @@ function SignupForm() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               referralCode: referralCode.trim().toUpperCase(),
-              newUserId: data.user.id,
             }),
           });
         } catch (refErr) {
@@ -183,9 +183,31 @@ function SignupForm() {
               />
             </div>
 
+            {/* ✅ Consentement RGPD obligatoire */}
+            <div className="flex items-start gap-3">
+              <input
+                type="checkbox"
+                id="accept-terms"
+                checked={acceptTerms}
+                onChange={(e) => setAcceptTerms(e.target.checked)}
+                className="mt-1 h-4 w-4 rounded border-[#d2d2d7] text-[#0071e3] focus:ring-[#0071e3]"
+                required
+              />
+              <label htmlFor="accept-terms" className="text-[13px] text-[#86868b] leading-5">
+                J&apos;accepte les{' '}
+                <a href="/legal/cgv" target="_blank" className="text-[#0071e3] hover:underline">
+                  Conditions Générales de Vente
+                </a>{' '}
+                et la{' '}
+                <a href="/legal/privacy" target="_blank" className="text-[#0071e3] hover:underline">
+                  Politique de Confidentialité
+                </a>.
+              </label>
+            </div>
+
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !acceptTerms}
               className="w-full py-3 bg-[#1d1d1f] text-white rounded-full text-[17px] font-medium hover:bg-black transition-colors disabled:opacity-50"
             >
               {loading ? 'Création...' : 'Créer mon compte'}

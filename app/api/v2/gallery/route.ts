@@ -1,26 +1,26 @@
 import { NextResponse } from 'next/server';
-import { createClient as createSupabaseClient } from '@supabase/supabase-js';
-
-const supabaseAdmin = createSupabaseClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { createAdminClient } from '@/lib/supabase/server';
 
 /**
  * GET /api/v2/gallery — Récupérer les générations publiques pour la galerie
- * Retourne les meilleures générations complétées (anonymisées)
+ * Retourne les meilleures générations complétées (anonymisées, sans input_image_url)
  */
 export async function GET(req: Request) {
   try {
+    const supabaseAdmin = await createAdminClient();
     const url = new URL(req.url);
     const style = url.searchParams.get('style');
     const room = url.searchParams.get('room');
-    const limit = parseInt(url.searchParams.get('limit') || '24');
-    const offset = parseInt(url.searchParams.get('offset') || '0');
+    // ✅ Limit capé à 50 maximum pour éviter les abus
+    const rawLimit = parseInt(url.searchParams.get('limit') || '24');
+    const limit = Math.max(1, Math.min(rawLimit, 50));
+    const rawOffset = parseInt(url.searchParams.get('offset') || '0');
+    const offset = Math.max(0, rawOffset);
 
+    // ✅ input_image_url retiré : les photos des intérieurs des utilisateurs sont privées
     let query = supabaseAdmin
       .from('generations')
-      .select('id, style_slug, room_type_slug, input_image_url, output_image_url, created_at')
+      .select('id, style_slug, room_type_slug, output_image_url, created_at')
       .eq('status', 'completed')
       .not('output_image_url', 'is', null)
       .order('created_at', { ascending: false })

@@ -156,7 +156,7 @@ export class FalImageGeneratorService implements IImageGeneratorService {
           
           num_inference_steps: 28, 
           guidance_scale: 3.5, 
-          enable_safety_checker: false,
+          enable_safety_checker: true,
           output_format: "jpeg"
         } as any,
         webhookUrl: process.env.NEXT_PUBLIC_APP_URL ? `${process.env.NEXT_PUBLIC_APP_URL}/api/v2/webhooks/fal` : undefined,

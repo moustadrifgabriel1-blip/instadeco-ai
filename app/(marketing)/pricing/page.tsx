@@ -273,8 +273,6 @@ export default function PricingPage() {
 
     try {
       const response = await createSubscriptionSession({
-        userId: user.id,
-        email: user.email,
         planId,
         interval: billingInterval,
         successUrl: `${window.location.origin}/dashboard?subscription=success`,

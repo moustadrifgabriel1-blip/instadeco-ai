@@ -4,6 +4,7 @@ import { useCases } from '@/src/infrastructure/config/di-container';
 import { GenerationMapper } from '@/src/application/mappers/GenerationMapper';
 import { sendGenerationCompleteEmail } from '@/lib/notifications/marketing-emails';
 import { createClient as createSupabaseAdmin } from '@supabase/supabase-js';
+import { createClient } from '@/lib/supabase/server';
 
 /**
  * Schéma de validation
@@ -12,9 +13,8 @@ const paramsSchema = z.object({
   id: z.string().min(1),
 });
 
-const querySchema = z.object({
-  userId: z.string().optional(),
-});
+export const maxDuration = 30;
+export const dynamic = 'force-dynamic';
 
 /**
  * GET /api/v2/generations/[id]/status
@@ -23,15 +23,23 @@ const querySchema = z.object({
  */
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const url = new URL(req.url);
+    // 🔒 Authentification serveur
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
     
-    const paramsValidation = paramsSchema.safeParse(params);
-    const queryValidation = querySchema.safeParse({
-      userId: url.searchParams.get('userId'),
-    });
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: 'Authentification requise' },
+        { status: 401 }
+      );
+    }
+
+    const resolvedParams = await params;
+    
+    const paramsValidation = paramsSchema.safeParse(resolvedParams);
 
     if (!paramsValidation.success) {
       return NextResponse.json(
@@ -41,7 +49,8 @@ export async function GET(
     }
 
     const { id } = paramsValidation.data;
-    const { userId } = queryValidation.success ? queryValidation.data : { userId: undefined };
+    // Utiliser le userId de la session pour vérifier la propriété
+    const userId = user.id;
 
     console.log('[StatusAPI] Request for generation:', id);
 

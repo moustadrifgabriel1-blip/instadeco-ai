@@ -2,13 +2,12 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import Stripe from 'stripe';
 import { checkRateLimit, getClientIP, RATE_LIMIT_CONFIGS } from '@/lib/security/rate-limiter';
+import { requireAuth } from '@/lib/security/api-auth';
 
 /**
  * Schéma de validation pour la souscription à un abonnement
  */
 const subscriptionRequestSchema = z.object({
-  userId: z.string().uuid('ID utilisateur invalide'),
-  email: z.string().email('Email invalide'),
   planId: z.enum(['sub_essentiel', 'sub_pro', 'sub_business']),
   interval: z.enum(['monthly', 'annual']).default('monthly'),
   successUrl: z.string().url().optional(),
@@ -75,6 +74,12 @@ function getSubscriptionConfig(planId: string, interval: string): {
  * Crée une session Stripe Checkout en mode subscription
  */
 export async function POST(req: Request) {
+  // ✅ Authentification obligatoire
+  const auth = await requireAuth();
+  if (auth.error) return auth.error;
+  const userId = auth.user.id;
+  const email = auth.user.email!;
+
   const clientIP = getClientIP(req.headers);
   const rateLimitResult = checkRateLimit(clientIP, RATE_LIMIT_CONFIGS.checkout);
 
@@ -96,7 +101,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const { userId, email, planId, interval, successUrl, cancelUrl } = validation.data;
+    const { planId, interval, successUrl, cancelUrl } = validation.data;
 
     const subConfig = getSubscriptionConfig(planId, interval);
     if (!subConfig) {
@@ -170,10 +175,7 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error('[Subscription] ❌ Erreur:', error);
     return NextResponse.json(
-      {
-        error: 'Erreur lors de la création de la session d\'abonnement',
-        details: error instanceof Error ? error.message : 'Erreur inconnue',
-      },
+      { error: 'Erreur lors de la création de la session d\'abonnement' },
       { status: 500 }
     );
   }

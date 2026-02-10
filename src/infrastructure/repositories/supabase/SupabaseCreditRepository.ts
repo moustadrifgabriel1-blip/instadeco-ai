@@ -48,28 +48,36 @@ export class SupabaseCreditRepository implements ICreditRepository {
     description: string,
     stripeSessionId?: string
   ): Promise<Result<number>> {
-    // 1. Récupérer le solde actuel
-    const balanceResult = await this.getBalance(userId);
-    if (!balanceResult.success) {
-      return balanceResult;
-    }
-
-    const newBalance = balanceResult.data + amount;
-
-    // 2. Mettre à jour le profil
-    const { error: updateError } = await this.supabase
-      .from('profiles')
-      .update({ 
-        credits: newBalance,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', userId);
+    // Opération atomique : incrémenter les crédits avec RPC ou update SQL
+    const { data, error: updateError } = await this.supabase
+      .rpc('increment_credits', { user_id_input: userId, amount_input: amount });
 
     if (updateError) {
-      return failure(new Error(`Failed to add credits: ${updateError.message}`));
+      // Fallback si la function RPC n'existe pas encore
+      console.warn('[Credits] RPC increment_credits failed, using fallback:', updateError.message);
+      
+      // Fallback : utiliser update avec subquery (moins atomique mais fonctionnel)
+      const balanceResult = await this.getBalance(userId);
+      if (!balanceResult.success) return balanceResult;
+      
+      const newBalance = balanceResult.data + amount;
+      const { error: fallbackError } = await this.supabase
+        .from('profiles')
+        .update({ credits: newBalance, updated_at: new Date().toISOString() })
+        .eq('id', userId);
+      
+      if (fallbackError) {
+        return failure(new Error(`Failed to add credits: ${fallbackError.message}`));
+      }
+      
+      // Créer la transaction
+      await this.createTransaction({ userId, amount, type: 'purchase', description, stripeSessionId });
+      return success(newBalance);
     }
 
-    // 3. Créer la transaction
+    const newBalance = data as number;
+
+    // Créer la transaction
     await this.createTransaction({
       userId,
       amount,
@@ -87,37 +95,47 @@ export class SupabaseCreditRepository implements ICreditRepository {
     description: string,
     generationId?: string
   ): Promise<Result<number>> {
-    // 1. Récupérer le solde actuel
-    const balanceResult = await this.getBalance(userId);
-    if (!balanceResult.success) {
-      return balanceResult;
+    // Opération atomique : décrémenter les crédits avec RPC
+    const { data, error: rpcError } = await this.supabase
+      .rpc('deduct_credits', { user_id_input: userId, amount_input: amount });
+
+    if (rpcError) {
+      // Fallback si la function RPC n'existe pas encore
+      console.warn('[Credits] RPC deduct_credits failed, using fallback:', rpcError.message);
+      
+      const balanceResult = await this.getBalance(userId);
+      if (!balanceResult.success) return balanceResult;
+      
+      const currentBalance = balanceResult.data;
+      if (currentBalance < amount) {
+        return failure(new Error('Insufficient credits'));
+      }
+      
+      const newBalance = currentBalance - amount;
+      const { error: fallbackError } = await this.supabase
+        .from('profiles')
+        .update({ credits: newBalance, updated_at: new Date().toISOString() })
+        .eq('id', userId);
+      
+      if (fallbackError) {
+        return failure(new Error(`Failed to deduct credits: ${fallbackError.message}`));
+      }
+      
+      await this.createTransaction({ userId, amount: -amount, type: 'generation', description, generationId });
+      return success(newBalance);
     }
 
-    const currentBalance = balanceResult.data;
-    
-    if (currentBalance < amount) {
+    // Si data est -1, c'est que les crédits sont insuffisants (convention de la RPC)
+    if (data === -1) {
       return failure(new Error('Insufficient credits'));
     }
 
-    const newBalance = currentBalance - amount;
+    const newBalance = data as number;
 
-    // 2. Mettre à jour le profil
-    const { error: updateError } = await this.supabase
-      .from('profiles')
-      .update({ 
-        credits: newBalance,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', userId);
-
-    if (updateError) {
-      return failure(new Error(`Failed to deduct credits: ${updateError.message}`));
-    }
-
-    // 3. Créer la transaction
+    // Créer la transaction
     await this.createTransaction({
       userId,
-      amount: -amount, // Négatif pour déduction
+      amount: -amount,
       type: 'generation',
       description,
       generationId,
