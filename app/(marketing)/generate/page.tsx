@@ -310,14 +310,24 @@ function GenerateContent() {
   };
 
   const handleUnlock = async () => {
+    console.log('[HD Unlock] Click — generationId:', generationId);
     if (!generationId) {
       alert('Génération non trouvée. Veuillez réessayer.');
       return;
     }
     
-    const checkoutUrl = await unlock({ generationId });
-    if (checkoutUrl) {
-      window.location.href = checkoutUrl;
+    try {
+      const checkoutUrl = await unlock({ generationId });
+      console.log('[HD Unlock] checkoutUrl:', checkoutUrl);
+      if (checkoutUrl) {
+        window.location.href = checkoutUrl;
+      } else {
+        // Si pas de checkoutUrl mais pas d'erreur, l'image est peut-être déjà débloquée
+        console.warn('[HD Unlock] Pas de checkoutUrl retourné');
+      }
+    } catch (err) {
+      console.error('[HD Unlock] Erreur:', err);
+      alert('Erreur lors du déblocage HD. Veuillez réessayer.');
     }
   };
 
@@ -655,7 +665,7 @@ function GenerateContent() {
                     disabled={isUnlocking}
                     className="w-full inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full text-[15px] font-semibold text-[#1d1d1f] bg-gradient-to-r from-amber-300 to-amber-400 hover:from-amber-400 hover:to-amber-500 transition-all disabled:opacity-50 shadow-lg shadow-amber-400/20 active:scale-95"
                   >
-                    {isUnlocking ? 'Chargement...' : 'Obtenir en HD — 4,99 €'}
+                    {isUnlocking ? 'Chargement...' : 'Obtenir en HD — 1,99 €'}
                   </button>
                   <p className="text-[11px] text-white/40 mt-2">Paiement unique • Téléchargement immédiat</p>
                 </div>
