@@ -195,7 +195,7 @@ export default function EssaiPage() {
           <h1 className="text-[40px] md:text-[48px] font-semibold tracking-[-0.025em] text-[#1d1d1f] leading-[1.08]">
             Testez InstaDeco en 30 secondes
           </h1>
-          <p className="mt-4 text-[17px] md:text-[19px] text-[#86868b] font-normal leading-[1.4]">
+          <p className="mt-4 text-[17px] md:text-[19px] text-[#636366] font-normal leading-[1.4]">
             Uploadez une photo de votre pièce, choisissez un style, et découvrez la magie de l&apos;IA.
           </p>
         </div>
@@ -225,10 +225,10 @@ export default function EssaiPage() {
                 <p className="text-[19px] text-[#1d1d1f] font-semibold tracking-[-0.01em]">
                   {isDragActive ? 'Déposez votre image ici' : 'Ajoutez une photo de votre pièce'}
                 </p>
-                <p className="mt-2 text-[14px] text-[#86868b]">
+                <p className="mt-2 text-[14px] text-[#636366]">
                   Glissez-déposez ou cliquez — PNG, JPG, WEBP — Max 10 Mo
                 </p>
-                <div className="mt-6 flex items-center justify-center gap-6 text-[12px] text-[#86868b]">
+                <div className="mt-6 flex items-center justify-center gap-6 text-[12px] text-[#636366]">
                   <span className="flex items-center gap-1"><Zap className="w-3 h-3" /> Résultat en 30s</span>
                   <span className="flex items-center gap-1"><Shield className="w-3 h-3" /> 100% privé</span>
                   <span className="flex items-center gap-1"><Star className="w-3 h-3" /> Gratuit</span>
@@ -260,7 +260,7 @@ export default function EssaiPage() {
 
               {/* Type de pièce */}
               <div className="text-center">
-                <label className="block text-[12px] font-semibold text-[#86868b] uppercase tracking-[.1em] mb-3">
+                <label className="block text-[12px] font-semibold text-[#636366] uppercase tracking-[.1em] mb-3">
                   Type de pièce
                 </label>
                 <div className="flex flex-wrap justify-center gap-2">
@@ -284,7 +284,7 @@ export default function EssaiPage() {
 
               {/* Style */}
               <div className="text-center">
-                <label className="block text-[12px] font-semibold text-[#86868b] uppercase tracking-[.1em] mb-3">
+                <label className="block text-[12px] font-semibold text-[#636366] uppercase tracking-[.1em] mb-3">
                   Style de décoration
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-w-xl mx-auto">
@@ -304,7 +304,7 @@ export default function EssaiPage() {
                       <p className={`font-semibold text-[14px] mt-1 ${selectedStyle === style.id ? 'text-[#E07B54]' : 'text-[#1d1d1f]'}`}>
                         {style.name}
                       </p>
-                      <p className="text-[11px] text-[#86868b] mt-0.5">{style.desc}</p>
+                      <p className="text-[11px] text-[#636366] mt-0.5">{style.desc}</p>
                     </button>
                   ))}
                 </div>
@@ -312,7 +312,7 @@ export default function EssaiPage() {
 
               {/* Erreur */}
               {error && (
-                <div className="text-center py-2">
+                <div className="text-center py-2" role="alert">
                   <p className="text-red-500 text-[14px]">{error}</p>
                 </div>
               )}
@@ -327,7 +327,7 @@ export default function EssaiPage() {
                   Transformer ma pièce
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </button>
-                <span className="text-[12px] text-[#86868b]">
+                <span className="text-[12px] text-[#636366]">
                   100% gratuit — 1 essai disponible
                 </span>
               </div>
@@ -348,14 +348,21 @@ export default function EssaiPage() {
               <p className="text-[19px] text-[#1d1d1f] font-semibold tracking-[-0.01em]">
                 {LOADING_MESSAGES.filter((m) => m.threshold <= Math.round(progress)).pop()?.text || 'Préparation...'}
               </p>
-              <p className="mt-1 text-[15px] text-[#86868b]">{Math.round(progress)}%</p>
-              <div className="w-56 h-[4px] bg-[#f5f5f7] rounded-full mt-5 overflow-hidden">
+              <p className="mt-1 text-[15px] text-[#636366]">{Math.round(progress)}%</p>
+              <div
+                className="w-56 h-[4px] bg-[#f5f5f7] rounded-full mt-5 overflow-hidden"
+                role="progressbar"
+                aria-valuenow={Math.round(progress)}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label="Progression de la génération"
+              >
                 <div
                   className="h-full bg-gradient-to-r from-[#E07B54] to-[#e8956e] rounded-full transition-all duration-700 ease-out"
                   style={{ width: `${Math.round(progress)}%` }}
                 />
               </div>
-              <p className="mt-6 text-[12px] text-[#86868b]">
+              <p className="mt-6 text-[12px] text-[#636366]">
                 Votre photo reste 100% privée
               </p>
             </div>
@@ -367,7 +374,7 @@ export default function EssaiPage() {
               {/* Avant / Après */}
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <span className="block text-[12px] font-semibold text-[#86868b] uppercase tracking-[.1em]">
+                  <span className="block text-[12px] font-semibold text-[#636366] uppercase tracking-[.1em]">
                     Avant
                   </span>
                   <div className="rounded-[16px] overflow-hidden bg-[#f5f5f7]">
@@ -375,7 +382,7 @@ export default function EssaiPage() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <span className="block text-[12px] font-semibold text-[#86868b] uppercase tracking-[.1em]">
+                  <span className="block text-[12px] font-semibold text-[#636366] uppercase tracking-[.1em]">
                     Après — {selectedStyleInfo?.name}
                   </span>
                   <div className="relative rounded-[16px] overflow-hidden bg-[#f5f5f7]">
@@ -402,7 +409,7 @@ export default function EssaiPage() {
                   Ça vous plaît ?
                 </h2>
                 <p className="mt-2 text-[17px] text-[#6B6B6B] max-w-md mx-auto leading-relaxed">
-                  Créez votre compte gratuitement et recevez <span className="font-bold text-[#E07B54]">2 crédits offerts</span> pour transformer d&apos;autres pièces.
+                  Créez votre compte gratuitement et recevez <span className="font-bold text-[#E07B54]">3 crédits offerts</span> pour transformer d&apos;autres pièces.
                 </p>
 
                 <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -416,8 +423,8 @@ export default function EssaiPage() {
                   </Link>
                 </div>
 
-                <div className="mt-6 flex items-center justify-center gap-6 text-[13px] text-[#86868b]">
-                  <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-500" /> 2 crédits offerts</span>
+                <div className="mt-6 flex items-center justify-center gap-6 text-[13px] text-[#636366]">
+                  <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-500" /> 3 crédits offerts</span>
                   <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-500" /> Sans engagement</span>
                   <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-500" /> 20+ styles</span>
                 </div>
@@ -426,16 +433,16 @@ export default function EssaiPage() {
               {/* Info supplémentaires */}
               <div className="grid grid-cols-3 gap-4 max-w-lg mx-auto">
                 <div className="text-center p-4 rounded-2xl bg-white border border-black/5">
-                  <p className="text-[24px] font-bold text-[#E07B54]">0,99 CHF</p>
-                  <p className="text-[12px] text-[#86868b] mt-1">par transformation</p>
+                  <p className="text-[24px] font-bold text-[#E07B54]">0,99 €</p>
+                  <p className="text-[12px] text-[#636366] mt-1">par transformation</p>
                 </div>
                 <div className="text-center p-4 rounded-2xl bg-white border border-black/5">
                   <p className="text-[24px] font-bold text-[#1d1d1f]">30s</p>
-                  <p className="text-[12px] text-[#86868b] mt-1">temps de rendu</p>
+                  <p className="text-[12px] text-[#636366] mt-1">temps de rendu</p>
                 </div>
                 <div className="text-center p-4 rounded-2xl bg-white border border-black/5">
                   <p className="text-[24px] font-bold text-[#1d1d1f]">20+</p>
-                  <p className="text-[12px] text-[#86868b] mt-1">styles disponibles</p>
+                  <p className="text-[12px] text-[#636366] mt-1">styles disponibles</p>
                 </div>
               </div>
             </div>
@@ -450,8 +457,8 @@ export default function EssaiPage() {
               <h2 className="text-[32px] font-bold text-[#1d1d1f] tracking-[-0.02em]">
                 Votre essai gratuit est terminé
               </h2>
-              <p className="mt-3 text-[17px] text-[#86868b] max-w-md mx-auto leading-relaxed">
-                Vous avez déjà utilisé votre essai gratuit. Créez un compte pour obtenir <span className="font-bold text-[#E07B54]">2 crédits offerts</span> et continuer à transformer vos pièces.
+              <p className="mt-3 text-[17px] text-[#636366] max-w-md mx-auto leading-relaxed">
+                Vous avez déjà utilisé votre essai gratuit. Créez un compte pour obtenir <span className="font-bold text-[#E07B54]">3 crédits offerts</span> et continuer à transformer vos pièces.
               </p>
 
               <div className="mt-8 flex flex-col items-center gap-4">
@@ -460,22 +467,22 @@ export default function EssaiPage() {
                   className="group inline-flex items-center gap-2 bg-[#E07B54] text-white px-8 py-4 rounded-full text-[17px] font-semibold hover:bg-[#d06a45] transition-all duration-200 shadow-lg shadow-[#E07B54]/20 active:scale-95"
                 >
                   <UserPlus className="w-5 h-5" />
-                  Créer mon compte — 2 crédits offerts
+                  Créer mon compte — 3 crédits offerts
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
 
                 <Link
                   href="/pricing"
-                  className="text-[14px] text-[#86868b] hover:text-[#1d1d1f] transition-colors underline"
+                  className="text-[14px] text-[#636366] hover:text-[#1d1d1f] transition-colors underline"
                 >
                   Voir les tarifs
                 </Link>
               </div>
 
-              <div className="mt-8 flex items-center justify-center gap-6 text-[13px] text-[#86868b]">
-                <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-500" /> 2 crédits offerts</span>
+              <div className="mt-8 flex items-center justify-center gap-6 text-[13px] text-[#636366]">
+                <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-500" /> 3 crédits offerts</span>
                 <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-500" /> Sans engagement</span>
-                <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-500" /> 0,99 CHF/transformation</span>
+                <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-500" /> 0,99 €/transformation</span>
               </div>
             </div>
           )}

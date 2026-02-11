@@ -16,8 +16,8 @@ const features = [
   },
   {
     icon: Wallet,
-    title: "0,99 CHF au lieu de 150 CHF/h",
-    description: "Un architecte d'intérieur coûte 150 CHF/h minimum. InstaDeco vous donne un résultat comparable pour moins d'un café."
+    title: "0,99 € au lieu de 150 €/h",
+    description: "Un architecte d'intérieur coûte 150 €/h minimum. InstaDeco vous donne un résultat comparable pour moins d'un café."
   },
   {
     icon: Palette,

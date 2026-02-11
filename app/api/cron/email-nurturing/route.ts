@@ -174,7 +174,7 @@ function emailWrapper(content: string, unsubscribeUrl?: string): string {
     <div style="background: linear-gradient(135deg, #E07B54, #D4603C); padding: 32px 24px; text-align: center;">
       <img src="https://instadeco.app/images/logo-v3-house-sparkle.svg" alt="InstaDeco AI" width="48" height="48" style="border-radius: 12px; margin-bottom: 12px;" />
       <h1 style="color: white; font-size: 24px; margin: 0; font-weight: 700;">InstaDeco AI</h1>
-      <p style="color: rgba(255,255,255,0.8); font-size: 14px; margin: 8px 0 0;">Votre architecte d'intérieur à 0,99 CHF</p>
+      <p style="color: rgba(255,255,255,0.8); font-size: 14px; margin: 8px 0 0;">Votre architecte d'intérieur à 0,99 €</p>
     </div>
     
     <!-- Content -->
@@ -184,7 +184,7 @@ function emailWrapper(content: string, unsubscribeUrl?: string): string {
     
     <!-- Footer -->
     <div style="background: #f5f5f7; padding: 16px 24px; text-align: center;">
-      <p style="color: #86868b; font-size: 12px; margin: 0;">
+      <p style="color: #636366; font-size: 12px; margin: 0;">
         InstaDeco AI — Votre décoration par intelligence artificielle<br />
         <a href="https://instadeco.app" style="color: #E07B54; text-decoration: none;">instadeco.app</a>
       </p>
@@ -216,8 +216,8 @@ function buildJ3Email(name: string, email: string): string {
     <div style="background: #FFF8F5; border-radius: 12px; padding: 20px; margin: 0 0 24px; border: 1px solid #F5D5C8;">
       <p style="margin: 0 0 8px; font-weight: 600; color: #1d1d1f;">💡 Le saviez-vous ?</p>
       <p style="margin: 0; color: #6B6B6B; font-size: 14px;">
-        Un décorateur d'intérieur facture en moyenne <strong>150 CHF/h</strong>.<br />
-        Avec InstaDeco, vous obtenez un résultat comparable pour <strong style="color: #E07B54;">0,99 CHF en 30 secondes</strong>.
+        Un décorateur d'intérieur facture en moyenne <strong>150 €/h</strong>.<br />
+        Avec InstaDeco, vous obtenez un résultat comparable pour <strong style="color: #E07B54;">0,99 € en 30 secondes</strong>.
       </p>
     </div>
     
@@ -282,9 +282,9 @@ function buildJ14Email(name: string, email: string): string {
       <p style="font-size: 36px; font-weight: 800; color: #E07B54; margin: 0 0 8px;">-20%</p>
       <p style="font-size: 18px; font-weight: 600; color: #1d1d1f; margin: 0 0 8px;">Sur votre premier pack de crédits</p>
       <p style="color: #6B6B6B; font-size: 14px; margin: 0 0 16px;">
-        Pack Créatif : <span style="text-decoration: line-through;">19,99 CHF</span> → <strong style="color: #E07B54;">15,99 CHF</strong> (25 crédits)
+        Pack Créatif : <span style="text-decoration: line-through;">19,99 €</span> → <strong style="color: #E07B54;">15,99 €</strong> (25 crédits)
       </p>
-      <p style="color: #86868b; font-size: 12px; margin: 0;">
+      <p style="color: #636366; font-size: 12px; margin: 0;">
         ⏰ Offre valable 48h uniquement
       </p>
     </div>
@@ -294,7 +294,7 @@ function buildJ14Email(name: string, email: string): string {
       <ul style="margin: 8px 0 0; padding: 0 0 0 20px; color: #6B6B6B; font-size: 14px;">
         <li>25 transformations haute qualité</li>
         <li>Testez tous les 12 styles</li>
-        <li>Équivalent à 3 750 CHF de consultations déco</li>
+        <li>Équivalent à 3 750 € de consultations déco</li>
         <li>Crédits valables à vie</li>
       </ul>
     </div>
@@ -306,7 +306,7 @@ function buildJ14Email(name: string, email: string): string {
       </a>
     </div>
     
-    <p style="color: #86868b; font-size: 13px; text-align: center; margin: 16px 0 0;">
+    <p style="color: #636366; font-size: 13px; text-align: center; margin: 16px 0 0;">
       Pas intéressé ? Pas de souci — vos 3 crédits gratuits n'expirent jamais.
     </p>
   `, unsubUrl);

@@ -15,8 +15,8 @@ const stats = [
   {
     icon: DollarSign,
     value: "150",
-    label: "CHF/h chez un déco",
-    suffix: " CHF/h",
+    label: "€/h chez un déco",
+    suffix: " €/h",
     prefix: "vs ",
     highlight: true,
     animate: false,
@@ -110,7 +110,7 @@ export function Stats() {
               </div>
               <div className="text-3xl md:text-4xl font-bold text-white mb-1">
                 {stat.highlight ? (
-                  <><span className="text-white/40 text-lg line-through">{animatedValues[index]}</span> <span className="text-[#E07B54]">→ 0,99 CHF</span></>
+                  <><span className="text-white/40 text-lg line-through">{animatedValues[index]}</span> <span className="text-[#E07B54]">→ 0,99 €</span></>
                 ) : (
                   <>{animatedValues[index].toLocaleString('fr-CH')}<span className="text-[#E07B54]">{stat.suffix}</span></>
                 )}

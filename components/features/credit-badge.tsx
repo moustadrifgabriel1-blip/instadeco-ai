@@ -62,8 +62,8 @@ export function CreditBadge() {
   if (loading) {
     return (
       <div className="flex items-center gap-2 px-4 py-2 bg-[#fbfbfd] border border-[#d2d2d7] rounded-full">
-        <div className="w-2 h-2 bg-[#86868b] rounded-full animate-pulse"></div>
-        <span className="text-sm text-[#86868b]">Chargement...</span>
+        <div className="w-2 h-2 bg-[#636366] rounded-full animate-pulse"></div>
+        <span className="text-sm text-[#636366]">Chargement...</span>
       </div>
     );
   }

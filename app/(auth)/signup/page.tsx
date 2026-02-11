@@ -118,24 +118,25 @@ function SignupForm() {
           <h1 className="text-[40px] font-semibold tracking-[-0.025em] text-[#1d1d1f] mb-2">
             Créer un compte
           </h1>
-          <p className="text-[17px] text-[#86868b]">
+          <p className="text-[17px] text-[#636366]">
             3 crédits gratuits pour commencer
           </p>
         </div>
 
         <div className="bg-white rounded-[20px] p-8 shadow-[0_2px_16px_rgba(0,0,0,0.08)]">
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-[12px] text-[14px] text-red-600">
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-[12px] text-[14px] text-red-600" role="alert">
               {error}
             </div>
           )}
 
           <form onSubmit={handleEmailSignup} className="space-y-5">
             <div>
-              <label className="block text-[12px] font-medium text-[#86868b] uppercase tracking-[.1em] mb-2">
+              <label htmlFor="signup-fullname" className="block text-[12px] font-medium text-[#636366] uppercase tracking-[.1em] mb-2">
                 Nom complet
               </label>
               <input
+                id="signup-fullname"
                 type="text"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
@@ -146,10 +147,11 @@ function SignupForm() {
             </div>
 
             <div>
-              <label className="block text-[12px] font-medium text-[#86868b] uppercase tracking-[.1em] mb-2">
+              <label htmlFor="signup-email" className="block text-[12px] font-medium text-[#636366] uppercase tracking-[.1em] mb-2">
                 Email
               </label>
               <input
+                id="signup-email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -160,10 +162,11 @@ function SignupForm() {
             </div>
 
             <div>
-              <label className="block text-[12px] font-medium text-[#86868b] uppercase tracking-[.1em] mb-2">
+              <label htmlFor="signup-password" className="block text-[12px] font-medium text-[#636366] uppercase tracking-[.1em] mb-2">
                 Mot de passe
               </label>
               <input
+                id="signup-password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -176,10 +179,11 @@ function SignupForm() {
 
             {/* Code parrainage */}
             <div>
-              <label className="block text-[12px] font-medium text-[#86868b] uppercase tracking-[.1em] mb-2">
+              <label htmlFor="signup-referral" className="block text-[12px] font-medium text-[#636366] uppercase tracking-[.1em] mb-2">
                 Code parrainage <span className="text-[#E07B54] font-normal lowercase">(optionnel • 3 crédits bonus)</span>
               </label>
               <input
+                id="signup-referral"
                 type="text"
                 value={referralCode}
                 onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
@@ -199,7 +203,7 @@ function SignupForm() {
                 className="mt-1 h-4 w-4 rounded border-[#d2d2d7] text-[#0071e3] focus:ring-[#0071e3]"
                 required
               />
-              <label htmlFor="accept-terms" className="text-[13px] text-[#86868b] leading-5">
+              <label htmlFor="accept-terms" className="text-[13px] text-[#636366] leading-5">
                 J&apos;accepte les{' '}
                 <a href="/legal/cgv" target="_blank" className="text-[#0071e3] hover:underline">
                   Conditions Générales de Vente
@@ -220,7 +224,7 @@ function SignupForm() {
                 onChange={(e) => setAcceptMarketing(e.target.checked)}
                 className="mt-1 h-4 w-4 rounded border-[#d2d2d7] text-[#0071e3] focus:ring-[#0071e3]"
               />
-              <label htmlFor="accept-marketing" className="text-[13px] text-[#86868b] leading-5">
+              <label htmlFor="accept-marketing" className="text-[13px] text-[#636366] leading-5">
                 J&apos;accepte de recevoir des emails d&apos;inspiration déco et des offres promotionnelles.
                 <span className="block text-[11px] mt-0.5">Optionnel • Désinscription en 1 clic</span>
               </label>
@@ -240,7 +244,7 @@ function SignupForm() {
               <div className="w-full border-t border-[#d2d2d7]"></div>
             </div>
             <div className="relative flex justify-center text-[14px]">
-              <span className="bg-white px-4 text-[#86868b]">ou</span>
+              <span className="bg-white px-4 text-[#636366]">ou</span>
             </div>
           </div>
 
@@ -258,7 +262,7 @@ function SignupForm() {
             Continuer avec Google
           </button>
 
-          <p className="mt-6 text-center text-[14px] text-[#86868b]">
+          <p className="mt-6 text-center text-[14px] text-[#636366]">
             Déjà un compte ?{' '}
             <a href="/login" className="text-[#0071e3] hover:underline">
               Se connecter

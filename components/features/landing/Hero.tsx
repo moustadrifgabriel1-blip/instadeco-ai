@@ -37,7 +37,7 @@ export function Hero() {
             {/* Badge */}
             <div className="badge-primary w-fit">
               <Sparkles className="h-4 w-4" />
-              <span>Votre architecte d&apos;intérieur à 0,99 CHF</span>
+              <span>Votre architecte d&apos;intérieur à 0,99 €</span>
             </div>
             
             {/* Titre principal */}
@@ -51,7 +51,7 @@ export function Hero() {
             
             {/* Description - Price anchoring Sutherland */}
             <p className="text-lg md:text-xl text-[#6B6B6B] max-w-xl leading-relaxed">
-              Un décorateur coûte <span className="line-through">150 CHF/h</span>. InstaDeco : <span className="font-semibold text-[#E07B54]">0,99 CHF en 30 secondes</span>.
+              Un décorateur coûte <span className="line-through">150 €/h</span>. InstaDeco : <span className="font-semibold text-[#E07B54]">0,99 € en 30 secondes</span>.
               Résultat de designer, sans travaux, sans rendez-vous.
             </p>
 

@@ -91,7 +91,7 @@ export default function GaleriePage() {
         {/* Filters */}
         <div className="flex flex-wrap justify-center gap-3 mb-8">
           <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-[#86868b]" />
+            <Filter className="w-4 h-4 text-[#636366]" />
             <select
               value={styleFilter}
               onChange={(e) => setStyleFilter(e.target.value)}
@@ -205,7 +205,7 @@ export default function GaleriePage() {
               Envie de voir votre pièce transformée ?
             </h3>
             <p className="text-[#6B6B6B] mb-4">
-              Un décorateur coûte 150 CHF/h. InstaDeco : <span className="font-bold text-[#E07B54]">0,99 CHF en 30 secondes</span>.
+              Un décorateur coûte 150 €/h. InstaDeco : <span className="font-bold text-[#E07B54]">0,99 € en 30 secondes</span>.
             </p>
             <Button asChild size="lg" className="rounded-full bg-gradient-to-r from-[#E07B54] to-[#D4603C] hover:shadow-lg hover:shadow-[#E07B54]/30">
               <Link href="/generate">
@@ -213,7 +213,7 @@ export default function GaleriePage() {
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Link>
             </Button>
-            <p className="text-xs text-[#86868b] mt-3">3 crédits offerts à l&apos;inscription</p>
+            <p className="text-xs text-[#636366] mt-3">3 crédits offerts à l&apos;inscription</p>
           </div>
         </div>
       </div>

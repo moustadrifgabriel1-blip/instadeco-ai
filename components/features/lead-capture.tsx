@@ -99,7 +99,13 @@ export function LeadCapture({ delay = 8000, variant = 'banner' }: LeadCapturePro
           onClick={handleDismiss}
         />
         {/* Popup */}
-        <div className="fixed inset-x-4 top-1/2 -translate-y-1/2 md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-[480px] bg-white rounded-2xl shadow-2xl z-50 overflow-hidden animate-in zoom-in-95 duration-300">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="lead-capture-title"
+          className="fixed inset-x-4 top-1/2 -translate-y-1/2 md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-[480px] bg-white rounded-2xl shadow-2xl z-50 overflow-hidden animate-in zoom-in-95 duration-300"
+          onKeyDown={(e) => { if (e.key === 'Escape') handleDismiss(); }}
+        >
           <button
             onClick={handleDismiss}
             className="absolute top-4 right-4 p-1 rounded-full hover:bg-gray-100 transition-colors z-10"
@@ -112,7 +118,7 @@ export function LeadCapture({ delay = 8000, variant = 'banner' }: LeadCapturePro
             <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <Gift className="w-8 h-8" />
             </div>
-            <h3 className="text-2xl font-bold mb-2">3 crédits offerts</h3>
+            <h3 id="lead-capture-title" className="text-2xl font-bold mb-2">3 crédits offerts</h3>
             <p className="text-white/80 text-sm">
               Testez la transformation IA de votre intérieur
             </p>

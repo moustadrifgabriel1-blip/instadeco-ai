@@ -86,13 +86,13 @@ function HDSuccessContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-50 flex items-center justify-center p-4">
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="text-center">
           {status === 'loading' && (
             <>
               <div className="mx-auto mb-4">
-                <Loader2 className="h-16 w-16 text-purple-600 animate-spin" />
+                <Loader2 className="h-16 w-16 text-[#E07B54] animate-spin" />
               </div>
               <CardTitle className="text-2xl">Vérification en cours...</CardTitle>
               <CardDescription>
@@ -149,7 +149,7 @@ function HDSuccessContent() {
               {/* Bouton de téléchargement */}
               <Button 
                 onClick={handleDownload}
-                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white py-6 text-lg"
+                className="w-full bg-gradient-to-r from-[#E07B54] to-[#D4603C] hover:from-[#d06a45] hover:to-[#c05535] text-white py-6 text-lg"
               >
                 <Download className="h-5 w-5 mr-2" />
                 Télécharger en HD
@@ -187,11 +187,11 @@ function HDSuccessContent() {
 // Loading fallback pour Suspense
 function LoadingFallback() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-50 flex items-center justify-center p-4">
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4">
-            <Loader2 className="h-16 w-16 text-purple-600 animate-spin" />
+            <Loader2 className="h-16 w-16 text-[#E07B54] animate-spin" />
           </div>
           <CardTitle className="text-2xl">Chargement...</CardTitle>
           <CardDescription>

@@ -47,7 +47,7 @@ export function CreditsDisplayV2({
         className
       )}>
         <Loader2 className={cn("animate-spin text-gray-400", iconSizes[size])} />
-        <span className="text-[#86868b]">Chargement...</span>
+        <span className="text-[#636366]">Chargement...</span>
       </div>
     );
   }

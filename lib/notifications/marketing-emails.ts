@@ -42,7 +42,7 @@ function emailWrapper(content: string): string {
     
     <!-- Footer -->
     <div style="background: #f5f5f7; padding: 16px 24px; text-align: center;">
-      <p style="color: #86868b; font-size: 12px; margin: 0;">
+      <p style="color: #636366; font-size: 12px; margin: 0;">
         InstaDeco AI — Décoration d'intérieur par intelligence artificielle<br />
         <a href="https://instadeco.app" style="color: #E07B54; text-decoration: none;">instadeco.app</a>
       </p>
@@ -112,7 +112,7 @@ function buildWelcomeEmail(name: string): string {
       </a>
     </div>
 
-    <p style="color: #86868b; font-size: 13px; text-align: center; margin: 16px 0 0;">
+    <p style="color: #636366; font-size: 13px; text-align: center; margin: 16px 0 0;">
       Vos 3 crédits n'expirent jamais. Prenez votre temps.
     </p>
   `);
@@ -173,7 +173,7 @@ function buildGenerationCompleteEmail(
       <div style="background: white; border: 2px solid #E07B54; border-radius: 12px; padding: 12px; display: inline-block;">
         <span style="font-size: 20px; font-weight: 800; color: #E07B54; letter-spacing: 2px;">${referralCode}</span>
       </div>
-      <p style="color: #86868b; font-size: 12px; margin: 12px 0 0;">
+      <p style="color: #636366; font-size: 12px; margin: 12px 0 0;">
         Lien de parrainage : <a href="https://instadeco.app/signup?ref=${referralCode}" style="color: #E07B54;">instadeco.app/signup?ref=${referralCode}</a>
       </p>
     </div>

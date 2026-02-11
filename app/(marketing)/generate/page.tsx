@@ -352,7 +352,7 @@ function GenerateContent() {
           <h1 className="text-[56px] font-semibold tracking-[-0.025em] text-[#1d1d1f] leading-[1.05]">
             Réinventez votre intérieur.
           </h1>
-          <p className="mt-4 text-[21px] text-[#86868b] font-normal leading-[1.4] tracking-[.011em]">
+          <p className="mt-4 text-[21px] text-[#636366] font-normal leading-[1.4] tracking-[.011em]">
             Uploadez une photo. Choisissez un style. L&apos;IA fait le reste.
           </p>
         </div>
@@ -370,22 +370,22 @@ function GenerateContent() {
                 relative rounded-[28px] border-2 border-dashed transition-all duration-300 cursor-pointer
                 ${isDragActive 
                   ? 'border-[#0071e3] bg-[#0071e3]/5' 
-                  : 'border-[#d2d2d7] hover:border-[#86868b] bg-white'
+                  : 'border-[#d2d2d7] hover:border-[#636366] bg-white'
                 }
               `}
             >
               <input {...getInputProps()} />
               <div className="py-20 px-8 text-center">
                 <div className="w-14 h-14 mx-auto mb-5 rounded-full bg-[#f5f5f7] flex items-center justify-center">
-                  <Plus className="w-6 h-6 text-[#86868b]" strokeWidth={1.5} />
+                  <Plus className="w-6 h-6 text-[#636366]" strokeWidth={1.5} />
                 </div>
                 <p className="text-[17px] text-[#1d1d1f] font-medium tracking-[-0.01em]">
                   {isDragActive ? 'Déposez votre image' : 'Ajouter une photo de votre pièce'}
                 </p>
-                <p className="mt-2 text-[12px] text-[#86868b] tracking-[.007em]">
+                <p className="mt-2 text-[12px] text-[#636366] tracking-[.007em]">
                   Glissez-déposez ou cliquez • PNG, JPG, WEBP • Max 10 Mo
                 </p>
-                <div className="mt-6 flex items-center justify-center gap-6 text-[11px] text-[#86868b]">
+                <div className="mt-6 flex items-center justify-center gap-6 text-[11px] text-[#636366]">
                   <span className="flex items-center gap-1"><Zap className="w-3 h-3" /> Résultat en 10s</span>
                   <span className="flex items-center gap-1"><Shield className="w-3 h-3" /> 100% privé</span>
                   <span className="flex items-center gap-1"><Star className="w-3 h-3" /> 12 styles</span>
@@ -419,7 +419,7 @@ function GenerateContent() {
               <div className="space-y-8">
                 {/* Transform Mode */}
                 <div className="text-center">
-                  <label className="block text-[12px] font-medium text-[#86868b] uppercase tracking-[.1em] mb-4">
+                  <label className="block text-[12px] font-medium text-[#636366] uppercase tracking-[.1em] mb-4">
                     Que voulez-vous faire ?
                   </label>
                   <div className="flex flex-wrap justify-center gap-3">
@@ -437,7 +437,7 @@ function GenerateContent() {
                       >
                         <span className="text-lg mr-2">{mode.icon}</span>
                         <span className="text-[14px] font-medium">{mode.name}</span>
-                        <p className={`text-[11px] mt-0.5 ${selectedMode === mode.id ? 'text-white/70' : 'text-[#86868b]'}`}>
+                        <p className={`text-[11px] mt-0.5 ${selectedMode === mode.id ? 'text-white/70' : 'text-[#636366]'}`}>
                           {mode.desc}
                         </p>
                       </button>
@@ -447,7 +447,7 @@ function GenerateContent() {
 
                 {/* Room Type */}
                 <div className="text-center">
-                  <label className="block text-[12px] font-medium text-[#86868b] uppercase tracking-[.1em] mb-4">
+                  <label className="block text-[12px] font-medium text-[#636366] uppercase tracking-[.1em] mb-4">
                     Type de pièce
                   </label>
                   <div className="flex flex-wrap justify-center gap-2">
@@ -471,7 +471,7 @@ function GenerateContent() {
 
                 {/* Style - Organisé par catégories */}
                 <div>
-                  <label className="block text-[12px] font-medium text-[#86868b] uppercase tracking-[.1em] mb-4 text-center">
+                  <label className="block text-[12px] font-medium text-[#636366] uppercase tracking-[.1em] mb-4 text-center">
                     Style de décoration
                   </label>
                   
@@ -482,7 +482,7 @@ function GenerateContent() {
                         <Check className="w-4 h-4" />
                         {selectedStyleInfo.name}
                       </span>
-                      <p className="mt-2 text-[13px] text-[#86868b]">{selectedStyleInfo.desc}</p>
+                      <p className="mt-2 text-[13px] text-[#636366]">{selectedStyleInfo.desc}</p>
                     </div>
                   )}
                   
@@ -494,7 +494,7 @@ function GenerateContent() {
                         className="bg-white rounded-2xl border border-black/5 overflow-hidden"
                       >
                         <div className="px-4 py-2 bg-[#f5f5f7] border-b border-black/5">
-                          <h3 className="text-[12px] font-semibold text-[#86868b] uppercase tracking-wider">
+                          <h3 className="text-[12px] font-semibold text-[#636366] uppercase tracking-wider">
                             {category.category}
                           </h3>
                         </div>
@@ -512,7 +512,7 @@ function GenerateContent() {
                               `}
                             >
                               <div className="font-medium text-[14px]">{style.name}</div>
-                              <div className={`text-[11px] ${selectedStyle === style.id ? 'text-white/70' : 'text-[#86868b]'}`}>
+                              <div className={`text-[11px] ${selectedStyle === style.id ? 'text-white/70' : 'text-[#636366]'}`}>
                                 {style.desc}
                               </div>
                             </button>
@@ -535,7 +535,7 @@ function GenerateContent() {
                     Transformer ma pièce
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" strokeWidth={2} />
                   </button>
-                  <span className="text-[12px] text-[#86868b]">
+                  <span className="text-[12px] text-[#636366]">
                     1 crédit sera utilisé • {credits} crédit{(credits ?? 0) > 1 ? 's' : ''} disponible{(credits ?? 0) > 1 ? 's' : ''}
                   </span>
                 </div>
@@ -552,14 +552,21 @@ function GenerateContent() {
                   <p className="text-[17px] text-[#1d1d1f] font-medium tracking-[-0.01em]">
                     {LOADING_MESSAGES.filter(m => m.threshold <= Math.round(progress)).pop()?.text || 'Préparation...'}
                   </p>
-                  <p className="mt-1 text-[14px] text-[#86868b]">{Math.round(progress)}%</p>
-                  <div className="w-48 h-[3px] bg-[#e8e8ed] rounded-full mt-4 overflow-hidden">
+                  <p className="mt-1 text-[14px] text-[#636366]">{Math.round(progress)}%</p>
+                  <div
+                    className="w-48 h-[3px] bg-[#e8e8ed] rounded-full mt-4 overflow-hidden"
+                    role="progressbar"
+                    aria-valuenow={Math.round(progress)}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-label="Progression de la génération"
+                  >
                     <div
                       className="h-full bg-gradient-to-r from-[#0071e3] to-[#34aadc] rounded-full transition-all duration-700 ease-out"
                       style={{ width: `${Math.round(progress)}%` }}
                     />
                   </div>
-                  <p className="mt-4 text-[11px] text-[#86868b] max-w-xs text-center">
+                  <p className="mt-4 text-[11px] text-[#636366] max-w-xs text-center">
                     Votre photo reste 100% privée
                   </p>
                 </div>
@@ -567,7 +574,7 @@ function GenerateContent() {
 
               {/* Error */}
               {error && (
-                <div className="text-center py-4">
+                <div className="text-center py-4" role="alert">
                   <p className="text-[#ff3b30] text-[14px]">{error}</p>
                   <button 
                     onClick={resetGenerate}
@@ -586,7 +593,7 @@ function GenerateContent() {
               {/* Before/After */}
               <div className="grid md:grid-cols-2 gap-5">
                 <div className="space-y-3">
-                  <span className="block text-[12px] font-medium text-[#86868b] uppercase tracking-[.1em]">
+                  <span className="block text-[12px] font-medium text-[#636366] uppercase tracking-[.1em]">
                     Avant
                   </span>
                   <div className="rounded-[20px] overflow-hidden bg-[#f5f5f7]">
@@ -602,7 +609,7 @@ function GenerateContent() {
                 </div>
 
                 <div className="space-y-3">
-                  <span className="block text-[12px] font-medium text-[#86868b] uppercase tracking-[.1em]">
+                  <span className="block text-[12px] font-medium text-[#636366] uppercase tracking-[.1em]">
                     Après — {selectedStyleInfo?.name}
                   </span>
                   <div className="relative rounded-[20px] overflow-hidden bg-[#f5f5f7]">
@@ -657,7 +664,7 @@ function GenerateContent() {
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                   <button
                     onClick={handleDownload}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-[13px] font-medium text-[#86868b] bg-[#f5f5f7] hover:bg-[#e8e8ed] transition-colors"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-[13px] font-medium text-[#636366] bg-[#f5f5f7] hover:bg-[#e8e8ed] transition-colors"
                   >
                     <Download className="w-3.5 h-3.5" strokeWidth={2} />
                     Télécharger l&apos;aperçu (avec filigrane)

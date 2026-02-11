@@ -78,24 +78,25 @@ export default function LoginPage() {
           <h1 className="text-[40px] font-semibold tracking-[-0.025em] text-[#1d1d1f] mb-2">
             Connexion
           </h1>
-          <p className="text-[17px] text-[#86868b]">
+          <p className="text-[17px] text-[#636366]">
             Accédez à votre compte InstaDeco
           </p>
         </div>
 
         <div className="bg-white rounded-[20px] p-8 shadow-[0_2px_16px_rgba(0,0,0,0.08)]">
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-[12px] text-[14px] text-red-600">
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-[12px] text-[14px] text-red-600" role="alert">
               {error}
             </div>
           )}
 
           <form onSubmit={handleEmailLogin} className="space-y-5">
             <div>
-              <label className="block text-[12px] font-medium text-[#86868b] uppercase tracking-[.1em] mb-2">
+              <label htmlFor="login-email" className="block text-[12px] font-medium text-[#636366] uppercase tracking-[.1em] mb-2">
                 Email
               </label>
               <input
+                id="login-email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -106,10 +107,11 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label className="block text-[12px] font-medium text-[#86868b] uppercase tracking-[.1em] mb-2">
+              <label htmlFor="login-password" className="block text-[12px] font-medium text-[#636366] uppercase tracking-[.1em] mb-2">
                 Mot de passe
               </label>
               <input
+                id="login-password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -117,6 +119,12 @@ export default function LoginPage() {
                 placeholder="••••••••"
                 required
               />
+            </div>
+
+            <div className="flex justify-end">
+              <a href="/reset-password" className="text-[13px] text-[#0071e3] hover:underline">
+                Mot de passe oublié ?
+              </a>
             </div>
 
             <button
@@ -133,7 +141,7 @@ export default function LoginPage() {
               <div className="w-full border-t border-[#d2d2d7]"></div>
             </div>
             <div className="relative flex justify-center text-[14px]">
-              <span className="bg-white px-4 text-[#86868b]">ou</span>
+              <span className="bg-white px-4 text-[#636366]">ou</span>
             </div>
           </div>
 
@@ -151,7 +159,7 @@ export default function LoginPage() {
             Continuer avec Google
           </button>
 
-          <p className="mt-6 text-center text-[14px] text-[#86868b]">
+          <p className="mt-6 text-center text-[14px] text-[#636366]">
             Pas encore de compte ?{' '}
             <a href="/signup" className="text-[#0071e3] hover:underline">
               Créer un compte

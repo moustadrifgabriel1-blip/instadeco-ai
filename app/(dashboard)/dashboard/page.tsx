@@ -357,7 +357,7 @@ export default function DashboardPageV2() {
       <div className="min-h-screen bg-[#fbfbfd] flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-8 h-8 animate-spin text-[#1d1d1f] mx-auto" />
-          <p className="mt-4 text-[#86868b]">Chargement...</p>
+          <p className="mt-4 text-[#636366]">Chargement...</p>
         </div>
       </div>
     );
@@ -380,7 +380,7 @@ export default function DashboardPageV2() {
           </Link>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 px-3 py-1.5 bg-[#f5f5f7] rounded-full">
-              <Coins className="w-4 h-4 text-[#86868b]" />
+              <Coins className="w-4 h-4 text-[#636366]" />
               <span className="text-sm font-medium text-[#1d1d1f]">
                 {creditsState.isLoading ? '...' : credits}
               </span>
@@ -390,8 +390,8 @@ export default function DashboardPageV2() {
                 onClick={() => setShowUserMenu(!showUserMenu)}
                 className="flex items-center gap-2 px-3 py-1.5 hover:bg-[#f5f5f7] rounded-full transition-colors"
               >
-                <User className="w-5 h-5 text-[#86868b]" />
-                <ChevronDown className="w-4 h-4 text-[#86868b]" />
+                <User className="w-5 h-5 text-[#636366]" />
+                <ChevronDown className="w-4 h-4 text-[#636366]" />
               </button>
               {showUserMenu && (
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-[#d2d2d7] py-2">
@@ -481,7 +481,7 @@ export default function DashboardPageV2() {
                 <div className="flex items-center justify-between mb-6">
                   <h1 className="text-2xl font-semibold text-[#1d1d1f]">Mes créations</h1>
                   <div className="flex items-center gap-2">
-                    <Filter className="w-4 h-4 text-[#86868b]" />
+                    <Filter className="w-4 h-4 text-[#636366]" />
                     <select
                       value={filterStatus}
                       onChange={(e) => setFilterStatus(e.target.value as FilterStatus)}
@@ -499,7 +499,7 @@ export default function DashboardPageV2() {
                   <Card>
                     <CardContent className="py-12 text-center">
                       <ImageIcon className="w-12 h-12 text-[#d2d2d7] mx-auto mb-4" />
-                      <p className="text-[#86868b]">Aucune création pour le moment</p>
+                      <p className="text-[#636366]">Aucune création pour le moment</p>
                       <Link
                         href="/generate"
                         className="inline-flex items-center gap-2 mt-4 px-6 py-2 bg-[#1d1d1f] text-white rounded-full hover:bg-black transition-colors"
@@ -629,7 +629,7 @@ export default function DashboardPageV2() {
                     
                     <div className="grid gap-4">
                       <div>
-                        <label className="text-sm font-medium text-[#86868b] mb-1 block">Nom d&apos;affichage</label>
+                        <label className="text-sm font-medium text-[#636366] mb-1 block">Nom d&apos;affichage</label>
                         {isEditingProfile ? (
                           <Input
                             value={displayName}
@@ -639,12 +639,12 @@ export default function DashboardPageV2() {
                           />
                         ) : (
                           <p className="text-[#1d1d1f]">
-                            {user?.user_metadata?.display_name || user?.user_metadata?.full_name || <span className="text-[#86868b] italic">Non renseigné</span>}
+                            {user?.user_metadata?.display_name || user?.user_metadata?.full_name || <span className="text-[#636366] italic">Non renseigné</span>}
                           </p>
                         )}
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-[#86868b] mb-1 block">Email</label>
+                        <label className="text-sm font-medium text-[#636366] mb-1 block">Email</label>
                         <p className="text-[#1d1d1f]">{user?.email}</p>
                       </div>
                     </div>
@@ -704,7 +704,7 @@ export default function DashboardPageV2() {
                         Supprimer mon compte
                       </Button>
                     </div>
-                    <p className="text-xs text-[#86868b]">
+                    <p className="text-xs text-[#636366]">
                       L&apos;export contient toutes vos données personnelles au format JSON.
                     </p>
                   </CardContent>
@@ -712,13 +712,20 @@ export default function DashboardPageV2() {
 
                 {/* Modale de suppression */}
                 {showDeleteModal && (
-                  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-                    <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl">
+                  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => { setShowDeleteModal(false); setDeleteConfirmText(''); }}>
+                    <div
+                      role="dialog"
+                      aria-modal="true"
+                      aria-labelledby="delete-modal-title"
+                      className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl"
+                      onClick={(e) => e.stopPropagation()}
+                      onKeyDown={(e) => { if (e.key === 'Escape') { setShowDeleteModal(false); setDeleteConfirmText(''); } }}
+                    >
                       <div className="flex items-center gap-3 mb-4">
                         <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
                           <AlertTriangle className="w-5 h-5 text-red-600" />
                         </div>
-                        <h3 className="text-lg font-semibold text-[#1d1d1f]">Supprimer mon compte</h3>
+                        <h3 id="delete-modal-title" className="text-lg font-semibold text-[#1d1d1f]">Supprimer mon compte</h3>
                       </div>
                       <p className="text-sm text-[#6B6B6B] mb-4">
                         Cette action est <strong className="text-red-600">irréversible</strong>. Toutes vos données seront définitivement supprimées :
@@ -782,11 +789,12 @@ export default function DashboardPageV2() {
                     <form onSubmit={handleChangePassword} className="space-y-5">
                       {/* New password */}
                       <div>
-                        <label className="block text-sm font-medium text-[#86868b] mb-1.5">
+                        <label htmlFor="new-password" className="block text-sm font-medium text-[#636366] mb-1.5">
                           Nouveau mot de passe
                         </label>
                         <div className="relative">
                           <Input
+                            id="new-password"
                             type={showNewPassword ? 'text' : 'password'}
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
@@ -796,7 +804,7 @@ export default function DashboardPageV2() {
                           <button
                             type="button"
                             onClick={() => setShowNewPassword(!showNewPassword)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#86868b] hover:text-[#1d1d1f] transition-colors"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#636366] hover:text-[#1d1d1f] transition-colors"
                           >
                             {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                           </button>
@@ -826,23 +834,23 @@ export default function DashboardPageV2() {
                             
                             {/* Critères */}
                             <div className="grid grid-cols-2 gap-1 text-xs">
-                              <div className={`flex items-center gap-1.5 ${newPassword.length >= 8 ? 'text-green-600' : 'text-[#86868b]'}`}>
+                              <div className={`flex items-center gap-1.5 ${newPassword.length >= 8 ? 'text-green-600' : 'text-[#636366]'}`}>
                                 {newPassword.length >= 8 ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
                                 8 caractères min.
                               </div>
-                              <div className={`flex items-center gap-1.5 ${/[A-Z]/.test(newPassword) ? 'text-green-600' : 'text-[#86868b]'}`}>
+                              <div className={`flex items-center gap-1.5 ${/[A-Z]/.test(newPassword) ? 'text-green-600' : 'text-[#636366]'}`}>
                                 {/[A-Z]/.test(newPassword) ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
                                 1 majuscule
                               </div>
-                              <div className={`flex items-center gap-1.5 ${/[a-z]/.test(newPassword) ? 'text-green-600' : 'text-[#86868b]'}`}>
+                              <div className={`flex items-center gap-1.5 ${/[a-z]/.test(newPassword) ? 'text-green-600' : 'text-[#636366]'}`}>
                                 {/[a-z]/.test(newPassword) ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
                                 1 minuscule
                               </div>
-                              <div className={`flex items-center gap-1.5 ${/[0-9]/.test(newPassword) ? 'text-green-600' : 'text-[#86868b]'}`}>
+                              <div className={`flex items-center gap-1.5 ${/[0-9]/.test(newPassword) ? 'text-green-600' : 'text-[#636366]'}`}>
                                 {/[0-9]/.test(newPassword) ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
                                 1 chiffre
                               </div>
-                              <div className={`flex items-center gap-1.5 ${/[!@#$%^&*(),.?":{}|<>]/.test(newPassword) ? 'text-green-600' : 'text-[#86868b]'}`}>
+                              <div className={`flex items-center gap-1.5 ${/[!@#$%^&*(),.?":{}|<>]/.test(newPassword) ? 'text-green-600' : 'text-[#636366]'}`}>
                                 {/[!@#$%^&*(),.?":{}|<>]/.test(newPassword) ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
                                 1 caractère spécial
                               </div>
@@ -853,11 +861,12 @@ export default function DashboardPageV2() {
 
                       {/* Confirm password */}
                       <div>
-                        <label className="block text-sm font-medium text-[#86868b] mb-1.5">
+                        <label htmlFor="confirm-password" className="block text-sm font-medium text-[#636366] mb-1.5">
                           Confirmer le mot de passe
                         </label>
                         <div className="relative">
                           <Input
+                            id="confirm-password"
                             type={showConfirmPassword ? 'text' : 'password'}
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
@@ -867,7 +876,7 @@ export default function DashboardPageV2() {
                           <button
                             type="button"
                             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#86868b] hover:text-[#1d1d1f] transition-colors"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#636366] hover:text-[#1d1d1f] transition-colors"
                           >
                             {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                           </button>
@@ -887,7 +896,7 @@ export default function DashboardPageV2() {
                       </div>
 
                       {passwordError && (
-                        <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">
+                        <div role="alert" className="flex items-center gap-2 text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">
                           <XCircle className="w-4 h-4 flex-shrink-0" />
                           {passwordError}
                         </div>
@@ -1024,7 +1033,7 @@ export default function DashboardPageV2() {
                       <div className="text-center">
                         <Users className="w-8 h-8 text-[#E07B54] mx-auto mb-2" />
                         <div className="text-3xl font-bold text-[#1d1d1f]">{referralStats.totalReferred}</div>
-                        <p className="text-sm text-[#86868b]">Amis parrainés</p>
+                        <p className="text-sm text-[#636366]">Amis parrainés</p>
                       </div>
                     </CardContent>
                   </Card>
@@ -1033,7 +1042,7 @@ export default function DashboardPageV2() {
                       <div className="text-center">
                         <Sparkles className="w-8 h-8 text-[#E07B54] mx-auto mb-2" />
                         <div className="text-3xl font-bold text-[#1d1d1f]">{referralStats.totalCreditsEarned}</div>
-                        <p className="text-sm text-[#86868b]">Crédits gagnés</p>
+                        <p className="text-sm text-[#636366]">Crédits gagnés</p>
                       </div>
                     </CardContent>
                   </Card>
@@ -1057,7 +1066,7 @@ export default function DashboardPageV2() {
                           </div>
                           <div>
                             <h4 className="font-medium text-[#1d1d1f]">{item.title}</h4>
-                            <p className="text-sm text-[#86868b]">{item.desc}</p>
+                            <p className="text-sm text-[#636366]">{item.desc}</p>
                           </div>
                         </div>
                       ))}

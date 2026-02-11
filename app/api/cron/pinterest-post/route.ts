@@ -71,7 +71,7 @@ export async function GET(req: Request) {
         generationId: gen.id,
         imageUrl: gen.output_image_url,
         title: `${room} style ${style} — Transformation IA InstaDeco`,
-        description: `✨ Transformation avant/après : ${room} relooké en style ${style} par l'IA d'InstaDeco. Résultat en 30 secondes ! 🎨\n\nUn décorateur coûte 150 CHF/h. InstaDeco : 0,99 CHF.\n\n${HASHTAGS.slice(0, 8).join(' ')}\n\n👉 instadeco.app/galerie`,
+        description: `✨ Transformation avant/après : ${room} relooké en style ${style} par l'IA d'InstaDeco. Résultat en 30 secondes ! 🎨\n\nUn décorateur coûte 150 €/h. InstaDeco : 0,99 €.\n\n${HASHTAGS.slice(0, 8).join(' ')}\n\n👉 instadeco.app/galerie`,
         link: `https://instadeco.app/galerie?style=${gen.style_slug}`,
         boardName: `Décoration ${style}`,
       };

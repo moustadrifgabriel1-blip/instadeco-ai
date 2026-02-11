@@ -26,11 +26,11 @@ function PaymentSuccessContent() {
 
   if (isVerifying) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-blue-50">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-amber-50">
         <Card className="w-full max-w-md">
           <CardContent className="pt-6">
             <div className="flex flex-col items-center space-y-4">
-              <Loader2 className="h-12 w-12 animate-spin text-purple-600" />
+              <Loader2 className="h-12 w-12 animate-spin text-[#E07B54]" />
               <p className="text-lg font-medium text-gray-700">
                 Vérification du paiement...
               </p>
@@ -92,11 +92,11 @@ function PaymentSuccessContent() {
 
 function LoadingFallback() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-blue-50">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-amber-50">
       <Card className="w-full max-w-md">
         <CardContent className="pt-6">
           <div className="flex flex-col items-center space-y-4">
-            <Loader2 className="h-12 w-12 animate-spin text-purple-600" />
+            <Loader2 className="h-12 w-12 animate-spin text-[#E07B54]" />
             <p className="text-lg font-medium text-gray-700">
               Chargement...
             </p>
