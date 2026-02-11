@@ -24,7 +24,10 @@ function isAuthorized(request: Request): boolean {
   const authHeader = request.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;
   
-  if (!cronSecret) return true; // Pas de secret configuré = pas de vérification
+  if (!cronSecret) {
+    console.error('[CRON seo-submit] CRON_SECRET non configuré');
+    return false;
+  }
   return authHeader === `Bearer ${cronSecret}`;
 }
 

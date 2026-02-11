@@ -11,11 +11,18 @@ import { createClient } from '@supabase/supabase-js';
 export const runtime = 'nodejs';
 
 export async function GET(request: NextRequest) {
+  // 🔒 Protéger cet endpoint de diagnostic par CRON_SECRET
+  const cronSecret = process.env.CRON_SECRET;
+  const authHeader = request.headers.get('authorization');
+  
+  if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
     const geminiKey = process.env.GEMINI_API_KEY;
-    const cronSecret = process.env.CRON_SECRET;
 
     // Vérification des variables d'environnement
     const envCheck = {

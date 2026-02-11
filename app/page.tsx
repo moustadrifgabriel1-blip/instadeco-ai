@@ -1,5 +1,6 @@
 import dynamic from 'next/dynamic';
 import { Hero } from '@/components/features/landing/Hero';
+import { LeadCaptureLazy } from '@/components/features/lead-capture-lazy';
 
 // Lazy load below-the-fold components
 const HowItWorks = dynamic(() => import('@/components/features/landing/HowItWorks').then(mod => ({ default: mod.HowItWorks })), {
@@ -24,10 +25,6 @@ const Testimonials = dynamic(() => import('@/components/features/landing/Testimo
 
 const FinalCTA = dynamic(() => import('@/components/features/landing/FinalCTA').then(mod => ({ default: mod.FinalCTA })), {
   loading: () => <div className="min-h-[200px]" />,
-});
-
-const LeadCaptureLazy = dynamic(() => import('@/components/features/lead-capture').then(mod => ({ default: mod.LeadCapture })), {
-  ssr: false,
 });
 
 export default function HomePage() {

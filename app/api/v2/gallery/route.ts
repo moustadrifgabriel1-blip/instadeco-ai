@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/v2/gallery — Récupérer les générations publiques pour la galerie
  * Retourne les meilleures générations complétées (anonymisées, sans input_image_url)

@@ -4,6 +4,8 @@ import { useCases } from '@/src/infrastructure/config/di-container';
 import { GenerationMapper } from '@/src/application/mappers/GenerationMapper';
 import { createClient } from '@/lib/supabase/server';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * Schéma de validation
  */

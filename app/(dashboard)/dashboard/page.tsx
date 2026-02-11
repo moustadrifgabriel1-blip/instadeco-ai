@@ -16,12 +16,10 @@ import {
   Sparkles, 
   Check, 
   ImageIcon,
-  LayoutDashboard,
   CreditCard,
   Shield,
   LogOut,
   User,
-  Settings,
   ChevronDown,
   Coins,
   Clock,
@@ -38,7 +36,10 @@ import {
   Gift,
   Copy,
   Share2,
-  Users
+  Users,
+  Trash2,
+  FileDown,
+  AlertTriangle,
 } from 'lucide-react';
 import { useGenerations } from '@/src/presentation/hooks/useGenerations';
 import { useCredits } from '@/src/presentation/hooks/useCredits';
@@ -69,13 +70,11 @@ export default function DashboardPageV2() {
   const [showUserMenu, setShowUserMenu] = useState(false);
   
   // Security state
-  const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [passwordSuccess, setPasswordSuccess] = useState('');
   const [isChangingPassword, setIsChangingPassword] = useState(false);
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -90,6 +89,12 @@ export default function DashboardPageV2() {
   const [referralCode, setReferralCode] = useState<string | null>(null);
   const [referralStats, setReferralStats] = useState({ totalReferred: 0, totalCreditsEarned: 0 });
   const [referralCopied, setReferralCopied] = useState(false);
+
+  // Delete account state
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   // ============================================
   // AUTH CHECK
@@ -129,6 +134,45 @@ export default function DashboardPageV2() {
     }
   };
 
+  const handleExportData = async () => {
+    setIsExporting(true);
+    try {
+      const response = await fetch('/api/v2/user/export');
+      if (!response.ok) throw new Error('Erreur export');
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `instadeco-export-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Export error:', err);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmText !== 'SUPPRIMER MON COMPTE') return;
+    setIsDeleting(true);
+    try {
+      const response = await fetch('/api/v2/user/delete', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ confirmation: 'SUPPRIMER MON COMPTE' }),
+      });
+      if (!response.ok) throw new Error('Erreur suppression');
+      await supabase.auth.signOut();
+      router.push('/');
+    } catch (err) {
+      console.error('Delete error:', err);
+      setIsDeleting(false);
+    }
+  };
+
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setPasswordError('');
@@ -148,7 +192,6 @@ export default function DashboardPageV2() {
     const hasUpperCase = /[A-Z]/.test(newPassword);
     const hasLowerCase = /[a-z]/.test(newPassword);
     const hasNumber = /[0-9]/.test(newPassword);
-    const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(newPassword);
     
     if (!hasUpperCase || !hasLowerCase || !hasNumber) {
       setPasswordError('Le mot de passe doit contenir au moins 1 majuscule, 1 minuscule et 1 chiffre');
@@ -172,7 +215,6 @@ export default function DashboardPageV2() {
       }
       
       setPasswordSuccess('Mot de passe modifié avec succès !');
-      setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
     } catch (error: unknown) {
@@ -256,99 +298,6 @@ export default function DashboardPageV2() {
     }
   };
 
-  // Fonction pour ajouter le filigrane sur l'image
-  const addWatermarkToImage = async (imageUrl: string): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      console.log('[Watermark] Loading image:', imageUrl.slice(0, 80));
-      
-      const img = document.createElement('img');
-      img.crossOrigin = 'anonymous';
-      
-      img.onload = () => {
-        console.log('[Watermark] Image loaded, dimensions:', img.width, 'x', img.height);
-        
-        try {
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d');
-          
-          if (!ctx) {
-            reject(new Error('Canvas context not available'));
-            return;
-          }
-          
-          canvas.width = img.width;
-          canvas.height = img.height;
-          ctx.drawImage(img, 0, 0);
-          
-          // Filigrane principal
-          const mainText = 'InstaDeco';
-          const fontSize = Math.max(img.width / 8, 60);
-          ctx.font = `bold ${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          
-          const centerX = img.width / 2;
-          const centerY = img.height / 2;
-          
-          ctx.save();
-          ctx.translate(centerX, centerY);
-          ctx.rotate(-15 * Math.PI / 180);
-          
-          ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-          ctx.shadowBlur = 10;
-          ctx.shadowOffsetX = 2;
-          ctx.shadowOffsetY = 2;
-          
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
-          ctx.fillText(mainText, 0, 0);
-          
-          ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
-          ctx.lineWidth = 2;
-          ctx.strokeText(mainText, 0, 0);
-          
-          ctx.restore();
-          
-          // Mention IA
-          const aiText = 'Généré par IA';
-          const aiFontSize = Math.max(img.width / 50, 12);
-          ctx.font = `${aiFontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
-          ctx.textAlign = 'right';
-          ctx.textBaseline = 'bottom';
-          
-          ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-          ctx.shadowBlur = 3;
-          ctx.shadowOffsetX = 1;
-          ctx.shadowOffsetY = 1;
-          
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-          ctx.fillText(aiText, img.width - 15, img.height - 10);
-          
-          canvas.toBlob((blob) => {
-            if (blob) {
-              console.log('[Watermark] ✅ Blob created successfully');
-              resolve(URL.createObjectURL(blob));
-            } else {
-              console.error('[Watermark] ❌ Failed to create blob');
-              reject(new Error('Failed to create blob'));
-            }
-          }, 'image/jpeg', 0.92);
-        } catch (canvasError) {
-          console.error('[Watermark] ❌ Canvas error (likely CORS):', canvasError);
-          reject(canvasError);
-        }
-      };
-      
-      img.onerror = (e) => {
-        console.error('[Watermark] ❌ Failed to load image:', e);
-        reject(new Error('Failed to load image'));
-      };
-      
-      // Ajouter un timestamp pour éviter le cache qui pourrait bloquer CORS
-      const separator = imageUrl.includes('?') ? '&' : '?';
-      img.src = imageUrl + separator + 't=' + Date.now();
-    });
-  };
-
   const handleDownload = async (generationId: string, outputUrl: string, isHD: boolean = false) => {
     if (!outputUrl) return;
     
@@ -399,48 +348,6 @@ export default function DashboardPageV2() {
     if (filterStatus === 'all') return true;
     return gen.status === filterStatus;
   });
-
-  // ============================================
-  // RENDER HELPERS
-  // ============================================
-  const getStyleName = (slug: string) => {
-    const style = STYLES.find(s => s.id === slug || s.slug === slug);
-    return style?.name || slug;
-  };
-
-  const getRoomName = (slug: string) => {
-    const room = ROOM_TYPES.find(r => r.id === slug || r.slug === slug);
-    return room?.name || slug;
-  };
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return (
-          <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">
-            <Check className="w-3 h-3" />
-            Terminé
-          </span>
-        );
-      case 'processing':
-      case 'pending':
-        return (
-          <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs">
-            <Clock className="w-3 h-3" />
-            En cours
-          </span>
-        );
-      case 'failed':
-        return (
-          <span className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs">
-            <AlertCircle className="w-3 h-3" />
-            Échec
-          </span>
-        );
-      default:
-        return null;
-    }
-  };
 
   // ============================================
   // LOADING STATE
@@ -763,6 +670,97 @@ export default function DashboardPageV2() {
                     </div>
                   </CardContent>
                 </Card>
+
+                {/* Mes données (RGPD) */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <FileDown className="w-5 h-5 text-[#0071e3]" />
+                      Mes données personnelles
+                    </CardTitle>
+                    <CardDescription>Conformément au RGPD, vous pouvez exporter ou supprimer vos données</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <Button
+                        variant="outline"
+                        onClick={handleExportData}
+                        disabled={isExporting}
+                        className="flex-1 gap-2"
+                      >
+                        {isExporting ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <FileDown className="w-4 h-4" />
+                        )}
+                        Exporter mes données
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => setShowDeleteModal(true)}
+                        className="flex-1 gap-2 text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        Supprimer mon compte
+                      </Button>
+                    </div>
+                    <p className="text-xs text-[#86868b]">
+                      L&apos;export contient toutes vos données personnelles au format JSON.
+                    </p>
+                  </CardContent>
+                </Card>
+
+                {/* Modale de suppression */}
+                {showDeleteModal && (
+                  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+                    <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+                          <AlertTriangle className="w-5 h-5 text-red-600" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-[#1d1d1f]">Supprimer mon compte</h3>
+                      </div>
+                      <p className="text-sm text-[#6B6B6B] mb-4">
+                        Cette action est <strong className="text-red-600">irréversible</strong>. Toutes vos données seront définitivement supprimées :
+                      </p>
+                      <ul className="text-sm text-[#6B6B6B] mb-4 space-y-1 list-disc pl-5">
+                        <li>Votre profil et informations personnelles</li>
+                        <li>Toutes vos générations et images</li>
+                        <li>Votre historique de crédits et transactions</li>
+                      </ul>
+                      <p className="text-sm text-[#1d1d1f] font-medium mb-2">
+                        Tapez <code className="bg-red-50 text-red-600 px-1.5 py-0.5 rounded text-xs">SUPPRIMER MON COMPTE</code> pour confirmer :
+                      </p>
+                      <Input
+                        value={deleteConfirmText}
+                        onChange={(e) => setDeleteConfirmText(e.target.value)}
+                        placeholder="SUPPRIMER MON COMPTE"
+                        className="mb-4 font-mono"
+                      />
+                      <div className="flex gap-3">
+                        <Button
+                          variant="outline"
+                          onClick={() => { setShowDeleteModal(false); setDeleteConfirmText(''); }}
+                          className="flex-1"
+                        >
+                          Annuler
+                        </Button>
+                        <Button
+                          onClick={handleDeleteAccount}
+                          disabled={deleteConfirmText !== 'SUPPRIMER MON COMPTE' || isDeleting}
+                          className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                        >
+                          {isDeleting ? (
+                            <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                          ) : (
+                            <Trash2 className="w-4 h-4 mr-2" />
+                          )}
+                          Supprimer
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 

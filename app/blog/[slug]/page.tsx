@@ -264,16 +264,16 @@ function ArticleContent({ content, slug }: { content: string, slug: string }) {
         [&_.article-toc_li]:text-sm
         [&_.article-toc_a]:text-primary [&_.article-toc_a]:hover:underline
         
-        [&_.key-takeaway]:bg-amber-50 [&_.key-takeaway]:dark:bg-amber-950/30 [&_.key-takeaway]:border-l-4 [&_.key-takeaway]:border-amber-500 [&_.key-takeaway]:rounded-r-lg [&_.key-takeaway]:p-4 [&_.key-takeaway]:my-8
-        [&_.key-takeaway_strong]:text-amber-700 [&_.key-takeaway_strong]:dark:text-amber-400
-        [&_.key-takeaway_p]:text-amber-900 [&_.key-takeaway_p]:dark:text-amber-100 [&_.key-takeaway_p]:mb-0 [&_.key-takeaway_p]:mt-2
+        [&_.key-takeaway]:bg-amber-50 [&_.key-takeaway]:border-l-4 [&_.key-takeaway]:border-amber-500 [&_.key-takeaway]:rounded-r-lg [&_.key-takeaway]:p-4 [&_.key-takeaway]:my-8
+        [&_.key-takeaway_strong]:text-amber-700
+        [&_.key-takeaway_p]:text-amber-900 [&_.key-takeaway_p]:mb-0 [&_.key-takeaway_p]:mt-2
         
-        [&_.pro-tip]:bg-blue-50 [&_.pro-tip]:dark:bg-blue-950/30 [&_.pro-tip]:border-l-4 [&_.pro-tip]:border-blue-500 [&_.pro-tip]:rounded-r-lg [&_.pro-tip]:p-4 [&_.pro-tip]:my-8
-        [&_.pro-tip_strong]:text-blue-700 [&_.pro-tip_strong]:dark:text-blue-400
-        [&_.pro-tip_p]:text-blue-900 [&_.pro-tip_p]:dark:text-blue-100 [&_.pro-tip_p]:mb-0 [&_.pro-tip_p]:mt-2
+        [&_.pro-tip]:bg-blue-50 [&_.pro-tip]:border-l-4 [&_.pro-tip]:border-blue-500 [&_.pro-tip]:rounded-r-lg [&_.pro-tip]:p-4 [&_.pro-tip]:my-8
+        [&_.pro-tip_strong]:text-blue-700
+        [&_.pro-tip_p]:text-blue-900 [&_.pro-tip_p]:mb-0 [&_.pro-tip_p]:mt-2
         
-        [&_.expert-tip]:bg-purple-50 [&_.expert-tip]:dark:bg-purple-950/30 [&_.expert-tip]:border-l-4 [&_.expert-tip]:border-purple-500 [&_.expert-tip]:rounded-r-lg [&_.expert-tip]:p-4 [&_.expert-tip]:my-8 [&_.expert-tip]:italic
-        [&_.expert-tip_p]:text-purple-900 [&_.expert-tip_p]:dark:text-purple-100 [&_.expert-tip_p]:mb-0
+        [&_.expert-tip]:bg-purple-50 [&_.expert-tip]:border-l-4 [&_.expert-tip]:border-purple-500 [&_.expert-tip]:rounded-r-lg [&_.expert-tip]:p-4 [&_.expert-tip]:my-8 [&_.expert-tip]:italic
+        [&_.expert-tip_p]:text-purple-900 [&_.expert-tip_p]:mb-0
         
         [&_.cta-contextual]:bg-gradient-to-r [&_.cta-contextual]:from-primary/10 [&_.cta-contextual]:to-primary/5 [&_.cta-contextual]:rounded-xl [&_.cta-contextual]:p-6 [&_.cta-contextual]:my-8 [&_.cta-contextual]:text-center [&_.cta-contextual]:border [&_.cta-contextual]:border-primary/20
         [&_.cta-contextual_p]:text-foreground [&_.cta-contextual_p]:mb-0 [&_.cta-contextual_p]:text-lg

@@ -10,10 +10,8 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import dynamic from 'next/dynamic';
 import { ArrowRight, Palette, Check, Star, Sparkles } from 'lucide-react';
-
-const LeadCaptureLazy = dynamic(() => import('@/components/features/lead-capture').then(mod => ({ default: mod.LeadCapture })), { ssr: false });
+import { LeadCaptureLazy } from '@/components/features/lead-capture-lazy';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -24,7 +22,7 @@ import { STYLE_SEO_DATA, getStyleSEOBySlug } from '@/lib/seo/programmatic-data';
 import { CITIES } from '@/src/shared/constants/cities';
 
 interface PageProps {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 // Pre-render toutes les pages de style au build
@@ -35,7 +33,8 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const style = getStyleSEOBySlug(params.slug);
+  const { slug } = await params;
+  const style = getStyleSEOBySlug(slug);
   if (!style) return { title: 'Style non trouvé' };
 
   return {
@@ -60,8 +59,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default function StylePage({ params }: PageProps) {
-  const style = getStyleSEOBySlug(params.slug);
+export default async function StylePage({ params }: PageProps) {
+  const { slug } = await params;
+  const style = getStyleSEOBySlug(slug);
   if (!style) notFound();
 
   // Villes populaires pour le maillage

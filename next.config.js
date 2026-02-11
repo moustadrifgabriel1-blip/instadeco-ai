@@ -7,9 +7,7 @@ const nextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
   
-  experimental: {
-    serverComponentsExternalPackages: ['undici'],
-  },
+  serverExternalPackages: ['undici'],
   
   // Headers de sécurité
   async headers() {

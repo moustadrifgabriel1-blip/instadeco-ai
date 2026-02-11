@@ -10,7 +10,6 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import dynamic from 'next/dynamic';
 import { ArrowRight, Home, Check, Sparkles, Lightbulb } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -19,12 +18,11 @@ import { JsonLd } from '@/lib/seo/json-ld';
 import { generateFAQSchema, generateBreadcrumbList, generateArticleSchema } from '@/lib/seo/schemas';
 import { getCanonicalUrl } from '@/lib/seo/config';
 import { ROOM_SEO_DATA, STYLE_SEO_DATA, getRoomSEOBySlug } from '@/lib/seo/programmatic-data';
-
-const LeadCaptureLazy = dynamic(() => import('@/components/features/lead-capture').then(mod => ({ default: mod.LeadCapture })), { ssr: false });
+import { LeadCaptureLazy } from '@/components/features/lead-capture-lazy';
 import { CITIES } from '@/src/shared/constants/cities';
 
 interface PageProps {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 // Pre-render toutes les pages de pièce au build
@@ -35,7 +33,8 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const room = getRoomSEOBySlug(params.slug);
+  const { slug } = await params;
+  const room = getRoomSEOBySlug(slug);
   if (!room) return { title: 'Pièce non trouvée' };
 
   return {
@@ -60,8 +59,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default function RoomPage({ params }: PageProps) {
-  const room = getRoomSEOBySlug(params.slug);
+export default async function RoomPage({ params }: PageProps) {
+  const { slug } = await params;
+  const room = getRoomSEOBySlug(slug);
   if (!room) notFound();
 
   // Styles recommandés avec leurs données complètes

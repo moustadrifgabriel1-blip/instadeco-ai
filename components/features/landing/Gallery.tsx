@@ -62,15 +62,19 @@ function GalleryCard({ item, index, isVisible }: { item: typeof transformations[
     >
       {/* Images */}
       <div className="relative aspect-[3/2] overflow-hidden">
-        <img
+        <Image
           src={item.before}
           alt={`${item.room} avant`}
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${showAfter ? 'opacity-0' : 'opacity-100'}`}
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          className={`object-cover transition-opacity duration-500 ${showAfter ? 'opacity-0' : 'opacity-100'}`}
         />
-        <img
+        <Image
           src={item.after}
           alt={`${item.room} après - style ${item.style}`}
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${showAfter ? 'opacity-100' : 'opacity-0'}`}
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          className={`object-cover transition-opacity duration-500 ${showAfter ? 'opacity-100' : 'opacity-0'}`}
         />
         
         {/* Overlay gradient */}

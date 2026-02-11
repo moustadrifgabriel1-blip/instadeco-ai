@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ArrowRight, Filter, Sparkles, Eye } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 
 interface GalleryItem {
@@ -149,22 +150,24 @@ export default function GaleriePage() {
                 onMouseLeave={() => setHoveredId(null)}
               >
                 {/* Before image */}
-                <img
+                <Image
                   src={item.input_image_url}
                   alt={`${ROOM_LABELS[item.room_type_slug] || item.room_type_slug} avant`}
-                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  className={`object-cover transition-opacity duration-500 ${
                     hoveredId === item.id ? 'opacity-0' : 'opacity-100'
                   }`}
-                  loading="lazy"
                 />
                 {/* After image */}
-                <img
+                <Image
                   src={item.output_image_url}
                   alt={`${ROOM_LABELS[item.room_type_slug] || item.room_type_slug} style ${STYLE_LABELS[item.style_slug] || item.style_slug}`}
-                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  className={`object-cover transition-opacity duration-500 ${
                     hoveredId === item.id ? 'opacity-100' : 'opacity-0'
                   }`}
-                  loading="lazy"
                 />
 
                 {/* Overlay */}

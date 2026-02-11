@@ -12,7 +12,7 @@ import { useState, useEffect } from 'react';
 import { Menu, X, BookOpen, CreditCard, Home, Wand2, User as UserIcon, Plus, LayoutGrid, Building2, Eye } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { ThemeToggle } from '@/components/ui/theme-toggle';
+
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
 
@@ -51,7 +51,7 @@ export function Header() {
     <header className={cn(
       "sticky top-0 z-50 w-full transition-all duration-300",
       scrolled 
-        ? "bg-[--white]/95 dark:bg-[--white]/95 backdrop-blur-md border-b border-[--border-color] shadow-soft" 
+        ? "bg-[--white]/95 backdrop-blur-md border-b border-[--border-color] shadow-soft" 
         : "bg-transparent"
     )}>
       <div className="container mx-auto px-4">
@@ -91,7 +91,7 @@ export function Header() {
 
           {/* CTA Desktop */}
           <div className="hidden md:flex items-center gap-3">
-            <ThemeToggle />
+
             {loading ? (
               <div className="h-9 w-24 bg-[#FFF8F5] animate-shimmer rounded-lg" />
             ) : user ? (

@@ -9,7 +9,10 @@ const MODEL_PATH = 'fal-ai/flux-general';
  * Schéma de validation pour l'essai gratuit
  */
 const trialRequestSchema = z.object({
-  imageBase64: z.string().min(100, 'Image requise'),
+  imageBase64: z.string().min(100, 'Image requise').refine(
+    (val) => val.startsWith('data:image/'),
+    'Seuls les data URIs image sont acceptés'
+  ),
   roomType: z.string().max(50).regex(/^[a-z0-9-]+$/).default('salon'),
   style: z.string().max(50).regex(/^[a-z0-9-]+$/).default('moderne'),
 });

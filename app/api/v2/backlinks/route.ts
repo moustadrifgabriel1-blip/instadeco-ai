@@ -15,12 +15,13 @@ import { BacklinkOutreachService } from '@/lib/seo/backlink-outreach';
 function isAuthorized(req: NextRequest): boolean {
   const authHeader = req.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;
-  if (cronSecret && authHeader === `Bearer ${cronSecret}`) return true;
   
-  // En dev, autoriser tout
-  if (process.env.NODE_ENV === 'development') return true;
+  if (!cronSecret) {
+    console.error('[Backlinks] CRON_SECRET non configuré');
+    return false;
+  }
   
-  return false;
+  return authHeader === `Bearer ${cronSecret}`;
 }
 
 /**

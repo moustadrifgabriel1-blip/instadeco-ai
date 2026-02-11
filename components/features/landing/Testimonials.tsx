@@ -120,9 +120,11 @@ export function Testimonials() {
           <div className="bg-[#FFF8F5] rounded-3xl p-8 md:p-12 text-center">
             {/* Avatar */}
             <div className="mb-6">
-              <img
+              <Image
                 src={testimonials[currentIndex].image}
                 alt={testimonials[currentIndex].name}
+                width={80}
+                height={80}
                 className="h-20 w-20 rounded-full mx-auto object-cover border-4 border-white shadow-warm"
               />
             </div>

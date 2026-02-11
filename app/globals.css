@@ -4,7 +4,6 @@
 
 /* ============================================
    INSTADECO AI - DESIGN SYSTEM
-   Mode Clair + Mode Sombre
    ============================================ */
 
 :root {
@@ -51,39 +50,7 @@
   --radius: 0.75rem;
 }
 
-/* === MODE SOMBRE === */
-.dark {
-  --terracotta: #F0936C;
-  --terracotta-dark: #E07B54;
-  --terracotta-light: #3D2A22;
-  
-  --cream: #1A1512;
-  --text-dark: #F5F5F5;
-  --text-muted: #A0A0A0;
-  --border-color: #3D3530;
-  --white: #0F0D0C;
-  
-  /* Shadcn variables */
-  --background: 15 10% 7%;
-  --foreground: 0 0% 96%;
-  --card: 15 8% 10%;
-  --card-foreground: 0 0% 96%;
-  --popover: 15 8% 10%;
-  --popover-foreground: 0 0% 96%;
-  --primary: 16 70% 65%;
-  --primary-foreground: 15 10% 7%;
-  --secondary: 15 10% 15%;
-  --secondary-foreground: 0 0% 96%;
-  --muted: 15 10% 15%;
-  --muted-foreground: 0 0% 65%;
-  --accent: 15 10% 18%;
-  --accent-foreground: 0 0% 96%;
-  --destructive: 0 62% 50%;
-  --destructive-foreground: 0 0% 100%;
-  --border: 15 10% 20%;
-  --input: 15 10% 20%;
-  --ring: 16 70% 65%;
-}
+
 
 /* ============================================
    BASE STYLES
@@ -107,12 +74,7 @@
     transition: background-color 0.3s ease, color 0.3s ease;
   }
   
-  /* Mode sombre - Override Tailwind bg-background */
-  .dark body,
-  .dark {
-    background-color: var(--white);
-    color: var(--text-dark);
-  }
+
 }
 
 /* ============================================
@@ -239,10 +201,6 @@
   box-shadow: 0 12px 40px rgba(224, 123, 84, 0.12);
 }
 
-.dark .card-interactive:hover {
-  box-shadow: 0 12px 40px rgba(240, 147, 108, 0.08);
-}
-
 /* ============================================
    BADGES
    ============================================ */
@@ -279,15 +237,6 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--terracotta-light);
-}
-
-/* Mode sombre - scrollbar */
-.dark ::-webkit-scrollbar-track {
-  background: var(--cream);
-}
-
-.dark ::-webkit-scrollbar-thumb {
-  background: var(--border-color);
 }
 
 /* ============================================

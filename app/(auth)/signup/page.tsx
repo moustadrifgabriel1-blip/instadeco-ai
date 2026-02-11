@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Suspense } from 'react';
 import Image from 'next/image';
 
 function SignupForm() {
@@ -15,6 +14,7 @@ function SignupForm() {
   const [password, setPassword] = useState('');
   const [referralCode, setReferralCode] = useState('');
   const [acceptTerms, setAcceptTerms] = useState(false);
+  const [acceptMarketing, setAcceptMarketing] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -36,6 +36,8 @@ function SignupForm() {
         options: {
           data: {
             full_name: fullName,
+            consent_marketing: acceptMarketing,
+            consent_marketing_date: new Date().toISOString(),
           },
         },
       });
@@ -76,6 +78,10 @@ function SignupForm() {
   };
 
   const handleGoogleSignup = async () => {
+    if (!acceptTerms) {
+      setError('Veuillez accepter les CGV et la Politique de Confidentialité.');
+      return;
+    }
     setLoading(true);
     setError('');
 
@@ -202,6 +208,21 @@ function SignupForm() {
                 <a href="/legal/privacy" target="_blank" className="text-[#0071e3] hover:underline">
                   Politique de Confidentialité
                 </a>.
+              </label>
+            </div>
+
+            {/* Consentement marketing séparé (opt-in RGPD) */}
+            <div className="flex items-start gap-3">
+              <input
+                type="checkbox"
+                id="accept-marketing"
+                checked={acceptMarketing}
+                onChange={(e) => setAcceptMarketing(e.target.checked)}
+                className="mt-1 h-4 w-4 rounded border-[#d2d2d7] text-[#0071e3] focus:ring-[#0071e3]"
+              />
+              <label htmlFor="accept-marketing" className="text-[13px] text-[#86868b] leading-5">
+                J&apos;accepte de recevoir des emails d&apos;inspiration déco et des offres promotionnelles.
+                <span className="block text-[11px] mt-0.5">Optionnel • Désinscription en 1 clic</span>
               </label>
             </div>
 

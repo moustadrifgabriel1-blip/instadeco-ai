@@ -1,5 +1,7 @@
 import { MetadataRoute } from 'next';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * Sitemap dynamique pour SEO
  * 

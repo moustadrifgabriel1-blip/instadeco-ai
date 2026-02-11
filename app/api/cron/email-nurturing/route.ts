@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
+import { buildUnsubscribeUrl } from '@/lib/utils/unsubscribe';
+
+export const dynamic = 'force-dynamic';
 
 const supabaseAdmin = createSupabaseClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -12,15 +15,6 @@ const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'InstaDeco AI <contact@insta
 function getResend(): Resend | null {
   if (!process.env.RESEND_API_KEY) return null;
   return new Resend(process.env.RESEND_API_KEY);
-}
-
-interface UserNurture {
-  id: string;
-  email: string;
-  full_name: string | null;
-  credits: number;
-  created_at: string;
-  generation_count: number;
 }
 
 /**
@@ -56,11 +50,14 @@ export async function GET(req: Request) {
 
     const { data: j3Users } = await supabaseAdmin
       .from('profiles')
-      .select('id, email, full_name, credits')
+      .select('id, email, full_name, credits, consent_marketing')
       .gte('created_at', threeDaysAgoMin.toISOString())
       .lt('created_at', threeDaysAgo.toISOString());
 
     for (const user of (j3Users || [])) {
+      // Vérifier le consentement marketing (RGPD: opt-in strict)
+      if (user.consent_marketing === false) continue;
+
       // Vérifier s'ils ont fait une génération
       const { count } = await supabaseAdmin
         .from('generations')
@@ -73,7 +70,7 @@ export async function GET(req: Request) {
             from: FROM_EMAIL,
             to: [user.email],
             subject: '🏠 Votre pièce attend d\'être transformée !',
-            html: buildJ3Email(user.full_name || 'là'),
+            html: buildJ3Email(user.full_name || 'là', user.email),
           });
           results.j3++;
         } catch {
@@ -90,17 +87,20 @@ export async function GET(req: Request) {
 
     const { data: j7Users } = await supabaseAdmin
       .from('profiles')
-      .select('id, email, full_name')
+      .select('id, email, full_name, consent_marketing')
       .gte('created_at', sevenDaysAgoMin.toISOString())
       .lt('created_at', sevenDaysAgo.toISOString());
 
     for (const user of (j7Users || [])) {
+      // Vérifier le consentement marketing (RGPD: opt-in strict)
+      if (user.consent_marketing === false) continue;
+
       try {
         await resend.emails.send({
           from: FROM_EMAIL,
           to: [user.email],
           subject: '✨ 3 transformations qui vont vous inspirer',
-          html: buildJ7Email(user.full_name || 'là'),
+          html: buildJ7Email(user.full_name || 'là', user.email),
         });
         results.j7++;
       } catch {
@@ -116,11 +116,14 @@ export async function GET(req: Request) {
 
     const { data: j14Users } = await supabaseAdmin
       .from('profiles')
-      .select('id, email, full_name, credits')
+      .select('id, email, full_name, credits, consent_marketing')
       .gte('created_at', fourteenDaysAgoMin.toISOString())
       .lt('created_at', fourteenDaysAgo.toISOString());
 
     for (const user of (j14Users || [])) {
+      // Vérifier le consentement marketing (RGPD: opt-in strict)
+      if (user.consent_marketing === false) continue;
+
       // Vérifier s'ils ont acheté (plus de 3 crédits = achat)
       const { count } = await supabaseAdmin
         .from('credit_transactions')
@@ -134,7 +137,7 @@ export async function GET(req: Request) {
             from: FROM_EMAIL,
             to: [user.email],
             subject: '🎁 Offre exclusive : -20% sur votre premier pack',
-            html: buildJ14Email(user.full_name || 'là'),
+            html: buildJ14Email(user.full_name || 'là', user.email),
           });
           results.j14++;
         } catch {
@@ -160,7 +163,7 @@ export async function GET(req: Request) {
 // EMAIL TEMPLATES
 // ============================================
 
-function emailWrapper(content: string): string {
+function emailWrapper(content: string, unsubscribeUrl?: string): string {
   return `
 <!DOCTYPE html>
 <html lang="fr">
@@ -186,7 +189,8 @@ function emailWrapper(content: string): string {
         <a href="https://instadeco.app" style="color: #E07B54; text-decoration: none;">instadeco.app</a>
       </p>
       <p style="color: #aaa; font-size: 11px; margin: 8px 0 0;">
-        Vous recevez cet email car vous êtes inscrit sur InstaDeco AI.
+        Vous recevez cet email car vous êtes inscrit sur InstaDeco AI.${unsubscribeUrl ? `<br />
+        <a href="${unsubscribeUrl}" style="color: #aaa; text-decoration: underline;">Se désinscrire des emails marketing</a>` : ''}
       </p>
     </div>
   </div>
@@ -194,7 +198,8 @@ function emailWrapper(content: string): string {
 </html>`;
 }
 
-function buildJ3Email(name: string): string {
+function buildJ3Email(name: string, email: string): string {
+  const unsubUrl = buildUnsubscribeUrl(email);
   return emailWrapper(`
     <h2 style="color: #1d1d1f; font-size: 22px; margin: 0 0 16px;">Bonjour ${name} 👋</h2>
     
@@ -222,10 +227,11 @@ function buildJ3Email(name: string): string {
         Transformer ma pièce maintenant →
       </a>
     </div>
-  `);
+  `, unsubUrl);
 }
 
-function buildJ7Email(name: string): string {
+function buildJ7Email(name: string, email: string): string {
+  const unsubUrl = buildUnsubscribeUrl(email);
   return emailWrapper(`
     <h2 style="color: #1d1d1f; font-size: 22px; margin: 0 0 16px;">Les transformations de la semaine ✨</h2>
     
@@ -259,10 +265,11 @@ function buildJ7Email(name: string): string {
         Essayer un nouveau style →
       </a>
     </div>
-  `);
+  `, unsubUrl);
 }
 
-function buildJ14Email(name: string): string {
+function buildJ14Email(name: string, email: string): string {
+  const unsubUrl = buildUnsubscribeUrl(email);
   return emailWrapper(`
     <h2 style="color: #1d1d1f; font-size: 22px; margin: 0 0 16px;">Une offre spéciale pour vous 🎁</h2>
     
@@ -302,5 +309,5 @@ function buildJ14Email(name: string): string {
     <p style="color: #86868b; font-size: 13px; text-align: center; margin: 16px 0 0;">
       Pas intéressé ? Pas de souci — vos 3 crédits gratuits n'expirent jamais.
     </p>
-  `);
+  `, unsubUrl);
 }

@@ -16,7 +16,6 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import dynamic from 'next/dynamic';
 import {
   ArrowRight, Clock, Euro, Palette, Camera, Zap, Upload, Download,
   Globe, Brain, Layers, TrendingUp, Maximize, Repeat, Eye,
@@ -29,14 +28,10 @@ import { JsonLd } from '@/lib/seo/json-ld';
 import { generateFAQSchema, generateBreadcrumbList, generateArticleSchema } from '@/lib/seo/schemas';
 import { getCanonicalUrl } from '@/lib/seo/config';
 import { INTENT_PAGES, getIntentPageBySlug } from '@/lib/seo/intent-pages-data';
-
-const LeadCaptureLazy = dynamic(
-  () => import('@/components/features/lead-capture').then(mod => ({ default: mod.LeadCapture })),
-  { ssr: false }
-);
+import { LeadCaptureLazy } from '@/components/features/lead-capture-lazy';
 
 interface PageProps {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 export function generateStaticParams() {
@@ -44,7 +39,8 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const page = getIntentPageBySlug(params.slug);
+  const { slug } = await params;
+  const page = getIntentPageBySlug(slug);
   if (!page) return { title: 'Page non trouvée' };
 
   return {
@@ -97,8 +93,9 @@ const iconMap: Record<string, React.ReactNode> = {
   split: <Layers className="w-6 h-6" />,
 };
 
-export default function IntentPage({ params }: PageProps) {
-  const page = getIntentPageBySlug(params.slug);
+export default async function IntentPage({ params }: PageProps) {
+  const { slug } = await params;
+  const page = getIntentPageBySlug(slug);
   if (!page) notFound();
 
   const relatedPages = INTENT_PAGES.filter((p) => p.slug !== page.slug).slice(0, 3);
@@ -123,7 +120,7 @@ export default function IntentPage({ params }: PageProps) {
         <div className="container px-4 md:px-6 max-w-4xl mx-auto text-center space-y-6">
           <Badge className="bg-[#E07B54]/20 text-[#E07B54] border-[#E07B54]/30 px-4 py-1.5">
             <Sparkles className="w-3 h-3 mr-2" />
-            Propulsé par l&apos;IA
+            InstaDeco AI
           </Badge>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight">
             {page.hero.headline}
@@ -162,9 +159,9 @@ export default function IntentPage({ params }: PageProps) {
           <h2 className="text-3xl font-bold text-center mb-10">{page.problem.title}</h2>
           <div className="grid md:grid-cols-2 gap-4">
             {page.problem.points.map((point, i) => (
-              <div key={i} className="flex items-start gap-3 p-4 bg-red-50 dark:bg-red-950/20 rounded-xl border border-red-100 dark:border-red-900/30">
+              <div key={i} className="flex items-start gap-3 p-4 bg-red-50 rounded-xl border border-red-100">
                 <span className="text-red-500 text-lg mt-0.5">✗</span>
-                <p className="text-sm text-gray-700 dark:text-gray-300">{point}</p>
+                <p className="text-sm text-gray-700">{point}</p>
               </div>
             ))}
           </div>

@@ -4,6 +4,8 @@ import { useCases } from '@/src/infrastructure/config/di-container';
 import { CreditMapper } from '@/src/application/mappers/CreditMapper';
 import { requireAuth } from '@/lib/security/api-auth';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * Schéma de validation (limit uniquement, userId vient du token)
  */

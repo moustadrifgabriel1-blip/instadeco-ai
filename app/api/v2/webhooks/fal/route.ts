@@ -13,11 +13,17 @@ export const maxDuration = 30;
 export async function POST(req: Request) {
   try {
     // ✅ Vérification du secret partagé Fal.ai
-    const webhookSecret = req.headers.get('x-fal-webhook-secret') 
-      || new URL(req.url).searchParams.get('secret');
     const expectedSecret = process.env.FAL_WEBHOOK_SECRET;
 
-    if (expectedSecret && webhookSecret !== expectedSecret) {
+    if (!expectedSecret) {
+      console.error('[Fal Webhook] FAL_WEBHOOK_SECRET non configuré');
+      return NextResponse.json({ error: 'Server misconfigured' }, { status: 500 });
+    }
+
+    // Ne jamais accepter le secret via query string (fuite dans les logs)
+    const webhookSecret = req.headers.get('x-fal-webhook-secret');
+
+    if (webhookSecret !== expectedSecret) {
       console.warn('[Fal Webhook] ⚠️ Unauthorized webhook attempt');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

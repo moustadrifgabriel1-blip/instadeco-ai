@@ -2,7 +2,6 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import dynamic from 'next/dynamic';
 import { CITIES, City, CountryCode } from '@/src/shared/constants/cities';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -14,13 +13,10 @@ import {
 import { JsonLd } from '@/lib/seo/json-ld';
 import { generateLocalBusinessSchema, generateBreadcrumbList, generateFAQSchema } from '@/lib/seo/schemas';
 import { getCanonicalUrl } from '@/lib/seo/config';
-
-const LeadCaptureLazy = dynamic(() => import('@/components/features/lead-capture').then(mod => ({ default: mod.LeadCapture })), { ssr: false });
+import { LeadCaptureLazy } from '@/components/features/lead-capture-lazy';
 
 interface PageProps {
-  params: {
-    slug: string;
-  };
+  params: Promise<{ slug: string }>;
 }
 
 // Génération des routes statiques
@@ -133,7 +129,8 @@ const getTestimonials = (city: City, terms: any) => [
 
 // Métadonnées SEO
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const city = CITIES.find((c) => c.slug === params.slug);
+  const { slug } = await params;
+  const city = CITIES.find((c) => c.slug === slug);
   if (!city) return { title: 'Page non trouvée' };
 
   const title = `Architecte d'intérieur IA à ${city.name} (${city.zip}) - Rénovation & Déco`;
@@ -169,8 +166,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default function CityPage({ params }: PageProps) {
-  const city = CITIES.find((c) => c.slug === params.slug);
+export default async function CityPage({ params }: PageProps) {
+  const { slug } = await params;
+  const city = CITIES.find((c) => c.slug === slug);
   if (!city) notFound();
 
   const terms = getLocalTerms(city);
@@ -208,7 +206,7 @@ export default function CityPage({ params }: PageProps) {
 
       {/* --- HERO SECTION --- */}
       <section className="relative pt-24 pb-32 overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-blue-50/50 to-background dark:from-blue-950/20 dark:to-background -z-10" />
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-blue-50/50 to-background -z-10" />
         <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-primary/5 blur-[120px] rounded-full -z-10" />
         
         <div className="container px-4 md:px-6">
@@ -298,7 +296,7 @@ export default function CityPage({ params }: PageProps) {
           <div className="grid md:grid-cols-3 gap-8">
             <Card className="bg-background border-none shadow-lg">
               <CardContent className="pt-6 space-y-4">
-                <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600">
+                <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
                   <Building className="w-6 h-6" />
                 </div>
                 <h3 className="text-xl font-bold">{archContent.title}</h3>
@@ -308,7 +306,7 @@ export default function CityPage({ params }: PageProps) {
 
             <Card className="bg-background border-none shadow-lg">
               <CardContent className="pt-6 space-y-4">
-                <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600">
+                <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-600">
                   <Zap className="w-6 h-6" />
                 </div>
                 <h3 className="text-xl font-bold">Instantané & Économique</h3>
@@ -320,7 +318,7 @@ export default function CityPage({ params }: PageProps) {
 
             <Card className="bg-background border-none shadow-lg">
               <CardContent className="pt-6 space-y-4">
-                <div className="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600">
+                <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
                   <Home className="w-6 h-6" />
                 </div>
                 <h3 className="text-xl font-bold">Spécial Immobilier Local</h3>

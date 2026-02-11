@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { useCases } from '@/src/infrastructure/config/di-container';
 import { requireAuth } from '@/lib/security/api-auth';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/v2/credits
  * 

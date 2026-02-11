@@ -2,6 +2,7 @@ import './globals.css';
 import type { Metadata, Viewport } from 'next';
 import { Inter, Playfair_Display } from 'next/font/google';
 import { Header, Footer } from '@/components/layout';
+import { CookieBanner } from '@/components/features/cookie-banner';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { generateOrganizationSchema, generateWebSiteSchema, generateSoftwareAppSchema } from '@/lib/seo/schemas';
 import { SEO_CONFIG } from '@/lib/seo/config';
@@ -173,6 +174,7 @@ export default function RootLayout({
           <Header />
           <main className="flex-1">{children}</main>
           <Footer />
+          <CookieBanner />
         </div>
       </body>
     </html>

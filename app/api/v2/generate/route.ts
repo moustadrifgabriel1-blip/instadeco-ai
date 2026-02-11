@@ -12,7 +12,10 @@ import { createClient } from '@/lib/supabase/server';
  * Schéma de validation pour la génération
  */
 const generateRequestSchema = z.object({
-  imageUrl: z.string().min(1, 'Image URL requise'),
+  imageUrl: z.string().min(1, 'Image URL requise').refine(
+    (url) => url.startsWith('data:image/') || /^https:\/\//.test(url),
+    'Seules les URLs HTTPS ou les data URIs image sont acceptés'
+  ),
   roomType: z.string().max(50).regex(/^[a-z0-9-]+$/, 'Format invalide').default('salon'),
   style: z.string().max(50).regex(/^[a-z0-9-]+$/, 'Format invalide').default('moderne'),
   userId: z.string().uuid('ID utilisateur invalide').optional(), // Optionnel : on prend l'userId de la session si absent

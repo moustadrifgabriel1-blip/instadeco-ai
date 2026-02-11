@@ -92,7 +92,7 @@ export function ShareButton({ title, url, variant = 'sidebar' }: ShareButtonProp
         </Button>
 
         {showMenu && (
-          <div className="absolute left-12 top-0 bg-white dark:bg-zinc-900 rounded-xl shadow-xl border border-border p-2 min-w-[180px] z-50 animate-in fade-in slide-in-from-left-2 duration-200">
+          <div className="absolute left-12 top-0 bg-white rounded-xl shadow-xl border border-border p-2 min-w-[180px] z-50 animate-in fade-in slide-in-from-left-2 duration-200">
             {shareLinks.map((link) => (
               <a
                 key={link.name}
