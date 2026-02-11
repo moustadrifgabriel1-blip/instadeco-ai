@@ -154,7 +154,7 @@ export default function CGVPage() {
 
           <h3 className="text-lg font-medium text-gray-800 mt-4 mb-2">4.2 Téléchargement HD</h3>
           <p className="text-gray-700 mb-4">
-            Le téléchargement en haute définition d&apos;une image générée est facturé <strong>1,99 € / 1,99 CHF</strong> 
+            Le téléchargement en haute définition d&apos;une image générée est facturé <strong>4,99 € / 4,99 CHF</strong> 
             par image (paiement unique par image).
           </p>
 

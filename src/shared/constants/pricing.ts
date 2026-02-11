@@ -48,8 +48,8 @@ export const CREDIT_COSTS = {
  * Prix HD Unlock (paiement unique)
  */
 export const HD_UNLOCK_PRICE = {
-  amount: 199, // 1.99€
-  priceDisplay: '1,99 €',
+  amount: 499, // 4.99€
+  priceDisplay: '4,99 €',
   stripePriceId: process.env.STRIPE_PRICE_HD_UNLOCK,
 } as const;
 

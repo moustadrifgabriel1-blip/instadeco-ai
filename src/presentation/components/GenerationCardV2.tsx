@@ -289,7 +289,7 @@ export function GenerationCardV2({
                 className="flex-1 h-8 text-xs bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
               >
                 <Lock className="h-3 w-3 mr-1" />
-                HD - 1,99€
+                HD - 4,99€
               </Button>
             ) : (
               <Button

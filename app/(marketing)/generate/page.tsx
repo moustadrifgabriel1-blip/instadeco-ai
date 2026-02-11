@@ -665,7 +665,7 @@ function GenerateContent() {
                     disabled={isUnlocking}
                     className="w-full inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full text-[15px] font-semibold text-[#1d1d1f] bg-gradient-to-r from-amber-300 to-amber-400 hover:from-amber-400 hover:to-amber-500 transition-all disabled:opacity-50 shadow-lg shadow-amber-400/20 active:scale-95"
                   >
-                    {isUnlocking ? 'Chargement...' : 'Obtenir en HD — 1,99 €'}
+                    {isUnlocking ? 'Chargement...' : 'Obtenir en HD — 4,99 €'}
                   </button>
                   <p className="text-[11px] text-white/40 mt-2">Paiement unique • Téléchargement immédiat</p>
                 </div>

@@ -51,7 +51,7 @@ const pricingFAQ = [
   },
   {
     question: "Quelle est la qualité des images générées ?",
-    answer: "Toutes les images sont en haute définition (1024×1024 pixels). Vous pouvez aussi débloquer la version HD+ (2048×2048) pour seulement 1,99€ par image."
+    answer: "Toutes les images sont en haute définition (1024×1024 pixels). Vous pouvez aussi débloquer la version HD+ (2048×2048) pour seulement 4,99€ par image."
   },
   {
     question: "Puis-je utiliser les images pour mon activité pro ?",
