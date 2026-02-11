@@ -11,7 +11,7 @@ declare global {
       SUPABASE_SERVICE_ROLE_KEY: string;
 
       // Fal.ai
-      FAL_API_KEY: string;
+      FAL_KEY: string;
 
       // Stripe - Packs de crédits
       STRIPE_SECRET_KEY: string;

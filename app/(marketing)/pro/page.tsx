@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { 
   Building2, Camera, Zap, TrendingUp, Check, ArrowRight, 
-  Star, Shield, Clock, CreditCard, ChevronDown, Home,
+  Shield, Clock, CreditCard, ChevronDown, Home,
   Users, BarChart3, Sparkles, Download, Palette, Award
 } from 'lucide-react';
 
@@ -50,27 +50,27 @@ const PRO_PLANS = [
   },
 ];
 
-const TESTIMONIALS = [
+const PRO_USE_CASES = [
   {
-    name: 'Julien M.',
-    role: 'Agent immobilier',
-    company: 'Century 21 Lyon',
-    text: 'Depuis que j\'utilise InstaDeco Pro, mes biens se vendent 30% plus vite. Les acheteurs se projettent immédiatement. Un investissement ridicule comparé au home staging classique.',
-    metric: '+30% ventes rapides',
+    profile: 'Agents immobiliers',
+    role: 'Home staging virtuel',
+    useCase: 'Meublez virtuellement vos biens vides pour aider les acquéreurs à se projeter. Complément rapide et économique au home staging physique.',
+    benefit: 'Projection immédiate',
+    icon: '🏢',
   },
   {
-    name: 'Sophie R.',
-    role: 'Home Stager indépendante',
-    company: 'SR Home Staging, Genève',
-    text: 'Je montre d\'abord le rendu IA à mes clients pour valider la direction, puis je réalise le staging physique. Ça évite les allers-retours et les clients adorent.',
-    metric: '2x plus de clients',
+    profile: 'Home stagers',
+    role: 'Validation rapide',
+    useCase: 'Montrez un rendu IA à vos clients pour valider la direction déco avant de réaliser le staging physique. Réduisez les allers-retours.',
+    benefit: 'Moins d\'allers-retours',
+    icon: '🎨',
   },
   {
-    name: 'Thomas B.',
-    role: 'Directeur d\'agence',
-    company: 'Nexity Bordeaux',
-    text: 'On a équipé nos 15 agents avec InstaDeco Pro. Chaque annonce a maintenant une version "meublée virtuellement". Le taux de clics sur nos annonces a explosé.',
-    metric: '+45% clics annonces',
+    profile: 'Agences & promoteurs',
+    role: 'À l\'échelle',
+    useCase: 'Équipez vos équipes pour ajouter une version "meublée virtuellement" à chaque annonce. 12 styles disponibles, résultat en ~30 secondes.',
+    benefit: '12 styles disponibles',
+    icon: '🏗️',
   },
 ];
 
@@ -84,26 +84,26 @@ const USE_CASES = [
   {
     icon: Building2,
     title: 'Agents immobiliers',
-    description: 'Meublez virtuellement vos biens vides. Les acheteurs se projettent, les biens se vendent plus vite.',
-    stat: '73% des acheteurs se décident sur les photos',
+    description: 'Meublez virtuellement vos biens vides. Aidez les acquéreurs à se projeter dans un espace aménagé.',
+    stat: '12 styles disponibles instantanément',
   },
   {
     icon: Palette,
     title: 'Home stagers',
     description: 'Présentez plusieurs propositions en quelques minutes. Validez avec vos clients avant d\'intervenir physiquement.',
-    stat: 'Divisez par 10 le temps de proposition',
+    stat: 'Proposition en ~30 secondes',
   },
   {
     icon: BarChart3,
     title: 'Promoteurs',
     description: 'Visualisez des logements neufs en plusieurs styles. Aidez vos acheteurs à se projeter sur plan.',
-    stat: '+25% de réservations constatées',
+    stat: '8 types de pièces supportés',
   },
   {
     icon: Users,
     title: 'Architectes d\'intérieur',
-    description: 'Montrez à vos clients un avant/après instantané. Gagnez des projets grâce à un rendu professionnel immédiat.',
-    stat: '15 min au lieu de 3 jours de maquette',
+    description: 'Montrez à vos clients un avant/après instantané pour valider la direction déco.',
+    stat: 'Résultat en quelques secondes',
   },
 ];
 
@@ -189,7 +189,6 @@ export default function ProPage() {
               <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-400" /> Essai gratuit</span>
               <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-400" /> Sans engagement</span>
               <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-400" /> Résultat en 10 secondes</span>
-              <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-400" /> 12 000+ utilisateurs</span>
             </div>
           </div>
         </div>
@@ -244,10 +243,10 @@ export default function ProPage() {
           {/* Stats clés */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { value: '73%', label: 'des acheteurs se décident sur les photos' },
-              { value: '10s', label: 'pour transformer une pièce' },
-              { value: '-60%', label: 'de temps de vente moyen' },
-              { value: '12', label: 'styles disponibles' },
+              { value: '12', label: 'styles de décoration disponibles' },
+              { value: '~30s', label: 'pour transformer une pièce' },
+              { value: '8', label: 'types de pièces supportés' },
+              { value: 'HD+', label: 'jusqu\'à 2048px inclus' },
             ].map((stat) => (
               <div key={stat.label} className="text-center p-4 bg-white rounded-xl border border-gray-100">
                 <p className="text-3xl font-bold text-[#E07B54]">{stat.value}</p>
@@ -317,28 +316,24 @@ export default function ProPage() {
         </div>
       </section>
 
-      {/* ===== TÉMOIGNAGES PROS ===== */}
+      {/* ===== CAS D'USAGE PROS ===== */}
       <section className="py-20">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Ils vendent plus vite grâce à InstaDeco Pro
+              Comment les pros utilisent InstaDeco
             </h2>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {TESTIMONIALS.map((t) => (
-              <div key={t.name} className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
-                <div className="flex items-center gap-1 mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                  ))}
-                </div>
-                <p className="text-gray-700 mb-6 italic leading-relaxed">&quot;{t.text}&quot;</p>
+            {PRO_USE_CASES.map((t) => (
+              <div key={t.profile} className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
+                <div className="text-4xl mb-4">{t.icon}</div>
+                <h3 className="font-semibold text-gray-900 text-lg mb-2">{t.profile}</h3>
+                <p className="text-sm text-[#E07B54] font-medium mb-4">{t.role}</p>
+                <p className="text-gray-700 leading-relaxed mb-4">{t.useCase}</p>
                 <div className="border-t pt-4">
-                  <p className="font-semibold text-gray-900">{t.name}</p>
-                  <p className="text-sm text-gray-500">{t.role} — {t.company}</p>
-                  <p className="text-sm font-bold text-[#E07B54] mt-2">{t.metric}</p>
+                  <p className="text-sm font-bold text-[#E07B54]">{t.benefit}</p>
                 </div>
               </div>
             ))}

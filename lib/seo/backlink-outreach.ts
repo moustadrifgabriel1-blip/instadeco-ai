@@ -134,7 +134,7 @@ ${topics.map((t, i) => `${i + 1}. ${t}`).join('\n')}
 
 L'article serait 100% original, illustré avec des avant/après réalisés par notre IA, et adapté à votre ligne éditoriale. Pas de contenu promotionnel — juste de la valeur pour vos lecteurs.
 
-On a déjà généré plus de 12 000 designs pour des particuliers et professionnels en France, Suisse et Belgique.
+Notre plateforme propose 12 styles de décoration et un résultat en 10 secondes, pour des particuliers et professionnels en France, Suisse et Belgique.
 
 Est-ce que ça vous intéresserait d'en discuter ?
 
@@ -161,7 +161,6 @@ https://instadeco.app`,
 Un salon daté des années 90 transformé en loft moderne en 10 secondes ? C'est ce que propose InstaDeco, une application d'IA développée en Suisse qui démocratise la décoration intérieure.
 
 Quelques chiffres :
-• 12 000+ designs générés depuis le lancement
 • 12 styles de décoration (du Scandinave au Wabi-Sabi)
 • 10 secondes pour transformer n'importe quelle pièce
 • Disponible en France, Suisse et Belgique

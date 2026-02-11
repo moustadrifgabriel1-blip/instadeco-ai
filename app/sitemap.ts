@@ -55,13 +55,43 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     },
     {
-      url: `${BASE_URL}/login`,
+      url: `${BASE_URL}/quiz`,
       lastModified: now,
       changeFrequency: 'monthly',
-      priority: 0.5,
+      priority: 0.8,
     },
     {
-      url: `${BASE_URL}/signup`,
+      url: `${BASE_URL}/galerie`,
+      lastModified: now,
+      changeFrequency: 'daily',
+      priority: 0.7,
+    },
+    {
+      url: `${BASE_URL}/essai`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: `${BASE_URL}/styles`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    {
+      url: `${BASE_URL}/pieces`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    {
+      url: `${BASE_URL}/solutions`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    {
+      url: `${BASE_URL}/a-propos`,
       lastModified: now,
       changeFrequency: 'monthly',
       priority: 0.5,
@@ -71,26 +101,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // ============================================
   // PAGES LÉGALES
   // ============================================
-  const legalPages: MetadataRoute.Sitemap = [
-    {
-      url: `${BASE_URL}/legal/mentions-legales`,
-      lastModified: now,
-      changeFrequency: 'yearly',
-      priority: 0.3,
-    },
-    {
-      url: `${BASE_URL}/legal/privacy`,
-      lastModified: now,
-      changeFrequency: 'yearly',
-      priority: 0.3,
-    },
-    {
-      url: `${BASE_URL}/legal/cgv`,
-      lastModified: now,
-      changeFrequency: 'yearly',
-      priority: 0.3,
-    },
-  ];
+  // Pages légales : exclues du sitemap.
+  // Elles sont bloquées dans robots.txt, les soumettre au sitemap
+  // enverrait des signaux contradictoires à Google.
+  // Elles restent accessibles via les liens internes du footer.
 
   // ============================================
   // ARTICLES DE BLOG (DYNAMIQUE)
@@ -178,6 +192,37 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   // ============================================
+  // PAGES SEO CROISÉES (STYLE × PIÈCE)
+  // Seules les combinaisons à fort volume de recherche sont soumises.
+  // Doit être synchronisé avec PRIORITY_COMBOS dans deco/[style]/[piece]/page.tsx
+  // Les autres pages existent mais sont en noindex.
+  // ============================================
+  const priorityCombos = [
+    // Top salon
+    'moderne/salon', 'scandinave/salon', 'industriel/salon', 'boheme/salon', 'japandi/salon',
+    // Top chambre
+    'scandinave/chambre', 'boheme/chambre', 'japandi/chambre', 'minimaliste/chambre',
+    // Top cuisine
+    'moderne/cuisine', 'industriel/cuisine', 'contemporain/cuisine',
+    // Top bureau
+    'scandinave/bureau', 'industriel/bureau', 'minimaliste/bureau',
+    // Top salle de bain
+    'japandi/salle-de-bain', 'moderne/salle-de-bain',
+    // Top salle à manger
+    'scandinave/salle-a-manger', 'rustique/salle-a-manger',
+  ];
+  const decoPages: MetadataRoute.Sitemap = priorityCombos.map(combo => ({
+    url: `${BASE_URL}/deco/${combo}`,
+    lastModified: now,
+    changeFrequency: 'monthly' as const,
+    priority: 0.6,
+  }));
+
+  // Pages /g/[id] : volontairement exclues du sitemap.
+  // Elles servent au partage social (OG) et sont en noindex
+  // pour éviter l'index bloat (thin content UGC).
+
+  // ============================================
   // PAGES SEO INTENT (SOLUTIONS)
   // ============================================
   const solutionPages: MetadataRoute.Sitemap = [
@@ -198,7 +243,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     ...staticPages, 
-    ...legalPages, 
     ...blogIndexPage, 
     ...articlePages, 
     ...cityIndexPage,
@@ -206,5 +250,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...stylePages,
     ...roomPages,
     ...solutionPages,
+    ...decoPages,
   ];
 }

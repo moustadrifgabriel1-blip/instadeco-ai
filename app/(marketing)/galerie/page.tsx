@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { ArrowRight, Filter, Sparkles, Eye } from 'lucide-react';
+import { ArrowRight, Filter, Sparkles, Eye, Share2 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
+import { ShareButtons } from '@/components/features/share-buttons';
 
 interface GalleryItem {
   id: string;
@@ -192,6 +193,23 @@ export default function GaleriePage() {
                   <p className="text-white/80 text-xs">
                     Style {STYLE_LABELS[item.style_slug] || item.style_slug}
                   </p>
+                </div>
+
+                {/* Actions au hover */}
+                <div className="absolute top-3 right-3 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <ShareButtons
+                    url="https://instadeco.app/galerie"
+                    title={`Transformation ${ROOM_LABELS[item.room_type_slug] || item.room_type_slug} style ${STYLE_LABELS[item.style_slug] || item.style_slug} 🏠✨`}
+                    imageUrl={item.output_image_url}
+                    variant="floating"
+                  />
+                  <Link
+                    href={`/essai`}
+                    className="w-10 h-10 flex items-center justify-center rounded-full bg-[#E07B54]/90 backdrop-blur-md shadow-lg hover:bg-[#E07B54] transition-all duration-200 border border-white/20"
+                    title="Essayer ce style"
+                  >
+                    <Sparkles className="w-4 h-4 text-white" />
+                  </Link>
                 </div>
               </div>
             ))}

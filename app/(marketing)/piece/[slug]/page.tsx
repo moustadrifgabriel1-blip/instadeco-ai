@@ -15,7 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { JsonLd } from '@/lib/seo/json-ld';
-import { generateFAQSchema, generateBreadcrumbList, generateArticleSchema } from '@/lib/seo/schemas';
+import { generateFAQSchema, generateBreadcrumbList, generateWebPageSchema } from '@/lib/seo/schemas';
 import { getCanonicalUrl } from '@/lib/seo/config';
 import { ROOM_SEO_DATA, STYLE_SEO_DATA, getRoomSEOBySlug } from '@/lib/seo/programmatic-data';
 import { LeadCaptureLazy } from '@/components/features/lead-capture-lazy';
@@ -80,7 +80,7 @@ export default async function RoomPage({ params }: PageProps) {
   return (
     <div className="min-h-screen bg-background">
       <JsonLd data={[
-        generateArticleSchema({
+        generateWebPageSchema({
           title: `Décoration ${room.name}`,
           description: room.metaDescription,
           url: getCanonicalUrl(`/piece/${room.slug}`),

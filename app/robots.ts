@@ -22,43 +22,19 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: '*',
-        allow: [
-          '/',
-          '/blog/',
-          '/style/',
-          '/piece/',
-          '/architecte-interieur/',
-          '/exemples',
-          '/pricing',
-          '/generate',
-        ],
+        allow: '/',
         disallow: [
           '/api/',           // API routes
           '/dashboard/',     // Dashboard privé
           '/auth/',          // Callback auth
+          '/login',          // Page login (pas de valeur SEO)
+          '/signup',         // Page signup (pas de valeur SEO)
           '/credits/',       // Pages post-paiement
           '/hd-success/',    // Page succès HD
-          '/seed/',          // Page de test
           '/_next/',         // Next.js internals
-          '/legal/privacy',  // Pages à faible valeur SEO
-          '/legal/cgv',
-          '/legal/mentions-legales',
         ],
-      },
-      {
-        // Googlebot - règles spécifiques (plus permissif)
-        userAgent: 'Googlebot',
-        allow: '/',
-        disallow: ['/api/', '/dashboard/', '/auth/', '/seed/'],
-      },
-      {
-        // Bingbot
-        userAgent: 'Bingbot',
-        allow: '/',
-        disallow: ['/api/', '/dashboard/', '/auth/', '/seed/'],
       },
     ],
     sitemap: `${BASE_URL}/sitemap.xml`,
-    host: BASE_URL,
   };
 }

@@ -1,17 +1,16 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import { CITIES, City, CountryCode } from '@/src/shared/constants/cities';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { 
-  Check, MapPin, Star, ArrowRight, Home, Zap, Palette, 
-  Building, Quote, Camera, Wand2, Download
+  MapPin, ArrowRight, Home, Zap, Palette, 
+  Building, Wand2, Camera
 } from 'lucide-react';
 import { JsonLd } from '@/lib/seo/json-ld';
-import { generateLocalBusinessSchema, generateBreadcrumbList, generateFAQSchema } from '@/lib/seo/schemas';
+import { generateServiceSchema, generateBreadcrumbList, generateFAQSchema } from '@/lib/seo/schemas';
 import { getCanonicalUrl } from '@/lib/seo/config';
 import { LeadCaptureLazy } from '@/components/features/lead-capture-lazy';
 
@@ -102,30 +101,6 @@ const getArchitectureContent = (city: City) => {
   }
 };
 
-// Avis clients fictifs localisés pour la preuve sociale
-const getTestimonials = (city: City, terms: any) => [
-  {
-    initial: "C",
-    name: "Camille D.",
-    role: "Propriétaire",
-    location: `${city.name} Centre`,
-    text: `J'hésitais à casser une cloison dans mon ${terms.apartment}. En une photo, j'ai vu le potentiel. C'est bluffant de réalisme.`
-  },
-  {
-    initial: "T",
-    name: "Thomas L.",
-    role: "Investisseur",
-    location: `${city.region}`,
-    text: `Pour mes annonces de location, c'est indispensable. Mes biens à ${city.name} partent 2x plus vite avec du home staging virtuel.`
-  },
-  {
-    initial: "S",
-    name: "Sarah B.",
-    role: "Architecte",
-    location: `${city.name}`,
-    text: `Je l'utilise pour mes planches d'ambiance préliminaires. Ça me fait gagner des heures de modélisation 3D.`
-  }
-];
 
 // Métadonnées SEO
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -173,7 +148,6 @@ export default async function CityPage({ params }: PageProps) {
 
   const terms = getLocalTerms(city);
   const archContent = getArchitectureContent(city);
-  const testimonials = getTestimonials(city, terms);
 
   // FAQ items for schema
   const faqItems = [
@@ -190,7 +164,7 @@ export default async function CityPage({ params }: PageProps) {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <JsonLd data={[
-        generateLocalBusinessSchema({
+        generateServiceSchema({
           name: city.name,
           region: city.region,
           zip: city.zip,
@@ -243,46 +217,35 @@ export default async function CityPage({ params }: PageProps) {
               </div>
 
               <div className="flex items-center gap-4 text-sm text-muted-foreground pt-4">
-                <div className="flex -space-x-2">
-                  {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className="w-8 h-8 rounded-full border-2 border-background bg-muted overflow-hidden relative">
-                       <Image src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${i}-${city.slug}`} alt="User" fill />
-                    </div>
-                  ))}
+                <div className="flex items-center gap-2">
+                  <Zap className="w-4 h-4 text-primary" />
+                  <span>Service 100% en ligne</span>
                 </div>
-                <div>
-                  <div className="font-semibold text-foreground">Adopté par 300+ voisins</div>
-                  <div>à {city.name} ce mois-ci</div>
-                </div>
+                <span>·</span>
+                <span>Résultat en 10 secondes</span>
+                <span>·</span>
+                <span>Essai gratuit</span>
               </div>
             </div>
 
             {/* Visual Content */}
+            {/* Visual placeholder */}
             <div className="relative animate-in slide-in-from-right duration-1000 delay-200 lg:h-[600px] hidden lg:block">
-              {/* Floating Cards Effect */}
-              <div className="absolute top-10 right-10 w-64 h-80 rounded-2xl overflow-hidden shadow-2xl border-4 border-white rotate-6 hover:rotate-0 transition-transform duration-500 z-10">
-                <Image 
-                  src={`https://source.unsplash.com/600x800/?luxury,interior,${city.archStyle}`} 
-                  alt={`Intérieur ${city.name} après`}
-                  fill
-                  className="object-cover"
-                />
-                <div className="absolute bottom-4 left-4 right-4 bg-black/60 backdrop-blur text-white p-3 rounded-lg text-xs">
-                  <div className="font-bold flex items-center gap-2"><Check className="w-3 h-3 text-green-400"/> Après</div>
-                  Style Japandi
-                </div>
-              </div>
-
-              <div className="absolute top-20 right-40 w-64 h-80 rounded-2xl overflow-hidden shadow-xl border-4 border-white -rotate-6 grayscale hover:grayscale-0 transition-all duration-500 z-0 opacity-80">
-                <Image 
-                  src={`https://source.unsplash.com/600x800/?messy,room,renovation`} 
-                  alt={`Intérieur ${city.name} avant`}
-                  fill
-                  className="object-cover"
-                />
-                <div className="absolute bottom-4 left-4 right-4 bg-black/60 backdrop-blur text-white p-3 rounded-lg text-xs">
-                  <div className="font-bold flex items-center gap-2"><Camera className="w-3 h-3"/> Avant</div>
-                  Photo originale
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-primary/10 via-primary/5 to-blue-50 border border-primary/10 flex items-center justify-center">
+                <div className="text-center space-y-6 p-8">
+                  <div className="w-20 h-20 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center">
+                    <Wand2 className="w-10 h-10 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-xl font-bold text-foreground">Avant → Après</p>
+                    <p className="text-muted-foreground mt-2">Uploadez votre photo et voyez la transformation en 10 secondes</p>
+                  </div>
+                  <Button className="rounded-full" asChild>
+                    <Link href="/essai">
+                      Essayer maintenant
+                      <ArrowRight className="ml-2 w-4 h-4" />
+                    </Link>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -343,20 +306,21 @@ export default async function CityPage({ params }: PageProps) {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {['Scandinave', 'Industriel', 'Bohème', 'Minimaliste'].map((style, i) => (
-              <div key={style} className="group relative aspect-[3/4] rounded-xl overflow-hidden cursor-pointer">
-                <Image 
-                  src={`https://source.unsplash.com/400x600/?interior,${style},${city.archStyle}`}
-                  alt={`Style ${style} idéal pour ${city.name}`}
-                  fill
-                  className="object-cover group-hover:scale-110 transition-transform duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity" />
-                <div className="absolute bottom-4 left-4 text-white">
-                  <div className="text-xs font-medium uppercase tracking-wider mb-1">Style</div>
-                  <div className="text-xl font-bold">{style}</div>
+            {[
+              { name: 'Scandinave', slug: 'scandinave' },
+              { name: 'Industriel', slug: 'industriel' },
+              { name: 'Bohème', slug: 'boheme' },
+              { name: 'Minimaliste', slug: 'minimaliste' },
+            ].map((style) => (
+              <Link key={style.slug} href={`/style/${style.slug}`} className="group relative aspect-[3/4] rounded-xl overflow-hidden border border-border hover:border-primary/30 transition-colors">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-blue-50" />
+                <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center">
+                  <Palette className="w-8 h-8 text-primary mb-3 group-hover:scale-110 transition-transform" />
+                  <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-1">Style</div>
+                  <div className="text-xl font-bold text-foreground">{style.name}</div>
+                  <p className="text-sm text-muted-foreground mt-2">Découvrir ce style →</p>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
@@ -406,33 +370,44 @@ export default async function CityPage({ params }: PageProps) {
         </div>
       </section>
 
-      {/* --- TESTIMONIALS LOCALES --- */}
+      {/* --- CAS D'USAGE --- */}
       <section className="py-24 bg-background">
         <div className="container px-4 md:px-6 space-y-12">
-          <h2 className="text-3xl font-bold text-center">Ils ont rénové à {city.name}</h2>
+          <h2 className="text-3xl font-bold text-center">Idéal pour vos projets à {city.name}</h2>
           <div className="grid md:grid-cols-3 gap-8">
-            {testimonials.map((t, i) => (
-              <Card key={i} className="bg-muted/50 border-none">
-                <CardContent className="pt-6 space-y-4">
-                  <div className="flex gap-1 text-yellow-500">
-                    {[1,2,3,4,5].map(star => <Star key={star} className="w-4 h-4 fill-current"/>)}
-                  </div>
-                  <p className="italic text-muted-foreground relative">
-                    <Quote className="w-8 h-8 absolute -top-4 -left-2 opacity-10" />
-                    &ldquo;{t.text}&rdquo;
-                  </p>
-                  <div className="flex items-center gap-3 pt-2">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary">
-                      {t.initial}
-                    </div>
-                    <div>
-                      <div className="font-bold text-sm">{t.name}</div>
-                      <div className="text-xs text-muted-foreground">{t.role} • {t.location}</div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+            <Card className="bg-muted/50 border-none">
+              <CardContent className="pt-6 space-y-4">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Home className="w-5 h-5 text-primary" />
+                </div>
+                <h3 className="font-bold">Propriétaires</h3>
+                <p className="text-sm text-muted-foreground">
+                  Visualisez votre {terms.apartment} redécoré avant d&apos;acheter le moindre meuble. Évitez les erreurs coûteuses.
+                </p>
+              </CardContent>
+            </Card>
+            <Card className="bg-muted/50 border-none">
+              <CardContent className="pt-6 space-y-4">
+                <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                  <Building className="w-5 h-5 text-green-600" />
+                </div>
+                <h3 className="font-bold">Agents immobiliers</h3>
+                <p className="text-sm text-muted-foreground">
+                  Le Home Staging virtuel aide vos acheteurs à se projeter. Vendez plus vite à {city.name}.
+                </p>
+              </CardContent>
+            </Card>
+            <Card className="bg-muted/50 border-none">
+              <CardContent className="pt-6 space-y-4">
+                <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+                  <Palette className="w-5 h-5 text-purple-600" />
+                </div>
+                <h3 className="font-bold">Décorateurs & Architectes</h3>
+                <p className="text-sm text-muted-foreground">
+                  Présentez des planches d&apos;ambiance photoréalistes à vos clients en quelques secondes.
+                </p>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>

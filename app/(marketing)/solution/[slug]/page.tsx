@@ -25,7 +25,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { JsonLd } from '@/lib/seo/json-ld';
-import { generateFAQSchema, generateBreadcrumbList, generateArticleSchema } from '@/lib/seo/schemas';
+import { generateFAQSchema, generateBreadcrumbList, generateWebPageSchema } from '@/lib/seo/schemas';
 import { getCanonicalUrl } from '@/lib/seo/config';
 import { INTENT_PAGES, getIntentPageBySlug } from '@/lib/seo/intent-pages-data';
 import { LeadCaptureLazy } from '@/components/features/lead-capture-lazy';
@@ -50,7 +50,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     openGraph: {
       title: page.metaTitle,
       description: page.metaDescription,
-      type: 'article',
+      type: 'website',
       url: getCanonicalUrl(`/solution/${page.slug}`),
       images: [getCanonicalUrl('/og-image.png')],
     },
@@ -103,7 +103,7 @@ export default async function IntentPage({ params }: PageProps) {
   return (
     <div className="min-h-screen bg-background">
       <JsonLd data={[
-        generateArticleSchema({
+        generateWebPageSchema({
           title: page.title,
           description: page.metaDescription,
           url: getCanonicalUrl(`/solution/${page.slug}`),
@@ -144,10 +144,10 @@ export default async function IntentPage({ params }: PageProps) {
           {/* Trust signals */}
           <div className="flex items-center justify-center gap-6 pt-6 text-sm text-gray-400">
             <span className="flex items-center gap-1">
-              <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-              4.8/5 (2 400+ avis)
+              <Zap className="w-4 h-4 text-yellow-500" />
+              Résultat en 10 secondes
             </span>
-            <span>+12 000 utilisateurs</span>
+            <span>12 styles disponibles</span>
             <span>Essai gratuit</span>
           </div>
         </div>

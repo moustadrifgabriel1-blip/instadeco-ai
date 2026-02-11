@@ -167,13 +167,19 @@ export async function POST(req: Request) {
     });
 
   } catch (error) {
-    console.error('[Generate V2] ❌ Erreur:', error);
+    // Log complet même en production (visible dans Vercel Functions logs)
+    console.error('[Generate V2] ❌ Erreur non-catchée:', {
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      name: error instanceof Error ? error.name : typeof error,
+    });
 
-    const isProduction = process.env.NODE_ENV === 'production';
     return NextResponse.json(
       {
         error: 'Erreur serveur critique',
-        details: isProduction ? 'Une erreur interne est survenue.' : (error instanceof Error ? error.message : String(error)),
+        code: 'INTERNAL_ERROR',
+        // En prod, on donne quand même le type d'erreur (pas le stack)
+        details: error instanceof Error ? error.message : 'Une erreur interne est survenue.',
       },
       { status: 500 }
     );

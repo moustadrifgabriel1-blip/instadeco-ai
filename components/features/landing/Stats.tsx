@@ -6,11 +6,11 @@ import { Users, Image, Star, Zap, DollarSign } from 'lucide-react';
 const stats = [
   {
     icon: Image,
-    value: "12,847",
-    label: "pièces transformées",
+    value: "12",
+    label: "styles de décoration",
     suffix: "+",
-    animate: true,
-    target: 12847,
+    animate: false,
+    target: 12,
   },
   {
     icon: DollarSign,
@@ -23,20 +23,20 @@ const stats = [
     target: 150,
   },
   {
-    icon: Star,
-    value: "4.9",
-    label: "Note moyenne",
-    suffix: "/5",
-    animate: false,
-    target: 4.9,
-  },
-  {
     icon: Zap,
     value: "30",
     label: "secondes par design",
     suffix: "s",
     animate: false,
     target: 30,
+  },
+  {
+    icon: Star,
+    value: "8",
+    label: "types de pièces",
+    suffix: "",
+    animate: false,
+    target: 8,
   }
 ];
 

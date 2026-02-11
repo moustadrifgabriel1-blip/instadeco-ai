@@ -32,10 +32,10 @@ async function createHDProduct() {
     console.log('✅ Produit créé:', product.id);
     console.log('   Nom:', product.name);
 
-    // 2. Créer le prix (4.99€)
+    // 2. Créer le prix (1.99€)
     const price = await stripe.prices.create({
       product: product.id,
-      unit_amount: 499, // 4.99€ en centimes
+      unit_amount: 199, // 1.99€ en centimes
       currency: 'eur',
       metadata: {
         type: 'hd_unlock',
@@ -43,7 +43,7 @@ async function createHDProduct() {
     });
 
     console.log('\n✅ Prix créé:', price.id);
-    console.log('   Montant: 4.99€');
+    console.log('   Montant: 1.99€');
 
     console.log('\n' + '='.repeat(50));
     console.log('📋 CONFIGURATION À AJOUTER:');

@@ -40,7 +40,7 @@ export async function GET(req: Request) {
     }
 
     const now = new Date();
-    const results = { j3: 0, j7: 0, j14: 0, errors: 0 };
+    const results = { j3: 0, j7: 0, j14: 0, quiz: 0, errors: 0 };
 
     // ========================================
     // J+3 : Relance "Votre pièce attend"
@@ -146,7 +146,40 @@ export async function GET(req: Request) {
       }
     }
 
-    console.log(`[Email Nurturing] ✅ J3: ${results.j3}, J7: ${results.j7}, J14: ${results.j14}, Errors: ${results.errors}`);
+    // ========================================
+    // QUIZ: Email nurturing post-quiz (J+1)
+    // Leads qui ont fait le quiz il y a 1 jour
+    // ========================================
+    const oneDayAgo = new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000);
+    const oneDayAgoMin = new Date(oneDayAgo.getTime() - 24 * 60 * 60 * 1000);
+
+    const { data: quizLeads } = await supabaseAdmin
+      .from('leads')
+      .select('id, email, name, source, metadata')
+      .eq('source', 'quiz_style_deco')
+      .gte('created_at', oneDayAgoMin.toISOString())
+      .lt('created_at', oneDayAgo.toISOString());
+
+    for (const lead of (quizLeads || [])) {
+      if (!lead.email) continue;
+
+      // Extraire le style du quiz depuis les metadata
+      const quizStyle = lead.metadata?.style || 'Moderne';
+
+      try {
+        await resend.emails.send({
+          from: FROM_EMAIL,
+          to: [lead.email],
+          subject: `🎨 Votre style ${quizStyle} vous attend — testez-le sur vos photos !`,
+          html: buildQuizFollowUpEmail(lead.name || 'là', lead.email, quizStyle),
+        });
+        results.quiz++;
+      } catch {
+        results.errors++;
+      }
+    }
+
+    console.log(`[Email Nurturing] ✅ J3: ${results.j3}, J7: ${results.j7}, J14: ${results.j14}, Quiz: ${results.quiz}, Errors: ${results.errors}`);
 
     return NextResponse.json({
       success: true,
@@ -255,8 +288,8 @@ function buildJ7Email(name: string, email: string): string {
     </div>
     
     <p style="color: #6B6B6B; line-height: 1.6; margin: 0 0 24px;">
-      <strong style="color: #1d1d1f;">+12 847 pièces</strong> ont déjà été transformées avec InstaDeco.
-      Et la vôtre ?
+      <strong style="color: #1d1d1f;">12 styles, 8 types de pièces, ~30 secondes</strong> — c'est tout ce qu'il faut pour visualiser votre intérieur autrement.
+      Et votre pièce ?
     </p>
     
     <div style="text-align: center; margin: 24px 0;">
@@ -308,6 +341,61 @@ function buildJ14Email(name: string, email: string): string {
     
     <p style="color: #636366; font-size: 13px; text-align: center; margin: 16px 0 0;">
       Pas intéressé ? Pas de souci — vos 3 crédits gratuits n'expirent jamais.
+    </p>
+  `, unsubUrl);
+}
+
+// Mapping des styles vers des slugs pour les liens
+const STYLE_SLUG_MAP: Record<string, string> = {
+  'Moderne': 'moderne', 'Scandinave': 'scandinave', 'Industriel': 'industriel',
+  'Bohème': 'boheme', 'Minimaliste': 'minimaliste', 'Japandi': 'japandi',
+  'Art Déco': 'art-deco', 'Contemporain': 'contemporain', 'Rustique': 'rustique',
+  'Coastal': 'coastal', 'Mid-Century Modern': 'mid-century', 'Luxe': 'luxe',
+};
+
+function buildQuizFollowUpEmail(name: string, email: string, styleName: string): string {
+  const unsubUrl = buildUnsubscribeUrl(email);
+  const styleSlug = STYLE_SLUG_MAP[styleName] || 'moderne';
+  
+  return emailWrapper(`
+    <h2 style="color: #1d1d1f; font-size: 22px; margin: 0 0 16px;">Votre style déco : ${styleName} 🎨</h2>
+    
+    <p style="color: #6B6B6B; line-height: 1.6; margin: 0 0 16px;">
+      Bonjour ${name}, vous avez découvert que votre style de décoration idéal est le <strong style="color: #E07B54;">${styleName}</strong> ! 
+      Et maintenant ?
+    </p>
+
+    <div style="background: #FFF8F5; border-radius: 16px; padding: 24px; margin: 0 0 24px; border: 1px solid #F5D5C8;">
+      <p style="margin: 0 0 12px; font-weight: 700; color: #1d1d1f; font-size: 18px;">🏠 Passez de la théorie à la pratique</p>
+      <p style="margin: 0 0 16px; color: #6B6B6B; font-size: 15px; line-height: 1.6;">
+        Prenez une simple photo de votre pièce et découvrez-la transformée en style 
+        <strong>${styleName}</strong> en seulement 30 secondes grâce à notre IA.
+      </p>
+      <ul style="margin: 0; padding: 0 0 0 20px; color: #6B6B6B; font-size: 14px; line-height: 1.8;">
+        <li>📸 Prenez une photo de votre pièce</li>
+        <li>🎨 Choisissez le style ${styleName}</li>
+        <li>✨ Recevez votre transformation en 30 secondes</li>
+        <li>💰 Première transformation 100% gratuite</li>
+      </ul>
+    </div>
+
+    <div style="text-align: center; margin: 24px 0;">
+      <a href="https://instadeco.app/essai?style=${styleSlug}"
+         style="display: inline-block; background: linear-gradient(135deg, #E07B54, #D4603C); color: white; text-decoration: none; padding: 16px 36px; border-radius: 50px; font-weight: 600; font-size: 16px;">
+        Tester le style ${styleName} sur ma pièce →
+      </a>
+    </div>
+
+    <div style="background: #f5f5f7; border-radius: 12px; padding: 16px; margin: 24px 0 0;">
+      <p style="margin: 0; color: #636366; font-size: 13px; text-align: center;">
+        📖 <a href="https://instadeco.app/style/${styleSlug}" style="color: #E07B54; text-decoration: none; font-weight: 500;">
+          Lire le guide complet du style ${styleName}
+        </a>
+      </p>
+    </div>
+    
+    <p style="color: #636366; font-size: 13px; text-align: center; margin: 16px 0 0;">
+      Votre essai gratuit n'expire jamais.
     </p>
   `, unsubUrl);
 }

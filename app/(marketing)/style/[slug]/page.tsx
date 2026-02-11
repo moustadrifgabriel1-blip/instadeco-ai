@@ -16,7 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { JsonLd } from '@/lib/seo/json-ld';
-import { generateFAQSchema, generateBreadcrumbList, generateArticleSchema } from '@/lib/seo/schemas';
+import { generateFAQSchema, generateBreadcrumbList, generateWebPageSchema } from '@/lib/seo/schemas';
 import { getCanonicalUrl } from '@/lib/seo/config';
 import { STYLE_SEO_DATA, getStyleSEOBySlug } from '@/lib/seo/programmatic-data';
 import { CITIES } from '@/src/shared/constants/cities';
@@ -77,7 +77,7 @@ export default async function StylePage({ params }: PageProps) {
   return (
     <div className="min-h-screen bg-background">
       <JsonLd data={[
-        generateArticleSchema({
+        generateWebPageSchema({
           title: style.title,
           description: style.metaDescription,
           url: getCanonicalUrl(`/style/${style.slug}`),

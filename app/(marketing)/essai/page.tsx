@@ -4,7 +4,10 @@ import { useCallback, useState, useEffect, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Plus, ArrowRight, Sparkles, Shield, Zap, Star, Check, UserPlus, Gift } from 'lucide-react';
+import { Plus, ArrowRight, Sparkles, Shield, Zap, Star, Check, UserPlus, Gift, Share2 } from 'lucide-react';
+import { FlashOffer } from '@/components/features/flash-offer';
+import { ShareButtons } from '@/components/features/share-buttons';
+import { SocialProofToast } from '@/components/features/social-proof-toast';
 
 // Styles populaires pour l'essai (6 max)
 const TRIAL_STYLES = [
@@ -400,37 +403,59 @@ export default function EssaiPage() {
                 </div>
               </div>
 
-              {/* CTA : Créer un compte */}
-              <div className="bg-gradient-to-br from-[#FFF8F5] to-[#FFF0E8] rounded-[24px] border border-[#F0E6E0] p-8 text-center">
-                <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-[#E07B54] flex items-center justify-center">
-                  <Gift className="w-7 h-7 text-white" />
+              {/* Partage — Encourager la viralité */}
+              <div className="bg-white rounded-[20px] border border-black/5 p-5 text-center shadow-sm">
+                <div className="flex items-center justify-center gap-2 mb-3">
+                  <Share2 className="w-4 h-4 text-[#E07B54]" />
+                  <span className="text-[14px] font-semibold text-[#1d1d1f]">Montrez votre transformation à vos proches</span>
                 </div>
-                <h2 className="text-[28px] font-bold text-[#1d1d1f] tracking-[-0.02em]">
-                  Ça vous plaît ?
+                <ShareButtons
+                  url="https://instadeco.app/essai"
+                  title={`Regardez ma transformation déco en style ${selectedStyleInfo?.name} ! 🏠✨ Testez gratuitement :`}
+                  description="J'ai transformé ma pièce avec l'IA en 30 secondes. Testez gratuitement !"
+                  imageUrl={generatedImage}
+                  variant="inline"
+                />
+              </div>
+
+              {/* OFFRE FLASH — Conversion immédiate */}
+              <FlashOffer
+                stripePaymentUrl="/pricing"
+                durationMinutes={15}
+                originalPrice="9,99 €"
+                flashPrice="4,99 €"
+                credits={5}
+              />
+
+              {/* OU Créer un compte gratuit */}
+              <div className="bg-gradient-to-br from-[#FFF8F5] to-[#FFF0E8] rounded-[24px] border border-[#F0E6E0] p-6 sm:p-8 text-center">
+                <p className="text-[13px] font-medium text-[#636366] uppercase tracking-wider mb-3">Ou bien</p>
+                <h2 className="text-[22px] sm:text-[26px] font-bold text-[#1d1d1f] tracking-[-0.02em]">
+                  Créez votre compte gratuit
                 </h2>
-                <p className="mt-2 text-[17px] text-[#6B6B6B] max-w-md mx-auto leading-relaxed">
-                  Créez votre compte gratuitement et recevez <span className="font-bold text-[#E07B54]">3 crédits offerts</span> pour transformer d&apos;autres pièces.
+                <p className="mt-2 text-[15px] text-[#6B6B6B] max-w-md mx-auto leading-relaxed">
+                  Recevez <span className="font-bold text-[#E07B54]">3 crédits offerts</span> pour transformer d&apos;autres pièces.
                 </p>
 
-                <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
+                <div className="mt-5 flex flex-col sm:flex-row items-center justify-center gap-4">
                   <Link
                     href="/signup"
-                    className="group inline-flex items-center gap-2 bg-[#E07B54] text-white px-8 py-4 rounded-full text-[17px] font-semibold hover:bg-[#d06a45] transition-all duration-200 shadow-lg shadow-[#E07B54]/20 active:scale-95"
+                    className="group inline-flex items-center gap-2 bg-[#1d1d1f] text-white px-7 py-3.5 rounded-full text-[15px] font-semibold hover:bg-[#333] transition-all duration-200 shadow-lg active:scale-95"
                   >
-                    <UserPlus className="w-5 h-5" />
-                    Créer mon compte gratuit
-                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    <UserPlus className="w-4 h-4" />
+                    Créer mon compte — c&apos;est gratuit
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </Link>
                 </div>
 
-                <div className="mt-6 flex items-center justify-center gap-6 text-[13px] text-[#636366]">
-                  <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-500" /> 3 crédits offerts</span>
-                  <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-500" /> Sans engagement</span>
-                  <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-500" /> 20+ styles</span>
+                <div className="mt-4 flex flex-wrap items-center justify-center gap-4 text-[12px] text-[#636366]">
+                  <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-green-500" /> 3 crédits offerts</span>
+                  <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-green-500" /> Sans engagement</span>
+                  <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-green-500" /> 20+ styles</span>
                 </div>
               </div>
 
-              {/* Info supplémentaires */}
+              {/* Stats en bas */}
               <div className="grid grid-cols-3 gap-4 max-w-lg mx-auto">
                 <div className="text-center p-4 rounded-2xl bg-white border border-black/5">
                   <p className="text-[24px] font-bold text-[#E07B54]">0,99 €</p>
@@ -488,6 +513,7 @@ export default function EssaiPage() {
           )}
         </div>
       </section>
+      <SocialProofToast initialDelay={5000} interval={20000} maxNotifications={5} />
     </div>
   );
 }

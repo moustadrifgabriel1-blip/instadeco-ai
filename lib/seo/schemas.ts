@@ -97,12 +97,6 @@ export function generateSoftwareAppSchema() {
       priceCurrency: 'EUR',
       offerCount: 3,
     },
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.8',
-      ratingCount: '347',
-      bestRating: '5',
-    },
     screenshot: getFullUrl(SEO_CONFIG.ogImage),
     featureList: [
       'Décoration par Intelligence Artificielle',
@@ -140,12 +134,6 @@ export function generateProductSchema(plans: Array<{
       availability: 'https://schema.org/InStock',
       url: getCanonicalUrl('/pricing'),
     })),
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.8',
-      ratingCount: '347',
-      bestRating: '5',
-    },
   };
 }
 
@@ -294,7 +282,7 @@ export function generateBreadcrumbList(segments: Array<{ label: string; path: st
 /**
  * Schema LocalBusiness pour les pages villes
  */
-export function generateLocalBusinessSchema(city: {
+export function generateServiceSchema(city: {
   name: string;
   region: string;
   zip: string;
@@ -302,48 +290,58 @@ export function generateLocalBusinessSchema(city: {
   currency: string;
 }) {
   return {
-    '@type': 'LocalBusiness',
-    '@id': `${SEO_CONFIG.siteUrl}/architecte-interieur/${city.name.toLowerCase().replace(/\s+/g, '-')}#business`,
-    name: `InstaDeco AI ${city.name}`,
-    image: getFullUrl(SEO_CONFIG.ogImage),
-    description: `Service de décoration d'intérieur et home staging virtuel par IA à ${city.name}. Transformez vos pièces en 10 secondes.`,
+    '@type': 'Service',
+    name: `Décoration d'intérieur par IA à ${city.name}`,
+    description: `Service en ligne de décoration d'intérieur et home staging virtuel par IA, disponible à ${city.name} (${city.region}).`,
     url: getCanonicalUrl(`/architecte-interieur/${city.name.toLowerCase().replace(/\s+/g, '-')}`),
-    telephone: '',
-    email: SEO_CONFIG.email,
-    address: {
-      '@type': 'PostalAddress',
-      addressLocality: city.name,
-      addressRegion: city.region,
-      postalCode: city.zip,
-      addressCountry: city.country,
+    provider: {
+      '@type': 'Organization',
+      '@id': `${SEO_CONFIG.siteUrl}/#organization`,
+      name: SEO_CONFIG.organization.name,
     },
-    priceRange: `${city.currency}9.99 - ${city.currency}34.99`,
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.7',
-      ratingCount: '89',
-      bestRating: '5',
+    areaServed: {
+      '@type': 'City',
+      name: city.name,
+      containedInPlace: {
+        '@type': 'AdministrativeArea',
+        name: city.region,
+      },
     },
-    openingHoursSpecification: {
-      '@type': 'OpeningHoursSpecification',
-      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-      opens: '00:00',
-      closes: '23:59',
+    serviceType: 'Décoration d\'intérieur virtuelle',
+    offers: {
+      '@type': 'AggregateOffer',
+      lowPrice: '9.99',
+      highPrice: '34.99',
+      priceCurrency: city.country === 'CH' ? 'CHF' : 'EUR',
     },
-    sameAs: [
-      SEO_CONFIG.siteUrl,
-    ],
+    availableChannel: {
+      '@type': 'ServiceChannel',
+      serviceUrl: SEO_CONFIG.siteUrl,
+      availableLanguage: 'fr',
+    },
   };
 }
 
 /**
- * Schema AggregateRating réutilisable
+ * Schema WebPage générique pour les pages programmatiques
+ * (styles, pièces, deco croisé)
  */
-export function generateAggregateRating(rating: number = 4.8, count: number = 347) {
+export function generateWebPageSchema(page: {
+  title: string;
+  description: string;
+  url: string;
+}) {
   return {
-    '@type': 'AggregateRating',
-    ratingValue: rating.toString(),
-    ratingCount: count.toString(),
-    bestRating: '5',
+    '@type': 'WebPage',
+    name: page.title,
+    description: page.description,
+    url: page.url.startsWith('http') ? page.url : getCanonicalUrl(page.url),
+    isPartOf: {
+      '@id': `${SEO_CONFIG.siteUrl}/#website`,
+    },
+    publisher: {
+      '@id': `${SEO_CONFIG.siteUrl}/#organization`,
+    },
+    inLanguage: SEO_CONFIG.language,
   };
 }

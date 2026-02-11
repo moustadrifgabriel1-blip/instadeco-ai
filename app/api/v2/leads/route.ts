@@ -6,6 +6,8 @@ import { z } from 'zod';
 const leadSchema = z.object({
   email: z.string().email('Email invalide'),
   source: z.string().optional().default('lead_capture'),
+  name: z.string().optional(),
+  metadata: z.record(z.string()).optional(),
 });
 
 /**
@@ -40,7 +42,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const { email, source } = parsed.data;
+    const { email, source, name, metadata } = parsed.data;
 
     // Vérifier si le lead existe déjà
     const { data: existing } = await supabaseAdmin
@@ -60,6 +62,8 @@ export async function POST(req: Request) {
       .insert({
         email: email.toLowerCase(),
         source,
+        ...(name && { name }),
+        ...(metadata && { metadata }),
         created_at: new Date().toISOString(),
       });
 

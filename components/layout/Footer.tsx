@@ -14,10 +14,16 @@ const footerLinks = {
   product: [
     { href: '/generate', label: 'Générer une image' },
     { href: '/galerie', label: 'Galerie Before/After' },
+    { href: '/quiz', label: 'Quiz : Mon style déco' },
     { href: '/exemples', label: 'Exemples' },
     { href: '/pricing', label: 'Tarifs' },
     { href: '/blog', label: 'Blog' },
     { href: '/pro', label: 'Pour les Pros' },
+  ],
+  hubs: [
+    { href: '/styles', label: 'Tous les styles' },
+    { href: '/pieces', label: 'Toutes les pièces' },
+    { href: '/solutions', label: 'Toutes les solutions' },
   ],
   services: [
     { href: '/architecte-interieur', label: 'Architecte intérieur IA' },
@@ -43,6 +49,7 @@ const footerLinks = {
     { href: '/legal/mentions-legales', label: 'Mentions légales' },
     { href: '/legal/privacy', label: 'Confidentialité' },
     { href: '/legal/cgv', label: 'CGV' },
+    { href: '/a-propos', label: 'À propos' },
   ],
   social: [
     { href: 'https://twitter.com/instadeco_ai', label: 'Twitter' },
@@ -124,6 +131,16 @@ export function Footer() {
                   </Link>
                 </li>
               ))}
+              {footerLinks.hubs.slice(0, 1).map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-[#E07B54] hover:underline font-medium"
+                  >
+                    → {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -138,6 +155,16 @@ export function Footer() {
                     className="text-sm text-[#6B6B6B] hover:text-[#E07B54] transition-colors"
                   >
                     {link.label}
+                  </Link>
+                </li>
+              ))}
+              {footerLinks.hubs.slice(1).map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-[#E07B54] hover:underline font-medium"
+                  >
+                    → {link.label}
                   </Link>
                 </li>
               ))}

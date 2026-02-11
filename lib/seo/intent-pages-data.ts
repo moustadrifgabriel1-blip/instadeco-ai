@@ -94,7 +94,7 @@ export const INTENT_PAGES: IntentPageData[] = [
       { step: 3, title: 'Résultat en 10 secondes', description: 'L\'IA génère un rendu photoréaliste de votre pièce meublée' },
     ],
     faq: [
-      { question: 'Le home staging virtuel est-il aussi efficace que le physique ?', answer: 'Des études montrent que le home staging virtuel augmente les visites de 40% et réduit le délai de vente de 30%. C\'est proche du physique pour une fraction du prix.' },
+      { question: 'Le home staging virtuel est-il aussi efficace que le physique ?', answer: 'Le home staging virtuel permet aux acquéreurs de se projeter dans un bien meublé, comme le staging physique, mais pour une fraction du coût et en quelques secondes seulement.' },
       { question: 'Les images sont-elles utilisables pour des annonces immobilières ?', answer: 'Oui ! Nos rendus sont en haute résolution et photoréalistes. Ils sont parfaits pour les portails immobiliers (SeLoger, Idealista, Immoweb, etc.).' },
       { question: 'Combien coûte le home staging virtuel avec InstaDeco ?', answer: 'À partir de 1€ par image avec le pack Découverte. Les professionnels bénéficient de tarifs dégressifs avec nos packs Pro.' },
       { question: 'Puis-je tester plusieurs styles pour la même pièce ?', answer: 'Absolument ! C\'est l\'un des grands avantages du virtuel : testez scandinave, moderne, industriel et choisissez celui qui plaît le plus aux acheteurs.' },
@@ -378,7 +378,7 @@ export const INTENT_PAGES: IntentPageData[] = [
       points: [
         'Les pièces vides ou mal décorées ne font pas rêver les acheteurs',
         'Les vendeurs ont du mal à projeter les acheteurs dans le bien',
-        'Les photos d\'annonces de pièces vides génèrent 73% moins de clics',
+        'Les photos d\'annonces de pièces vides attirent moins l\'attention des acquéreurs',
         'Produire des avant/après de qualité nécessite un stager professionnel',
       ],
     },
@@ -387,7 +387,7 @@ export const INTENT_PAGES: IntentPageData[] = [
       description: 'Uploadez la photo "avant" et l\'IA crée instantanément une version "après" meublée et décorée. Parfait pour les annonces immobilières.',
       benefits: [
         { icon: 'split', title: 'Comparaison directe', description: 'Avant/après côte à côte pour un impact maximal' },
-        { icon: 'trending-up', title: '+73% de clics', description: 'Les annonces avec home staging reçoivent plus de visites' },
+        { icon: 'trending-up', title: 'Plus de visites', description: 'Les annonces meublées attirent davantage l\'attention des acquéreurs' },
         { icon: 'clock', title: 'Instantané', description: 'Pas d\'attente, rendu immédiat' },
         { icon: 'repeat', title: 'Multi-styles', description: 'Plusieurs propositions pour chaque pièce' },
       ],

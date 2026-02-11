@@ -16,6 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { ArticleCard } from '@/components/features/blog';
 import { ShareButton } from '@/components/features/blog/ShareButton';
+import { BlogCtaBanner } from '@/components/features/blog-cta-banner';
 import { formatBlogTitle, cn } from '@/lib/utils';
 import { sanitizeHtml, sanitizeJsonLd } from '@/lib/security/sanitize';
 
@@ -403,6 +404,9 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             <div className="py-2">
               <ArticleContent content={article.content} slug={article.slug} />
             </div>
+
+            {/* CTA contextuel basé sur les tags de l'article */}
+            <BlogCtaBanner tags={article.tags} variant="inline" />
 
             <Separator className="my-12" />
 

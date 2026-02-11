@@ -86,8 +86,8 @@ export function Hero() {
                   ))}
                 </div>
                 <div className="text-sm">
-                  <p className="font-semibold text-[#2D2D2D]">+12 000 utilisateurs</p>
-                  <p className="text-[#6B6B6B]">pièces transformées</p>
+                  <p className="font-semibold text-[#2D2D2D]">12 styles de déco</p>
+                  <p className="text-[#6B6B6B]">disponibles</p>
                 </div>
               </div>
               
@@ -98,7 +98,7 @@ export function Hero() {
                     <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
                   ))}
                 </div>
-                <span className="text-sm font-medium text-[#2D2D2D]">4.9/5</span>
+                <span className="text-sm font-medium text-[#2D2D2D]">Top qualité</span>
               </div>
             </div>
           </div>

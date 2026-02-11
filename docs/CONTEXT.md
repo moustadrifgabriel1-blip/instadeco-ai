@@ -1,8 +1,8 @@
 # 🏠 InstaDeco AI - Contrat de Contexte Global
 
 **Date de création :** 16 janvier 2026  
-**Dernière mise à jour :** 22 janvier 2026  
-**Version :** 2.1.0  
+**Dernière mise à jour :** 11 février 2026  
+**Version :** 2.2.0  
 **Type de projet :** SaaS B2C - Décoration d'intérieur par IA  
 **🏗️ Architecture :** Hexagonale (Ports & Adapters)  
 **🎨 Branding :** InstaDeco AI  
@@ -89,7 +89,7 @@
 
 ## 📅 État d'Avancement (Journal de Bord)
 
-### ✅ Récemment Complété (24 Janvier 2026)
+### ✅ Récemment Complété (11 Février 2026)
 1.  **Migration Auth & DB** : Finalisation du passage de Firebase à Supabase.
 2.  **Fix RLS** : Correction des politiques "Infinite Recursion" sur Supabase.
 3.  **Fix Header UI** : Le composant `Header` affiche correctement les crédits.
@@ -101,6 +101,8 @@
     *   Scripts obsolètes supprimés
     *   Documentation obsolète supprimée
 6.  **Blog SEO** : Intégration complète avec génération automatique d'articles.
+7.  **Fix Sécurité DB** : Correction de 10 warnings `function_search_path_mutable` — ajout de `SET search_path = ''` sur toutes les fonctions PostgreSQL.
+8.  **Mise à jour CONTEXT.md** : Suppression de toutes les références obsolètes à Replicate.
 
 ### 🚧 En Cours de Débogage
 1.  **Erreur Génération 500** : Le processus de génération lève une erreur interne.
@@ -206,7 +208,7 @@ src/
 │   │   ├── SupabaseGenerationRepository.ts
 │   │   └── SupabaseCreditTransactionRepository.ts
 │   ├── services/              # Implémentation des ports Service
-│   │   ├── ReplicateImageGenerationService.ts
+│   │   ├── FalImageGeneratorService.ts
 │   │   ├── SupabaseStorageService.ts
 │   │   ├── StripePaymentService.ts
 │   │   └── SupabaseAuthService.ts
@@ -309,7 +311,7 @@ CREATE TABLE public.generations (
   input_image_url TEXT NOT NULL,
   output_image_url TEXT,
   status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'processing', 'completed', 'failed')),
-  replicate_prediction_id TEXT,
+  fal_request_id TEXT,
   error_message TEXT,
   generation_time_ms INTEGER,
   hd_unlocked BOOLEAN NOT NULL DEFAULT FALSE,
@@ -581,11 +583,11 @@ function MyComponent() {
    a. Vérifier crédits utilisateur (IUserRepository)
    b. Déduire 1 crédit (ICreditTransactionRepository)
    c. Upload image (IStorageService)
-   d. Démarrer génération (IImageGenerationService → Replicate)
+   d. Démarrer génération (IImageGenerationService → Fal.ai)
    e. Créer enregistrement generation (IGenerationRepository)
 6. API Route → Return { generationId, status: "pending" }
 7. Frontend → Polling GET /api/v2/generations/[id]/status
-8. Replicate termine → Webhook ou polling met à jour status
+8. Fal.ai termine → Résultat synchrone ou polling met à jour status
 9. Frontend → Affiche image générée
 ```
 
@@ -649,8 +651,8 @@ NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
 SUPABASE_SERVICE_ROLE_KEY=eyJ...
 
-# Replicate
-REPLICATE_API_TOKEN=r8_xxx
+# Fal.ai
+FAL_KEY=fal_xxx
 
 # Stripe
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_xxx
@@ -680,5 +682,5 @@ RATE_LIMIT_MAX_REQUESTS=10
 
 **Version:** 2.0.0  
 **Architecture:** Hexagonale (Ports & Adapters)  
-**Stack:** Next.js 14 + Supabase + Replicate + Stripe  
-**Dernière mise à jour:** 20 janvier 2026
+**Stack:** Next.js 14 + Supabase + Fal.ai + Stripe  
+**Dernière mise à jour:** 11 février 2026

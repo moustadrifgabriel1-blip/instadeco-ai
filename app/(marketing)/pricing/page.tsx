@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Check, Sparkles, Clock, CreditCard, Image, Download, Palette, Building2, HelpCircle, ChevronDown, Heart, Shield, Zap, Star, Users, TrendingUp, ArrowRight, Repeat, Crown } from 'lucide-react';
+import { Check, Sparkles, Clock, CreditCard, Image, Download, Palette, Building2, HelpCircle, ChevronDown, Heart, Shield, Zap, Users, TrendingUp, ArrowRight, Repeat, Crown } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
 import { usePurchaseCredits } from '@/src/presentation/hooks/usePurchaseCredits';
 import { createSubscriptionSession } from '@/src/presentation/api/client';
+import { SocialProofToast } from '@/components/features/social-proof-toast';
 import { CreditPackId, SubscriptionPlanId, BillingInterval } from '@/src/presentation/types';
 
 // v2 - force rebuild (cache Vercel stale après suppression footer dupliqué)
@@ -17,8 +18,8 @@ const PRICING_PLANS = [
     id: 'pack_10' as CreditPackId,
     name: 'Découverte',
     credits: 10,
-    price: 9.99,
-    pricePerCredit: 1.00,
+    price: 9.90,
+    pricePerCredit: 0.99,
     popular: false,
     emoji: '🌱',
     description: 'Parfait pour tester',
@@ -29,7 +30,7 @@ const PRICING_PLANS = [
     id: 'pack_25' as CreditPackId,
     name: 'Créatif',
     credits: 25,
-    price: 19.99,
+    price: 19.90,
     pricePerCredit: 0.80,
     popular: true,
     emoji: '✨',
@@ -41,7 +42,7 @@ const PRICING_PLANS = [
     id: 'pack_50' as CreditPackId,
     name: 'Pro',
     credits: 50,
-    price: 34.99,
+    price: 34.90,
     pricePerCredit: 0.70,
     popular: false,
     emoji: '🚀',
@@ -116,27 +117,24 @@ const SUBSCRIPTION_PLANS = [
   },
 ];
 
-const SOCIAL_PROOF_REVIEWS = [
+const USE_CASE_HIGHLIGHTS = [
   {
-    name: 'Sophie L.',
-    location: 'Genève, Suisse',
-    rating: 5,
-    text: 'J\'ai testé 3 styles pour mon salon avant de me décider. Le rendu est bluffant, bien mieux que ce que j\'imaginais !',
-    pack: 'Créatif',
+    profile: 'Propriétaires',
+    icon: '🏠',
+    text: 'Testez plusieurs styles sur votre propre photo avant de vous engager dans des travaux. Comparez moderne, scandinave ou japandi en quelques secondes.',
+    pack: 'Découverte',
   },
   {
-    name: 'Marc D.',
-    location: 'Lyon, France',
-    rating: 5,
-    text: 'Agent immobilier, j\'utilise InstaDeco pour du home staging virtuel. Mes clients adorent. ROI immédiat.',
+    profile: 'Agents immobiliers',
+    icon: '🏢',
+    text: 'Meublez virtuellement vos biens vides pour aider les acheteurs à se projeter. Un complément au home staging physique, rapide et économique.',
     pack: 'Pro',
   },
   {
-    name: 'Camille B.',
-    location: 'Bruxelles, Belgique',
-    rating: 5,
-    text: 'J\'hésitais entre scandinave et japandi pour ma chambre. En 10 secondes j\'ai pu comparer. Incroyable.',
-    pack: 'Découverte',
+    profile: 'Architectes d\'intérieur',
+    icon: '🎨',
+    text: 'Montrez un avant/après instantané à vos clients pour valider la direction déco avant de réaliser le projet. Idéal en phase de proposition.',
+    pack: 'Créatif',
   },
 ];
 
@@ -226,24 +224,7 @@ export default function PricingPage() {
   
   const { purchase, isLoading, error } = usePurchaseCredits();
 
-  // Animated counter for social proof
-  const [genCount, setGenCount] = useState(0);
-  useEffect(() => {
-    const target = 12847;
-    const duration = 2000;
-    const step = target / (duration / 16);
-    let current = 0;
-    const timer = setInterval(() => {
-      current += step;
-      if (current >= target) {
-        setGenCount(target);
-        clearInterval(timer);
-      } else {
-        setGenCount(Math.floor(current));
-      }
-    }, 16);
-    return () => clearInterval(timer);
-  }, []);
+
 
   const handleSelectPlan = async (planId: CreditPackId) => {
     if (!user) {
@@ -388,22 +369,18 @@ export default function PricingPage() {
           </div>
         )}
 
-        {/* Social proof counter */}
+        {/* Social proof — faits vérifiables uniquement */}
         <div className="flex flex-wrap justify-center gap-8 sm:gap-12 mt-6">
           <div className="text-center">
-            <div className="text-2xl sm:text-3xl font-bold text-[#2D2D2D]">{genCount.toLocaleString('fr-FR')}+</div>
-            <div className="text-sm text-[#6B6B6B]">designs générés</div>
+            <div className="text-2xl sm:text-3xl font-bold text-[#2D2D2D]">12</div>
+            <div className="text-sm text-[#6B6B6B]">styles de déco</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl sm:text-3xl font-bold text-[#2D2D2D]">4.8/5</div>
-            <div className="text-sm text-[#6B6B6B] flex items-center gap-1">
-              {[1,2,3,4,5].map(i => (
-                <Star key={i} className={`w-3.5 h-3.5 ${i <= 4 ? 'text-amber-400 fill-amber-400' : 'text-amber-400 fill-amber-200'}`} />
-              ))}
-            </div>
+            <div className="text-2xl sm:text-3xl font-bold text-[#2D2D2D]">8</div>
+            <div className="text-sm text-[#6B6B6B]">types de pièces</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl sm:text-3xl font-bold text-[#2D2D2D]">10 sec</div>
+            <div className="text-2xl sm:text-3xl font-bold text-[#2D2D2D]">~30s</div>
             <div className="text-sm text-[#6B6B6B]">par génération</div>
           </div>
         </div>
@@ -554,38 +531,29 @@ export default function PricingPage() {
         </div>
       </div>
 
-      {/* Social Proof - Testimonials */}
+      {/* Cas d'usage — profils réels sans faux témoignages */}
       <div className="bg-gradient-to-b from-[#FFF8F5] to-white py-16 sm:py-20">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 bg-[#FFF0EB] text-[#D4603C] px-4 py-2 rounded-full text-sm font-medium mb-4">
               <Users className="w-4 h-4" />
-              Ils ont transformé leur intérieur
+              Pour qui ?
             </div>
             <h2 className="text-2xl sm:text-3xl md:text-[36px] font-semibold text-[#2D2D2D]">
-              Ce que nos utilisateurs en pensent
+              Un outil adapté à chaque besoin
             </h2>
           </div>
           <div className="grid sm:grid-cols-3 gap-6">
-            {SOCIAL_PROOF_REVIEWS.map((review, idx) => (
+            {USE_CASE_HIGHLIGHTS.map((useCase, idx) => (
               <div key={idx} className="bg-white rounded-2xl p-6 border border-[#F0E8E4] shadow-sm hover:shadow-md transition-shadow">
-                <div className="flex items-center gap-1 mb-3">
-                  {[1,2,3,4,5].map(i => (
-                    <Star key={i} className="w-4 h-4 text-amber-400 fill-amber-400" />
-                  ))}
-                </div>
+                <div className="text-3xl mb-3">{useCase.icon}</div>
+                <h3 className="font-semibold text-[#2D2D2D] mb-2">{useCase.profile}</h3>
                 <p className="text-[#2D2D2D] text-sm leading-relaxed mb-4">
-                  &ldquo;{review.text}&rdquo;
+                  {useCase.text}
                 </p>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium text-sm text-[#2D2D2D]">{review.name}</p>
-                    <p className="text-xs text-[#6B6B6B]">{review.location}</p>
-                  </div>
-                  <span className="text-xs bg-[#FFF0EB] text-[#D4603C] px-2 py-1 rounded-full">
-                    Pack {review.pack}
-                  </span>
-                </div>
+                <span className="text-xs bg-[#FFF0EB] text-[#D4603C] px-2 py-1 rounded-full">
+                  Pack {useCase.pack}
+                </span>
               </div>
             ))}
           </div>
@@ -809,6 +777,7 @@ export default function PricingPage() {
           </div>
         </div>
       </div>
+      <SocialProofToast initialDelay={6000} interval={20000} maxNotifications={8} />
     </div>
   );
 }

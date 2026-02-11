@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { SmartGenerationCard } from '@/components/features/smart-generation-card';
+import { ShareButtons } from '@/components/features/share-buttons';
 import { 
   Loader2, 
   Download, 
@@ -521,9 +522,10 @@ export default function DashboardPageV2() {
                              }
                           }}
                         >
-                         <div className="flex justify-end mt-2 px-1">
+                         <div className="flex flex-col gap-2 mt-2 px-1">
                           {gen.status === 'completed' && gen.outputImageUrl && (
-                            <div className="flex items-center gap-2">
+                            <>
+                              <div className="flex items-center gap-2">
                                 <Button
                                   variant="ghost" 
                                   size="sm"
@@ -552,7 +554,16 @@ export default function DashboardPageV2() {
                                     HD
                                   </Button>
                                 )}
-                            </div>
+                              </div>
+                              <ShareButtons
+                                url="https://instadeco.app/galerie"
+                                title={`Ma transformation déco en style ${gen.styleSlug.replace(/-/g, ' ')} 🏠✨`}
+                                description={`${gen.roomType.replace(/-/g, ' ')} transformé en style ${gen.styleSlug.replace(/-/g, ' ')} avec l'IA`}
+                                imageUrl={gen.outputImageUrl}
+                                referralCode={referralCode || undefined}
+                                variant="compact"
+                              />
+                            </>
                           )}
                         </div>
                         </SmartGenerationCard>

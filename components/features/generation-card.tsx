@@ -2,8 +2,9 @@
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Download, Loader2, AlertCircle, Clock } from 'lucide-react';
+import { Download, Loader2, AlertCircle, Clock, Share2 } from 'lucide-react';
 import Image from 'next/image';
+import { ShareButtons } from './share-buttons';
 
 interface GenerationCardProps {
   id: string;
@@ -130,6 +131,14 @@ export function GenerationCard({
                 <Download className="h-4 w-4 mr-1" />
                 Télécharger
               </Button>
+              <ShareButtons
+                url={`https://instadeco.app/galerie`}
+                title={`Ma transformation déco en style ${styleSlug.replace(/-/g, ' ')} 🏠✨`}
+                description={`${roomTypeSlug.replace(/-/g, ' ')} transformé en style ${styleSlug.replace(/-/g, ' ')} avec InstaDeco AI`}
+                imageUrl={outputImageUrl}
+                variant="floating"
+                className="absolute top-3 left-3 z-10"
+              />
             </div>
           </div>
         )}
