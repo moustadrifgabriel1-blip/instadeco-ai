@@ -1,7 +1,21 @@
-import { type NextRequest } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { updateSession } from '@/lib/supabase/middleware';
 
 export async function middleware(request: NextRequest) {
+  // Protection des endpoints cron contre les appels externes
+  // Vercel Cron envoie automatiquement le header Authorization: Bearer <CRON_SECRET>
+  if (request.nextUrl.pathname.startsWith('/api/cron/')) {
+    const authHeader = request.headers.get('authorization');
+    const cronSecret = process.env.CRON_SECRET;
+
+    if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
+      return NextResponse.json(
+        { error: 'Unauthorized — Cron endpoints are restricted' },
+        { status: 401 }
+      );
+    }
+  }
+
   return await updateSession(request);
 }
 

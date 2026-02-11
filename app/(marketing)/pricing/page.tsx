@@ -805,7 +805,7 @@ export default function PricingPage() {
               Essayer gratuitement
               <ArrowRight className="w-4 h-4" />
             </a>
-            <span className="text-white/60 text-sm">1 crédit offert à l&apos;inscription</span>
+            <span className="text-white/60 text-sm">3 crédits offerts à l&apos;inscription</span>
           </div>
         </div>
       </div>
