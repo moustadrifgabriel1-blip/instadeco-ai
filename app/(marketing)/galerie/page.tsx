@@ -11,7 +11,6 @@ interface GalleryItem {
   id: string;
   style_slug: string;
   room_type_slug: string;
-  input_image_url: string;
   output_image_url: string;
   created_at: string;
 }
@@ -45,7 +44,6 @@ export default function GaleriePage() {
   const [loading, setLoading] = useState(true);
   const [styleFilter, setStyleFilter] = useState<string>('');
   const [roomFilter, setRoomFilter] = useState<string>('');
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   const fetchGallery = useCallback(async () => {
     setLoading(true);
@@ -86,7 +84,7 @@ export default function GaleriePage() {
           pièces transformées par IA
         </h1>
         <p className="text-lg text-[#6B6B6B] max-w-2xl mx-auto mb-8">
-          Survolez pour voir l&apos;avant/après. Chaque transformation a été réalisée en moins de 30 secondes.
+          Découvrez les créations de notre communauté. Chaque transformation a été réalisée par IA en moins de 30 secondes.
         </p>
 
         {/* Filters */}
@@ -146,48 +144,30 @@ export default function GaleriePage() {
             {items.map((item) => (
               <div
                 key={item.id}
-                className="group relative aspect-[3/2] rounded-2xl overflow-hidden cursor-pointer border border-[#F0E8E4] shadow-sm hover:shadow-lg transition-all"
-                onMouseEnter={() => setHoveredId(item.id)}
-                onMouseLeave={() => setHoveredId(null)}
+                className="group relative aspect-[3/2] rounded-2xl overflow-hidden cursor-pointer border border-[#F0E8E4] shadow-sm hover:shadow-lg transition-all hover:scale-[1.02]"
               >
-                {/* Before image */}
-                <Image
-                  src={item.input_image_url}
-                  alt={`${ROOM_LABELS[item.room_type_slug] || item.room_type_slug} avant`}
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  className={`object-cover transition-opacity duration-500 ${
-                    hoveredId === item.id ? 'opacity-0' : 'opacity-100'
-                  }`}
-                />
-                {/* After image */}
+                {/* Generated image */}
                 <Image
                   src={item.output_image_url}
                   alt={`${ROOM_LABELS[item.room_type_slug] || item.room_type_slug} style ${STYLE_LABELS[item.style_slug] || item.style_slug}`}
                   fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  className={`object-cover transition-opacity duration-500 ${
-                    hoveredId === item.id ? 'opacity-100' : 'opacity-0'
-                  }`}
+                  sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  className="object-cover"
                 />
 
                 {/* Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
 
-                {/* Label */}
+                {/* Badge IA */}
                 <div className="absolute top-3 left-3">
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
-                    hoveredId === item.id
-                      ? 'bg-[#E07B54] text-white'
-                      : 'bg-white/90 text-[#2D2D2D]'
-                  }`}>
-                    {hoveredId === item.id ? 'Après ✨' : 'Avant'}
+                  <span className="px-3 py-1 rounded-full text-xs font-medium bg-[#E07B54]/90 text-white backdrop-blur-sm">
+                    IA ✨
                   </span>
                 </div>
 
                 {/* Info */}
                 <div className="absolute bottom-3 left-3 right-3">
-                  <p className="text-white font-medium text-sm">
+                  <p className="text-white font-medium text-sm capitalize">
                     {ROOM_LABELS[item.room_type_slug] || item.room_type_slug}
                   </p>
                   <p className="text-white/80 text-xs">
