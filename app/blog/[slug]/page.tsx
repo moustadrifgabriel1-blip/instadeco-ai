@@ -246,7 +246,19 @@ function ArticleContent({ content, slug }: { content: string, slug: string }) {
 
   // Parsing synchrone puis sanitization
   const rawHtml = marked.parse(content, { renderer, async: false });
-  const htmlContent = sanitizeHtml(rawHtml as string);
+  let htmlContent = sanitizeHtml(rawHtml as string);
+
+  // Post-traitement : remplacer les images placeholder.jpg restantes
+  // (certaines viennent de blocs HTML bruts dans le markdown, non traités par renderer.image)
+  htmlContent = htmlContent.replace(
+    /<img\s+src="([^"]*placeholder[^"]*)"(\s+alt="([^"]*)")?/g,
+    (_match, _src, _altAttr, altText) => {
+      const keyword = (altText || 'décoration').toLowerCase();
+      const realSrc = getBlogImageUrl(keyword, slug, 800, 500);
+      const safeAlt = (altText || 'Image de décoration intérieure').replace(/"/g, '&quot;');
+      return `<img src="${realSrc}" alt="${safeAlt}"`;
+    }
+  );
 
   return (
     <div
@@ -505,7 +517,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             },
             keywords: article.tags.join(', '),
             wordCount: article.wordCount,
-            articleBody: article.content.replace(/<[^>]*>/g, '').slice(0, 500),
+            articleBody: article.content.replace(/<[^>]*>/g, '').replace(/placeholder\.jpg/g, '').slice(0, 500),
           }),
         }}
       />
