@@ -17,14 +17,13 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
 
 const navigationItems = [
-  { href: '/', label: 'Accueil', icon: Home },
   { href: '/generate', label: 'Générer', icon: Wand2 },
   { href: '/galerie', label: 'Galerie', icon: Eye },
-  { href: '/quiz', label: 'Quiz Déco', icon: Star },
   { href: '/exemples', label: 'Exemples', icon: LayoutGrid },
+  { href: '/quiz', label: 'Quiz', icon: Star },
   { href: '/blog', label: 'Blog', icon: BookOpen },
   { href: '/pricing', label: 'Tarifs', icon: CreditCard },
-  { href: '/pro', label: 'Pour les Pros', icon: Building2 },
+  { href: '/pro', label: 'Pros', icon: Building2 },
 ];
 
 export function Header() {
@@ -55,43 +54,42 @@ export function Header() {
         ? "bg-[--white]/95 backdrop-blur-md border-b border-[--border-color] shadow-soft" 
         : "bg-transparent"
     )}>
-      <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="flex h-16 items-center justify-between gap-4">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 font-bold text-xl group">
+          <Link href="/" className="flex items-center gap-2 font-bold text-xl group shrink-0">
             <Image
               src="/images/logo-v3-house-sparkle.svg"
               alt="InstaDeco AI"
-              width={36}
-              height={36}
-              className="h-9 w-9 rounded-lg group-hover:scale-105 transition-transform"
+              width={32}
+              height={32}
+              className="h-8 w-8 rounded-lg group-hover:scale-105 transition-transform"
               priority
             />
             <span className="hidden sm:inline text-[#2D2D2D]">InstaDeco</span>
             <span className="text-gradient font-extrabold">AI</span>
           </Link>
 
-          {/* Navigation Desktop */}
-          <nav className="hidden md:flex items-center gap-1">
+          {/* Navigation Desktop — sans icônes pour gagner de la place */}
+          <nav className="hidden lg:flex items-center gap-0.5">
             {navigationItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200',
+                  'px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all duration-200 whitespace-nowrap',
                   isActive(item.href)
                     ? 'text-[#E07B54] bg-[#FFE4D9]'
                     : 'text-[#6B6B6B] hover:text-[#2D2D2D] hover:bg-[#FFF8F5]'
                 )}
               >
-                <item.icon className="h-4 w-4" />
                 {item.label}
               </Link>
             ))}
           </nav>
 
           {/* CTA Desktop */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-2 shrink-0">
 
             {loading ? (
               <div className="h-9 w-24 bg-[#FFF8F5] animate-shimmer rounded-lg" />
@@ -143,7 +141,7 @@ export function Header() {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2 -mr-2 rounded-lg hover:bg-[#FFF8F5] transition-colors"
+            className="lg:hidden p-2 -mr-2 rounded-lg hover:bg-[#FFF8F5] transition-colors"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label={mobileMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
           >
@@ -157,11 +155,25 @@ export function Header() {
 
         {/* Mobile Menu */}
         <div className={cn(
-          "md:hidden overflow-hidden transition-all duration-300",
+          "lg:hidden overflow-hidden transition-all duration-300",
           mobileMenuOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
         )}>
           <div className="border-t border-[#F0E6E0] py-4 bg-white">
             <nav className="flex flex-col gap-2">
+              {/* Accueil — mobile uniquement */}
+              <Link
+                href="/"
+                onClick={() => setMobileMenuOpen(false)}
+                className={cn(
+                  'flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all',
+                  pathname === '/'
+                    ? 'bg-[#FFE4D9] text-[#E07B54]'
+                    : 'text-[#6B6B6B] hover:text-[#2D2D2D] hover:bg-[#FFF8F5]'
+                )}
+              >
+                <Home className="h-5 w-5" />
+                Accueil
+              </Link>
               {navigationItems.map((item) => (
                 <Link
                   key={item.href}
