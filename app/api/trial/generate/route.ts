@@ -3,7 +3,12 @@ import { z } from 'zod';
 import { fal } from '@fal-ai/client';
 import { checkRateLimit, getClientIP } from '@/lib/security/rate-limiter';
 
-const MODEL_PATH = 'fal-ai/flux-general';
+const MODEL_PATH = 'fal-ai/flux-general/image-to-image';
+
+/**
+ * Negative prompt pour empêcher toute modification structurelle.
+ */
+const STRUCTURAL_NEGATIVE_PROMPT = 'different room layout, changed walls, modified windows, different room proportions, architectural changes, different ceiling, changed floor plan, different room shape, added windows, removed windows, moved doors, different perspective, different camera angle, distorted proportions, extra rooms, merged rooms, wider room, narrower room, taller ceiling, lower ceiling, different flooring material change';
 
 /**
  * Schéma de validation pour l'essai gratuit
@@ -78,18 +83,23 @@ export async function POST(req: Request) {
 
     console.log('[Trial] 🎨 Submitting to Fal.ai...', { style, roomType });
 
-    // Submit à fal.ai (queue)
+    // Submit à fal.ai (queue) — Image-to-Image
+    // L'image source sert de BASE (img2img) + EasyControls depth pour double verrou structurel.
+    // strength bas = on préserve la structure, on change meubles/déco
     const { request_id } = await fal.queue.submit(MODEL_PATH, {
       input: {
         prompt,
+        image_url: imageBase64,              // Image source = base img2img
+        strength: 0.55,                       // Préserver la structure (0=identique, 1=refaire)
         easycontrols: [
           {
             control_method_url: 'depth',
             image_url: imageBase64,
             image_control_type: 'spatial',
-            scale: 0.7,
+            scale: 1.0,                       // Force élevée du contrôle de profondeur
           },
         ],
+        negative_prompt: STRUCTURAL_NEGATIVE_PROMPT,
         image_size: imageSize,
         num_inference_steps: 28,
         guidance_scale: 3.5,
@@ -138,25 +148,21 @@ function buildTrialPrompt(style: string, roomType: string): string {
   const styleDesc = styleDescriptions[style] || 'modern minimalist, clean lines, neutral colors';
   const roomDesc = roomDescriptions[roomType] || 'living room';
 
-  return `TASK: COMPLETE TRANSFORMATION
+  return `Interior design transformation of this exact ${roomDesc}.
 
-Transform this ${roomDesc} into a stunning ${styleDesc} design.
+STRICT RULES — NEVER MODIFY:
+- Walls, ceiling, floor shape and proportions must be IDENTICAL to the photo
+- Windows, doors, radiators: exact same position, size, shape
+- Room depth, width, height: exact same proportions
+- Camera angle and perspective: identical
 
-🏗️ ARCHITECTURE (NEVER CHANGE):
-- Room dimensions, walls, ceiling height
-- Window positions, sizes, shapes  
-- Door positions and sizes
+ONLY CHANGE furniture and decoration:
+- Replace furniture with ${styleDesc} pieces
+- Add ${style} decorative elements, textiles, lighting
+- Keep furniture appropriate for a ${roomDesc}
 
-COMPLETE TRANSFORMATION:
-→ Replace ALL furniture with ${style} style pieces
-→ New furniture arrangement optimized for the space
-→ Wall colors and textures matching ${style} aesthetic
-→ ${style} lighting fixtures and decor elements
-
-Create a magazine-worthy ${style} ${roomDesc}.
-Professional interior photography, ${styleDesc}, architectural digest quality, 8k, photorealistic.
-
-Professional architectural photograph, shot on 50mm lens, f/2.8, ISO 200, realistic textures, natural lighting, 8k resolution, photorealistic, highly detailed.`;
+Result: same room structure, new ${style} interior design.
+Professional architectural photograph, photorealistic, 8k, natural lighting.`;
 }
 
 /**

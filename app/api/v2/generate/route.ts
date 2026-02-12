@@ -19,7 +19,7 @@ const generateRequestSchema = z.object({
   roomType: z.string().max(50).regex(/^[a-z0-9-]+$/, 'Format invalide').default('salon'),
   style: z.string().max(50).regex(/^[a-z0-9-]+$/, 'Format invalide').default('moderne'),
   userId: z.string().uuid('ID utilisateur invalide').optional(), // Optionnel : on prend l'userId de la session si absent
-  transformMode: z.enum(['full_redesign', 'rearrange', 'keep_layout', 'decor_only']).default('full_redesign'),
+  transformMode: z.enum(['full_redesign', 'keep_layout', 'decor_only']).default('full_redesign'),
 });
 
 export const maxDuration = 60; // Set max duration to 60 seconds (Hobby limit usually 10s, Pro 300s)
@@ -109,7 +109,7 @@ export async function POST(req: Request) {
       roomType,
       imageBase64: imageUrl, // Le storage service gère base64 et URL
       prompt,
-      transformMode: transformMode as 'full_redesign' | 'rearrange' | 'keep_layout' | 'decor_only',
+      transformMode: transformMode as 'full_redesign' | 'keep_layout' | 'decor_only',
     });
     
     const duration = Date.now() - startTime;
@@ -192,7 +192,7 @@ export async function POST(req: Request) {
  * ============================================================================
  * 
  * MATRICE DES COMBINAISONS:
- * - 4 modes: full_redesign, rearrange, keep_layout, decor_only
+ * - 3 modes: full_redesign, keep_layout, decor_only
  * - 9 types de pièce: salon, chambre, chambre-enfant, cuisine, salle-de-bain, bureau, salle-a-manger, entree, terrasse
  * - 12+ styles: original, moderne, minimaliste, boheme, industriel, classique, japandi, midcentury, coastal, farmhouse, artdeco, ludique
  * 
@@ -327,11 +327,13 @@ function buildPrompt(style: string, roomType: string, transformMode: string = 'f
 
   // Contraintes architecturales (communes à tous les modes)
   const architectureBlock = `
-🏗️ ARCHITECTURE (NEVER CHANGE):
-- Room dimensions, walls, ceiling height
-- Window positions, sizes, shapes  
-- Door positions and sizes
-- Built-in features (columns, beams, alcoves)`;
+🏗️ ARCHITECTURE (NEVER CHANGE — MUST BE IDENTICAL TO PHOTO):
+- Room dimensions, walls, ceiling height: IDENTICAL
+- Window positions, sizes, shapes: IDENTICAL
+- Door positions and sizes: IDENTICAL
+- Built-in features (columns, beams, alcoves, radiators): IDENTICAL
+- Room proportions and camera perspective: IDENTICAL
+- Floor shape and boundaries: IDENTICAL`;
 
   // Contraintes de type de pièce (communes à tous les modes)
   const roomTypeBlock = `
@@ -391,36 +393,6 @@ COMPLETE TRANSFORMATION:
 Create a magazine-worthy ${style} ${roomDesc}.
 Professional interior photography, ${styleDesc}, architectural digest quality, 8k, photorealistic.`;
     }
-  }
-
-  // ----- MODE: REARRANGE -----
-  if (transformMode === 'rearrange') {
-    // rearrange = nouvelle disposition, le style influence peu
-    return `TASK: NEW FURNITURE ARRANGEMENT FOR THIS ${roomDesc.toUpperCase()}
-
-Show a completely different furniture layout while keeping similar style furniture.
-
-${roomTypeBlock}
-${architectureBlock}
-
-YOUR TASK - REARRANGE:
-→ Move the ${constraints.keyFurniture} to a DIFFERENT position/wall
-→ Create a completely new layout
-→ Optimize traffic flow and functionality
-→ Make the room feel fresh and reorganized
-
-KEEP THE SAME:
-✓ Similar style and aesthetic (${isOriginalStyle ? 'match existing style' : 'inspired by ' + style})
-✓ Similar furniture types (${constraints.keyFurniture})
-✓ General color palette
-✓ Wall colors and flooring
-
-DO NOT:
-✗ Keep furniture in the same positions - MOVE EVERYTHING
-✗ Change room type (${roomDesc} must stay a ${roomDesc})
-
-This shows "what if I reorganized my ${roomDesc}" with furniture in new positions.
-Professional photography, natural lighting, realistic.`;
   }
 
   // ----- MODE: KEEP_LAYOUT -----

@@ -17,6 +17,8 @@ export interface PurchaseCreditsInput {
   priceId: string;
   successUrl: string;
   cancelUrl: string;
+  /** Stripe coupon ID for discounts */
+  couponId?: string;
 }
 
 /**
@@ -66,6 +68,7 @@ export class PurchaseCreditsUseCase {
       priceId: input.priceId,
       successUrl: input.successUrl,
       cancelUrl: input.cancelUrl,
+      couponId: input.couponId,
       metadata: {
         type: 'credits_purchase',
         userId: input.userId,

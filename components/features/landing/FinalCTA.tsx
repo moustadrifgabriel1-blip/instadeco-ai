@@ -29,7 +29,7 @@ export function FinalCTA() {
           InstaDeco vous donne le même résultat en 30 secondes.
         </p>
         <Button size="lg" className="h-14 px-10 text-lg rounded-full bg-white text-[#E07B54] hover:bg-white/95 font-bold shadow-2xl hover:scale-105 transition-transform border-0" asChild>
-          <Link href="/generate">
+          <Link href="/essai">
             J&apos;essaie maintenant
             <ArrowRight className="ml-2 h-5 w-5" />
           </Link>

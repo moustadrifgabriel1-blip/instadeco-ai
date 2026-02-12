@@ -34,6 +34,7 @@ export function usePurchaseCredits(): UsePurchaseCreditsReturn {
       packId: CreditPackId;
       successUrl?: string;
       cancelUrl?: string;
+      couponId?: string;
     }): Promise<string | null> => {
       if (!user || !user.email) {
         setError('Vous devez être connecté');
@@ -48,6 +49,7 @@ export function usePurchaseCredits(): UsePurchaseCreditsReturn {
           packId: input.packId,
           successUrl: input.successUrl,
           cancelUrl: input.cancelUrl,
+          couponId: input.couponId,
         });
 
         return response.checkoutUrl;

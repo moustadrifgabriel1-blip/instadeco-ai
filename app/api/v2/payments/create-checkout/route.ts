@@ -12,6 +12,7 @@ const purchaseRequestSchema = z.object({
   packId: z.enum(['pack_10', 'pack_25', 'pack_50', 'pack_100']).default('pack_10'),
   successUrl: z.string().url().optional(),
   cancelUrl: z.string().url().optional(),
+  couponId: z.string().optional(),
 });
 
 // Fonction pour obtenir la config du pack au runtime
@@ -87,7 +88,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const { packId, successUrl, cancelUrl } = validation.data;
+    const { packId, successUrl, cancelUrl, couponId } = validation.data;
 
     // Récupérer la config du pack au runtime
     const packConfig = getPackConfig(packId);
@@ -97,6 +98,9 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
+
+    // Vérifier le coupon : accepter soit le paramètre direct, soit la variable d'env
+    const effectiveCoupon = couponId || undefined;
 
     // URLs par défaut
     const origin = new URL(req.url).origin;
@@ -112,6 +116,7 @@ export async function POST(req: Request) {
       priceId: packConfig.priceId,
       successUrl: defaultSuccessUrl,
       cancelUrl: defaultCancelUrl,
+      couponId: effectiveCoupon,
     });
 
     if (!result.success) {

@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useState, useEffect, useMemo } from 'react';
+import Link from 'next/link';
 import { useDropzone } from 'react-dropzone';
 import Image from 'next/image';
 import { Plus, X, ArrowRight, Download, Check, ChevronDown, Sparkles, Star, Shield, Zap } from 'lucide-react';
@@ -26,19 +27,13 @@ const TRANSFORM_MODES = [
   { 
     id: 'full_redesign', 
     name: 'Transformation complète', 
-    desc: 'Remplacer tous les meubles et la déco',
+    desc: 'Remplacer meubles et déco, garder la structure',
     icon: '✨'
-  },
-  { 
-    id: 'rearrange', 
-    name: 'Nouvelle disposition', 
-    desc: 'Même style, agencement différent',
-    icon: '🔄'
   },
   { 
     id: 'keep_layout', 
     name: 'Garder la disposition', 
-    desc: 'Nouveaux meubles, même emplacement',
+    desc: 'Nouveaux meubles au même emplacement',
     icon: '📐'
   },
   { 
@@ -338,26 +333,8 @@ function GenerateContent() {
 
   return (
     <div className="min-h-screen bg-[#fbfbfd]">
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#fbfbfd]/80 backdrop-blur-xl border-b border-black/5">
-        <div className="max-w-[980px] mx-auto px-6 h-12 flex items-center justify-between">
-          <a href="/" className="text-[21px] font-semibold tracking-[-0.01em] text-[#1d1d1f]">
-            InstaDeco
-          </a>
-          <div className="flex items-center gap-6">
-            <span className="text-sm text-[#424245]">{credits} crédits</span>
-            <a href="/pricing" className="text-xs text-[#424245] hover:text-[#1d1d1f] transition-colors">
-              Tarifs
-            </a>
-            <a href="/dashboard" className="text-xs font-medium text-[#fbfbfd] bg-[#1d1d1f] px-4 py-1.5 rounded-full hover:bg-black transition-colors">
-              Mon Compte
-            </a>
-          </div>
-        </div>
-      </nav>
-
       {/* Hero */}
-      <section className="pt-28 pb-12 px-6">
+      <section className="pt-12 pb-12 px-6">
         <div className="max-w-[680px] mx-auto text-center">
           <h1 className="text-[56px] font-semibold tracking-[-0.025em] text-[#1d1d1f] leading-[1.05]">
             Réinventez votre intérieur.

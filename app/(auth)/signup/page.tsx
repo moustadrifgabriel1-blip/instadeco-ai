@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
@@ -264,9 +265,9 @@ function SignupForm() {
 
           <p className="mt-6 text-center text-[14px] text-[#636366]">
             Déjà un compte ?{' '}
-            <a href="/login" className="text-[#0071e3] hover:underline">
+            <Link href="/login" className="text-[#0071e3] hover:underline">
               Se connecter
-            </a>
+            </Link>
           </p>
         </div>
       </div>

@@ -122,8 +122,8 @@ export async function POST(req: Request) {
     }
 
     // 4. Créer le parrainage
-    const REFERRER_BONUS = 3;
-    const REFERRED_BONUS = 3;
+    const REFERRER_BONUS = 5;
+    const REFERRED_BONUS = 5;
 
     const { error: insertError } = await supabaseAdmin
       .from('referrals')

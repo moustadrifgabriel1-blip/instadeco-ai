@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
+import Link from 'next/link';
 import { Check, Sparkles, Clock, CreditCard, Image, Download, Palette, Building2, HelpCircle, ChevronDown, Heart, Shield, Zap, Users, TrendingUp, ArrowRight, Repeat, Crown } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { usePurchaseCredits } from '@/src/presentation/hooks/usePurchaseCredits';
 import { createSubscriptionSession } from '@/src/presentation/api/client';
 import { SocialProofToast } from '@/components/features/social-proof-toast';
@@ -213,9 +214,19 @@ const FAQ_ITEMS = [
   },
 ];
 
-export default function PricingPage() {
+export default function PricingPageWrapper() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#fbfbfd]" />}>
+      <PricingPage />
+    </Suspense>
+  );
+}
+
+function PricingPage() {
   const { user } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const couponFromUrl = searchParams?.get('coupon') || undefined;
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [pricingMode, setPricingMode] = useState<PricingMode>('credits');
   const [billingInterval, setBillingInterval] = useState<BillingInterval>('monthly');
@@ -236,6 +247,7 @@ export default function PricingPage() {
       packId: planId,
       successUrl: `${window.location.origin}/dashboard?payment=success`,
       cancelUrl: `${window.location.origin}/pricing?payment=cancelled`,
+      couponId: couponFromUrl,
     });
 
     if (checkoutUrl) {
@@ -520,13 +532,13 @@ export default function PricingPage() {
             ))}
           </div>
           <div className="text-center mt-10">
-            <a
-              href="/generate"
+            <Link
+              href="/essai"
               className="inline-flex items-center gap-2 bg-gradient-to-r from-[#E07B54] to-[#D4603C] text-white px-8 py-3.5 rounded-full text-base font-medium hover:shadow-lg hover:shadow-[#E07B54]/30 transition-all active:scale-95"
             >
               Essayer maintenant
               <ArrowRight className="w-4 h-4" />
-            </a>
+            </Link>
           </div>
         </div>
       </div>
@@ -766,13 +778,13 @@ export default function PricingPage() {
             Rejoignez les milliers d&apos;utilisateurs qui ont déjà redesigné leur espace avec InstaDeco AI.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a
-              href="/generate"
+            <Link
+              href="/essai"
               className="inline-flex items-center gap-2 bg-white text-[#D4603C] px-8 py-3.5 rounded-full text-base font-semibold hover:bg-white/90 transition-all active:scale-95 shadow-lg"
             >
               Essayer gratuitement
               <ArrowRight className="w-4 h-4" />
-            </a>
+            </Link>
             <span className="text-white/60 text-sm">3 crédits offerts à l&apos;inscription</span>
           </div>
         </div>

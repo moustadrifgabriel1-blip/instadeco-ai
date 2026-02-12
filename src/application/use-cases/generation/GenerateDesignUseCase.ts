@@ -84,8 +84,8 @@ export interface GenerateDesignInput {
   roomType: string;
   imageBase64: string;
   prompt: string;
-  /** Mode de transformation: full_redesign, rearrange, keep_layout, decor_only */
-  transformMode?: 'full_redesign' | 'rearrange' | 'keep_layout' | 'decor_only';
+  /** Mode de transformation: full_redesign, keep_layout, decor_only */
+  transformMode?: 'full_redesign' | 'keep_layout' | 'decor_only';
 }
 
 /**

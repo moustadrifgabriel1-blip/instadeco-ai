@@ -10,6 +10,8 @@ export interface CreateCheckoutSessionOptions {
   successUrl: string;
   cancelUrl: string;
   metadata?: Record<string, string>;
+  /** Stripe coupon ID for discounts (e.g. 20% off promo) */
+  couponId?: string;
 }
 
 /**

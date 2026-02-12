@@ -40,7 +40,7 @@ export async function GET(req: Request) {
     }
 
     const now = new Date();
-    const results = { j3: 0, j7: 0, j14: 0, quiz: 0, errors: 0 };
+    const results = { j3: 0, j7: 0, j14: 0, quiz: 0, trial_j1: 0, trial_j3: 0, trial_j7: 0, errors: 0 };
 
     // ========================================
     // J+3 : Relance "Votre pièce attend"
@@ -179,7 +179,106 @@ export async function GET(req: Request) {
       }
     }
 
-    console.log(`[Email Nurturing] ✅ J3: ${results.j3}, J7: ${results.j7}, J14: ${results.j14}, Quiz: ${results.quiz}, Errors: ${results.errors}`);
+    // ========================================
+    // TRIAL: J+1 — Rappel résultat + inscription
+    // Leads qui ont fait l'essai il y a 1 jour et ne sont pas inscrits
+    // ========================================
+    const { data: trialJ1Leads } = await supabaseAdmin
+      .from('leads')
+      .select('id, email, name, source, metadata')
+      .eq('source', 'trial_email_gate')
+      .gte('created_at', oneDayAgoMin.toISOString())
+      .lt('created_at', oneDayAgo.toISOString());
+
+    for (const lead of (trialJ1Leads || [])) {
+      if (!lead.email) continue;
+      // Vérifier qu'ils ne se sont pas inscrits
+      const { count: userCount } = await supabaseAdmin
+        .from('profiles')
+        .select('id', { count: 'exact', head: true })
+        .eq('email', lead.email);
+
+      if ((userCount || 0) > 0) continue; // Déjà inscrit, skip
+
+      const style = lead.metadata?.style || 'Moderne';
+      try {
+        await resend.emails.send({
+          from: FROM_EMAIL,
+          to: [lead.email],
+          subject: '🏠 Votre transformation déco vous attend !',
+          html: buildTrialJ1Email(lead.name || 'là', lead.email, style),
+        });
+        results.trial_j1++;
+      } catch {
+        results.errors++;
+      }
+    }
+
+    // ========================================
+    // TRIAL: J+3 — Inspiration + offre flash
+    // ========================================
+    const { data: trialJ3Leads } = await supabaseAdmin
+      .from('leads')
+      .select('id, email, name, source, metadata')
+      .eq('source', 'trial_email_gate')
+      .gte('created_at', threeDaysAgoMin.toISOString())
+      .lt('created_at', threeDaysAgo.toISOString());
+
+    for (const lead of (trialJ3Leads || [])) {
+      if (!lead.email) continue;
+      const { count: userCount } = await supabaseAdmin
+        .from('profiles')
+        .select('id', { count: 'exact', head: true })
+        .eq('email', lead.email);
+
+      if ((userCount || 0) > 0) continue;
+
+      try {
+        await resend.emails.send({
+          from: FROM_EMAIL,
+          to: [lead.email],
+          subject: '✨ 3 crédits offerts — Transformez toutes vos pièces',
+          html: buildTrialJ3Email(lead.name || 'là', lead.email),
+        });
+        results.trial_j3++;
+      } catch {
+        results.errors++;
+      }
+    }
+
+    // ========================================
+    // TRIAL: J+7 — Dernière chance + offre -20%
+    // ========================================
+    const { data: trialJ7Leads } = await supabaseAdmin
+      .from('leads')
+      .select('id, email, name, source, metadata')
+      .eq('source', 'trial_email_gate')
+      .gte('created_at', sevenDaysAgoMin.toISOString())
+      .lt('created_at', sevenDaysAgo.toISOString());
+
+    for (const lead of (trialJ7Leads || [])) {
+      if (!lead.email) continue;
+      const { count: userCount } = await supabaseAdmin
+        .from('profiles')
+        .select('id', { count: 'exact', head: true })
+        .eq('email', lead.email);
+
+      if ((userCount || 0) > 0) continue;
+
+      try {
+        await resend.emails.send({
+          from: FROM_EMAIL,
+          to: [lead.email],
+          subject: '🎁 Dernière chance : -20% sur vos crédits déco',
+          html: buildTrialJ7Email(lead.name || 'là', lead.email),
+        });
+        results.trial_j7++;
+      } catch {
+        results.errors++;
+      }
+    }
+
+    console.log(`[Email Nurturing] ✅ J3: ${results.j3}, J7: ${results.j7}, J14: ${results.j14}, Quiz: ${results.quiz}, Trial-J1: ${results.trial_j1}, Trial-J3: ${results.trial_j3}, Trial-J7: ${results.trial_j7}, Errors: ${results.errors}`);
 
     return NextResponse.json({
       success: true,
@@ -303,6 +402,11 @@ function buildJ7Email(name: string, email: string): string {
 
 function buildJ14Email(name: string, email: string): string {
   const unsubUrl = buildUnsubscribeUrl(email);
+  const couponId = process.env.STRIPE_COUPON_20_PERCENT || '';
+  const pricingUrl = couponId
+    ? `https://instadeco.app/pricing?coupon=${couponId}`
+    : 'https://instadeco.app/pricing';
+
   return emailWrapper(`
     <h2 style="color: #1d1d1f; font-size: 22px; margin: 0 0 16px;">Une offre spéciale pour vous 🎁</h2>
     
@@ -315,7 +419,7 @@ function buildJ14Email(name: string, email: string): string {
       <p style="font-size: 36px; font-weight: 800; color: #E07B54; margin: 0 0 8px;">-20%</p>
       <p style="font-size: 18px; font-weight: 600; color: #1d1d1f; margin: 0 0 8px;">Sur votre premier pack de crédits</p>
       <p style="color: #6B6B6B; font-size: 14px; margin: 0 0 16px;">
-        Pack Créatif : <span style="text-decoration: line-through;">19,99 €</span> → <strong style="color: #E07B54;">15,99 €</strong> (25 crédits)
+        Pack Créatif : <span style="text-decoration: line-through;">19,90 €</span> → <strong style="color: #E07B54;">15,92 €</strong> (25 crédits)
       </p>
       <p style="color: #636366; font-size: 12px; margin: 0;">
         ⏰ Offre valable 48h uniquement
@@ -323,17 +427,17 @@ function buildJ14Email(name: string, email: string): string {
     </div>
 
     <div style="background: #f5f5f7; border-radius: 12px; padding: 16px; margin: 0 0 24px;">
-      <p style="margin: 0 0 4px; font-weight: 600; color: #1d1d1f; font-size: 14px;">Ce que voulons dire 25 crédits :</p>
+      <p style="margin: 0 0 4px; font-weight: 600; color: #1d1d1f; font-size: 14px;">Ce que représentent 25 crédits :</p>
       <ul style="margin: 8px 0 0; padding: 0 0 0 20px; color: #6B6B6B; font-size: 14px;">
         <li>25 transformations haute qualité</li>
-        <li>Testez tous les 12 styles</li>
+        <li>Testez les 12 styles</li>
         <li>Équivalent à 3 750 € de consultations déco</li>
         <li>Crédits valables à vie</li>
       </ul>
     </div>
     
     <div style="text-align: center; margin: 24px 0;">
-      <a href="https://instadeco.app/pricing"
+      <a href="${pricingUrl}"
          style="display: inline-block; background: linear-gradient(135deg, #E07B54, #D4603C); color: white; text-decoration: none; padding: 14px 32px; border-radius: 50px; font-weight: 600; font-size: 16px;">
         Profiter de l'offre -20% →
       </a>
@@ -396,6 +500,131 @@ function buildQuizFollowUpEmail(name: string, email: string, styleName: string):
     
     <p style="color: #636366; font-size: 13px; text-align: center; margin: 16px 0 0;">
       Votre essai gratuit n'expire jamais.
+    </p>
+  `, unsubUrl);
+}
+
+// ============================================
+// TRIAL EMAIL TEMPLATES (pour leads /essai)
+// ============================================
+
+function buildTrialJ1Email(name: string, email: string, style: string): string {
+  const unsubUrl = buildUnsubscribeUrl(email);
+  return emailWrapper(`
+    <h2 style="color: #1d1d1f; font-size: 22px; margin: 0 0 16px;">Votre transformation vous attend 🏠</h2>
+    
+    <p style="color: #6B6B6B; line-height: 1.6; margin: 0 0 16px;">
+      Bonjour ${name}, hier vous avez testé InstaDeco et découvert votre pièce en style <strong style="color: #E07B54;">${style}</strong>.
+    </p>
+    
+    <p style="color: #6B6B6B; line-height: 1.6; margin: 0 0 24px;">
+      Envie d'aller plus loin ? Créez votre compte gratuit et recevez 
+      <strong style="color: #E07B54;">3 crédits offerts</strong> pour transformer d'autres pièces,
+      essayer d'autres styles et télécharger vos images en HD.
+    </p>
+
+    <div style="background: #FFF8F5; border-radius: 12px; padding: 20px; margin: 0 0 24px; border: 1px solid #F5D5C8;">
+      <p style="margin: 0 0 8px; font-weight: 600; color: #1d1d1f;">✨ Avec un compte gratuit :</p>
+      <ul style="margin: 0; padding: 0 0 0 20px; color: #6B6B6B; font-size: 14px; line-height: 1.8;">
+        <li>3 transformations supplémentaires offertes</li>
+        <li>20+ styles de décoration (vs 6 en essai)</li>
+        <li>Historique de vos créations</li>
+        <li>Téléchargement HD</li>
+      </ul>
+    </div>
+    
+    <div style="text-align: center; margin: 24px 0;">
+      <a href="https://instadeco.app/signup"
+         style="display: inline-block; background: linear-gradient(135deg, #E07B54, #D4603C); color: white; text-decoration: none; padding: 14px 32px; border-radius: 50px; font-weight: 600; font-size: 16px;">
+        Créer mon compte — 3 crédits offerts →
+      </a>
+    </div>
+    
+    <p style="color: #636366; font-size: 13px; text-align: center; margin: 16px 0 0;">
+      Sans engagement • Sans carte bancaire • Inscription en 30 secondes
+    </p>
+  `, unsubUrl);
+}
+
+function buildTrialJ3Email(name: string, email: string): string {
+  const unsubUrl = buildUnsubscribeUrl(email);
+  return emailWrapper(`
+    <h2 style="color: #1d1d1f; font-size: 22px; margin: 0 0 16px;">3 transformations vous attendent ✨</h2>
+    
+    <p style="color: #6B6B6B; line-height: 1.6; margin: 0 0 16px;">
+      Bonjour ${name}, vous avez adoré votre essai gratuit sur InstaDeco il y a quelques jours.
+    </p>
+
+    <p style="color: #6B6B6B; line-height: 1.6; margin: 0 0 24px;">
+      Saviez-vous que <strong style="color: #1d1d1f;">3 crédits gratuits</strong> vous attendent ?
+      Créez votre compte en 30 secondes pour les utiliser.
+    </p>
+
+    <div style="margin: 0 0 24px;">
+      <div style="background: #f5f5f7; border-radius: 12px; padding: 16px; margin: 0 0 12px;">
+        <p style="margin: 0 0 4px; font-weight: 600; color: #1d1d1f;">🛋️ Idée 1 : Multi-style</p>
+        <p style="margin: 0; color: #6B6B6B; font-size: 14px;">Testez la même pièce en Moderne, Scandinave et Japandi pour comparer.</p>
+      </div>
+      <div style="background: #f5f5f7; border-radius: 12px; padding: 16px; margin: 0 0 12px;">
+        <p style="margin: 0 0 4px; font-weight: 600; color: #1d1d1f;">🏠 Idée 2 : Multi-pièce</p>
+        <p style="margin: 0; color: #6B6B6B; font-size: 14px;">Transformez votre salon, chambre et cuisine dans le même style.</p>
+      </div>
+      <div style="background: #f5f5f7; border-radius: 12px; padding: 16px;">
+        <p style="margin: 0 0 4px; font-weight: 600; color: #1d1d1f;">📱 Idée 3 : Home staging</p>
+        <p style="margin: 0; color: #6B6B6B; font-size: 14px;">Vous vendez ? Meublez virtuellement pour accélérer la vente.</p>
+      </div>
+    </div>
+    
+    <div style="text-align: center; margin: 24px 0;">
+      <a href="https://instadeco.app/signup"
+         style="display: inline-block; background: linear-gradient(135deg, #E07B54, #D4603C); color: white; text-decoration: none; padding: 14px 32px; border-radius: 50px; font-weight: 600; font-size: 16px;">
+        Récupérer mes 3 crédits gratuits →
+      </a>
+    </div>
+  `, unsubUrl);
+}
+
+function buildTrialJ7Email(name: string, email: string): string {
+  const unsubUrl = buildUnsubscribeUrl(email);
+  const pricingUrl = process.env.STRIPE_COUPON_20_PERCENT
+    ? `https://instadeco.app/pricing?coupon=${process.env.STRIPE_COUPON_20_PERCENT}`
+    : 'https://instadeco.app/pricing';
+
+  return emailWrapper(`
+    <h2 style="color: #1d1d1f; font-size: 22px; margin: 0 0 16px;">Dernière chance : -20% pour vous 🎁</h2>
+    
+    <p style="color: #6B6B6B; line-height: 1.6; margin: 0 0 16px;">
+      Bonjour ${name}, cela fait une semaine que vous avez découvert InstaDeco.
+      Pour fêter ça, voici une offre exclusive :
+    </p>
+
+    <div style="background: linear-gradient(135deg, #FFF8F5, #FFF0EB); border-radius: 16px; padding: 24px; margin: 0 0 24px; border: 2px solid #E07B54; text-align: center;">
+      <p style="font-size: 36px; font-weight: 800; color: #E07B54; margin: 0 0 8px;">-20%</p>
+      <p style="font-size: 18px; font-weight: 600; color: #1d1d1f; margin: 0 0 8px;">sur votre premier pack</p>
+      <p style="color: #6B6B6B; font-size: 14px; margin: 0 0 4px;">
+        25 crédits : <span style="text-decoration: line-through;">19,90 €</span> → <strong style="color: #E07B54;">15,92 €</strong>
+      </p>
+      <p style="color: #636366; font-size: 12px; margin: 8px 0 0;">
+        ⏰ Offre valable 48h uniquement
+      </p>
+    </div>
+
+    <div style="text-align: center; margin: 24px 0;">
+      <a href="https://instadeco.app/signup"
+         style="display: inline-block; background: linear-gradient(135deg, #E07B54, #D4603C); color: white; text-decoration: none; padding: 14px 32px; border-radius: 50px; font-weight: 600; font-size: 16px;">
+        Créer mon compte + profiter du -20% →
+      </a>
+    </div>
+    
+    <div style="text-align: center; margin: 0 0 16px;">
+      <a href="${pricingUrl}"
+         style="display: inline-block; background: white; color: #E07B54; text-decoration: none; padding: 10px 24px; border-radius: 50px; font-weight: 600; font-size: 14px; border: 2px solid #E07B54;">
+        Voir les tarifs →
+      </a>
+    </div>
+    
+    <p style="color: #636366; font-size: 13px; text-align: center; margin: 16px 0 0;">
+      Pas intéressé ? Pas de souci — votre essai gratuit reste disponible sur inscription.
     </p>
   `, unsubUrl);
 }

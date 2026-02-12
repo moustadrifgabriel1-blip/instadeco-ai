@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -122,9 +123,9 @@ export default function LoginPage() {
             </div>
 
             <div className="flex justify-end">
-              <a href="/reset-password" className="text-[13px] text-[#0071e3] hover:underline">
+              <Link href="/reset-password" className="text-[13px] text-[#0071e3] hover:underline">
                 Mot de passe oublié ?
-              </a>
+              </Link>
             </div>
 
             <button
@@ -161,9 +162,9 @@ export default function LoginPage() {
 
           <p className="mt-6 text-center text-[14px] text-[#636366]">
             Pas encore de compte ?{' '}
-            <a href="/signup" className="text-[#0071e3] hover:underline">
+            <Link href="/signup" className="text-[#0071e3] hover:underline">
               Créer un compte
-            </a>
+            </Link>
           </p>
         </div>
       </div>

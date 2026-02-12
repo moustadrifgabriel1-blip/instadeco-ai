@@ -164,10 +164,10 @@ function buildGenerationCompleteEmail(
   const referralSection = referralCode ? `
     <div style="background: linear-gradient(135deg, #FFF8F5, #FFF0EB); border-radius: 16px; padding: 24px; margin: 24px 0; border: 2px dashed #E07B54; text-align: center;">
       <p style="font-size: 16px; font-weight: 700; color: #1d1d1f; margin: 0 0 8px;">
-        🎁 Parrainez un ami, gagnez 3 crédits
+        🎁 Parrainez un ami, gagnez 5 crédits
       </p>
       <p style="color: #6B6B6B; font-size: 14px; margin: 0 0 16px;">
-        Partagez votre code de parrainage et recevez <strong style="color: #E07B54;">3 crédits gratuits</strong>
+        Partagez votre code de parrainage et recevez <strong style="color: #E07B54;">5 crédits gratuits</strong>
         pour chaque ami qui s'inscrit !
       </p>
       <div style="background: white; border: 2px solid #E07B54; border-radius: 12px; padding: 12px; display: inline-block;">

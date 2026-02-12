@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import { Flame, Clock, ArrowRight, Check, Sparkles, Gift, Zap } from 'lucide-react';
 
 interface FlashOfferProps {
@@ -134,14 +135,14 @@ export function FlashOffer({
 
         {/* CTA principal */}
         <div className="flex flex-col items-center gap-3">
-          <a
+          <Link
             href={stripePaymentUrl}
             className="group w-full max-w-sm inline-flex items-center justify-center gap-2 bg-[#E07B54] text-white px-8 py-4 rounded-full text-[17px] font-bold hover:bg-[#d06a45] transition-all duration-200 shadow-xl shadow-[#E07B54]/30 active:scale-[0.98] hover:scale-[1.02]"
           >
             <Zap className="w-5 h-5" />
             Profiter de l&apos;offre — {flashPrice}
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-          </a>
+          </Link>
           <p className="text-[11px] text-[#636366]">
             Paiement sécurisé par Stripe • Sans engagement
           </p>

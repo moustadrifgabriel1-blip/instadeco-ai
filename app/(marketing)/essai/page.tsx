@@ -4,10 +4,12 @@ import { useCallback, useState, useEffect, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Plus, ArrowRight, Sparkles, Shield, Zap, Star, Check, UserPlus, Gift, Share2 } from 'lucide-react';
+import { Plus, ArrowRight, Sparkles, Shield, Zap, Star, Check, UserPlus, Gift, Share2, Mail } from 'lucide-react';
 import { FlashOffer } from '@/components/features/flash-offer';
 import { ShareButtons } from '@/components/features/share-buttons';
 import { SocialProofToast } from '@/components/features/social-proof-toast';
+import { LeadCaptureLazy } from '@/components/features/lead-capture-lazy';
+import { trackTrialStart, trackTrialComplete, trackLeadCaptured } from '@/lib/analytics/gtag';
 
 // Styles populaires pour l'essai (6 max)
 const TRIAL_STYLES = [
@@ -39,7 +41,7 @@ const LOADING_MESSAGES = [
 ];
 
 export default function EssaiPage() {
-  const [step, setStep] = useState<'upload' | 'options' | 'generating' | 'result' | 'trial-used'>('upload');
+  const [step, setStep] = useState<'upload' | 'options' | 'generating' | 'email-gate' | 'result' | 'trial-used'>('upload');
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [selectedStyle, setSelectedStyle] = useState('moderne');
@@ -47,6 +49,9 @@ export default function EssaiPage() {
   const [progress, setProgress] = useState(0);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [trialEmail, setTrialEmail] = useState('');
+  const [emailStatus, setEmailStatus] = useState<'idle' | 'loading' | 'error'>('idle');
+  const [emailError, setEmailError] = useState('');
   const pollingRef = useRef<NodeJS.Timeout | null>(null);
 
   // Vérifier si l'essai a déjà été utilisé
@@ -99,6 +104,7 @@ export default function EssaiPage() {
     setStep('generating');
     setProgress(0);
     setError(null);
+    trackTrialStart(selectedStyle, selectedRoom);
 
     try {
       // Convertir en base64
@@ -150,7 +156,9 @@ export default function EssaiPage() {
             setProgress(100);
             setGeneratedImage(statusData.imageUrl);
             localStorage.setItem('instadeco_trial_used', 'true');
-            setTimeout(() => setStep('result'), 500);
+            trackTrialComplete(selectedStyle, selectedRoom);
+            // Show email gate before revealing result
+            setTimeout(() => setStep('email-gate'), 500);
           } else if (statusData.status === 'failed') {
             clearInterval(progressInterval);
             if (pollingRef.current) clearInterval(pollingRef.current);
@@ -176,9 +184,9 @@ export default function EssaiPage() {
       {/* Navigation simplifiée */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-[#fbfbfd]/80 backdrop-blur-xl border-b border-black/5">
         <div className="max-w-[980px] mx-auto px-6 h-12 flex items-center justify-between">
-          <a href="/" className="text-[21px] font-semibold tracking-[-0.01em] text-[#1d1d1f]">
+          <Link href="/" className="text-[21px] font-semibold tracking-[-0.01em] text-[#1d1d1f]">
             InstaDeco
-          </a>
+          </Link>
           <Link
             href="/signup"
             className="text-xs font-medium text-[#fbfbfd] bg-[#E07B54] px-4 py-1.5 rounded-full hover:bg-[#d06a45] transition-colors"
@@ -371,6 +379,114 @@ export default function EssaiPage() {
             </div>
           )}
 
+          {/* ── ÉTAPE 3.5 : EMAIL GATE (avant le résultat) ── */}
+          {step === 'email-gate' && generatedImage && (
+            <div className="flex flex-col items-center py-12">
+              <div className="max-w-md w-full bg-white rounded-[28px] border border-black/5 shadow-xl overflow-hidden">
+                {/* Preview floutée */}
+                <div className="relative h-48 overflow-hidden">
+                  <Image
+                    src={generatedImage}
+                    alt="Votre résultat"
+                    width={600}
+                    height={300}
+                    className="w-full h-full object-cover blur-lg scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white/80" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="bg-white/90 backdrop-blur-md rounded-2xl px-6 py-3 shadow-lg">
+                      <p className="text-[15px] font-bold text-[#1d1d1f] flex items-center gap-2">
+                        <Sparkles className="w-5 h-5 text-[#E07B54]" />
+                        Votre résultat est prêt !
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Formulaire email */}
+                <div className="p-6 sm:p-8">
+                  <h2 className="text-[22px] font-bold text-[#1d1d1f] text-center mb-2">
+                    Entrez votre email pour voir le résultat
+                  </h2>
+                  <p className="text-[14px] text-[#636366] text-center mb-6">
+                    Recevez aussi <span className="font-semibold text-[#E07B54]">3 crédits offerts</span> pour transformer d&apos;autres pièces.
+                  </p>
+
+                  <form
+                    onSubmit={async (e) => {
+                      e.preventDefault();
+                      if (!trialEmail || emailStatus === 'loading') return;
+                      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trialEmail)) {
+                        setEmailError('Email invalide');
+                        setEmailStatus('error');
+                        return;
+                      }
+                      setEmailStatus('loading');
+                      setEmailError('');
+                      try {
+                        await fetch('/api/v2/leads', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            email: trialEmail,
+                            source: 'trial_email_gate',
+                            metadata: { style: selectedStyle, room: selectedRoom },
+                          }),
+                        });
+                        trackLeadCaptured('trial_email_gate');
+                        localStorage.setItem('trial_lead_email', trialEmail);
+                        setStep('result');
+                      } catch {
+                        setEmailError('Erreur, réessayez');
+                        setEmailStatus('error');
+                      }
+                    }}
+                    className="space-y-3"
+                  >
+                    <input
+                      type="email"
+                      value={trialEmail}
+                      onChange={(e) => { setTrialEmail(e.target.value); setEmailStatus('idle'); }}
+                      placeholder="votre@email.com"
+                      className="w-full px-4 py-3.5 rounded-xl border border-[#d2d2d7] focus:border-[#E07B54] focus:ring-2 focus:ring-[#E07B54]/20 outline-none transition-all text-[#1d1d1f] text-[15px]"
+                      required
+                      autoFocus
+                    />
+                    {emailStatus === 'error' && (
+                      <p className="text-red-500 text-[12px]">{emailError}</p>
+                    )}
+                    <button
+                      type="submit"
+                      disabled={emailStatus === 'loading'}
+                      className="w-full group inline-flex items-center justify-center gap-2 bg-[#E07B54] text-white px-6 py-3.5 rounded-xl text-[16px] font-semibold hover:bg-[#d06a45] transition-all disabled:opacity-50 shadow-lg shadow-[#E07B54]/20"
+                    >
+                      {emailStatus === 'loading' ? (
+                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      ) : (
+                        <>
+                          <Mail className="w-5 h-5" />
+                          Voir mon résultat
+                          <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                        </>
+                      )}
+                    </button>
+                  </form>
+
+                  <button
+                    onClick={() => setStep('result')}
+                    className="w-full mt-3 text-[12px] text-[#636366] hover:text-[#1d1d1f] transition-colors py-2"
+                  >
+                    Passer →
+                  </button>
+
+                  <p className="text-[11px] text-[#aaa] text-center mt-3">
+                    Pas de spam. Désinscription en 1 clic.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* ── ÉTAPE 4 : RÉSULTAT ── */}
           {step === 'result' && generatedImage && imagePreview && (
             <div className="space-y-8">
@@ -420,7 +536,7 @@ export default function EssaiPage() {
 
               {/* OFFRE FLASH — Conversion immédiate */}
               <FlashOffer
-                stripePaymentUrl="/pricing"
+                stripePaymentUrl="/signup?redirect=/pricing"
                 durationMinutes={15}
                 originalPrice="9,99 €"
                 flashPrice="4,99 €"
@@ -514,6 +630,8 @@ export default function EssaiPage() {
         </div>
       </section>
       <SocialProofToast initialDelay={5000} interval={20000} maxNotifications={5} />
+      {/* Exit-intent popup pour capturer les emails avant départ */}
+      <LeadCaptureLazy variant="popup" delay={30000} />
     </div>
   );
 }

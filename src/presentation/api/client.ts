@@ -206,6 +206,7 @@ export interface CreateCheckoutRequest {
   packId: 'pack_10' | 'pack_25' | 'pack_50' | 'pack_100';
   successUrl?: string;
   cancelUrl?: string;
+  couponId?: string;
 }
 
 export interface CreateCheckoutResponse {

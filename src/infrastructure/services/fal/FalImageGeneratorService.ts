@@ -8,41 +8,30 @@ import {
 
 // --- CONSTANTS & MAPPINGS ---
 
-const MODEL_PATH = 'fal-ai/flux-general';
+/**
+ * Modèle Image-to-Image : l'image source est la BASE de la génération.
+ * Le paramètre `strength` contrôle combien l'image change :
+ *   0.0 = image identique, 1.0 = image complètement changée.
+ * Combiné avec EasyControls depth (scale élevé), cela force la préservation
+ * de la structure architecturale (murs, fenêtres, proportions).
+ */
+const MODEL_PATH = 'fal-ai/flux-general/image-to-image';
 
-// Enhanced prompts for Flux to ensure "World-Class Interior Design" quality
-const STYLE_PROMPTS: Record<string, string> = {
-  'original': 'same existing interior style, improved organization, better lighting, enhanced aesthetics while preserving the current design character and furniture style',
-  'moderne': 'modern interior design, sleek lines, contemporary italian furniture, neutral color palette, warm lighting, high-end finishing, architectural digest style, 8k, photorealistic',
-  'minimaliste': 'minimalist interior design, wabi-sabi influence, clean lines, decluttered space, natural materials, light oak wood, soft white walls, serene atmosphere, high quality textures',
-  'boheme': 'bohemian chic interior, eclectic decor, rattan furniture, layered textiles, persian rugs, indoor plants, warm earth tones, cozy atmosphere, macrame details, natural lighting',
-  'industriel': 'industrial loft style, exposed brick walls, metal accents, leather furniture, concrete floors, high ceilings, factory windows, raw materials, urban chic aesthetic, dramatic lighting',
-  'classique': 'luxury classic interior, haussmannian style, moldings on walls, velvet upholstery, crystal chandelier, gold accents, marble fireplace, sophisticated antique furniture, timeless elegance',
-  'japandi': 'japandi style, blend of japanese rustic minimalism and scandinavian functionality, light wood, low profile furniture, beige and grey tones, organic shapes, zen atmosphere, soft textures',
-  'midcentury': 'mid-century modern interior, eames era furniture, teak wood, organic curves, geometric patterns, olive green and mustard yellow accents, retro mood, clean architectural lines',
-  'coastal': 'coastal hamptons style, light and airy, white wood paneling, linen fabrics, soft blue and sand tones, beach house vibe, natural light, elegant and relaxed atmosphere',
-  'farmhouse': 'modern farmhouse interior, rustic wooden beams, shiplap walls, comfortable overstuffed furniture, neutral warm tones, vintage accessories, cozy and inviting, country living style',
-  'artdeco': 'art deco interior, geometric patterns, velvet furniture, brass and gold metallic accents, rich jewel tones, emerald green, symmetry, glamorous and opulent atmosphere, great gatsby style',
-  'ludique': 'playful kids room interior, vibrant but harmonious colors, creative furniture shapes, educational decor, soft rugs, organized toy storage, whimsical atmosphere, safe and cozy for children',
-  // Fallbacks
-  'scandinave': 'scandinavian interior design, hygge atmosphere, light wood, white walls, functional design, cozy textiles, clean and bright',
-  'luxe': 'ultra luxury interior design, marble floors, silk drapes, custom furniture, gold leaf details, expensive materials, penthouse vibe, cinematic lighting',
-  'zen': 'zen sanctuary interior, bamboo accents, pebble stones, water feature, minimal furniture, meditation space, soft diffused lighting, peaceful',
-  'cozy': 'ultra cozy interior, warm fireplace, fluffy blankets, soft lighting, reading nook, warm wood tones, inviting atmosphere, hygge',
-  'vintage': 'vintage retro interior, curated antique pieces, wallpaper with floral patterns, velvet textures, nostalgic atmosphere, wes anderson style',
-  'loft': 'new york loft style, open plan, huge windows, exposed pipes, concrete ceiling, artistic decor, spacious and urban',
-};
+/**
+ * Negative prompt pour empêcher toute modification structurelle.
+ * Utilisé avec NAG (Normalized Attention Guidance) de Flux.
+ */
+const STRUCTURAL_NEGATIVE_PROMPT = 'different room layout, changed walls, modified windows, different room proportions, architectural changes, different ceiling, changed floor plan, different room shape, added windows, removed windows, moved doors, different perspective, different camera angle, distorted proportions, extra rooms, merged rooms, wider room, narrower room, taller ceiling, lower ceiling, different flooring material change';
 
-const ROOM_PROMPTS: Record<string, string> = {
-  'salon': 'spacious living room',
-  'chambre': 'master bedroom',
-  'chambre-enfant': 'kids bedroom, playful but organized',
-  'cuisine': 'gourmet kitchen with island',
-  'salle-de-bain': 'luxury spa bathroom',
-  'bureau': 'home office workspace',
-  'salle-a-manger': 'dining room with large table',
-  'entree': 'entryway hallway',
-  'terrasse': 'outdoor terrace patio',
+/**
+ * Paramètres de contrôle par mode de transformation.
+ * strength: combien l'image originale est modifiée (0=aucun, 1=total)
+ * depthScale: force du contrôle de profondeur (structure spatiale)
+ */
+const TRANSFORM_PARAMS: Record<string, { strength: number; depthScale: number }> = {
+  full_redesign:  { strength: 0.55, depthScale: 1.0 },   // Changer meubles + déco, garder architecture
+  keep_layout:    { strength: 0.45, depthScale: 1.2 },   // Changer style meubles, garder positions
+  decor_only:     { strength: 0.35, depthScale: 1.3 },   // Changer uniquement déco/accessoires
 };
 
 /**
@@ -130,32 +119,35 @@ export class FalImageGeneratorService implements IImageGeneratorService {
       const imageSize = getOptimalImageSize(options.width || 1024, options.height || 1024);
       console.log('[Fal.ai] 📐 Using image size:', imageSize);
 
-      // 3. Submit to Queue
-      // NOTE: Using easycontrols with "depth" control method - this is the simplest and most reliable
-      // approach for structure-preserving generation on Fal.ai's flux-general endpoint.
-      // EasyControl handles depth map generation internally.
+      // 3. Submit to Queue — Image-to-Image avec contrôle de profondeur
+      // L'image source sert de BASE (img2img) + EasyControls depth pour double verrou structurel.
+      // strength bas = on préserve la structure, on change meubles/déco
+      // depthScale élevé = la profondeur 3D de la pièce est strictement respectée
+      const params = TRANSFORM_PARAMS[transformMode] || TRANSFORM_PARAMS.full_redesign;
+      
+      console.log('[Fal.ai] 🔧 Parameters:', {
+        strength: params.strength,
+        depthScale: params.depthScale,
+        transformMode,
+      });
+
       const { request_id } = await fal.queue.submit(MODEL_PATH, {
         input: {
           prompt: fullPrompt,
+          image_url: options.controlImageUrl,     // Image source = base img2img
+          strength: params.strength,               // Contrôle combien on modifie vs préserve
           easycontrols: [
             {
-              control_method_url: "depth", // Built-in depth control
-              image_url: options.controlImageUrl,
-              image_control_type: "spatial", // "spatial" for structure, "subject" for style
-              // Ajuster le scale selon le mode:
-              // - rearrange: PLUS BAS (0.4) pour donner liberté de déplacer les meubles
-              // - decor_only: très haut (1.2) car on garde TOUT sauf la déco
-              // - keep_layout: haut (1.0) car on garde les positions exactes
-              // - full_redesign: moyen (0.7) pour transformer tout en gardant la structure de base
-              scale: transformMode === 'rearrange' ? 0.4 : 
-                     transformMode === 'decor_only' ? 1.2 : 
-                     transformMode === 'keep_layout' ? 1.0 : 0.7
+              control_method_url: "depth",         // Contrôle de profondeur
+              image_url: options.controlImageUrl,   // Même image pour le depth map
+              image_control_type: "spatial",        // Contrôle spatial (structure)
+              scale: params.depthScale              // Force du contrôle de profondeur
             }
           ],
+          negative_prompt: STRUCTURAL_NEGATIVE_PROMPT,
           image_size: imageSize, 
-          
           num_inference_steps: 28, 
-          guidance_scale: 3.5, 
+          guidance_scale: 3.5,
           enable_safety_checker: true,
           output_format: "jpeg"
         } as any,

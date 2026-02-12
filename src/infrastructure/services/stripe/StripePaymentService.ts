@@ -38,7 +38,7 @@ export class StripePaymentService implements IPaymentService {
 
   async createCheckoutSession(options: CreateCheckoutSessionOptions): Promise<Result<CheckoutSessionResult>> {
     try {
-      const session = await this.stripe.checkout.sessions.create({
+      const sessionParams: Stripe.Checkout.SessionCreateParams = {
         mode: 'payment',
         payment_method_types: ['card'],
         customer_email: options.userEmail,
@@ -54,7 +54,14 @@ export class StripePaymentService implements IPaymentService {
           ...options.metadata,
           userId: options.userId,
         },
-      });
+      };
+
+      // Appliquer le coupon de réduction si fourni
+      if (options.couponId) {
+        sessionParams.discounts = [{ coupon: options.couponId }];
+      }
+
+      const session = await this.stripe.checkout.sessions.create(sessionParams);
 
       if (!session.url) {
         return failure(new Error('Checkout session URL not generated'));

@@ -356,21 +356,7 @@ export default function QuizPage() {
   if (step === 'intro') {
     return (
       <div className="min-h-screen bg-[#fbfbfd]">
-        <nav className="fixed top-0 left-0 right-0 z-50 bg-[#fbfbfd]/80 backdrop-blur-xl border-b border-black/5">
-          <div className="max-w-[980px] mx-auto px-6 h-12 flex items-center justify-between">
-            <a href="/" className="text-[21px] font-semibold tracking-[-0.01em] text-[#1d1d1f]">
-              InstaDeco
-            </a>
-            <Link
-              href="/essai"
-              className="text-xs font-medium text-[#fbfbfd] bg-[#E07B54] px-4 py-1.5 rounded-full hover:bg-[#d06a45] transition-colors"
-            >
-              Essai gratuit
-            </Link>
-          </div>
-        </nav>
-
-        <section className="pt-24 pb-20 px-6">
+        <section className="pt-8 pb-20 px-6">
           <div className="max-w-[600px] mx-auto text-center">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#FFF3ED] text-[#E07B54] rounded-full text-sm font-medium mb-6">
               <Star className="w-4 h-4" />
@@ -427,7 +413,7 @@ export default function QuizPage() {
     return (
       <div className="min-h-screen bg-[#fbfbfd]">
         {/* Header avec progression */}
-        <nav className="fixed top-0 left-0 right-0 z-50 bg-[#fbfbfd]/80 backdrop-blur-xl border-b border-black/5">
+        <nav className="sticky top-16 z-40 bg-[#fbfbfd]/80 backdrop-blur-xl border-b border-black/5">
           <div className="max-w-[980px] mx-auto px-6">
             <div className="h-12 flex items-center justify-between">
               <button
@@ -440,9 +426,9 @@ export default function QuizPage() {
               <span className="text-[13px] font-medium text-[#636366]">
                 {currentQuestion + 1} / {totalQuestions}
               </span>
-              <a href="/" className="text-[13px] text-[#636366] hover:text-[#1d1d1f] transition-colors">
+              <Link href="/" className="text-[13px] text-[#636366] hover:text-[#1d1d1f] transition-colors">
                 Quitter
-              </a>
+              </Link>
             </div>
             {/* Barre de progression */}
             <div className="h-[3px] bg-[#f5f5f7] -mx-6">
@@ -454,7 +440,7 @@ export default function QuizPage() {
           </div>
         </nav>
 
-        <section className="pt-20 pb-16 px-6">
+        <section className="pt-8 pb-16 px-6">
           <div className="max-w-[720px] mx-auto">
             {/* Question */}
             <div className="text-center mb-8">
@@ -569,21 +555,7 @@ export default function QuizPage() {
   if (step === 'result' && resultStyle) {
     return (
       <div className="min-h-screen bg-[#fbfbfd]">
-        <nav className="fixed top-0 left-0 right-0 z-50 bg-[#fbfbfd]/80 backdrop-blur-xl border-b border-black/5">
-          <div className="max-w-[980px] mx-auto px-6 h-12 flex items-center justify-between">
-            <a href="/" className="text-[21px] font-semibold tracking-[-0.01em] text-[#1d1d1f]">
-              InstaDeco
-            </a>
-            <Link
-              href="/essai"
-              className="text-xs font-medium text-[#fbfbfd] bg-[#E07B54] px-4 py-1.5 rounded-full hover:bg-[#d06a45] transition-colors"
-            >
-              Essayer gratuitement
-            </Link>
-          </div>
-        </nav>
-
-        <section className="pt-20 pb-20 px-6">
+        <section className="pt-8 pb-20 px-6">
           <div className="max-w-[640px] mx-auto">
             {/* Résultat principal */}
             <div className="text-center mb-8">

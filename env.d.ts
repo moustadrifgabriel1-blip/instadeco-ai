@@ -45,6 +45,12 @@ declare global {
 
       // Node
       NODE_ENV: 'development' | 'production' | 'test';
+
+      // Google Analytics
+      NEXT_PUBLIC_GA_MEASUREMENT_ID?: string;
+
+      // Stripe Coupon (pour offres promotionnelles)
+      STRIPE_COUPON_20_PERCENT?: string;
     }
   }
 }

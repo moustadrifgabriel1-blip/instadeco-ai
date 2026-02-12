@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { fal } from '@fal-ai/client';
 
-const MODEL_PATH = 'fal-ai/flux-general';
+const MODEL_PATH = 'fal-ai/flux-general/image-to-image';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
