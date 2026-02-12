@@ -226,11 +226,13 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
           {/* Pagination */}
           {pagination.totalPages > 1 && (
             <div className="mt-8">
-              <Pagination
-                currentPage={pagination.page}
-                totalPages={pagination.totalPages}
-                basePath="/blog"
-              />
+              <Suspense fallback={null}>
+                <Pagination
+                  currentPage={pagination.page}
+                  totalPages={pagination.totalPages}
+                  basePath="/blog"
+                />
+              </Suspense>
             </div>
           )}
         </main>

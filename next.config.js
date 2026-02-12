@@ -7,7 +7,7 @@ const nextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
   
-  serverExternalPackages: ['undici'],
+  serverExternalPackages: ['undici', 'jsdom'],
   
   // Headers de sécurité
   async headers() {

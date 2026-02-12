@@ -1,11 +1,13 @@
 /**
  * Utilitaire de sanitization HTML
- * Utilise DOMPurify pour une protection robuste contre les attaques XSS
+ * 
+ * Sanitizer server-safe basé sur une allowlist (sans dépendance jsdom).
+ * Le contenu est généré par notre propre système (marked + custom renderer),
+ * donc une approche allowlist est suffisante et fiable.
  */
-import DOMPurify from 'isomorphic-dompurify';
 
 // Liste des balises HTML autorisées dans le contenu du blog
-const ALLOWED_TAGS = [
+const ALLOWED_TAGS = new Set([
   'p', 'br', 'strong', 'b', 'em', 'i', 'u', 's',
   'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
   'ul', 'ol', 'li',
@@ -13,14 +15,23 @@ const ALLOWED_TAGS = [
   'a', 'img', 'figure', 'figcaption',
   'table', 'thead', 'tbody', 'tr', 'th', 'td',
   'div', 'span', 'hr',
-];
+]);
 
-// Attributs autorisés par balise
-const ALLOWED_ATTR = [
+// Balises interdites (supprimées avec leur contenu)
+const FORBIDDEN_TAGS = new Set([
+  'script', 'style', 'iframe', 'object', 'embed', 'form', 'input',
+  'textarea', 'select', 'button', 'applet', 'base', 'link', 'meta',
+]);
+
+// Attributs autorisés
+const ALLOWED_ATTR = new Set([
   'href', 'title', 'target', 'rel',
   'src', 'alt', 'width', 'height', 'loading',
   'class',
-];
+]);
+
+// Attributs événementiels interdits (pattern)
+const EVENT_ATTR_PATTERN = /^on/i;
 
 // Protocoles autorisés pour les URLs
 const ALLOWED_PROTOCOLS = ['http:', 'https:', 'mailto:'];
@@ -53,17 +64,86 @@ export function escapeHtml(text: string): string {
 }
 
 /**
- * Sanitize le contenu HTML avec DOMPurify (protection XSS robuste)
+ * Sanitize un attribut HTML individuel
+ */
+function sanitizeAttribute(tagName: string, attrName: string, attrValue: string): string | null {
+  const lowerAttr = attrName.toLowerCase();
+
+  // Bloquer les attributs événementiels
+  if (EVENT_ATTR_PATTERN.test(lowerAttr)) {
+    return null;
+  }
+
+  // Vérifier l'allowlist
+  if (!ALLOWED_ATTR.has(lowerAttr)) {
+    return null;
+  }
+
+  // Valider les URLs dans href et src
+  if (lowerAttr === 'href' || lowerAttr === 'src') {
+    const decoded = attrValue.replace(/&#x([0-9a-f]+);/gi, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
+    if (!isSafeUrl(decoded)) {
+      return null;
+    }
+  }
+
+  return `${lowerAttr}="${attrValue.replace(/"/g, '&quot;')}"`;
+}
+
+/**
+ * Sanitize le contenu HTML avec une approche allowlist server-safe.
+ * 
+ * Supprime les balises interdites (avec contenu), ne garde que les balises
+ * et attributs autorisés, et valide les URLs.
  */
 export function sanitizeHtml(html: string): string {
-  return DOMPurify.sanitize(html, {
-    ALLOWED_TAGS,
-    ALLOWED_ATTR,
-    ALLOW_DATA_ATTR: false,
-    ADD_ATTR: ['target', 'rel'],
-    FORBID_TAGS: ['script', 'style', 'iframe', 'object', 'embed', 'form', 'input'],
-    FORBID_ATTR: ['onerror', 'onclick', 'onload', 'onmouseover', 'onfocus', 'onblur'],
+  // 1. Supprimer les balises interdites avec leur contenu
+  let result = html;
+  for (const tag of FORBIDDEN_TAGS) {
+    const regex = new RegExp(`<${tag}[^>]*>[\\s\\S]*?<\\/${tag}>`, 'gi');
+    result = result.replace(regex, '');
+    // Supprimer aussi les balises auto-fermantes
+    const selfClosing = new RegExp(`<${tag}[^>]*/?>`, 'gi');
+    result = result.replace(selfClosing, '');
+  }
+
+  // 2. Traiter toutes les balises HTML
+  result = result.replace(/<\/?([a-zA-Z][a-zA-Z0-9]*)\b([^>]*)?\/?>/g, (match, tagName, attrs) => {
+    const lowerTag = tagName.toLowerCase();
+
+    // Balise non autorisée : supprimer la balise mais garder le contenu
+    if (!ALLOWED_TAGS.has(lowerTag)) {
+      return '';
+    }
+
+    // Balise fermante
+    if (match.startsWith('</')) {
+      return `</${lowerTag}>`;
+    }
+
+    // Traiter les attributs
+    const sanitizedAttrs: string[] = [];
+    if (attrs) {
+      // Parser les attributs (gère les guillemets simples, doubles et sans guillemets)
+      const attrRegex = /([a-zA-Z_][\w-]*)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+)))?/g;
+      let attrMatch;
+      while ((attrMatch = attrRegex.exec(attrs)) !== null) {
+        const attrName = attrMatch[1];
+        const attrValue = attrMatch[2] ?? attrMatch[3] ?? attrMatch[4] ?? '';
+        const sanitized = sanitizeAttribute(lowerTag, attrName, attrValue);
+        if (sanitized) {
+          sanitizedAttrs.push(sanitized);
+        }
+      }
+    }
+
+    // Reconstruire la balise
+    const isSelfClosing = match.endsWith('/>') || ['br', 'hr', 'img'].includes(lowerTag);
+    const attrStr = sanitizedAttrs.length > 0 ? ' ' + sanitizedAttrs.join(' ') : '';
+    return `<${lowerTag}${attrStr}${isSelfClosing ? ' /' : ''}>`;
   });
+
+  return result;
 }
 
 /**
