@@ -205,6 +205,13 @@ function ArticleContent({ content, slug }: { content: string, slug: string }) {
       src = getBlogImageUrl(keyword, slug, 800, 500);
     }
     
+    // Remplacement des URLs placeholder.jpg par des images réelles
+    if (src.includes('placeholder') || src.includes('/blog/placeholder')) {
+      // Extraire un mot-clé du alt text pour choisir une image pertinente
+      const altKeyword = (text || '').toLowerCase();
+      src = getBlogImageUrl(altKeyword || 'décoration', slug, 800, 500);
+    }
+    
     // Vérifier que l'URL est valide (éviter les URLs cassées)
     if (!src || src === '#' || (!src.startsWith('http') && !src.startsWith('/'))) {
       src = getBlogImageUrl('décoration', slug, 800, 500);

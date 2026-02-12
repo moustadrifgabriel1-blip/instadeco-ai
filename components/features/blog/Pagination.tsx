@@ -81,10 +81,10 @@ export function Pagination({ currentPage, totalPages, basePath }: PaginationProp
         variant="outline"
         size="sm"
         asChild
-        disabled={currentPage === 1}
-        className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
+        disabled={currentPage <= 1}
+        className={currentPage <= 1 ? 'pointer-events-none opacity-50' : ''}
       >
-        <Link href={getPageUrl(currentPage - 1)} aria-label="Page précédente">
+        <Link href={currentPage <= 1 ? '#' : getPageUrl(currentPage - 1)} aria-label="Page précédente">
           <ChevronLeft className="h-4 w-4" />
           <span className="hidden sm:inline ml-1">Précédent</span>
         </Link>
