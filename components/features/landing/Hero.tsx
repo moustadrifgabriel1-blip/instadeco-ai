@@ -59,7 +59,7 @@ export function Hero() {
             <div className="flex flex-col sm:flex-row gap-4">
               <Button 
                 size="lg" 
-                className="group h-14 px-8 text-lg rounded-xl btn-primary" 
+                className="group h-12 px-6 text-base sm:h-14 sm:px-8 sm:text-lg rounded-xl btn-primary" 
                 asChild
               >
                 <Link href="/essai" className="flex items-center gap-2">
@@ -111,7 +111,7 @@ export function Hero() {
             </div>
             
             {/* Badge flottant */}
-            <div className="absolute -bottom-4 -left-4 glass rounded-xl px-4 py-3 shadow-warm animate-float" style={{ animationDelay: '0.5s' }}>
+            <div className="absolute -bottom-2 -left-2 sm:-bottom-4 sm:-left-4 glass rounded-xl px-3 py-2 sm:px-4 sm:py-3 shadow-warm animate-float hidden sm:flex" style={{ animationDelay: '0.5s' }}>
               <div className="flex items-center gap-3">
                 <div className="h-10 w-10 rounded-lg bg-[#E07B54] flex items-center justify-center">
                   <Sparkles className="h-5 w-5 text-white" />

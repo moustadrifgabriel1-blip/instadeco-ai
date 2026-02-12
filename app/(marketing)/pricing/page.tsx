@@ -288,9 +288,9 @@ function PricingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#FFF8F5] via-[#FFFBF9] to-white">
       {/* Hero */}
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-16 md:py-20 text-center relative">
-        <div className="absolute top-10 left-10 w-20 h-20 bg-[#FFE4D9] rounded-full blur-3xl opacity-60" />
-        <div className="absolute top-20 right-16 w-16 h-16 bg-[#E8F4E5] rounded-full blur-2xl opacity-50" />
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-16 md:py-20 text-center relative overflow-hidden">
+        <div className="absolute top-10 left-10 w-20 h-20 bg-[#FFE4D9] rounded-full blur-3xl opacity-60 hidden sm:block" />
+        <div className="absolute top-20 right-16 w-16 h-16 bg-[#E8F4E5] rounded-full blur-2xl opacity-50 hidden sm:block" />
         
         <div className="inline-flex items-center gap-2 bg-[#FFF0EB] text-[#D4603C] px-4 py-2 rounded-full text-sm font-medium mb-6">
           <Heart className="w-4 h-4" />
@@ -320,18 +320,18 @@ function PricingPage() {
                   : 'text-[#6B6B6B] hover:text-[#2D2D2D]'
               }`}
             >
-              <CreditCard className="w-4 h-4" />
+              <CreditCard className="w-4 h-4 hidden sm:block" />
               Packs de crédits
             </button>
             <button
               onClick={() => setPricingMode('subscription')}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all relative ${
+              className={`flex items-center gap-2 px-3 sm:px-5 py-2.5 rounded-full text-sm font-medium transition-all relative ${
                 pricingMode === 'subscription'
                   ? 'bg-gradient-to-r from-[#E07B54] to-[#D4603C] text-white shadow-md'
                   : 'text-[#6B6B6B] hover:text-[#2D2D2D]'
               }`}
             >
-              <Repeat className="w-4 h-4" />
+              <Repeat className="w-4 h-4 hidden sm:block" />
               Abonnements
               <span className="absolute -top-2.5 -right-2 bg-[#4CAF50] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full animate-pulse">
                 NEW
@@ -491,7 +491,7 @@ function PricingPage() {
         </div>
 
         {/* Payment logos */}
-        <div className="flex items-center justify-center gap-4 mt-6 opacity-50">
+        <div className="flex flex-wrap items-center justify-center gap-4 mt-6 opacity-50">
           <span className="text-xs text-[#6B6B6B]">Paiement par</span>
           <span className="text-sm font-semibold text-[#635BFF]">stripe</span>
           <span className="text-xs text-[#6B6B6B]">•</span>
@@ -585,7 +585,8 @@ function PricingPage() {
             </h2>
           </div>
           <div className="rounded-2xl border border-[#F0E8E4] overflow-hidden">
-            <table className="w-full text-sm">
+            <div className="overflow-x-auto">
+            <table className="w-full text-sm min-w-[480px]">
               <thead>
                 <tr className="bg-[#FFF8F5]">
                   <th className="text-left p-4 font-medium text-[#6B6B6B]"></th>
@@ -614,6 +615,7 @@ function PricingPage() {
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
         </div>
       </div>
@@ -927,7 +929,7 @@ function MobileCarousel({
   return (
     <div className="relative">
       <div
-        className="overflow-visible"
+        className="overflow-hidden"
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
@@ -1109,7 +1111,7 @@ function MobileSubscriptionCarousel({
   return (
     <div className="relative">
       <div
-        className="overflow-visible"
+        className="overflow-hidden"
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}

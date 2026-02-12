@@ -21,14 +21,14 @@ export function FinalCTA() {
           Lancez-vous dès maintenant
         </div>
         
-        <h2 className="text-3xl md:text-5xl font-heading font-bold text-white mb-6">
+        <h2 className="text-2xl sm:text-3xl md:text-5xl font-heading font-bold text-white mb-6">
           L&apos;intérieur de vos rêves pour 0,99 €
         </h2>
-        <p className="text-xl text-white/85 max-w-2xl mx-auto mb-10">
+        <p className="text-base sm:text-xl text-white/85 max-w-2xl mx-auto mb-10">
           Un décorateur facture 150 €/h et prend 2 semaines.<br />
           InstaDeco vous donne le même résultat en 30 secondes.
         </p>
-        <Button size="lg" className="h-14 px-10 text-lg rounded-full bg-white text-[#E07B54] hover:bg-white/95 font-bold shadow-2xl hover:scale-105 transition-transform border-0" asChild>
+        <Button size="lg" className="h-12 px-6 text-base sm:h-14 sm:px-10 sm:text-lg rounded-full bg-white text-[#E07B54] hover:bg-white/95 font-bold shadow-2xl hover:scale-105 transition-transform border-0" asChild>
           <Link href="/essai">
             J&apos;essaie maintenant
             <ArrowRight className="ml-2 h-5 w-5" />

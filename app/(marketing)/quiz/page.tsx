@@ -356,14 +356,14 @@ export default function QuizPage() {
   if (step === 'intro') {
     return (
       <div className="min-h-screen bg-[#fbfbfd]">
-        <section className="pt-8 pb-20 px-6">
+        <section className="pt-6 pb-12 px-4 sm:pt-8 sm:pb-20 sm:px-6">
           <div className="max-w-[600px] mx-auto text-center">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#FFF3ED] text-[#E07B54] rounded-full text-sm font-medium mb-6">
               <Star className="w-4 h-4" />
               Quiz gratuit — 2 min
             </div>
 
-            <h1 className="text-[40px] md:text-[52px] font-semibold tracking-[-0.03em] text-[#1d1d1f] leading-[1.06] mb-4">
+            <h1 className="text-[28px] sm:text-[36px] md:text-[52px] font-semibold tracking-[-0.03em] text-[#1d1d1f] leading-[1.06] mb-4">
               Quel est votre style
               <br />
               <span className="bg-gradient-to-r from-[#E07B54] to-[#D4603C] bg-clip-text text-transparent">
@@ -371,20 +371,20 @@ export default function QuizPage() {
               </span>
             </h1>
 
-            <p className="text-[17px] md:text-[19px] text-[#636366] leading-[1.5] mb-8 max-w-md mx-auto">
+            <p className="text-[15px] sm:text-[17px] md:text-[19px] text-[#636366] leading-[1.5] mb-8 max-w-md mx-auto">
               Répondez à {totalQuestions} questions visuelles et découvrez le style qui vous correspond le mieux.
             </p>
 
             <button
               onClick={() => setStep('quiz')}
-              className="group inline-flex items-center gap-2 bg-[#E07B54] text-white px-8 py-4 rounded-full text-[17px] font-semibold hover:bg-[#d06a45] transition-all duration-200 shadow-lg shadow-[#E07B54]/20 active:scale-95"
+              className="group inline-flex items-center gap-2 bg-[#E07B54] text-white px-6 py-3.5 sm:px-8 sm:py-4 rounded-full text-[15px] sm:text-[17px] font-semibold hover:bg-[#d06a45] transition-all duration-200 shadow-lg shadow-[#E07B54]/20 active:scale-95"
             >
               <Sparkles className="w-5 h-5" />
               Découvrir mon style
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </button>
 
-            <div className="mt-8 flex items-center justify-center gap-6 text-[13px] text-[#636366]">
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-[12px] sm:text-[13px] text-[#636366]">
               <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-500" /> 100% gratuit</span>
               <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-500" /> 8 questions</span>
               <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-500" /> Résultat immédiat</span>
@@ -440,11 +440,11 @@ export default function QuizPage() {
           </div>
         </nav>
 
-        <section className="pt-8 pb-16 px-6">
+        <section className="pt-6 pb-12 px-4 sm:pt-8 sm:pb-16 sm:px-6">
           <div className="max-w-[720px] mx-auto">
             {/* Question */}
             <div className="text-center mb-8">
-              <h2 className="text-[28px] md:text-[34px] font-semibold tracking-[-0.02em] text-[#1d1d1f] leading-tight">
+              <h2 className="text-[22px] sm:text-[28px] md:text-[34px] font-semibold tracking-[-0.02em] text-[#1d1d1f] leading-tight">
                 {question.question}
               </h2>
               <p className="mt-2 text-[15px] text-[#636366]">{question.subtitle}</p>
@@ -644,19 +644,19 @@ export default function QuizPage() {
             </div>
 
             {/* CTA : Essayer ce style */}
-            <div className="bg-gradient-to-br from-[#E07B54] to-[#D4603C] rounded-[24px] p-8 text-center shadow-xl shadow-[#E07B54]/20">
+            <div className="bg-gradient-to-br from-[#E07B54] to-[#D4603C] rounded-[24px] p-5 sm:p-8 text-center shadow-xl shadow-[#E07B54]/20">
               <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-white/20 flex items-center justify-center">
                 <Home className="w-7 h-7 text-white" />
               </div>
-              <h2 className="text-[24px] sm:text-[28px] font-bold text-white tracking-[-0.02em] mb-2">
+              <h2 className="text-[20px] sm:text-[24px] md:text-[28px] font-bold text-white tracking-[-0.02em] mb-2">
                 Voyez votre pièce en style {resultStyle.name}
               </h2>
-              <p className="text-[15px] text-white/80 max-w-md mx-auto mb-6 leading-relaxed">
+              <p className="text-[14px] sm:text-[15px] text-white/80 max-w-md mx-auto mb-6 leading-relaxed">
                 Uploadez une photo et notre IA transforme votre pièce en style {resultStyle.name} en 30 secondes. Gratuit, sans inscription.
               </p>
               <Link
                 href="/essai"
-                className="group inline-flex items-center gap-2 bg-white text-[#E07B54] px-8 py-4 rounded-full text-[17px] font-bold hover:bg-white/90 transition-all duration-200 shadow-lg active:scale-95"
+                className="group inline-flex items-center gap-2 bg-white text-[#E07B54] px-6 py-3 sm:px-8 sm:py-4 rounded-full text-[15px] sm:text-[17px] font-bold hover:bg-white/90 transition-all duration-200 shadow-lg active:scale-95"
               >
                 <Sparkles className="w-5 h-5" />
                 Essayer gratuitement

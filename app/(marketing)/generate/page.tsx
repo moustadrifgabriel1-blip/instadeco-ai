@@ -334,19 +334,19 @@ function GenerateContent() {
   return (
     <div className="min-h-screen bg-[#fbfbfd]">
       {/* Hero */}
-      <section className="pt-12 pb-12 px-6">
+      <section className="pt-8 pb-8 px-4 sm:pt-12 sm:pb-12 sm:px-6">
         <div className="max-w-[680px] mx-auto text-center">
-          <h1 className="text-[56px] font-semibold tracking-[-0.025em] text-[#1d1d1f] leading-[1.05]">
+          <h1 className="text-[28px] sm:text-[40px] md:text-[48px] lg:text-[56px] font-semibold tracking-[-0.025em] text-[#1d1d1f] leading-[1.08]">
             Réinventez votre intérieur.
           </h1>
-          <p className="mt-4 text-[21px] text-[#636366] font-normal leading-[1.4] tracking-[.011em]">
+          <p className="mt-3 text-[16px] sm:text-[18px] md:text-[21px] text-[#636366] font-normal leading-[1.4] tracking-[.011em]">
             Uploadez une photo. Choisissez un style. L&apos;IA fait le reste.
           </p>
         </div>
       </section>
 
       {/* Main App */}
-      <section className="pb-20 px-6">
+      <section className="pb-12 px-4 sm:pb-20 sm:px-6">
         <div className="max-w-[980px] mx-auto">
           
           {/* Upload Zone */}
@@ -362,17 +362,17 @@ function GenerateContent() {
               `}
             >
               <input {...getInputProps()} />
-              <div className="py-20 px-8 text-center">
+              <div className="py-14 px-4 sm:py-20 sm:px-8 text-center">
                 <div className="w-14 h-14 mx-auto mb-5 rounded-full bg-[#f5f5f7] flex items-center justify-center">
                   <Plus className="w-6 h-6 text-[#636366]" strokeWidth={1.5} />
                 </div>
-                <p className="text-[17px] text-[#1d1d1f] font-medium tracking-[-0.01em]">
+                <p className="text-[15px] sm:text-[17px] text-[#1d1d1f] font-medium tracking-[-0.01em]">
                   {isDragActive ? 'Déposez votre image' : 'Ajouter une photo de votre pièce'}
                 </p>
                 <p className="mt-2 text-[12px] text-[#636366] tracking-[.007em]">
                   Glissez-déposez ou cliquez • PNG, JPG, WEBP • Max 10 Mo
                 </p>
-                <div className="mt-6 flex items-center justify-center gap-6 text-[11px] text-[#636366]">
+                <div className="mt-6 flex items-center justify-center gap-3 sm:gap-6 flex-wrap text-[11px] text-[#636366]">
                   <span className="flex items-center gap-1"><Zap className="w-3 h-3" /> Résultat en 10s</span>
                   <span className="flex items-center gap-1"><Shield className="w-3 h-3" /> 100% privé</span>
                   <span className="flex items-center gap-1"><Star className="w-3 h-3" /> 12 styles</span>
@@ -409,13 +409,13 @@ function GenerateContent() {
                   <label className="block text-[12px] font-medium text-[#636366] uppercase tracking-[.1em] mb-4">
                     Que voulez-vous faire ?
                   </label>
-                  <div className="flex flex-wrap justify-center gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     {TRANSFORM_MODES.map((mode) => (
                       <button
                         key={mode.id}
                         onClick={() => setSelectedMode(mode.id)}
                         className={`
-                          px-5 py-3 rounded-2xl text-left transition-all duration-200 min-w-[180px]
+                          px-4 py-3 rounded-2xl text-left transition-all duration-200 w-full
                           ${selectedMode === mode.id
                             ? 'bg-[#1d1d1f] text-white ring-2 ring-[#1d1d1f] ring-offset-2'
                             : 'bg-[#f5f5f7] text-[#1d1d1f] hover:bg-[#e8e8ed]'
@@ -632,7 +632,7 @@ function GenerateContent() {
                     <Sparkles className="w-5 h-5 text-amber-400" />
                     <span className="text-white font-semibold text-[17px]">Débloquer la version HD</span>
                   </div>
-                  <div className="flex items-center justify-center gap-4 mb-4 text-[13px] text-white/70">
+                  <div className="flex items-center justify-center gap-2 sm:gap-4 flex-wrap mb-4 text-[12px] sm:text-[13px] text-white/70">
                     <span className="flex items-center gap-1"><Check className="w-3.5 h-3.5 text-[#4CAF50]" /> Sans filigrane</span>
                     <span className="flex items-center gap-1"><Check className="w-3.5 h-3.5 text-[#4CAF50]" /> Résolution 4K</span>
                     <span className="flex items-center gap-1"><Check className="w-3.5 h-3.5 text-[#4CAF50]" /> Usage commercial</span>

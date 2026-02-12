@@ -64,9 +64,9 @@ export function Footer() {
   return (
     <footer className="border-t border-[#F0E6E0] bg-[#FFF8F5]">
       <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-8 mb-12">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-6 lg:gap-8 mb-12">
           {/* Brand */}
-          <div className="col-span-2 md:col-span-1">
+          <div className="col-span-2 sm:col-span-3 lg:col-span-1">
             <Link href="/" className="flex items-center gap-2 font-bold text-xl mb-4 group">
               <Image
                 src="/images/logo-v3-house-sparkle.svg"

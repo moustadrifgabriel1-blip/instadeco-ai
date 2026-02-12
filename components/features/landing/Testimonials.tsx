@@ -88,21 +88,21 @@ export function Testimonials() {
           {/* Navigation buttons */}
           <button 
             onClick={goToPrev}
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-12 z-10 h-12 w-12 rounded-full bg-white border border-[#F0E6E0] shadow-soft flex items-center justify-center hover:border-[#E07B54] hover:shadow-warm transition-all"
+            className="absolute left-2 sm:left-0 top-1/2 -translate-y-1/2 sm:-translate-x-4 md:-translate-x-12 z-10 h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-white border border-[#F0E6E0] shadow-soft hidden sm:flex items-center justify-center hover:border-[#E07B54] hover:shadow-warm transition-all"
             aria-label="Précédent"
           >
             <ChevronLeft className="h-5 w-5 text-[#2D2D2D]" />
           </button>
           <button 
             onClick={goToNext}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-12 z-10 h-12 w-12 rounded-full bg-white border border-[#F0E6E0] shadow-soft flex items-center justify-center hover:border-[#E07B54] hover:shadow-warm transition-all"
+            className="absolute right-2 sm:right-0 top-1/2 -translate-y-1/2 sm:translate-x-4 md:translate-x-12 z-10 h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-white border border-[#F0E6E0] shadow-soft hidden sm:flex items-center justify-center hover:border-[#E07B54] hover:shadow-warm transition-all"
             aria-label="Suivant"
           >
             <ChevronRight className="h-5 w-5 text-[#2D2D2D]" />
           </button>
 
           {/* Use case card */}
-          <div className="bg-[#FFF8F5] rounded-3xl p-8 md:p-12 text-center">
+          <div className="bg-[#FFF8F5] rounded-3xl p-5 sm:p-8 md:p-12 text-center">
             {/* Icon */}
             <div className="mb-6">
               <span className="text-5xl">{useCases[currentIndex].icon}</span>

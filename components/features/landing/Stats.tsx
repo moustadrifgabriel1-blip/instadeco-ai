@@ -96,7 +96,7 @@ export function Stats() {
           Le résultat d&apos;un architecte d&apos;intérieur • Le prix d&apos;un café
         </p>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
           {stats.map((stat, index) => (
             <div 
               key={stat.label}
@@ -105,10 +105,10 @@ export function Stats() {
               }`}
               style={{ transitionDelay: `${index * 100}ms` }}
             >
-              <div className="inline-flex items-center justify-center h-12 w-12 rounded-xl bg-[#E07B54]/20 mb-4 mx-auto">
-                <stat.icon className="h-6 w-6 text-[#E07B54]" />
+              <div className="inline-flex items-center justify-center h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-[#E07B54]/20 mb-3 sm:mb-4 mx-auto">
+                <stat.icon className="h-5 w-5 sm:h-6 sm:w-6 text-[#E07B54]" />
               </div>
-              <div className="text-3xl md:text-4xl font-bold text-white mb-1">
+              <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-1">
                 {stat.highlight ? (
                   <><span className="text-white/40 text-lg line-through">{animatedValues[index]}</span> <span className="text-[#E07B54]">→ 0,99 €</span></>
                 ) : (

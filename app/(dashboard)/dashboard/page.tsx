@@ -728,7 +728,7 @@ export default function DashboardPageV2() {
                       role="dialog"
                       aria-modal="true"
                       aria-labelledby="delete-modal-title"
-                      className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl"
+                      className="bg-white rounded-2xl p-4 sm:p-6 max-w-md w-full shadow-xl"
                       onClick={(e) => e.stopPropagation()}
                       onKeyDown={(e) => { if (e.key === 'Escape') { setShowDeleteModal(false); setDeleteConfirmText(''); } }}
                     >
@@ -844,7 +844,7 @@ export default function DashboardPageV2() {
                             </p>
                             
                             {/* Critères */}
-                            <div className="grid grid-cols-2 gap-1 text-xs">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-xs">
                               <div className={`flex items-center gap-1.5 ${newPassword.length >= 8 ? 'text-green-600' : 'text-[#636366]'}`}>
                                 {newPassword.length >= 8 ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
                                 8 caractères min.
@@ -948,9 +948,9 @@ export default function DashboardPageV2() {
                 
                 {/* Referral value prop */}
                 <div className="bg-gradient-to-r from-[#FFF8F5] to-[#FFF0EB] rounded-2xl p-6 border border-[#F5D5C8] mb-6">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-[#E07B54] flex items-center justify-center flex-shrink-0">
-                      <Gift className="w-6 h-6 text-white" />
+                  <div className="flex items-start gap-3 sm:gap-4">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#E07B54] flex items-center justify-center flex-shrink-0">
+                      <Gift className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                     </div>
                     <div>
                       <h2 className="text-lg font-semibold text-[#1d1d1f] mb-1">
@@ -974,8 +974,8 @@ export default function DashboardPageV2() {
                     <CardDescription>Partagez ce code avec vos amis pour qu&apos;ils l&apos;utilisent lors de leur inscription</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex items-center gap-3">
-                      <div className="flex-1 bg-[#f5f5f7] rounded-xl px-4 py-3 font-mono text-lg font-bold text-[#1d1d1f] tracking-widest text-center">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                      <div className="flex-1 bg-[#f5f5f7] rounded-xl px-4 py-3 font-mono text-base sm:text-lg font-bold text-[#1d1d1f] tracking-widest text-center">
                         {referralCode || '...'}
                       </div>
                       <Button
