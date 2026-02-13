@@ -76,8 +76,11 @@ export function generateCSP(): string {
       'wss://*.supabase.co',
       'https://api.stripe.com',
       'https://*.fal.ai',
+      'https://*.fal.media',
       'https://generativelanguage.googleapis.com',
       'https://www.google-analytics.com',
+      'https://www.googletagmanager.com',
+      'https://analytics.google.com',
     ],
     'frame-src': [
       "'self'",
