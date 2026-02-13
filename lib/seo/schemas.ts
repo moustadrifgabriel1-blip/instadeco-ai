@@ -92,8 +92,8 @@ export function generateSoftwareAppSchema() {
     url: getCanonicalUrl('/generate'),
     offers: {
       '@type': 'AggregateOffer',
-      lowPrice: '9.99',
-      highPrice: '34.99',
+      lowPrice: '9.90',
+      highPrice: '34.90',
       priceCurrency: 'EUR',
       offerCount: 3,
     },
@@ -101,8 +101,8 @@ export function generateSoftwareAppSchema() {
     featureList: [
       'Décoration par Intelligence Artificielle',
       'Home staging virtuel',
-      'Plus de 12 styles de décoration',
-      'Résultat en 10 secondes',
+      'Plus de 20 styles de décoration',
+      'Résultat en ~30 secondes',
       'Export haute définition',
     ],
   };

@@ -19,7 +19,6 @@ export type AuditEventType =
   | 'payment_failed'
   | 'credits_purchased'
   | 'credits_deducted'
-  | 'hd_unlock'
   | 'rate_limit_exceeded'
   | 'suspicious_activity'
   | 'admin_action';

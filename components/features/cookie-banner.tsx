@@ -36,9 +36,9 @@ export function CookieBanner() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
           <div className="flex-1">
             <p className="text-[14px] text-[#1d1d1f] leading-relaxed">
-              <span className="font-semibold">🍪 Cookies essentiels uniquement.</span>{' '}
-              Nous utilisons des cookies strictement nécessaires au fonctionnement du site 
-              (authentification et session). Aucun cookie publicitaire ou de tracking.{' '}
+              <span className="font-semibold">🍪 Cookies & Analyse.</span>{' '}
+              Nous utilisons des cookies pour la connexion et des outils d'analyse (Google Analytics, Facebook Pixel) 
+              afin de mesurer nos performances publicitaires.{' '}
               <Link 
                 href="/legal/privacy" 
                 className="text-[#0071e3] hover:underline"

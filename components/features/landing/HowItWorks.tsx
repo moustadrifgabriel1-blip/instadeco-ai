@@ -12,7 +12,7 @@ const steps = [
   {
     number: "02",
     title: "Choisissez un style",
-    description: "Sélectionnez parmi 12 styles déco : Moderne, Scandinave, Japandi, Bohème, Industriel...",
+    description: "Sélectionnez parmi 20+ styles déco : Moderne, Scandinave, Japandi, Bohème, Industriel...",
     icon: "🎨"
   },
   {

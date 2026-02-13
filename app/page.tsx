@@ -39,7 +39,7 @@ const FinalCTA = dynamic(() => import('@/components/features/landing/FinalCTA').
  */
 export const metadata: Metadata = {
   title: 'InstaDeco AI - Décoration d\'Intérieur par IA | Résultat en 30 Secondes',
-  description: 'Transformez n\'importe quelle pièce avec l\'IA pour 0,99€. 12 styles de décoration, résultat photoréaliste en 30 secondes. Home staging virtuel, simulation déco avant/après. Essai gratuit.',
+  description: 'Transformez n\'importe quelle pièce avec l\'IA pour 0,99€. 20+ styles de décoration, résultat photoréaliste en ~30 secondes. Home staging virtuel, simulation déco avant/après. Essai gratuit.',
   alternates: {
     canonical: getCanonicalUrl('/'),
   },
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
 const homepageFAQ = [
   {
     question: 'Comment fonctionne la décoration par IA d\'InstaDeco ?',
-    answer: 'Prenez une photo de votre pièce, choisissez un style parmi 12 options (Moderne, Scandinave, Japandi, Bohème…), et notre IA génère un rendu photoréaliste de votre pièce redécorée en 30 secondes. Le résultat respecte la structure de votre espace (murs, fenêtres, volumes).',
+    answer: 'Prenez une photo de votre pièce, choisissez un style parmi plus de 20 options (Moderne, Scandinave, Japandi, Bohème…), et notre IA génère un rendu photoréaliste de votre pièce redécorée en ~30 secondes. Le résultat respecte la structure de votre espace (murs, fenêtres, volumes).',
   },
   {
     question: 'Combien coûte InstaDeco par rapport à un architecte d\'intérieur ?',
@@ -57,7 +57,7 @@ const homepageFAQ = [
   },
   {
     question: 'Quels styles de décoration sont disponibles ?',
-    answer: 'InstaDeco propose 12 styles : Moderne, Scandinave, Industriel, Bohème, Japandi, Minimaliste, Art Déco, Contemporain, Rustique, Coastal, Mid-Century et Luxe. Chaque style peut être appliqué à tous les types de pièces.',
+    answer: 'InstaDeco propose plus de 20 styles : Moderne, Scandinave, Industriel, Bohème, Japandi, Minimaliste, Art Déco, Contemporain, Haussmannien, Provençal, Chalet Alpin, Bord de mer, Luxe et bien d’autres. Chaque style peut être appliqué à tous les types de pièces.',
   },
   {
     question: 'Puis-je utiliser InstaDeco pour du home staging virtuel ?',
@@ -114,7 +114,7 @@ export default function HomePage() {
         <div className="container px-4 md:px-6">
           <h2 className="text-2xl font-bold text-center mb-2">Explorez nos styles de décoration</h2>
           <p className="text-muted-foreground text-center mb-10 max-w-2xl mx-auto">
-            Chaque intérieur mérite un style qui lui correspond. Découvrez nos 12 styles de décoration et trouvez celui qui vous ressemble.
+            Chaque intérieur mérite un style qui lui correspond. Découvrez nos 20+ styles de décoration et trouvez celui qui vous ressemble.
           </p>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {POPULAR_STYLES.map((style) => (
@@ -131,7 +131,7 @@ export default function HomePage() {
           </div>
           <div className="text-center mt-6">
             <Link href="/styles" className="text-sm text-primary hover:underline inline-flex items-center gap-1">
-              Voir les 12 styles <ArrowRight className="w-3 h-3" />
+              Voir tous les styles <ArrowRight className="w-3 h-3" />
             </Link>
           </div>
         </div>

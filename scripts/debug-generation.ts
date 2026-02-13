@@ -22,7 +22,6 @@ async function testGenerationInsert() {
       input_image_url: 'https://via.placeholder.com/150',
       custom_prompt: 'Test prompt',
       status: 'pending',
-      hd_unlocked: false,
     })
     .select()
     .single();

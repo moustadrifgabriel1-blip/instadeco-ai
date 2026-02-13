@@ -11,7 +11,6 @@ export interface GenerationDTO {
   inputImageUrl: string;
   outputImageUrl: string | null;
   status: string;
-  hdUnlocked: boolean;
   createdAt: string;
   updatedAt: string;
 }

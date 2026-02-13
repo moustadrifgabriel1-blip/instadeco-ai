@@ -6,7 +6,10 @@
  * vers les pages villes, styles et outils.
  */
 
+'use client';
+
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Heart } from 'lucide-react';
 import Image from 'next/image';
 
@@ -59,14 +62,20 @@ const footerLinks = {
 };
 
 export function Footer() {
+  const pathname = usePathname();
   const currentYear = new Date().getFullYear();
+
+  // Masquer le footer sur les pages dashboard (elles ont leur propre layout)
+  if (pathname.startsWith('/dashboard') || pathname.startsWith('/credits') || pathname === '/essai') {
+    return null;
+  }
 
   return (
     <footer className="border-t border-[#F0E6E0] bg-[#FFF8F5]">
       <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-6 lg:gap-8 mb-12">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-8 gap-6 lg:gap-8 mb-12">
           {/* Brand */}
-          <div className="col-span-2 sm:col-span-3 lg:col-span-1">
+          <div className="col-span-2 sm:col-span-3 lg:col-span-2">
             <Link href="/" className="flex items-center gap-2 font-bold text-xl mb-4 group">
               <Image
                 src="/images/logo-v3-house-sparkle.svg"

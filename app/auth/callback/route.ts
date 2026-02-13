@@ -37,5 +37,8 @@ export async function GET(request: Request) {
   }
 
   // URL to redirect to after sign in process completes
-  return NextResponse.redirect(`${origin}/generate`);
+  const redirectPath = requestUrl.searchParams.get('redirect') || '/generate';
+  // Sécurité : n'accepter que les chemins relatifs (pas de redirect externe)
+  const safeRedirect = redirectPath.startsWith('/') ? redirectPath : '/generate';
+  return NextResponse.redirect(`${origin}${safeRedirect}`);
 }

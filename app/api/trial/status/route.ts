@@ -6,6 +6,9 @@ const MODEL_PATH = 'fal-ai/flux-general/image-to-image';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
 
+// Cache de requêtes pour détecter les boucles infinies
+const requestCache = new Map<string, { count: number; firstSeen: number }>();
+
 /**
  * GET /api/trial/status?requestId=xxx
  * 
@@ -18,6 +21,26 @@ export async function GET(req: Request) {
 
   if (!requestId) {
     return NextResponse.json({ error: 'requestId manquant' }, { status: 400 });
+  }
+
+  // Détecter les boucles infinies (> 50 polls = 2min30)
+  const cacheKey = requestId;
+  const cached = requestCache.get(cacheKey);
+  const now = Date.now();
+  
+  if (cached) {
+    cached.count++;
+    // Si > 50 polls ou > 3min, forcer l'échec
+    if (cached.count > 50 || (now - cached.firstSeen) > 180000) {
+      console.error(`[Trial Status] ⏰ Timeout: requestId=${requestId} polled ${cached.count} times over ${Math.floor((now - cached.firstSeen) / 1000)}s`);
+      requestCache.delete(cacheKey);
+      return NextResponse.json({ 
+        status: 'failed', 
+        error: 'La génération a pris trop de temps. Veuillez réessayer.' 
+      });
+    }
+  } else {
+    requestCache.set(cacheKey, { count: 1, firstSeen: now });
   }
 
   const FAL_KEY = process.env.FAL_KEY || process.env.FAL_API_KEY;
@@ -45,15 +68,25 @@ export async function GET(req: Request) {
             || result?.data?.image?.url;
 
           if (imageUrl) {
+            console.log(`[Trial Status] ✅ Image ready: ${imageUrl.substring(0, 50)}...`);
+            requestCache.delete(cacheKey);
             return NextResponse.json({ status: 'completed', imageUrl });
+          } else {
+            console.error(`[Trial Status] ⚠️ Status=COMPLETED but no image URL in result:`, JSON.stringify(result).substring(0, 200));
+            requestCache.delete(cacheKey);
+            return NextResponse.json({ status: 'failed', error: 'Image introuvable dans le résultat' });
           }
         } catch (resultError: any) {
           console.error(`[Trial Status] ❌ SDK result fetch failed:`, resultError?.message);
+          requestCache.delete(cacheKey);
+          return NextResponse.json({ status: 'failed', error: 'Erreur lors de la récupération du résultat' });
         }
       }
 
       if (sdkStatus === 'FAILED') {
         const errorMsg = (statusResult as any)?.error || 'La génération a échoué';
+        console.error(`[Trial Status] ❌ Generation failed:`, errorMsg);
+        requestCache.delete(cacheKey);
         return NextResponse.json({ status: 'failed', error: errorMsg });
       }
 
@@ -99,9 +132,13 @@ export async function GET(req: Request) {
         }
 
         if (imageUrl) {
+          console.log(`[Trial Status] ✅ Image ready (REST): ${imageUrl.substring(0, 50)}...`);
+          requestCache.delete(cacheKey);
           return NextResponse.json({ status: 'completed', imageUrl });
         }
 
+        console.error(`[Trial Status] ⚠️ REST: Status completed but no image URL`);
+        requestCache.delete(cacheKey);
         return NextResponse.json({ status: 'failed', error: 'Image introuvable dans le résultat' });
       }
 
@@ -110,6 +147,8 @@ export async function GET(req: Request) {
       }
 
       if (['FAILED', 'ERROR'].includes(statusCode)) {
+        console.error(`[Trial Status] ❌ Generation failed (REST):`, statusData.error);
+        requestCache.delete(cacheKey);
         return NextResponse.json({ status: 'failed', error: statusData.error || 'La génération a échoué' });
       }
 

@@ -25,7 +25,6 @@ vi.mock('@/src/application/mappers/GenerationMapper', () => ({
         inputImageUrl: gen.inputImageUrl,
         outputImageUrl: gen.outputImageUrl,
         status: gen.status,
-        hdUnlocked: gen.hdUnlocked,
         createdAt: (gen.createdAt as Date)?.toISOString?.() || gen.createdAt,
         updatedAt: (gen.updatedAt as Date)?.toISOString?.() || gen.updatedAt,
       };
@@ -90,7 +89,6 @@ describe('POST /api/v2/generate', () => {
       inputImageUrl: 'https://storage.example.com/input.jpg',
       outputImageUrl: null,
       status: 'processing',
-      hdUnlocked: false,
       createdAt: new Date('2024-01-15T10:00:00Z'),
       updatedAt: new Date('2024-01-15T10:00:00Z'),
     };
@@ -162,7 +160,6 @@ describe('POST /api/v2/generate', () => {
           inputImageUrl: 'https://storage.example.com/input.jpg',
           outputImageUrl: null,
           status: 'processing',
-          hdUnlocked: false,
           createdAt: new Date(),
           updatedAt: new Date(),
         },

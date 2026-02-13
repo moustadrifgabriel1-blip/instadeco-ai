@@ -29,13 +29,13 @@ export function FinalCTA() {
           InstaDeco vous donne le même résultat en 30 secondes.
         </p>
         <Button size="lg" className="h-12 px-6 text-base sm:h-14 sm:px-10 sm:text-lg rounded-full bg-white text-[#E07B54] hover:bg-white/95 font-bold shadow-2xl hover:scale-105 transition-transform border-0" asChild>
-          <Link href="/essai">
-            J&apos;essaie maintenant
+          <Link href="/generate">
+            Relooker ma pièce gratuitement
             <ArrowRight className="ml-2 h-5 w-5" />
           </Link>
         </Button>
         <p className="mt-6 text-sm text-white/70">
-          ✨ 3 crédits offerts à l&apos;inscription • Pas de carte requise • Résultat garanti
+          ✨ 3 crédits offerts à l&apos;inscription • Pas de carte requise • Résultat en 30 secondes
         </p>
       </div>
     </section>

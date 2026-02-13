@@ -11,7 +11,6 @@ import {
   Clock, 
   Sparkles,
   ExternalLink,
-  Lock
 } from 'lucide-react';
 import { GenerationDTO } from '@/src/application/dtos/GenerationDTO';
 import { GenerationCardProps } from '@/src/presentation/types';
@@ -25,14 +24,12 @@ import { cn } from '@/lib/utils';
  * <GenerationCardV2 
  *   generation={generation} 
  *   onDownload={handleDownload}
- *   onUnlockHD={handleUnlockHD}
  * />
  * ```
  */
 export function GenerationCardV2({
   generation,
   onDownload,
-  onUnlockHD,
   showActions = true,
   className,
 }: GenerationCardProps) {
@@ -46,7 +43,6 @@ export function GenerationCardV2({
     outputImageUrl, 
     styleSlug, 
     roomType,
-    hdUnlocked,
     createdAt,
   } = generation;
 
@@ -224,26 +220,6 @@ export function GenerationCardV2({
               )}
               <span className="ml-2">Télécharger</span>
             </Button>
-
-            {!hdUnlocked && onUnlockHD && (
-              <Button
-                size="sm"
-                variant="default"
-                onClick={() => onUnlockHD(generation)}
-                className="h-10 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
-              >
-                <Sparkles className="h-4 w-4 mr-2" />
-                HD
-              </Button>
-            )}
-          </div>
-        )}
-
-        {/* Badge HD */}
-        {hdUnlocked && (
-          <div className="absolute top-2 right-2 px-2 py-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-xs font-medium rounded-full flex items-center gap-1">
-            <Sparkles className="h-3 w-3" />
-            HD
           </div>
         )}
       </div>
@@ -276,30 +252,8 @@ export function GenerationCardV2({
               ) : (
                 <Download className="h-3 w-3 mr-1" />
               )}
-              SD
+              Télécharger
             </Button>
-
-            {!hdUnlocked ? (
-              <Button
-                size="sm"
-                onClick={() => onUnlockHD?.(generation)}
-                disabled={!onUnlockHD}
-                className="flex-1 h-8 text-xs bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
-              >
-                <Lock className="h-3 w-3 mr-1" />
-                HD - 4,99€
-              </Button>
-            ) : (
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={downloadImage}
-                className="flex-1 h-8 text-xs border-purple-300 text-purple-600"
-              >
-                <Sparkles className="h-3 w-3 mr-1" />
-                HD
-              </Button>
-            )}
           </div>
         )}
       </CardContent>

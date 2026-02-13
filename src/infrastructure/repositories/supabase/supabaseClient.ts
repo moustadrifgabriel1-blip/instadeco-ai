@@ -90,7 +90,6 @@ export interface GenerationRow {
   output_image_url: string | null;
   status: string;
   custom_prompt: string | null;
-  hd_unlocked: boolean;
   stripe_session_id: string | null;
   created_at: string;
   updated_at: string;

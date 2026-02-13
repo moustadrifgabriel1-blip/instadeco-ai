@@ -110,29 +110,6 @@ export class ProcessStripeWebhookUseCase {
         action: 'credits_added',
       });
 
-    } else if (type === 'hd_unlock') {
-      // Déblocage HD
-      const generationId = metadata.generationId;
-
-      const updateResult = await this.generationRepo.update(generationId, {
-        hdUnlocked: true,
-        stripeSessionId: event.sessionId,
-      });
-
-      if (!updateResult.success) {
-        this.logger.error('Failed to unlock HD from webhook', updateResult.error as Error);
-        return failure(new PaymentError('Échec du déblocage HD'));
-      }
-
-      this.logger.info('HD unlocked from webhook', {
-        generationId,
-      });
-
-      return success({
-        processed: true,
-        eventType: event.type,
-        action: 'hd_unlocked',
-      });
     }
 
     return success({

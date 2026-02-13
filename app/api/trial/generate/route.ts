@@ -209,6 +209,11 @@ export async function POST(req: Request) {
       } as any,
     });
 
+    if (!request_id) {
+      console.error('[Trial] ❌ Fal.ai returned no request_id');
+      return NextResponse.json({ error: 'Erreur fal.ai: pas de request_id' }, { status: 500 });
+    }
+
     console.log('[Trial] ✅ Job submitted:', request_id);
 
     // Couche 2 : Enregistrer l'essai dans Supabase (persistant entre redéploiements)

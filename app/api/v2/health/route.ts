@@ -26,7 +26,6 @@ export async function GET(req: Request) {
     'STRIPE_PRICE_STARTER',
     'STRIPE_PRICE_PRO',
     'STRIPE_PRICE_UNLIMITED',
-    'STRIPE_PRICE_HD_UNLOCK',
   ];
 
   for (const key of envVars) {

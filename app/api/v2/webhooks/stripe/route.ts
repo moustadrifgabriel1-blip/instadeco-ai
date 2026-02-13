@@ -72,7 +72,7 @@ export async function POST(req: Request) {
     // Log le succès du paiement si c'était un checkout
     if (eventType === 'checkout.session.completed' && processed) {
       await logAuditEvent({
-        eventType: action?.includes('hd') ? 'hd_unlock' : 'payment_success',
+        eventType: 'payment_success',
         eventStatus: 'success',
         metadata: { eventType, action },
       });

@@ -67,7 +67,7 @@ const SUBSCRIPTION_PLANS = [
     pricePerCredit: { monthly: 0.63, annual: 0.50 },
     features: [
       '30 crédits / mois',
-      '12 styles de déco',
+      '20+ styles de déco',
       'Téléchargement illimité',
       'Usage commercial inclus',
       'Support par email',
@@ -87,7 +87,7 @@ const SUBSCRIPTION_PLANS = [
     pricePerCredit: { monthly: 0.49, annual: 0.39 },
     features: [
       '80 crédits / mois',
-      '12 styles de déco',
+      '20+ styles de déco',
       'HD+ inclus (2048px)',
       'Usage commercial inclus',
       'Support prioritaire',
@@ -108,7 +108,7 @@ const SUBSCRIPTION_PLANS = [
     pricePerCredit: { monthly: 0.40, annual: 0.32 },
     features: [
       '200 crédits / mois',
-      '12 styles de déco',
+      '20+ styles de déco',
       'HD+ inclus (2048px)',
       'Usage commercial illimité',
       'Support dédié',
@@ -384,7 +384,7 @@ function PricingPage() {
         {/* Social proof — faits vérifiables uniquement */}
         <div className="flex flex-wrap justify-center gap-8 sm:gap-12 mt-6">
           <div className="text-center">
-            <div className="text-2xl sm:text-3xl font-bold text-[#2D2D2D]">12</div>
+            <div className="text-2xl sm:text-3xl font-bold text-[#2D2D2D]">20+</div>
             <div className="text-sm text-[#6B6B6B]">styles de déco</div>
           </div>
           <div className="text-center">

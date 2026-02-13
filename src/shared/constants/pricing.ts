@@ -40,17 +40,7 @@ export const CREDIT_PRICES = {
  */
 export const CREDIT_COSTS = {
   GENERATION: 1,           // 1 crédit par génération
-  HD_UNLOCK: 0,            // Gratuit (paiement séparé)
   PREMIUM_STYLE: 2,        // 2 crédits pour styles premium
-} as const;
-
-/**
- * Prix HD Unlock (paiement unique)
- */
-export const HD_UNLOCK_PRICE = {
-  amount: 499, // 4.99€
-  priceDisplay: '4,99 €',
-  stripePriceId: process.env.STRIPE_PRICE_HD_UNLOCK,
 } as const;
 
 /**

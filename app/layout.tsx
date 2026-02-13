@@ -4,9 +4,11 @@ import { Inter, Playfair_Display } from 'next/font/google';
 import { Header, Footer } from '@/components/layout';
 import { CookieBanner } from '@/components/features/cookie-banner';
 import { GoogleAnalytics } from '@/components/features/google-analytics';
+import { AdTracker } from '@/components/features/ad-tracker';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { generateOrganizationSchema, generateWebSiteSchema, generateSoftwareAppSchema } from '@/lib/seo/schemas';
 import { SEO_CONFIG } from '@/lib/seo/config';
+import { FB_PIXEL_ID, getFBPixelScript } from '@/lib/analytics/fb-pixel';
 
 const inter = Inter({ 
   subsets: ['latin'], 
@@ -163,6 +165,16 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         {/* RSS Feed pour le blog */}
         <link rel="alternate" type="application/rss+xml" title="InstaDeco AI Blog" href={`${BASE_URL}/api/rss`} />
+        {/* Facebook Pixel */}
+        {FB_PIXEL_ID && (
+          <script dangerouslySetInnerHTML={{ __html: getFBPixelScript() }} />
+        )}
+        {FB_PIXEL_ID && (
+          <noscript>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img height="1" width="1" style={{ display: 'none' }} src={`https://www.facebook.com/tr?id=${FB_PIXEL_ID}&ev=PageView&noscript=1`} alt="" />
+          </noscript>
+        )}
         {/* JSON-LD Schemas globaux */}
         <JsonLd data={[
           generateOrganizationSchema(),
@@ -183,6 +195,7 @@ export default function RootLayout({
           <Footer />
           <CookieBanner />
           <GoogleAnalytics />
+          <AdTracker />
         </div>
       </body>
     </html>

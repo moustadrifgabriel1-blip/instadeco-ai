@@ -147,6 +147,8 @@ export default function EssaiPage() {
       const imageBase64 = await fileToBase64(imageFile);
       const fingerprint = getFingerprint();
 
+      console.log(`[Trial] 🚀 Starting generation: style=${selectedStyle}, room=${selectedRoom}, fingerprint=${fingerprint.substring(0, 8)}...`);
+
       // Appeler l'API trial
       const response = await fetch('/api/trial/generate', {
         method: 'POST',
@@ -160,8 +162,10 @@ export default function EssaiPage() {
       });
 
       const data = await response.json();
+      console.log(`[Trial] 📡 Generate API response:`, data);
 
       if (!response.ok) {
+        console.error(`[Trial] ❌ Generate API error: ${response.status}`, data);
         if (data.code === 'TRIAL_USED') {
           localStorage.setItem('instadeco_trial_used', 'true');
           setStep('trial-used');
@@ -171,6 +175,13 @@ export default function EssaiPage() {
       }
 
       const { requestId } = data;
+      
+      if (!requestId) {
+        console.error(`[Trial] ❌ No requestId in response:`, data);
+        throw new Error('Pas de requestId retourné par le serveur');
+      }
+
+      console.log(`[Trial] ✅ Job submitted with requestId: ${requestId}`);
 
       // Animer la progression
       const progressInterval = setInterval(() => {
@@ -191,22 +202,31 @@ export default function EssaiPage() {
           if (!stopped) {
             stopped = true;
             clearInterval(progressInterval);
-            setError('La génération a expiré. Veuillez réessayer.');
+            console.error(`[Trial] ⏰ Polling timeout after ${pollCount} attempts (~${Math.floor(pollCount * 3 / 60)}min)`);
+            setError('La génération a pris trop de temps. Veuillez réessayer avec une autre photo.');
             setStep('options');
           }
           return;
         }
 
         try {
+          console.log(`[Trial] 🔄 Polling attempt ${pollCount + 1}/${MAX_POLLS} for requestId=${requestId}`);
           const statusRes = await fetch(`/api/trial/status?requestId=${requestId}`);
           if (stopped) return;
           
+          if (!statusRes.ok) {
+            console.error(`[Trial] ❌ Status API error: ${statusRes.status} ${statusRes.statusText}`);
+            throw new Error(`Erreur serveur: ${statusRes.status}`);
+          }
+
           const statusData = await statusRes.json();
+          console.log(`[Trial] 📊 Status response:`, statusData);
 
           if (statusData.status === 'completed' && statusData.imageUrl) {
             stopped = true;
             clearInterval(progressInterval);
             setProgress(100);
+            console.log(`[Trial] ✅ Generation completed! Image: ${statusData.imageUrl.substring(0, 50)}...`);
             setGeneratedImage(statusData.imageUrl);
             localStorage.setItem('instadeco_trial_used', 'true');
             trackTrialComplete(selectedStyle, selectedRoom);
@@ -217,17 +237,20 @@ export default function EssaiPage() {
           if (statusData.status === 'failed') {
             stopped = true;
             clearInterval(progressInterval);
+            console.error(`[Trial] ❌ Generation failed:`, statusData.error);
             setError(statusData.error || 'La génération a échoué');
             setStep('options');
             return;
           }
 
           // Toujours en cours → re-poller après 3s
+          console.log(`[Trial] ⏳ Still processing... Next poll in 3s`);
           pollingRef.current = setTimeout(() => pollStatus(pollCount + 1), 3000);
         } catch (err: any) {
           if (stopped) return;
           stopped = true;
           clearInterval(progressInterval);
+          console.error(`[Trial] ❌ Polling error:`, err);
           setError(err.message || 'Erreur réseau. Veuillez réessayer.');
           setStep('options');
         }

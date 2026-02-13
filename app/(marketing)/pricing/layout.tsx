@@ -12,7 +12,7 @@ import { getCanonicalUrl } from '@/lib/seo/config';
 
 export const metadata: Metadata = {
   title: 'Tarifs & Crédits - Décoration IA sans Abonnement | InstaDeco AI',
-  description: 'Achetez des crédits sans abonnement pour transformer vos pièces par IA. À partir de 9,99€ pour 10 générations HD. Crédits sans expiration. Paiement sécurisé Stripe.',
+  description: 'Achetez des crédits sans abonnement pour transformer vos pièces par IA. À partir de 9,90€ pour 10 générations HD. Crédits sans expiration. Paiement sécurisé Stripe.',
   keywords: [
     'tarifs décoration IA',
     'prix home staging virtuel',
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     'décoration sans abonnement',
   ],
   openGraph: {
-    title: 'Tarifs InstaDeco AI - Décoration IA à partir de 9,99€',
+    title: 'Tarifs InstaDeco AI - Décoration IA à partir de 9,90€',
     description: 'Pas d\'abonnement, pas de surprise. Achetez des crédits et transformez vos pièces par IA quand vous voulez.',
     type: 'website',
     url: getCanonicalUrl('/pricing'),
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Tarifs InstaDeco AI - À partir de 9,99€',
+    title: 'Tarifs InstaDeco AI - À partir de 9,90€',
     description: 'Crédits sans abonnement pour décorer par IA. Paiement sécurisé.',
   },
   alternates: {
@@ -59,7 +59,7 @@ const pricingFAQ = [
   },
   {
     question: "Comment choisir le bon style pour ma pièce ?",
-    answer: "On propose 12 styles différents (Moderne, Scandinave, Japandi, Bohème...). Choisissez le style qui correspond à l'ambiance que vous voulez créer, et ajustez l'intensité de transformation selon vos goûts."
+    answer: "On propose plus de 20 styles différents (Moderne, Scandinave, Japandi, Bohème, Haussmannien, Chalet Alpin...). Choisissez le style qui correspond à l'ambiance que vous voulez créer, et ajustez l'intensité de transformation selon vos goûts."
   },
   {
     question: "Quels moyens de paiement acceptez-vous ?",
@@ -80,9 +80,9 @@ const pricingFAQ = [
 ];
 
 const pricingPlans = [
-  { name: 'Découverte', price: 9.99, credits: 10, description: 'Parfait pour tester' },
-  { name: 'Créatif', price: 19.99, credits: 25, description: 'Le plus choisi' },
-  { name: 'Pro', price: 34.99, credits: 50, description: 'Pour les passionnés' },
+  { name: 'Découverte', price: 9.90, credits: 10, description: 'Parfait pour tester' },
+  { name: 'Créatif', price: 19.90, credits: 25, description: 'Le plus populaire' },
+  { name: 'Pro', price: 34.90, credits: 50, description: 'Pour les passionnés' },
 ];
 
 export default function PricingLayout({

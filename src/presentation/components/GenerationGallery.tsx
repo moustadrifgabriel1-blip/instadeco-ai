@@ -30,10 +30,8 @@ export function GenerationGallery({
   emptyMessage = 'Aucune génération pour le moment',
   className,
   onDownload,
-  onUnlockHD,
 }: GenerationGalleryProps & {
   onDownload?: (generation: GenerationDTO) => void;
-  onUnlockHD?: (generation: GenerationDTO) => void;
 }) {
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
@@ -102,7 +100,6 @@ export function GenerationGallery({
             key={generation.id}
             generation={generation}
             onDownload={onDownload}
-            onUnlockHD={onUnlockHD}
           />
         ))}
       </div>

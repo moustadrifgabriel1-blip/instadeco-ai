@@ -17,7 +17,6 @@ export class GenerationMapper {
       inputImageUrl: entity.inputImageUrl,
       outputImageUrl: entity.outputImageUrl,
       status: entity.status,
-      hdUnlocked: entity.hdUnlocked,
       createdAt: entity.createdAt.toISOString(),
       updatedAt: entity.updatedAt.toISOString(),
     };
@@ -43,7 +42,6 @@ export class GenerationMapper {
       outputImageUrl: dto.outputImageUrl,
       status: dto.status as Generation['status'],
       prompt: null,
-      hdUnlocked: dto.hdUnlocked,
       stripeSessionId: null,
       createdAt: new Date(dto.createdAt),
       updatedAt: new Date(dto.updatedAt),

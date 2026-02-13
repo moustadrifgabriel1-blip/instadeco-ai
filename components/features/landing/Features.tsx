@@ -21,8 +21,8 @@ const features = [
   },
   {
     icon: Palette,
-    title: "12 Styles, 0 Limite",
-    description: "Scandinave, Japandi, Industriel, Bohème... Testez tous les styles en un clic. Chez un déco, c'est 3 propositions max."
+    title: "20+ Styles, 0 Limite",
+    description: "Scandinave, Japandi, Haussmannien, Chalet Alpin... Testez tous les styles en un clic. Chez un déco, c'est 3 propositions max."
   },
   {
     icon: MousePointerClick,

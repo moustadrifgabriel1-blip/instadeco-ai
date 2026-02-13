@@ -34,7 +34,6 @@ export class SupabaseGenerationRepository implements IGenerationRepository {
       outputImageUrl: outputImageUrl,
       status: row.status as Generation['status'],
       prompt: row.custom_prompt,
-      hdUnlocked: row.hd_unlocked,
       stripeSessionId: row.stripe_session_id,
       providerId: providerId,
       createdAt: new Date(row.created_at),
@@ -61,7 +60,6 @@ export class SupabaseGenerationRepository implements IGenerationRepository {
         input_image_url: input.inputImageUrl,
         custom_prompt: input.prompt,
         status: 'pending',
-        hd_unlocked: false,
         output_image_url: outputOverview,
       })
       .select()
@@ -114,7 +112,6 @@ export class SupabaseGenerationRepository implements IGenerationRepository {
 
     if (input.status !== undefined) updateData.status = input.status;
     if (input.outputImageUrl !== undefined) updateData.output_image_url = input.outputImageUrl;
-    if (input.hdUnlocked !== undefined) updateData.hd_unlocked = input.hdUnlocked;
     if (input.stripeSessionId !== undefined) updateData.stripe_session_id = input.stripeSessionId;
 
     // Hack: Stocker le providerId dans output_image_url si fourni et pas d'image finale

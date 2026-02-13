@@ -4,13 +4,13 @@ import { useCallback, useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useDropzone } from 'react-dropzone';
 import Image from 'next/image';
-import { Plus, X, ArrowRight, Download, Check, ChevronDown, Sparkles, Star, Shield, Zap } from 'lucide-react';
-import { ProtectedRoute } from '@/components/features/protected-route';
+import { Plus, X, ArrowRight, Download, Check, ChevronDown, Sparkles, Star, Shield, Zap, UserPlus, Eye, Users } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { useGenerate } from '@/src/presentation/hooks/useGenerate';
-import { useHDUnlock } from '@/src/presentation/hooks/useHDUnlock';
 import { useGenerationStatus } from '@/src/presentation/hooks/useGenerationStatus';
 import { STYLE_CATEGORIES_WITH_STYLES, ROOM_TYPES } from '@/src/shared/constants';
+import { fbTrackUploadPhoto, fbTrackStartGeneration } from '@/lib/analytics/fb-pixel';
+import { trackCTAClick } from '@/lib/analytics/gtag';
 
 const LOADING_MESSAGES = [
   { threshold: 0, text: 'Analyse de votre pièce...' },
@@ -45,25 +45,21 @@ const TRANSFORM_MODES = [
 ];
 
 export default function GeneratePageV2() {
-  return (
-    <ProtectedRoute>
-      <GenerateContent />
-    </ProtectedRoute>
-  );
+  return <GenerateContent />;
 }
 
 function GenerateContent() {
-  const { user, credits } = useAuth();
+  const { user, credits, loading } = useAuth();
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [selectedStyle, setSelectedStyle] = useState('moderne');
   const [selectedRoomType, setSelectedRoomType] = useState('salon');
   const [selectedMode, setSelectedMode] = useState('full_redesign');
   const [generationId, setGenerationId] = useState<string | null>(null);
+  const [showAuthPrompt, setShowAuthPrompt] = useState(false);
 
   // Hooks de la couche Presentation
   const { generate, state: generateState, reset: resetGenerate } = useGenerate();
-  const { unlock, isLoading: isUnlocking, error: hdError } = useHDUnlock();
   
   // Polling du statut de génération
   const { 
@@ -105,7 +101,7 @@ function GenerateContent() {
   }, [generateState.isLoading, generateState.progress, generationId, isComplete, isFailed]);
 
   const generatedImage = statusGeneration?.outputImageUrl || null;
-  const error = generateState.error || hdError || (isFailed ? 'La génération a échoué' : null);
+  const error = generateState.error || (isFailed ? 'La génération a échoué' : null);
 
   // Quand la génération démarre, stocker l'ID pour le polling
   useEffect(() => {
@@ -122,6 +118,10 @@ function GenerateContent() {
       setImagePreview(URL.createObjectURL(file));
       resetGenerate();
       setGenerationId(null);
+      setShowAuthPrompt(false);
+      // Track l'upload (engagement fort pour le Pixel FB)
+      fbTrackUploadPhoto();
+      trackCTAClick('upload_photo', '/generate');
     }
   }, [resetGenerate]);
 
@@ -142,7 +142,24 @@ function GenerateContent() {
   };
 
   const handleGenerate = async () => {
-    if (!imageFile || !user) return;
+    if (!imageFile) return;
+    
+    // Si l'utilisateur n'est pas connecté, afficher le prompt d'inscription
+    if (!user) {
+      setShowAuthPrompt(true);
+      // Sauvegarder les choix dans sessionStorage pour après le login
+      sessionStorage.setItem('instadeco_pending_generate', JSON.stringify({
+        style: selectedStyle,
+        roomType: selectedRoomType,
+        mode: selectedMode,
+      }));
+      return;
+    }
+    
+    setShowAuthPrompt(false);
+    
+    // Track la génération pour FB Pixel
+    fbTrackStartGeneration(selectedStyle, selectedRoomType);
     
     // Utiliser le hook generate
     await generate({
@@ -153,117 +170,10 @@ function GenerateContent() {
     });
   };
 
-  // Fonction pour ajouter le filigrane sur l'image - TRÈS VISIBLE pour encourager l'achat HD
-  const addWatermarkToImage = async (imageUrl: string): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const img = document.createElement('img');
-      img.crossOrigin = 'anonymous';
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        
-        if (!ctx) {
-          reject(new Error('Canvas context not available'));
-          return;
-        }
-        
-        canvas.width = img.width;
-        canvas.height = img.height;
-        ctx.drawImage(img, 0, 0);
-        
-        const centerX = img.width / 2;
-        const centerY = img.height / 2;
-        
-        // Bande semi-transparente en diagonale
-        ctx.save();
-        ctx.translate(centerX, centerY);
-        ctx.rotate(-25 * Math.PI / 180);
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
-        ctx.fillRect(-img.width, -60, img.width * 2, 120);
-        ctx.restore();
-        
-        // Filigrane principal - GROS et VISIBLE
-        const mainText = 'InstaDeco AI';
-        const mainFontSize = Math.max(img.width / 5, 100);
-        ctx.font = `900 ${mainFontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        
-        ctx.save();
-        ctx.translate(centerX, centerY);
-        ctx.rotate(-25 * Math.PI / 180);
-        
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-        ctx.shadowBlur = 8;
-        ctx.shadowOffsetX = 3;
-        ctx.shadowOffsetY = 3;
-        
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
-        ctx.fillText(mainText, 0, 0);
-        ctx.restore();
-        
-        // Filigranes répétés - haut gauche
-        const subFontSize = Math.max(img.width / 12, 40);
-        ctx.font = `bold ${subFontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-        
-        ctx.save();
-        ctx.translate(img.width * 0.2, img.height * 0.15);
-        ctx.rotate(-25 * Math.PI / 180);
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
-        ctx.shadowBlur = 4;
-        ctx.fillText('InstaDeco AI', 0, 0);
-        ctx.restore();
-        
-        // Filigranes répétés - bas droite
-        ctx.save();
-        ctx.translate(img.width * 0.8, img.height * 0.85);
-        ctx.rotate(-25 * Math.PI / 180);
-        ctx.fillText('InstaDeco AI', 0, 0);
-        ctx.restore();
-        
-        // Badge CTA en bas
-        const ctaFontSize = Math.max(img.width / 20, 24);
-        const badgeWidth = 340;
-        const badgeHeight = 42;
-        const badgeX = centerX - badgeWidth / 2;
-        const badgeY = img.height - 52;
-        
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
-        ctx.shadowBlur = 6;
-        ctx.fillStyle = 'rgba(224, 123, 84, 0.9)';
-        ctx.beginPath();
-        ctx.roundRect(badgeX, badgeY, badgeWidth, badgeHeight, 21);
-        ctx.fill();
-        
-        ctx.shadowBlur = 0;
-        ctx.font = `bold ${ctaFontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
-        ctx.fillStyle = 'white';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('🔓 Débloquer en HD sans filigrane', centerX, badgeY + badgeHeight / 2);
-        
-        canvas.toBlob((blob) => {
-          if (blob) {
-            resolve(URL.createObjectURL(blob));
-          } else {
-            reject(new Error('Failed to create blob'));
-          }
-        }, 'image/jpeg', 0.92);
-      };
-      
-      img.onerror = () => {
-        reject(new Error('Failed to load image'));
-      };
-      
-      img.src = imageUrl;
-    });
-  };
-
   const handleDownload = async () => {
     if (!generatedImage) return;
     
-    // SÉCURITÉ: Priorité à l'API serveur si on a un generationId
+    // Téléchargement via API serveur
     if (generationId) {
       try {
         const downloadUrl = `/api/v2/download?id=${generationId}`;
@@ -277,7 +187,7 @@ function GenerateContent() {
         const blobUrl = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = blobUrl;
-        link.download = 'instadeco-apercu.jpg';
+        link.download = `instadeco-${generationId}.jpg`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -285,44 +195,24 @@ function GenerateContent() {
         return;
       } catch (err) {
         console.error('Erreur téléchargement via API:', err);
-        // Continuer avec le watermark Canvas en fallback
       }
     }
     
-    // Fallback: Watermark côté client avec Canvas
+    // Fallback: téléchargement direct
     try {
-      const watermarkedUrl = await addWatermarkToImage(generatedImage);
+      const response = await fetch(generatedImage);
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
-      link.href = watermarkedUrl;
-      link.download = 'instadeco-apercu.jpg';
+      link.href = blobUrl;
+      link.download = 'instadeco-resultat.jpg';
+      document.body.appendChild(link);
       link.click();
-      setTimeout(() => URL.revokeObjectURL(watermarkedUrl), 1000);
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
     } catch (err) {
       console.error('Erreur lors du téléchargement:', err);
-      // SÉCURITÉ: Ne jamais télécharger sans filigrane
-      alert('Erreur lors du téléchargement. Veuillez réessayer depuis votre tableau de bord.');
-    }
-  };
-
-  const handleUnlock = async () => {
-    console.log('[HD Unlock] Click — generationId:', generationId);
-    if (!generationId) {
-      alert('Génération non trouvée. Veuillez réessayer.');
-      return;
-    }
-    
-    try {
-      const checkoutUrl = await unlock({ generationId });
-      console.log('[HD Unlock] checkoutUrl:', checkoutUrl);
-      if (checkoutUrl) {
-        window.location.href = checkoutUrl;
-      } else {
-        // Si pas de checkoutUrl mais pas d'erreur, l'image est peut-être déjà débloquée
-        console.warn('[HD Unlock] Pas de checkoutUrl retourné');
-      }
-    } catch (err) {
-      console.error('[HD Unlock] Erreur:', err);
-      alert('Erreur lors du déblocage HD. Veuillez réessayer.');
+      alert('Erreur lors du téléchargement. Veuillez réessayer.');
     }
   };
 
@@ -333,15 +223,43 @@ function GenerateContent() {
 
   return (
     <div className="min-h-screen bg-[#fbfbfd]">
+      {/* Bandeau de preuve sociale */}
+      <div className="bg-[#1d1d1f] text-white py-2 px-4 text-center">
+        <p className="text-[12px] sm:text-[13px] font-medium flex items-center justify-center gap-2 flex-wrap">
+          <Users className="w-3.5 h-3.5 text-[#E07B54]" />
+          <span>Déjà <strong>10 000+</strong> photos transformées</span>
+          <span className="hidden sm:inline text-white/40">•</span>
+          <span className="hidden sm:inline">Résultat en <strong>30 secondes</strong></span>
+          <span className="text-white/40">•</span>
+          <span className="flex items-center gap-0.5">
+            {[1,2,3,4,5].map(i => <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />)}
+          </span>
+        </p>
+      </div>
+
       {/* Hero */}
       <section className="pt-8 pb-8 px-4 sm:pt-12 sm:pb-12 sm:px-6">
         <div className="max-w-[680px] mx-auto text-center">
+          {!user && (
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#FFF3ED] text-[#E07B54] rounded-full text-[13px] font-medium mb-4">
+              <Sparkles className="w-4 h-4" />
+              Essayez maintenant — 3 crédits offerts à l&apos;inscription
+            </div>
+          )}
           <h1 className="text-[28px] sm:text-[40px] md:text-[48px] lg:text-[56px] font-semibold tracking-[-0.025em] text-[#1d1d1f] leading-[1.08]">
-            Réinventez votre intérieur.
+            Relookez votre pièce en 30 secondes.
           </h1>
           <p className="mt-3 text-[16px] sm:text-[18px] md:text-[21px] text-[#636366] font-normal leading-[1.4] tracking-[.011em]">
             Uploadez une photo. Choisissez un style. L&apos;IA fait le reste.
           </p>
+          {/* Mini galerie avant/après */}
+          <div className="mt-6 flex items-center justify-center gap-3 flex-wrap text-[12px] text-[#636366]">
+            <span className="flex items-center gap-1.5"><Eye className="w-3.5 h-3.5" /> 20+ styles de déco</span>
+            <span className="text-[#d2d2d7]">•</span>
+            <span className="flex items-center gap-1.5"><Zap className="w-3.5 h-3.5" /> Résultat en 30s</span>
+            <span className="text-[#d2d2d7]">•</span>
+            <span className="flex items-center gap-1.5"><Shield className="w-3.5 h-3.5" /> 100% privé</span>
+          </div>
         </div>
       </section>
 
@@ -513,19 +431,72 @@ function GenerateContent() {
               </div>
 
               {/* Generate Button */}
-              {!isGenerating && (
+              {!isGenerating && !showAuthPrompt && (
                 <div className="flex flex-col items-center pt-2 gap-3">
                   <button
                     onClick={handleGenerate}
-                    className="group inline-flex items-center gap-2 bg-[#0071e3] text-white px-7 py-3.5 rounded-full text-[17px] font-medium hover:bg-[#0077ed] transition-all duration-200 shadow-lg shadow-[#0071e3]/20"
+                    className="group inline-flex items-center gap-2 bg-[#E07B54] text-white px-8 py-4 rounded-full text-[17px] font-semibold hover:bg-[#d06a45] transition-all duration-200 shadow-lg shadow-[#E07B54]/20 active:scale-95"
                   >
                     <Sparkles className="w-5 h-5" />
                     Transformer ma pièce
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" strokeWidth={2} />
                   </button>
-                  <span className="text-[12px] text-[#636366]">
-                    1 crédit sera utilisé • {credits} crédit{(credits ?? 0) > 1 ? 's' : ''} disponible{(credits ?? 0) > 1 ? 's' : ''}
-                  </span>
+                  {user ? (
+                    <span className="text-[12px] text-[#636366]">
+                      1 crédit sera utilisé • {credits} crédit{(credits ?? 0) > 1 ? 's' : ''} disponible{(credits ?? 0) > 1 ? 's' : ''}
+                    </span>
+                  ) : (
+                    <span className="text-[12px] text-[#636366]">
+                      Gratuit — 3 crédits offerts à l&apos;inscription
+                    </span>
+                  )}
+                </div>
+              )}
+
+              {/* Auth Prompt — affiché quand un visiteur clique sur Transformer */}
+              {showAuthPrompt && !isGenerating && (
+                <div className="max-w-lg mx-auto">
+                  <div className="bg-gradient-to-br from-[#FFF8F5] to-[#FFF0E8] rounded-[24px] border border-[#F0E6E0] p-6 sm:p-8 text-center shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-[#E07B54]/10 flex items-center justify-center">
+                      <Sparkles className="w-7 h-7 text-[#E07B54]" />
+                    </div>
+                    <h3 className="text-[22px] font-bold text-[#1d1d1f] tracking-[-0.02em]">
+                      Votre transformation est prête !
+                    </h3>
+                    <p className="mt-2 text-[15px] text-[#636366] max-w-sm mx-auto">
+                      Créez un compte gratuit pour lancer la génération et recevoir <span className="font-bold text-[#E07B54]">3 crédits offerts</span>.
+                    </p>
+
+                    <div className="mt-6 flex flex-col gap-3">
+                      <Link
+                        href="/signup?redirect=/generate"
+                        className="group inline-flex items-center justify-center gap-2 bg-[#E07B54] text-white px-7 py-3.5 rounded-full text-[16px] font-semibold hover:bg-[#d06a45] transition-all shadow-lg shadow-[#E07B54]/20 active:scale-95"
+                      >
+                        <UserPlus className="w-5 h-5" />
+                        Créer mon compte — c&apos;est gratuit
+                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                      </Link>
+                      <Link
+                        href="/login?redirect=/generate"
+                        className="text-[14px] text-[#636366] hover:text-[#1d1d1f] transition-colors"
+                      >
+                        Déjà inscrit ? Se connecter
+                      </Link>
+                    </div>
+
+                    <div className="mt-5 flex flex-wrap items-center justify-center gap-3 text-[12px] text-[#636366]">
+                      <span className="flex items-center gap-1"><Check className="w-3.5 h-3.5 text-green-500" /> 3 crédits offerts</span>
+                      <span className="flex items-center gap-1"><Check className="w-3.5 h-3.5 text-green-500" /> Sans engagement</span>
+                      <span className="flex items-center gap-1"><Check className="w-3.5 h-3.5 text-green-500" /> Résultat en 30s</span>
+                    </div>
+
+                    <button
+                      onClick={() => setShowAuthPrompt(false)}
+                      className="mt-4 text-[12px] text-[#aaa] hover:text-[#636366] transition-colors"
+                    >
+                      ← Modifier mes options
+                    </button>
+                  </div>
                 </div>
               )}
 
@@ -610,54 +581,19 @@ function GenerateContent() {
                       className="w-full h-auto"
                       sizes="(max-width: 768px) 100vw, 50vw"
                     />
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                      <span 
-                        className="text-white/40 text-[32px] md:text-[48px] font-bold tracking-[.08em] rotate-[-15deg]"
-                        style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.2)' }}
-                      >
-                        InstaDeco
-                      </span>
-                    </div>
-                    <div className="absolute bottom-2 right-3 pointer-events-none">
-                      <span className="text-white/50 text-[9px] md:text-[10px]" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.4)' }}>
-                        Généré par IA
-                      </span>
-                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Actions - HD Upsell optimized */}
+              {/* Actions */}
               <div className="max-w-lg mx-auto">
-                {/* Primary: HD Unlock CTA */}
-                <div className="bg-gradient-to-br from-[#1d1d1f] to-[#2d2d2f] rounded-2xl p-6 text-center mb-4">
-                  <div className="flex items-center justify-center gap-2 mb-2">
-                    <Sparkles className="w-5 h-5 text-amber-400" />
-                    <span className="text-white font-semibold text-[17px]">Débloquer la version HD</span>
-                  </div>
-                  <div className="flex items-center justify-center gap-2 sm:gap-4 flex-wrap mb-4 text-[12px] sm:text-[13px] text-white/70">
-                    <span className="flex items-center gap-1"><Check className="w-3.5 h-3.5 text-[#4CAF50]" /> Sans filigrane</span>
-                    <span className="flex items-center gap-1"><Check className="w-3.5 h-3.5 text-[#4CAF50]" /> Résolution 4K</span>
-                    <span className="flex items-center gap-1"><Check className="w-3.5 h-3.5 text-[#4CAF50]" /> Usage commercial</span>
-                  </div>
-                  <button
-                    onClick={handleUnlock}
-                    disabled={isUnlocking}
-                    className="w-full inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full text-[15px] font-semibold text-[#1d1d1f] bg-gradient-to-r from-amber-300 to-amber-400 hover:from-amber-400 hover:to-amber-500 transition-all disabled:opacity-50 shadow-lg shadow-amber-400/20 active:scale-95"
-                  >
-                    {isUnlocking ? 'Chargement...' : 'Obtenir en HD — 4,99 €'}
-                  </button>
-                  <p className="text-[11px] text-white/40 mt-2">Paiement unique • Téléchargement immédiat</p>
-                </div>
-
-                {/* Secondary: Free download */}
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                   <button
                     onClick={handleDownload}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-[13px] font-medium text-[#636366] bg-[#f5f5f7] hover:bg-[#e8e8ed] transition-colors"
+                    className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full text-[15px] font-semibold text-white bg-[#E07B54] hover:bg-[#d06a45] transition-all shadow-lg shadow-[#E07B54]/20 active:scale-95"
                   >
-                    <Download className="w-3.5 h-3.5" strokeWidth={2} />
-                    Télécharger l&apos;aperçu (avec filigrane)
+                    <Download className="w-4 h-4" strokeWidth={2} />
+                    Télécharger l&apos;image
                   </button>
                   <button
                     onClick={removeImage}

@@ -47,8 +47,8 @@ export function Header() {
     return pathname.startsWith(href);
   };
 
-  // Masquer le header global sur /essai (cette page a sa propre nav simplifiée)
-  if (pathname === '/essai') {
+  // Masquer le header global sur /essai et /dashboard (ces pages ont leur propre nav)
+  if (pathname === '/essai' || pathname.startsWith('/dashboard') || pathname.startsWith('/credits')) {
     return null;
   }
 

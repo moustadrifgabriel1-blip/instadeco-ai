@@ -129,6 +129,10 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  /* Évite la coupure des lettres italiques qui dépassent */
+  padding-inline: 0.125rem;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
 }
 
 /* Fond gradient hero */

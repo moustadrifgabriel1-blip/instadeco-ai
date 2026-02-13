@@ -30,20 +30,44 @@ export function FlashOffer({
   onExpire,
   className = '',
 }: FlashOfferProps) {
-  const [timeLeft, setTimeLeft] = useState(durationMinutes * 60);
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [isExpired, setIsExpired] = useState(false);
   const [isPulsing, setIsPulsing] = useState(false);
 
+  // Persist timer in localStorage so it survives page refresh
   useEffect(() => {
-    if (timeLeft <= 0) {
+    const STORAGE_KEY = 'instadeco_flash_offer_end';
+    const stored = localStorage.getItem(STORAGE_KEY);
+    let endTime: number;
+
+    if (stored) {
+      endTime = parseInt(stored, 10);
+    } else {
+      endTime = Date.now() + durationMinutes * 60 * 1000;
+      localStorage.setItem(STORAGE_KEY, endTime.toString());
+    }
+
+    const remaining = Math.max(0, Math.floor((endTime - Date.now()) / 1000));
+    if (remaining <= 0) {
       setIsExpired(true);
       onExpire?.();
+    } else {
+      setTimeLeft(remaining);
+    }
+  }, [durationMinutes, onExpire]);
+
+  useEffect(() => {
+    if (timeLeft === null || timeLeft <= 0) {
+      if (timeLeft === 0) {
+        setIsExpired(true);
+        onExpire?.();
+      }
       return;
     }
 
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
-        if (prev <= 1) {
+        if (prev === null || prev <= 1) {
           setIsExpired(true);
           onExpire?.();
           return 0;
@@ -57,7 +81,7 @@ export function FlashOffer({
 
   // Effet pulsant quand le temps est bas
   useEffect(() => {
-    if (timeLeft <= 120 && timeLeft > 0) {
+    if (timeLeft !== null && timeLeft <= 120 && timeLeft > 0) {
       setIsPulsing(true);
     }
   }, [timeLeft]);
@@ -69,9 +93,9 @@ export function FlashOffer({
   }, []);
 
   // Calculer le pourcentage de temps restant pour la barre de progression
-  const percentage = (timeLeft / (durationMinutes * 60)) * 100;
+  const percentage = timeLeft !== null ? (timeLeft / (durationMinutes * 60)) * 100 : 100;
 
-  if (isExpired) {
+  if (isExpired || timeLeft === null) {
     return null;
   }
 

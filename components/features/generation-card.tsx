@@ -15,7 +15,6 @@ interface GenerationCardProps {
   status: 'pending' | 'processing' | 'completed' | 'failed';
   createdAt: string;
   errorMessage?: string;
-  hdUnlocked?: boolean;
   children?: React.ReactNode;
 }
 
@@ -28,12 +27,11 @@ export function GenerationCard({
   status,
   createdAt,
   errorMessage,
-  hdUnlocked = false,
   children
 }: GenerationCardProps) {
   const handleDownload = async () => {
     try {
-      // SÉCURITÉ: Toujours passer par l'API qui gère le filigrane
+      // Téléchargement via l'API
       const downloadUrl = `/api/v2/download?id=${id}`;
       const response = await fetch(downloadUrl);
       
@@ -46,7 +44,7 @@ export function GenerationCard({
       const blobUrl = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = blobUrl;
-      link.download = hdUnlocked ? `instadeco-hd-${id}.jpg` : `instadeco-${id}.jpg`;
+      link.download = `instadeco-${id}.jpg`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

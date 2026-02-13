@@ -30,7 +30,6 @@ export default function robots(): MetadataRoute.Robots {
           '/login',          // Page login (pas de valeur SEO)
           '/signup',         // Page signup (pas de valeur SEO)
           '/credits/',       // Pages post-paiement
-          '/hd-success/',    // Page succès HD
           '/_next/',         // Next.js internals
         ],
       },

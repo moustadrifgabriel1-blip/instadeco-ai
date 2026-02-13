@@ -197,29 +197,6 @@ export interface UsePurchaseCreditsReturn {
 }
 
 // ========================
-// HD UNLOCK TYPES
-// ========================
-
-/**
- * Input pour débloquer HD
- */
-export interface UnlockHDInput {
-  generationId: string;
-  successUrl?: string;
-  cancelUrl?: string;
-}
-
-/**
- * Hook useHDUnlock return type
- */
-export interface UseHDUnlockReturn {
-  unlock: (input: UnlockHDInput) => Promise<string | null>; // Returns checkout URL
-  confirm: (sessionId: string, generationId: string) => Promise<boolean>;
-  isLoading: boolean;
-  error: string | null;
-}
-
-// ========================
 // COMPONENT PROPS
 // ========================
 
@@ -229,7 +206,6 @@ export interface UseHDUnlockReturn {
 export interface GenerationCardProps {
   generation: GenerationDTO;
   onDownload?: (generation: GenerationDTO) => void;
-  onUnlockHD?: (generation: GenerationDTO) => void;
   showActions?: boolean;
   className?: string;
 }

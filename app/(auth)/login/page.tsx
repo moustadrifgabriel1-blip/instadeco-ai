@@ -3,11 +3,14 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
+import { Suspense } from 'react';
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get('redirect') || '/generate';
   const supabase = createClient();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -34,7 +37,7 @@ export default function LoginPage() {
         return;
       }
 
-      router.push('/generate');
+      router.push(redirectTo);
     } catch (err: unknown) {
       setError('Une erreur est survenue');
     } finally {
@@ -50,7 +53,7 @@ export default function LoginPage() {
       const { error: signInError } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${window.location.origin}/auth/callback?redirect=${encodeURIComponent(redirectTo)}`,
         },
       });
 
@@ -162,12 +165,24 @@ export default function LoginPage() {
 
           <p className="mt-6 text-center text-[14px] text-[#636366]">
             Pas encore de compte ?{' '}
-            <Link href="/signup" className="text-[#0071e3] hover:underline">
+            <Link href={`/signup${redirectTo !== '/generate' ? `?redirect=${redirectTo}` : ''}`} className="text-[#0071e3] hover:underline">
               Créer un compte
             </Link>
           </p>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#fbfbfd] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-[#d2d2d7] border-t-[#1d1d1f] rounded-full animate-spin" />
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }

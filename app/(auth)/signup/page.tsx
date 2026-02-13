@@ -19,7 +19,8 @@ function SignupForm() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Pre-fill referral code from URL
+  // Pre-fill referral code from URL & get redirect
+  const redirectTo = searchParams.get('redirect') || '/generate';
   useEffect(() => {
     const ref = searchParams.get('ref');
     if (ref) setReferralCode(ref.toUpperCase());
@@ -29,6 +30,21 @@ function SignupForm() {
     e.preventDefault();
     setLoading(true);
     setError('');
+
+    // Validation mot de passe (même règles que le changement de mdp)
+    if (password.length < 8) {
+      setError('Le mot de passe doit contenir au moins 8 caractères');
+      setLoading(false);
+      return;
+    }
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    if (!hasUpperCase || !hasLowerCase || !hasNumber) {
+      setError('Le mot de passe doit contenir au moins 1 majuscule, 1 minuscule et 1 chiffre');
+      setLoading(false);
+      return;
+    }
 
     try {
       const { data, error: signUpError } = await supabase.auth.signUp({
@@ -70,7 +86,7 @@ function SignupForm() {
         }
       }
       
-      router.push('/generate');
+      router.push(redirectTo);
     } catch (err: unknown) {
       setError('Une erreur est survenue');
     } finally {
@@ -90,7 +106,7 @@ function SignupForm() {
       const { error: signInError } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${window.location.origin}/auth/callback?redirect=${encodeURIComponent(redirectTo)}`,
         },
       });
 
@@ -172,9 +188,9 @@ function SignupForm() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-3 rounded-[12px] border border-[#d2d2d7] text-[17px] focus:outline-none focus:border-[#0071e3] transition-colors"
-                placeholder="Minimum 6 caractères"
+                placeholder="Min. 8 caractères (majuscule + chiffre)"
                 required
-                minLength={6}
+                minLength={8}
               />
             </div>
 

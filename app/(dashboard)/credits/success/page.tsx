@@ -15,13 +15,25 @@ function PaymentSuccessContent() {
   const [credits, setCredits] = useState<number | null>(null);
 
   useEffect(() => {
-    // Simuler une vérification (le webhook gère déjà l'ajout de crédits)
-    const timer = setTimeout(() => {
-      setIsVerifying(false);
-      // Vous pouvez optionnellement appeler une API pour vérifier le statut
-    }, 2000);
+    // Vérifier le solde de crédits réel après le paiement
+    const fetchCredits = async () => {
+      try {
+        // Délai pour laisser le temps au webhook Stripe de traiter
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        const response = await fetch('/api/v2/credits');
+        if (response.ok) {
+          const data = await response.json();
+          setCredits(data.data?.credits || null);
+        }
+      } catch (error) {
+        console.error('Erreur lors de la récupération des crédits:', error);
+      } finally {
+        setIsVerifying(false);
+      }
+    };
 
-    return () => clearTimeout(timer);
+    fetchCredits();
   }, [sessionId]);
 
   if (isVerifying) {
@@ -61,6 +73,11 @@ function PaymentSuccessContent() {
             <p className="text-sm text-green-800 text-center">
               ✅ Transaction complétée avec succès
             </p>
+            {credits !== null && (
+              <p className="text-lg font-bold text-green-700 text-center mt-2">
+                Vous avez maintenant {credits} crédit{credits > 1 ? 's' : ''}
+              </p>
+            )}
             {sessionId && (
               <p className="text-xs text-green-600 text-center mt-2">
                 ID: {sessionId.slice(0, 20)}...

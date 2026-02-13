@@ -19,7 +19,6 @@ declare global {
       STRIPE_PRICE_STARTER: string;
       STRIPE_PRICE_PRO: string;
       STRIPE_PRICE_UNLIMITED: string;
-      STRIPE_PRICE_HD_UNLOCK: string;
       STRIPE_PRICE_10_CREDITS?: string;
       STRIPE_PRICE_25_CREDITS?: string;
       STRIPE_PRICE_50_CREDITS?: string;
@@ -48,6 +47,9 @@ declare global {
 
       // Google Analytics
       NEXT_PUBLIC_GA_MEASUREMENT_ID?: string;
+
+      // Facebook Pixel
+      NEXT_PUBLIC_FB_PIXEL_ID?: string;
 
       // Stripe Coupon (pour offres promotionnelles)
       STRIPE_COUPON_20_PERCENT?: string;

@@ -122,7 +122,7 @@ export async function POST(req: Request) {
     const stripe = new Stripe(secretKey, { apiVersion: '2023-10-16' });
 
     const origin = new URL(req.url).origin;
-    const defaultSuccessUrl = successUrl || `${origin}/dashboard?subscription=success`;
+    const defaultSuccessUrl = successUrl || `${origin}/credits/success?session_id={CHECKOUT_SESSION_ID}`;
     const defaultCancelUrl = cancelUrl || `${origin}/pricing?subscription=cancelled`;
 
     const session = await stripe.checkout.sessions.create({

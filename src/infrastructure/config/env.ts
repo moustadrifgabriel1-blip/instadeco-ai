@@ -28,7 +28,6 @@ const envSchema = z.object({
   STRIPE_PRICE_25_CREDITS: z.string().optional(),
   STRIPE_PRICE_50_CREDITS: z.string().optional(),
   STRIPE_PRICE_100_CREDITS: z.string().optional(),
-  STRIPE_PRICE_HD_UNLOCK: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

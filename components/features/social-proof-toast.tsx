@@ -13,16 +13,16 @@ interface SocialProofToastProps {
   maxNotifications?: number;
 }
 
-// Messages anonymes montrant l'activité du service (pas de faux noms/villes)
+// Messages montrant les capacités du service (pas de simulation d'activité utilisateur)
 const ACTIVITY_TEMPLATES = [
   (style: string, room: string) =>
-    `Nouvelle transformation : ${room.toLowerCase()} en style ${style}`,
+    `Découvrez : ${room.toLowerCase()} en style ${style}`,
   (style: string, room: string) =>
-    `Un utilisateur vient de transformer ${room === 'Entrée' || room === 'Terrasse' || room === 'Cuisine' || room === 'Salle de bain' || room === 'Salle à manger' ? 'sa' : 'son'} ${room.toLowerCase()} en ${style}`,
+    `Tendance : transformez ${room === 'Entrée' || room === 'Terrasse' || room === 'Cuisine' || room === 'Salle de bain' || room === 'Salle à manger' ? 'votre' : 'votre'} ${room.toLowerCase()} en ${style}`,
   (style: string) =>
-    `Le style ${style} est populaire aujourd'hui !`,
+    `Le style ${style} est populaire en ce moment`,
   (_style: string, room: string) =>
-    `${room} : nouvelle transformation réalisée`,
+    `Idée déco : ${room} à redécouvrir`,
 ];
 
 function getRandomItem<T>(arr: T[]): T {

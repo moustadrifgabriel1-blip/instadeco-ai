@@ -25,8 +25,6 @@ import { PurchaseCreditsUseCase } from '@/src/application/use-cases/credits/Purc
 import { AddCreditsUseCase } from '@/src/application/use-cases/credits/AddCreditsUseCase';
 import { GetUserCreditsUseCase } from '@/src/application/use-cases/credits/GetUserCreditsUseCase';
 import { GetCreditHistoryUseCase } from '@/src/application/use-cases/credits/GetCreditHistoryUseCase';
-import { UnlockHDUseCase } from '@/src/application/use-cases/hd-unlock/UnlockHDUseCase';
-import { ConfirmHDUnlockUseCase } from '@/src/application/use-cases/hd-unlock/ConfirmHDUnlockUseCase';
 import { ProcessStripeWebhookUseCase } from '@/src/application/use-cases/webhooks/ProcessStripeWebhookUseCase';
 
 // Types
@@ -172,22 +170,6 @@ class DIContainer {
     );
   }
 
-  get unlockHDUseCase(): UnlockHDUseCase {
-    return new UnlockHDUseCase(
-      this.generationRepository,
-      this.paymentService,
-      this.logger,
-    );
-  }
-
-  get confirmHDUnlockUseCase(): ConfirmHDUnlockUseCase {
-    return new ConfirmHDUnlockUseCase(
-      this.generationRepository,
-      this.paymentService,
-      this.logger,
-    );
-  }
-
   get processStripeWebhookUseCase(): ProcessStripeWebhookUseCase {
     return new ProcessStripeWebhookUseCase(
       this.creditRepository,
@@ -265,7 +247,5 @@ export const useCases = {
   get addCredits() { return container.addCreditsUseCase; },
   get getUserCredits() { return container.getUserCreditsUseCase; },
   get getCreditHistory() { return container.getCreditHistoryUseCase; },
-  get unlockHD() { return container.unlockHDUseCase; },
-  get confirmHDUnlock() { return container.confirmHDUnlockUseCase; },
   get processStripeWebhook() { return container.processStripeWebhookUseCase; },
 };

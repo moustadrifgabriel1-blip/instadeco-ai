@@ -44,7 +44,6 @@ import {
 } from 'lucide-react';
 import { useGenerations } from '@/src/presentation/hooks/useGenerations';
 import { useCredits } from '@/src/presentation/hooks/useCredits';
-import { useHDUnlock } from '@/src/presentation/hooks/useHDUnlock';
 import { STYLES, ROOM_TYPES } from '@/src/shared/constants/styles';
 
 // ============================================
@@ -63,7 +62,6 @@ export default function DashboardPageV2() {
   // Nouveaux hooks de la couche Presentation
   const { generations, state: generationsState, refetch: refetchGenerations } = useGenerations({ limit: 50 });
   const { credits, state: creditsState, refetch: refetchCredits } = useCredits();
-  const { unlock, isLoading: isUnlocking, error: hdError } = useHDUnlock();
   
   // State local
   const [filterStatus, setFilterStatus] = useState<FilterStatus>('all');
@@ -267,56 +265,11 @@ export default function DashboardPageV2() {
     return { score: 3, label: 'Fort', color: 'bg-green-500' };
   };
 
-  const handleUnlock = async (generationId: string) => {
-    try {
-      // Utiliser l'endpoint avec crédits au lieu de Stripe
-      const response = await fetch('/api/v2/hd-unlock/with-credit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ generationId }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        if (response.status === 402) {
-          // Pas assez de crédits - rediriger vers pricing
-          alert('Crédits insuffisants. Achetez des crédits pour débloquer la HD.');
-          router.push('/pricing');
-          return;
-        }
-        throw new Error(data.error || 'Erreur lors du déblocage HD');
-      }
-
-      if (data.success) {
-        // Rafraîchir les données
-        refetchGenerations();
-        refetchCredits();
-      }
-    } catch (error) {
-      console.error('Erreur unlock:', error);
-      alert(error instanceof Error ? error.message : 'Erreur lors du déblocage HD');
-    }
-  };
-
-  const handleDownload = async (generationId: string, outputUrl: string, isHD: boolean = false) => {
+  const handleDownload = async (generationId: string, outputUrl: string) => {
     if (!outputUrl) return;
-    
-    if (isHD) {
-      // Rediriger vers checkout HD
-      const checkoutUrl = await unlock({ generationId });
-      if (checkoutUrl) {
-        window.location.href = checkoutUrl;
-      }
-      return;
-    }
 
-    // Téléchargement standard avec filigrane via API serveur
-    // Utilise l'API qui applique le filigrane côté serveur (évite les problèmes CORS)
     try {
       const downloadUrl = `/api/v2/download?id=${generationId}`;
-      
-      // Faire un fetch pour vérifier que l'API répond correctement
       const response = await fetch(downloadUrl);
       
       if (!response.ok) {
@@ -324,7 +277,6 @@ export default function DashboardPageV2() {
         throw new Error(errorData.error || 'Erreur de téléchargement');
       }
       
-      // Télécharger le blob avec le filigrane
       const blob = await response.blob();
       const blobUrl = window.URL.createObjectURL(blob);
       
@@ -337,8 +289,7 @@ export default function DashboardPageV2() {
       window.URL.revokeObjectURL(blobUrl);
     } catch (error) {
       console.error('Erreur téléchargement:', error);
-      // SÉCURITÉ: Ne jamais permettre le téléchargement sans filigrane
-      alert('Erreur lors du téléchargement. Veuillez réessayer ou débloquer la version HD.');
+      alert('Erreur lors du téléchargement. Veuillez réessayer.');
     }
   };
 
@@ -527,33 +478,12 @@ export default function DashboardPageV2() {
                             <>
                               <div className="flex items-center gap-2">
                                 <Button
-                                  variant="ghost" 
                                   size="sm"
-                                  onClick={() => handleDownload(gen.id, gen.outputImageUrl!, false)}
+                                  onClick={() => handleDownload(gen.id, gen.outputImageUrl!)}
                                 >
                                   <Download className="w-4 h-4 mr-2" />
-                                  SD
+                                  Télécharger
                                 </Button>
-                                {!gen.hdUnlocked ? (
-                                  <Button
-                                    size="sm"
-                                    onClick={() => handleUnlock(gen.id)}
-                                    disabled={isUnlocking}
-                                  >
-                                    <Sparkles className="w-4 h-4 mr-2" />
-                                    HD (1 crédit)
-                                  </Button>
-                                ) : (
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    className="text-green-600 border-green-200 bg-green-50"
-                                    onClick={() => handleDownload(gen.id, gen.outputImageUrl!, false)}
-                                  >
-                                    <Check className="w-4 h-4 mr-2" />
-                                    HD
-                                  </Button>
-                                )}
                               </div>
                               <ShareButtons
                                 url="https://instadeco.app/galerie"
