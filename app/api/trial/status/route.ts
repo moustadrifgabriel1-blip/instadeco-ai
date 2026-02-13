@@ -20,48 +20,33 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: 'requestId manquant' }, { status: 400 });
   }
 
-  console.log(`[Trial Status] 📡 Checking status for: ${requestId}`);
+  const FAL_KEY = process.env.FAL_KEY || process.env.FAL_API_KEY;
+  if (!FAL_KEY) {
+    console.error('[Trial Status] ❌ FAL_KEY manquant');
+    return NextResponse.json({ status: 'failed', error: 'Configuration serveur manquante' }, { status: 200 });
+  }
 
   try {
-    const FAL_KEY = process.env.FAL_KEY || process.env.FAL_API_KEY;
-    if (!FAL_KEY) {
-      console.error('[Trial Status] ❌ FAL_KEY manquant dans les variables d\'environnement');
-      return NextResponse.json({ error: 'Configuration serveur manquante' }, { status: 500 });
-    }
-
-    // ── Méthode 1 : SDK fal.ai (plus fiable) ──
+    // ── Méthode 1 : SDK fal.ai ──
     try {
       fal.config({ credentials: FAL_KEY });
       const statusResult = await fal.queue.status(MODEL_PATH, {
         requestId,
-        logs: true,
+        logs: false,
       });
-
-      console.log(`[Trial Status] 📊 SDK status:`, JSON.stringify({
-        status: statusResult?.status,
-        requestId,
-      }));
 
       const sdkStatus = (statusResult?.status || '').toUpperCase();
 
       if (sdkStatus === 'COMPLETED') {
-        // Récupérer le résultat
-        console.log(`[Trial Status] ✅ Completed, fetching result...`);
         try {
           const result = await fal.queue.result(MODEL_PATH, { requestId }) as any;
           const imageUrl = result?.data?.images?.[0]?.url 
             || result?.images?.[0]?.url
             || result?.data?.image?.url;
-          
-          console.log(`[Trial Status] 🖼️ Image URL found: ${imageUrl ? 'YES' : 'NO'}`, 
-            imageUrl ? imageUrl.substring(0, 80) + '...' : 'null');
 
           if (imageUrl) {
             return NextResponse.json({ status: 'completed', imageUrl });
           }
-
-          // Fallback: essayer la méthode REST
-          console.warn(`[Trial Status] ⚠️ SDK result missing image, trying REST fallback...`);
         } catch (resultError: any) {
           console.error(`[Trial Status] ❌ SDK result fetch failed:`, resultError?.message);
         }
@@ -69,93 +54,75 @@ export async function GET(req: Request) {
 
       if (sdkStatus === 'FAILED') {
         const errorMsg = (statusResult as any)?.error || 'La génération a échoué';
-        console.error(`[Trial Status] ❌ Generation failed:`, errorMsg);
         return NextResponse.json({ status: 'failed', error: errorMsg });
       }
 
       if (['IN_PROGRESS', 'IN_QUEUE', 'QUEUED', 'PENDING'].includes(sdkStatus)) {
-        console.log(`[Trial Status] ⏳ Still processing: ${sdkStatus}`);
         return NextResponse.json({ status: 'processing' });
       }
     } catch (sdkError: any) {
-      console.warn(`[Trial Status] ⚠️ SDK method failed, falling back to REST:`, sdkError?.message);
+      console.warn(`[Trial Status] ⚠️ SDK failed, trying REST:`, sdkError?.message);
     }
 
     // ── Méthode 2 : REST API fallback ──
-    const statusUrl = `https://queue.fal.run/${MODEL_PATH}/requests/${requestId}/status`;
-    console.log(`[Trial Status] 🔄 REST fallback: ${statusUrl}`);
-    
-    const statusResponse = await fetch(statusUrl, {
-      headers: { 'Authorization': `Key ${FAL_KEY}` },
-    });
+    try {
+      const statusUrl = `https://queue.fal.run/${MODEL_PATH}/requests/${requestId}/status`;
+      const statusResponse = await fetch(statusUrl, {
+        headers: { 'Authorization': `Key ${FAL_KEY}` },
+        signal: AbortSignal.timeout(10000),
+      });
 
-    console.log(`[Trial Status] 📡 REST status response: ${statusResponse.status}`);
+      if (!statusResponse.ok) {
+        // Si fal.ai retourne une erreur, on retourne "processing" pour que le client
+        // continue de poller au lieu d'obtenir un 500 qui boucle
+        console.warn(`[Trial Status] ⚠️ REST status returned ${statusResponse.status}`);
+        return NextResponse.json({ status: 'processing' });
+      }
 
-    if (!statusResponse.ok) {
-      const errorText = await statusResponse.text().catch(() => 'unknown');
-      console.error(`[Trial Status] ❌ REST status failed: ${statusResponse.status} - ${errorText}`);
-      return NextResponse.json({ 
-        error: 'Impossible de vérifier le statut',
-        detail: `fal.ai returned ${statusResponse.status}`,
-      }, { status: 500 });
-    }
+      const statusData = await statusResponse.json();
+      const statusCode = (statusData?.status || 'UNKNOWN').toUpperCase();
 
-    const statusData = await statusResponse.json();
-    const statusCode = (statusData?.status || 'UNKNOWN').toUpperCase();
-    console.log(`[Trial Status] 📊 REST status: ${statusCode}`, JSON.stringify(statusData).substring(0, 200));
+      if (['COMPLETED', 'SUCCEEDED', 'OK'].includes(statusCode)) {
+        let imageUrl = statusData?.images?.[0]?.url || statusData?.response?.images?.[0]?.url;
 
-    // Terminé
-    if (['COMPLETED', 'SUCCEEDED', 'OK'].includes(statusCode)) {
-      let imageUrl = statusData?.images?.[0]?.url || statusData?.response?.images?.[0]?.url;
+        if (!imageUrl) {
+          const resultUrl = `https://queue.fal.run/${MODEL_PATH}/requests/${requestId}`;
+          const resultResponse = await fetch(resultUrl, {
+            headers: { 'Authorization': `Key ${FAL_KEY}` },
+            signal: AbortSignal.timeout(10000),
+          });
 
-      if (!imageUrl) {
-        console.log(`[Trial Status] 🔍 Image not in status response, fetching full result...`);
-        const resultUrl = `https://queue.fal.run/${MODEL_PATH}/requests/${requestId}`;
-        const resultResponse = await fetch(resultUrl, {
-          headers: { 'Authorization': `Key ${FAL_KEY}` },
-        });
-
-        console.log(`[Trial Status] 📡 REST result response: ${resultResponse.status}`);
-
-        if (resultResponse.ok) {
-          const resultData = await resultResponse.json();
-          imageUrl = resultData?.images?.[0]?.url || resultData?.image?.url;
-          console.log(`[Trial Status] 🖼️ REST result image: ${imageUrl ? imageUrl.substring(0, 80) + '...' : 'NOT FOUND'}`,
-            `Keys: ${Object.keys(resultData).join(', ')}`);
-        } else {
-          const errText = await resultResponse.text().catch(() => '');
-          console.error(`[Trial Status] ❌ REST result failed: ${resultResponse.status} - ${errText}`);
+          if (resultResponse.ok) {
+            const resultData = await resultResponse.json();
+            imageUrl = resultData?.images?.[0]?.url || resultData?.image?.url;
+          }
         }
+
+        if (imageUrl) {
+          return NextResponse.json({ status: 'completed', imageUrl });
+        }
+
+        return NextResponse.json({ status: 'failed', error: 'Image introuvable dans le résultat' });
       }
 
-      if (imageUrl) {
-        console.log(`[Trial Status] ✅ Returning completed with image`);
-        return NextResponse.json({ status: 'completed', imageUrl });
+      if (['IN_PROGRESS', 'IN_QUEUE', 'QUEUED', 'PENDING', 'RUNNING', 'STARTING'].includes(statusCode)) {
+        return NextResponse.json({ status: 'processing' });
       }
 
-      console.error(`[Trial Status] ❌ Completed but no image found in any response`);
-      return NextResponse.json({ error: 'Image introuvable dans le résultat' }, { status: 500 });
-    }
+      if (['FAILED', 'ERROR'].includes(statusCode)) {
+        return NextResponse.json({ status: 'failed', error: statusData.error || 'La génération a échoué' });
+      }
 
-    // En cours
-    if (['IN_PROGRESS', 'IN_QUEUE', 'QUEUED', 'PENDING', 'RUNNING', 'STARTING'].includes(statusCode)) {
+      // Statut inconnu → traiter comme en cours
+      return NextResponse.json({ status: 'processing' });
+    } catch (restError: any) {
+      console.warn(`[Trial Status] ⚠️ REST also failed:`, restError?.message);
+      // En cas d'erreur réseau, retourner "processing" pour que le client re-essaie
       return NextResponse.json({ status: 'processing' });
     }
-
-    // Échoué
-    if (['FAILED', 'ERROR'].includes(statusCode)) {
-      console.error(`[Trial Status] ❌ Failed:`, statusData.error || statusData);
-      return NextResponse.json({
-        status: 'failed',
-        error: statusData.error || 'La génération a échoué',
-      });
-    }
-
-    // Statut inconnu → traiter comme en cours
-    console.warn(`[Trial Status] ❓ Unknown status: ${statusCode}`, JSON.stringify(statusData).substring(0, 300));
-    return NextResponse.json({ status: 'processing' });
   } catch (error: any) {
-    console.error('[Trial Status] ❌ Unhandled error:', error?.message || error, error?.stack?.split('\n').slice(0, 3).join(' | '));
-    return NextResponse.json({ error: 'Erreur serveur', detail: error?.message }, { status: 500 });
+    console.error('[Trial Status] ❌ Unhandled error:', error?.message);
+    // JAMAIS retourner un 500 — retourner un statut "processing" pour éviter la boucle d'erreurs
+    return NextResponse.json({ status: 'processing' });
   }
 }

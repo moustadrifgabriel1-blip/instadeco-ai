@@ -65,7 +65,7 @@ export default function EssaiPage() {
   // Nettoyage du polling
   useEffect(() => {
     return () => {
-      if (pollingRef.current) clearInterval(pollingRef.current);
+      if (pollingRef.current) clearTimeout(pollingRef.current);
     };
   }, []);
 
@@ -182,63 +182,59 @@ export default function EssaiPage() {
         });
       }, 300);
 
-      // Polling du statut avec gestion des erreurs serveur
-      let errorCount = 0;
-      const MAX_ERRORS = 5;
-      const MAX_POLLS = 60; // ~3min max (60 * 3s)
-      let pollCount = 0;
+      // Polling séquentiel du statut (pas de setInterval pour éviter les requêtes qui se chevauchent)
+      let stopped = false;
+      const MAX_POLLS = 40; // ~2min max (40 * 3s)
 
-      pollingRef.current = setInterval(async () => {
-        pollCount++;
+      const pollStatus = async (pollCount: number) => {
+        if (stopped || pollCount >= MAX_POLLS) {
+          if (!stopped) {
+            stopped = true;
+            clearInterval(progressInterval);
+            setError('La génération a expiré. Veuillez réessayer.');
+            setStep('options');
+          }
+          return;
+        }
+
         try {
           const statusRes = await fetch(`/api/trial/status?requestId=${requestId}`);
+          if (stopped) return;
           
-          // Gérer les erreurs HTTP (500, 502, etc.)
-          if (!statusRes.ok) {
-            errorCount++;
-            console.warn(`[Trial] Status error ${statusRes.status} (${errorCount}/${MAX_ERRORS})`);
-            if (errorCount >= MAX_ERRORS) {
-              clearInterval(progressInterval);
-              if (pollingRef.current) clearInterval(pollingRef.current);
-              setError('La génération prend trop de temps. Veuillez réessayer.');
-              setStep('options');
-            }
-            return; // On continue le polling (retry)
-          }
-
-          // Reset le compteur d'erreurs quand ça marche
-          errorCount = 0;
           const statusData = await statusRes.json();
 
           if (statusData.status === 'completed' && statusData.imageUrl) {
+            stopped = true;
             clearInterval(progressInterval);
-            if (pollingRef.current) clearInterval(pollingRef.current);
             setProgress(100);
             setGeneratedImage(statusData.imageUrl);
             localStorage.setItem('instadeco_trial_used', 'true');
             trackTrialComplete(selectedStyle, selectedRoom);
-            // Show email gate before revealing result
             setTimeout(() => setStep('email-gate'), 500);
-          } else if (statusData.status === 'failed') {
-            clearInterval(progressInterval);
-            if (pollingRef.current) clearInterval(pollingRef.current);
-            throw new Error(statusData.error || 'La génération a échoué');
+            return;
           }
 
-          // Timeout global
-          if (pollCount >= MAX_POLLS) {
+          if (statusData.status === 'failed') {
+            stopped = true;
             clearInterval(progressInterval);
-            if (pollingRef.current) clearInterval(pollingRef.current);
-            setError('La génération a expiré. Veuillez réessayer.');
+            setError(statusData.error || 'La génération a échoué');
             setStep('options');
+            return;
           }
+
+          // Toujours en cours → re-poller après 3s
+          pollingRef.current = setTimeout(() => pollStatus(pollCount + 1), 3000);
         } catch (err: any) {
+          if (stopped) return;
+          stopped = true;
           clearInterval(progressInterval);
-          if (pollingRef.current) clearInterval(pollingRef.current);
-          setError(err.message || 'Erreur inattendue');
+          setError(err.message || 'Erreur réseau. Veuillez réessayer.');
           setStep('options');
         }
-      }, 3000);
+      };
+
+      // Démarrer le polling après 2s (laisser le temps à fal.ai de démarrer)
+      pollingRef.current = setTimeout(() => pollStatus(0), 2000);
     } catch (err: any) {
       setError(err.message || 'Erreur inattendue');
       setStep('options');
