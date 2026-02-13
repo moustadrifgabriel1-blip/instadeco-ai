@@ -97,6 +97,42 @@ export default function EssaiPage() {
     });
   };
 
+  // Générer un fingerprint navigateur simple (non-invasif, basé sur des données publiques)
+  const getFingerprint = useCallback((): string => {
+    try {
+      const components = [
+        navigator.language,
+        screen.width + 'x' + screen.height,
+        screen.colorDepth,
+        new Date().getTimezoneOffset(),
+        navigator.hardwareConcurrency || 0,
+        navigator.maxTouchPoints || 0,
+        // Canvas fingerprint léger
+        (() => {
+          try {
+            const c = document.createElement('canvas');
+            const ctx = c.getContext('2d');
+            if (!ctx) return '0';
+            ctx.textBaseline = 'top';
+            ctx.font = '14px Arial';
+            ctx.fillText('fp', 2, 2);
+            return c.toDataURL().slice(-32);
+          } catch { return '0'; }
+        })(),
+      ].join('|');
+      // Simple hash
+      let hash = 0;
+      for (let i = 0; i < components.length; i++) {
+        const char = components.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash |= 0;
+      }
+      return Math.abs(hash).toString(36);
+    } catch {
+      return '';
+    }
+  }, []);
+
   // Lancer la génération
   const handleGenerate = async () => {
     if (!imageFile) return;
@@ -109,6 +145,7 @@ export default function EssaiPage() {
     try {
       // Convertir en base64
       const imageBase64 = await fileToBase64(imageFile);
+      const fingerprint = getFingerprint();
 
       // Appeler l'API trial
       const response = await fetch('/api/trial/generate', {
@@ -118,6 +155,7 @@ export default function EssaiPage() {
           imageBase64,
           roomType: selectedRoom,
           style: selectedStyle,
+          fingerprint,
         }),
       });
 
@@ -144,10 +182,32 @@ export default function EssaiPage() {
         });
       }, 300);
 
-      // Polling du statut
+      // Polling du statut avec gestion des erreurs serveur
+      let errorCount = 0;
+      const MAX_ERRORS = 5;
+      const MAX_POLLS = 60; // ~3min max (60 * 3s)
+      let pollCount = 0;
+
       pollingRef.current = setInterval(async () => {
+        pollCount++;
         try {
           const statusRes = await fetch(`/api/trial/status?requestId=${requestId}`);
+          
+          // Gérer les erreurs HTTP (500, 502, etc.)
+          if (!statusRes.ok) {
+            errorCount++;
+            console.warn(`[Trial] Status error ${statusRes.status} (${errorCount}/${MAX_ERRORS})`);
+            if (errorCount >= MAX_ERRORS) {
+              clearInterval(progressInterval);
+              if (pollingRef.current) clearInterval(pollingRef.current);
+              setError('La génération prend trop de temps. Veuillez réessayer.');
+              setStep('options');
+            }
+            return; // On continue le polling (retry)
+          }
+
+          // Reset le compteur d'erreurs quand ça marche
+          errorCount = 0;
           const statusData = await statusRes.json();
 
           if (statusData.status === 'completed' && statusData.imageUrl) {
@@ -163,6 +223,14 @@ export default function EssaiPage() {
             clearInterval(progressInterval);
             if (pollingRef.current) clearInterval(pollingRef.current);
             throw new Error(statusData.error || 'La génération a échoué');
+          }
+
+          // Timeout global
+          if (pollCount >= MAX_POLLS) {
+            clearInterval(progressInterval);
+            if (pollingRef.current) clearInterval(pollingRef.current);
+            setError('La génération a expiré. Veuillez réessayer.');
+            setStep('options');
           }
         } catch (err: any) {
           clearInterval(progressInterval);
@@ -255,10 +323,11 @@ export default function EssaiPage() {
               <div className="relative rounded-[20px] overflow-hidden bg-[#f5f5f7] shadow-sm">
                 <Image
                   src={imagePreview}
-                  alt="Votre pièce"
+                  alt="Votre pièce — aperçu avant transformation"
                   width={800}
                   height={533}
                   className="w-full h-auto max-h-[400px] object-cover"
+                  sizes="(max-width: 768px) 100vw, 672px"
                   unoptimized
                 />
                 <button
@@ -387,10 +456,11 @@ export default function EssaiPage() {
                 <div className="relative h-48 overflow-hidden">
                   <Image
                     src={generatedImage}
-                    alt="Votre résultat"
+                    alt="Aperçu du résultat (flouté)"
                     width={600}
                     height={300}
                     className="w-full h-full object-cover blur-lg scale-110"
+                    sizes="(max-width: 768px) 100vw, 448px"
                   />
                   <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white/80" />
                   <div className="absolute inset-0 flex items-center justify-center">
@@ -497,7 +567,7 @@ export default function EssaiPage() {
                     Avant
                   </span>
                   <div className="rounded-[16px] overflow-hidden bg-[#f5f5f7]">
-                    <Image src={imagePreview} alt="Avant" width={600} height={400} className="w-full h-auto" unoptimized />
+                    <Image src={imagePreview} alt="Votre pièce avant transformation" width={600} height={400} className="w-full h-auto" sizes="(max-width: 768px) 100vw, 50vw" unoptimized />
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -505,7 +575,7 @@ export default function EssaiPage() {
                     Après — {selectedStyleInfo?.name}
                   </span>
                   <div className="relative rounded-[16px] overflow-hidden bg-[#f5f5f7]">
-                    <Image src={generatedImage} alt="Après" width={600} height={400} className="w-full h-auto" />
+                    <Image src={generatedImage} alt="Résultat après transformation IA" width={600} height={400} className="w-full h-auto" sizes="(max-width: 768px) 100vw, 50vw" />
                     {/* Filigrane */}
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                       <span
@@ -538,9 +608,9 @@ export default function EssaiPage() {
               <FlashOffer
                 stripePaymentUrl="/signup?redirect=/pricing"
                 durationMinutes={15}
-                originalPrice="9,99 €"
+                originalPrice="9,90 €"
                 flashPrice="4,99 €"
-                credits={5}
+                credits={10}
               />
 
               {/* OU Créer un compte gratuit */}

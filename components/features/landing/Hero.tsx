@@ -81,7 +81,6 @@ export function Hero() {
                       width={40}
                       height={40}
                       className="h-10 w-10 rounded-full border-2 border-white object-cover shadow-soft"
-                      loading="lazy"
                     />
                   ))}
                 </div>

@@ -47,6 +47,11 @@ export function Header() {
     return pathname.startsWith(href);
   };
 
+  // Masquer le header global sur /essai (cette page a sa propre nav simplifiée)
+  if (pathname === '/essai') {
+    return null;
+  }
+
   return (
     <header className={cn(
       "sticky top-0 z-50 w-full transition-all duration-300",

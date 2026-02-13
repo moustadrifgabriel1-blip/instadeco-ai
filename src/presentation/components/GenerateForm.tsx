@@ -135,9 +135,11 @@ export function GenerateForm({
             <div className="relative aspect-video w-full max-w-md mx-auto rounded-lg overflow-hidden">
               <Image
                 src={imagePreview}
-                alt="Preview"
+                alt="Aperçu de votre pièce"
                 fill
                 className="object-cover"
+                sizes="(max-width: 768px) 100vw, 448px"
+                unoptimized
               />
             </div>
 

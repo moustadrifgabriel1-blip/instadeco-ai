@@ -420,10 +420,11 @@ export default async function DecoStylePiecePage({ params }: PageProps) {
       <section className="relative h-[350px] md:h-[450px] overflow-hidden">
         <Image
           src={imageUrl}
-          alt={`${room.name} style ${style.name}`}
+          alt={`${room.name} style ${style.name} — Décoration intérieure par IA`}
           fill
           priority
           className="object-cover"
+          sizes="100vw"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-black/40" />
         

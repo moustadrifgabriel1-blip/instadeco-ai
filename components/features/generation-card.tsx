@@ -3,7 +3,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Download, Loader2, AlertCircle, Clock, Share2 } from 'lucide-react';
-import Image from 'next/image';
+import { OptimizedRemoteImage, IMAGE_SIZES } from '@/components/ui/optimized-image';
 import { ShareButtons } from './share-buttons';
 
 interface GenerationCardProps {
@@ -92,13 +92,12 @@ export function GenerationCard({
     <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 group">
       <div className="relative aspect-square bg-gradient-to-br from-gray-100 to-gray-200">
         {outputImageUrl ? (
-          <Image
+          <OptimizedRemoteImage
             src={outputImageUrl}
             alt={`Génération ${styleSlug}`}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-300"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            loading="lazy"
+            sizePreset="card"
           />
         ) : status === 'failed' ? (
           <div className="w-full h-full flex flex-col items-center justify-center text-red-500">

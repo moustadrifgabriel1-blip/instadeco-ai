@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { fal } from '@fal-ai/client';
 import { checkRateLimit, getClientIP } from '@/lib/security/rate-limiter';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 
 const MODEL_PATH = 'fal-ai/flux-general/image-to-image';
 
@@ -20,22 +21,109 @@ const trialRequestSchema = z.object({
   ),
   roomType: z.string().max(50).regex(/^[a-z0-9-]+$/).default('salon'),
   style: z.string().max(50).regex(/^[a-z0-9-]+$/).default('moderne'),
+  fingerprint: z.string().max(64).optional(),
 });
 
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
 /**
+ * Vérifie si un essai a déjà été effectué via Supabase (persistant).
+ * Regarde l'IP ET le fingerprint navigateur.
+ */
+async function hasTrialBeenUsed(ip: string, fingerprint?: string): Promise<boolean> {
+  try {
+    // Vérifier par IP (dernières 48h)
+    const since = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
+    console.log(`[Trial] 🔍 Checking trial usage for IP: ${ip}, fingerprint: ${fingerprint?.substring(0, 8) || 'none'}`);
+    
+    const { data: ipMatch, error: ipError } = await supabaseAdmin
+      .from('trial_usage')
+      .select('id')
+      .eq('ip_address', ip)
+      .gte('created_at', since)
+      .limit(1);
+    
+    if (ipError) {
+      console.warn(`[Trial] ⚠️ Supabase IP check error (table may not exist):`, ipError.message, ipError.code);
+      return false; // Fallback: pas de blocage si table absente
+    }
+    
+    if (ipMatch && ipMatch.length > 0) {
+      console.log(`[Trial] ⛔ IP ${ip} already used trial`);
+      return true;
+    }
+
+    // Vérifier par fingerprint (si fourni) — toutes dates confondues
+    if (fingerprint) {
+      const { data: fpMatch, error: fpError } = await supabaseAdmin
+        .from('trial_usage')
+        .select('id')
+        .eq('fingerprint', fingerprint)
+        .limit(1);
+      
+      if (fpError) {
+        console.warn(`[Trial] ⚠️ Supabase fingerprint check error:`, fpError.message);
+        return false;
+      }
+      
+      if (fpMatch && fpMatch.length > 0) {
+        console.log(`[Trial] ⛔ Fingerprint ${fingerprint.substring(0, 8)} already used trial`);
+        return true;
+      }
+    }
+
+    console.log(`[Trial] ✅ No previous trial found`);
+    return false;
+  } catch (error: any) {
+    // En cas d'erreur DB (ex: table n'existe pas encore), on fallback sur le rate limiter mémoire
+    console.warn('[Trial] ⚠️ DB check failed, falling back to memory rate limiter:', error?.message || error);
+    return false;
+  }
+}
+
+/**
+ * Enregistre un essai dans Supabase pour persistance.
+ */
+async function recordTrialUsage(ip: string, fingerprint?: string, style?: string, roomType?: string): Promise<void> {
+  try {
+    console.log(`[Trial] 💾 Recording trial usage: IP=${ip}, fp=${fingerprint?.substring(0, 8) || 'none'}`);
+    const { error } = await supabaseAdmin
+      .from('trial_usage')
+      .insert({
+        ip_address: ip,
+        fingerprint: fingerprint || null,
+        style,
+        room_type: roomType,
+      });
+    
+    if (error) {
+      console.warn(`[Trial] ⚠️ Failed to record trial (table may not exist):`, error.message, error.code);
+      // Ne pas bloquer la génération si l'enregistrement échoue
+    } else {
+      console.log(`[Trial] ✅ Trial usage recorded successfully`);
+    }
+  } catch (error: any) {
+    console.warn('[Trial] ⚠️ Failed to record trial usage:', error?.message || error);
+    // Ne pas bloquer la génération si l'enregistrement échoue
+  }
+}
+
+/**
  * POST /api/trial/generate
  * 
  * Essai gratuit sans authentification.
- * Rate limité à 1 génération par IP toutes les 24h.
+ * Anti-abus multi-couche :
+ *  1. Rate limit mémoire (1 essai/IP/24h) — protection immédiate
+ *  2. Supabase trial_usage (IP + fingerprint) — protection persistante
+ *  3. localStorage côté client — UX immédiate
  */
 export async function POST(req: Request) {
   console.log('[Trial] 🚀 Starting trial generation');
 
-  // Rate limiting strict : 1 essai par IP par 24h
   const clientIP = getClientIP(req.headers);
+
+  // Couche 1 : Rate limit mémoire (protection même si DB down)
   const rateLimitResult = checkRateLimit(clientIP, {
     maxRequests: 1,
     windowSeconds: 86400, // 24h
@@ -43,7 +131,7 @@ export async function POST(req: Request) {
   });
 
   if (!rateLimitResult.success) {
-    console.warn(`[Trial] ⛔ Rate limit exceeded for IP: ${clientIP}`);
+    console.warn(`[Trial] ⛔ Memory rate limit exceeded for IP: ${clientIP}`);
     return NextResponse.json(
       {
         error: 'Vous avez déjà utilisé votre essai gratuit. Créez un compte pour continuer !',
@@ -65,7 +153,20 @@ export async function POST(req: Request) {
       );
     }
 
-    const { imageBase64, roomType, style } = validation.data;
+    const { imageBase64, roomType, style, fingerprint } = validation.data;
+
+    // Couche 2 : Vérification persistante Supabase (IP + fingerprint)
+    const alreadyUsed = await hasTrialBeenUsed(clientIP, fingerprint);
+    if (alreadyUsed) {
+      console.warn(`[Trial] ⛔ Persistent check: trial already used for IP: ${clientIP}, fp: ${fingerprint?.substring(0, 8)}...`);
+      return NextResponse.json(
+        {
+          error: 'Vous avez déjà utilisé votre essai gratuit. Créez un compte pour continuer !',
+          code: 'TRIAL_USED',
+        },
+        { status: 429 }
+      );
+    }
 
     // Configurer fal.ai
     const falKey = process.env.FAL_KEY || process.env.FAL_API_KEY;
@@ -81,7 +182,7 @@ export async function POST(req: Request) {
     // Extraire les dimensions pour déterminer le format
     const imageSize = guessImageSize(imageBase64);
 
-    console.log('[Trial] 🎨 Submitting to Fal.ai...', { style, roomType });
+    console.log(`[Trial] 🎨 Submitting to Fal.ai... style=${style}, room=${roomType}, imageSize=${imageSize}, promptLength=${prompt.length}`);
 
     // Submit à fal.ai (queue) — Image-to-Image
     // L'image source sert de BASE (img2img) + EasyControls depth pour double verrou structurel.
@@ -110,14 +211,17 @@ export async function POST(req: Request) {
 
     console.log('[Trial] ✅ Job submitted:', request_id);
 
+    // Couche 2 : Enregistrer l'essai dans Supabase (persistant entre redéploiements)
+    await recordTrialUsage(clientIP, fingerprint, style, roomType);
+
     return NextResponse.json({
       requestId: request_id,
       message: 'Génération lancée',
     });
   } catch (error: any) {
-    console.error('[Trial] ❌ Error:', error?.message || error);
+    console.error('[Trial] ❌ Unhandled error:', error?.message || error, error?.stack?.split('\n').slice(0, 3).join(' | '));
     return NextResponse.json(
-      { error: 'Erreur lors de la génération. Réessayez.' },
+      { error: 'Erreur lors de la génération. Réessayez.', detail: error?.message },
       { status: 500 }
     );
   }

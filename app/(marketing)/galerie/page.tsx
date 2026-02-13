@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ArrowRight, Filter, Sparkles, Eye, Share2 } from 'lucide-react';
 import Link from 'next/link';
-import Image from 'next/image';
+import { OptimizedRemoteImage } from '@/components/ui/optimized-image';
 import { Button } from '@/components/ui/button';
 import { ShareButtons } from '@/components/features/share-buttons';
 
@@ -147,11 +147,11 @@ export default function GaleriePage() {
                 className="group relative aspect-[3/2] rounded-2xl overflow-hidden cursor-pointer border border-[#F0E8E4] shadow-sm hover:shadow-lg transition-all hover:scale-[1.02]"
               >
                 {/* Generated image */}
-                <Image
+                <OptimizedRemoteImage
                   src={item.output_image_url}
-                  alt={`${ROOM_LABELS[item.room_type_slug] || item.room_type_slug} style ${STYLE_LABELS[item.style_slug] || item.style_slug}`}
+                  alt={`${ROOM_LABELS[item.room_type_slug] || item.room_type_slug} style ${STYLE_LABELS[item.style_slug] || item.style_slug} — Décoration IA`}
                   fill
-                  sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  sizePreset="gallery"
                   className="object-cover"
                 />
 

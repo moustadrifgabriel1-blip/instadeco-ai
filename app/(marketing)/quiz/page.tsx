@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import Image from 'next/image';
+import { OptimizedRemoteImage } from '@/components/ui/optimized-image';
 import Link from 'next/link';
 import { ArrowRight, ArrowLeft, Sparkles, Check, Gift, Star, Share2, ChevronRight, Home } from 'lucide-react';
 import { ShareButtons } from '@/components/features/share-buttons';
@@ -204,8 +204,8 @@ const QUIZ_QUESTIONS: QuizQuestion[] = [
     question: 'Quel matériau vous attire le plus ?',
     subtitle: 'Touchez du doigt votre style',
     options: [
-      { id: 'a', label: 'Bois naturel & lin', image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&h=300&fit=crop', scores: { scandinave: 3, japandi: 2, rustique: 1 } },
-      { id: 'b', label: 'Velours & marbre', image: 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=400&h=300&fit=crop', scores: { luxe: 3, 'art-deco': 2, moderne: 1 } },
+      { id: 'a', label: 'Bois naturel & lin', image: 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=400&h=300&fit=crop', scores: { scandinave: 3, japandi: 2, rustique: 1 } },
+      { id: 'b', label: 'Velours & marbre', image: 'https://images.unsplash.com/photo-1616047006789-b7af5afb8c20?w=400&h=300&fit=crop', scores: { luxe: 3, 'art-deco': 2, moderne: 1 } },
       { id: 'c', label: 'Métal & béton', image: 'https://images.unsplash.com/photo-1600566752355-35792bedcfea?w=400&h=300&fit=crop', scores: { industriel: 3, moderne: 2, contemporain: 1 } },
       { id: 'd', label: 'Rotin & macramé', image: 'https://images.unsplash.com/photo-1617325247661-675ab4b64ae2?w=400&h=300&fit=crop', scores: { boheme: 3, coastal: 2, rustique: 1 } },
     ],
@@ -226,7 +226,7 @@ const QUIZ_QUESTIONS: QuizQuestion[] = [
     question: 'Comment organisez-vous votre espace ?',
     subtitle: 'L\'ordre en dit long sur votre style',
     options: [
-      { id: 'a', label: 'Tout est rangé, rien ne traîne', image: 'https://images.unsplash.com/photo-1600607687644-aac4c3eac7f4?w=400&h=300&fit=crop', scores: { minimaliste: 3, moderne: 2, japandi: 1 } },
+      { id: 'a', label: 'Tout est rangé, rien ne traîne', image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&h=300&fit=crop', scores: { minimaliste: 3, moderne: 2, japandi: 1 } },
       { id: 'b', label: 'Désordre organisé et créatif', image: 'https://images.unsplash.com/photo-1618219908412-a29a1bb7b86e?w=400&h=300&fit=crop', scores: { boheme: 3, contemporain: 1, 'mid-century': 2 } },
       { id: 'c', label: 'Pratique avant tout', image: 'https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=400&h=300&fit=crop', scores: { scandinave: 2, industriel: 3, moderne: 1 } },
       { id: 'd', label: 'Chaque objet est une pièce choisie', image: 'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=400&h=300&fit=crop', scores: { luxe: 2, 'art-deco': 3, japandi: 1 } },
@@ -259,8 +259,8 @@ const QUIZ_QUESTIONS: QuizQuestion[] = [
     question: 'Le détail déco qui vous fait craquer ?',
     subtitle: 'La touche finale qui dit tout',
     options: [
-      { id: 'a', label: 'Un beau luminaire design', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop', scores: { moderne: 2, contemporain: 3, 'mid-century': 1 } },
-      { id: 'b', label: 'Des plantes vertes partout', image: 'https://images.unsplash.com/photo-1463320726281-696a485928c7?w=400&h=300&fit=crop', scores: { boheme: 2, scandinave: 3, japandi: 1 } },
+      { id: 'a', label: 'Un beau luminaire design', image: 'https://images.unsplash.com/photo-1540932239986-30128078f3c5?w=400&h=300&fit=crop', scores: { moderne: 2, contemporain: 3, 'mid-century': 1 } },
+      { id: 'b', label: 'Des plantes vertes partout', image: 'https://images.unsplash.com/photo-1545241047-6083a3684587?w=400&h=300&fit=crop', scores: { boheme: 2, scandinave: 3, japandi: 1 } },
       { id: 'c', label: 'Un tapis berbère unique', image: 'https://images.unsplash.com/photo-1600166898405-da9535204843?w=400&h=300&fit=crop', scores: { boheme: 3, rustique: 2, coastal: 1 } },
       { id: 'd', label: 'Un miroir doré sculptural', image: 'https://images.unsplash.com/photo-1618220179428-22790b461013?w=400&h=300&fit=crop', scores: { 'art-deco': 3, luxe: 2, contemporain: 1 } },
     ],
@@ -464,13 +464,13 @@ export default function QuizPage() {
                         : 'border-transparent hover:border-[#E07B54]/30'
                     }`}
                   >
-                    <Image
+                    <OptimizedRemoteImage
                       src={option.image}
                       alt={option.label}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-500"
                       sizes="(max-width: 768px) 50vw, 350px"
-                      loading={currentQuestion === 0 ? 'eager' : 'lazy'}
+                      priority={currentQuestion === 0}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4">

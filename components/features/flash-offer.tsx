@@ -24,9 +24,9 @@ interface FlashOfferProps {
 export function FlashOffer({
   stripePaymentUrl = '/pricing',
   durationMinutes = 15,
-  originalPrice = '9,99 €',
+  originalPrice = '9,90 €',
   flashPrice = '4,99 €',
-  credits = 5,
+  credits = 10,
   onExpire,
   className = '',
 }: FlashOfferProps) {

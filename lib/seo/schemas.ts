@@ -117,10 +117,18 @@ export function generateProductSchema(plans: Array<{
   credits: number;
   description: string;
 }>) {
+  // priceValidUntil : 1 an à partir d'aujourd'hui (format ISO)
+  const priceValidUntil = new Date(
+    new Date().getFullYear() + 1,
+    new Date().getMonth(),
+    new Date().getDate()
+  ).toISOString().split('T')[0];
+
   return {
     '@type': 'Product',
     name: 'Crédits InstaDeco AI',
     description: 'Crédits pour générer des rendus de décoration d\'intérieur par IA',
+    image: getFullUrl(SEO_CONFIG.ogImage),
     brand: {
       '@type': 'Brand',
       name: SEO_CONFIG.siteName,
@@ -131,6 +139,7 @@ export function generateProductSchema(plans: Array<{
       description: `${plan.credits} crédits de génération - ${plan.description}`,
       price: plan.price.toString(),
       priceCurrency: 'EUR',
+      priceValidUntil,
       availability: 'https://schema.org/InStock',
       url: getCanonicalUrl('/pricing'),
     })),

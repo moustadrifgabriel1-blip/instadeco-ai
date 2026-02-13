@@ -117,19 +117,39 @@ if (error) {
 
 ### 4. Optimisation des Images
 
-```typescript
-// Toujours utiliser next/image
-import Image from 'next/image';
+**Utiliser `OptimizedImage` ou `OptimizedRemoteImage`** de `components/ui/optimized-image.tsx` :
 
-<Image
+```typescript
+// ✅ Images distantes (Supabase, fal.ai) — gestion erreur automatique
+import { OptimizedRemoteImage } from '@/components/ui/optimized-image';
+
+<OptimizedRemoteImage
   src={generation.output_image_url}
-  alt="Génération"
-  width={800}
-  height={600}
-  className="rounded-lg"
-  priority={false} // true seulement pour les images above the fold
+  alt="Salon style scandinave — Décoration IA"
+  fill
+  sizePreset="card"  // hero | card | gallery | half | full | thumb
+  className="object-cover"
+  priority  // uniquement above-the-fold
+/>
+
+// ✅ Images avec dimensions fixes mais responsive
+<OptimizedImage
+  src={imagePreview}
+  alt="Aperçu de votre pièce"
+  width={600}
+  height={400}
+  responsive
+  sizes="(max-width: 768px) 100vw, 50vw"
+  unoptimized  // pour les blob: URLs
 />
 ```
+
+**Règles strictes :**
+- TOUJOURS spécifier `sizes` (ou `sizePreset`) quand `fill` est utilisé
+- JAMAIS ajouter `loading="lazy"` manuellement (Next.js le gère)
+- Alt text descriptif et en français pour le SEO
+- `onError` handler (automatique dans OptimizedImage)
+- Voir `docs/CONTEXT.md` section "Convention Images" pour la doc complète
 
 ## Workflow de Développement
 

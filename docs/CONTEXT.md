@@ -22,6 +22,7 @@
 9. [Système de Crédits et Paiements](#système-de-crédits-et-paiements)
 10. [Sécurité et Validation](#sécurité-et-validation)
 11. [Variables d'Environnement](#variables-denvironnement)
+12. [Convention Images — Responsive & SEO](#convention-images--responsive--seo)
 
 ---
 
@@ -669,7 +670,95 @@ RATE_LIMIT_MAX_REQUESTS=10
 
 ---
 
-## 📚 Fichiers de Documentation
+## �️ Convention Images — Responsive & SEO
+
+### Composant `OptimizedImage` (`components/ui/optimized-image.tsx`)
+
+Composant centralisé pour TOUTES les images du projet. Résout automatiquement :
+- **Gestion d'erreur** : fallback visuel si l'image ne charge pas (URL expirée, 404)
+- **Skeleton/shimmer** pendant le chargement
+- **`sizes` automatique** via presets quand `fill` est utilisé
+- **Suppression de `loading="lazy"` redondant** (Next.js le gère nativement)
+- **Alt text obligatoire** pour le SEO
+
+### Presets de tailles (`IMAGE_SIZES`)
+
+| Preset | Valeur | Usage |
+|--------|--------|-------|
+| `hero` | `100vw` | Images hero plein écran |
+| `card` | `(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw` | Cards de génération |
+| `gallery` | `(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw` | Grilles de galerie |
+| `half` | `(max-width: 768px) 100vw, 50vw` | Avant/Après côte à côte |
+| `full` | `100vw` | Pleine largeur |
+| `thumb` | `(max-width: 640px) 50vw, 200px` | Vignettes |
+| `default` | `(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw` | Défaut |
+
+### Règles OBLIGATOIRES
+
+1. **Images distantes** (Supabase, fal.ai) → Utiliser `<OptimizedRemoteImage>` ou ajouter un `onError` handler
+2. **`fill` + `sizes`** → Toujours spécifier `sizes` (ou `sizePreset`) quand `fill` est utilisé
+3. **Ne JAMAIS** ajouter `loading="lazy"` manuellement — Next.js le gère automatiquement
+4. **Alt text** → Toujours descriptif et en français pour le SEO (`"{pièce} style {style} — Décoration IA"`)
+5. **Images avec width/height** → Ajouter `sizes` pour le responsive + `className="w-full h-auto"` si responsive
+6. **Images preview** (blob: URLs) → Ajouter `unoptimized` (le proxy Next.js ne peut pas optimiser les blobs)
+7. **Images blog (markdown)** → Passent par le proxy `/_next/image` avec srcset responsive auto
+
+### Exemples
+
+```tsx
+// ✅ Image distante avec gestion d'erreur
+<OptimizedRemoteImage
+  src={outputImageUrl}
+  alt={`Salon style scandinave — Décoration IA`}
+  fill
+  sizePreset="card"
+  className="object-cover"
+/>
+
+// ✅ Image hero plein écran
+<OptimizedImage
+  src={heroUrl}
+  alt={article.title}
+  fill
+  priority
+  sizePreset="hero"
+  className="object-cover"
+/>
+
+// ✅ Image avec dimensions fixes mais responsive
+<OptimizedImage
+  src={imagePreview}
+  alt="Aperçu de votre pièce"
+  width={600}
+  height={400}
+  responsive
+  sizes="(max-width: 768px) 100vw, 50vw"
+  unoptimized  // pour les blob: URLs
+/>
+
+// ❌ INTERDIT — pas de sizes, loading redondant, alt vide
+<Image src={url} alt="" fill loading="lazy" />
+```
+
+### Configuration Next.js (`next.config.js`)
+
+```js
+images: {
+  remotePatterns: [
+    { protocol: 'https', hostname: '*.supabase.co' },
+    { protocol: 'https', hostname: 'v3.fal.media' },
+    { protocol: 'https', hostname: 'v3b.fal.media' },
+    { protocol: 'https', hostname: 'fal.media' },
+    { protocol: 'https', hostname: 'images.unsplash.com' },
+  ],
+  formats: ['image/avif', 'image/webp'],
+  minimumCacheTTL: 31536000, // 1 an
+}
+```
+
+---
+
+## �📚 Fichiers de Documentation
 
 | Fichier | Description |
 |---------|-------------|

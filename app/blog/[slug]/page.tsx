@@ -195,7 +195,7 @@ function ArticleContent({ content, slug }: { content: string, slug: string }) {
   // Configuration du renderer Markdown
   const renderer = new marked.Renderer();
   
-  // Gestion personnalisée des images
+  // Gestion personnalisée des images — optimisées via le proxy Next.js
   renderer.image = ({ href, title, text }: { href: string; title: string | null; text: string }) => {
     let src = href;
     
@@ -207,7 +207,6 @@ function ArticleContent({ content, slug }: { content: string, slug: string }) {
     
     // Remplacement des URLs placeholder.jpg par des images réelles
     if (src.includes('placeholder') || src.includes('/blog/placeholder')) {
-      // Extraire un mot-clé du alt text pour choisir une image pertinente
       const altKeyword = (text || '').toLowerCase();
       src = getBlogImageUrl(altKeyword || 'décoration', slug, 800, 500);
     }
@@ -220,13 +219,38 @@ function ArticleContent({ content, slug }: { content: string, slug: string }) {
     // Sécuriser alt text
     const safeAlt = (text || 'Image de décoration intérieure').replace(/"/g, '&quot;');
 
+    // ── Optimisation via le proxy d'images Next.js ──
+    // Génère srcset responsive avec conversion AVIF/WebP automatique
+    const isRemote = src.startsWith('http');
+    const encodedSrc = encodeURIComponent(src);
+    const widths = [640, 828, 1080, 1200];
+    const quality = 75;
+
+    // srcset optimisé via /_next/image
+    const srcset = isRemote
+      ? widths.map(w => `/_next/image?url=${encodedSrc}&w=${w}&q=${quality} ${w}w`).join(', ')
+      : '';
+    const optimizedSrc = isRemote
+      ? `/_next/image?url=${encodedSrc}&w=1080&q=${quality}`
+      : src;
+    const sizesAttr = '(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 800px';
+
+    // Fallback en cas d'erreur de chargement
+    const fallbackBg = 'background: linear-gradient(135deg, #fff7ed 0%, #fef3c7 100%)';
+    const onErrorHandler = `this.onerror=null;this.style.cssText='${fallbackBg};min-height:200px;display:flex;align-items:center;justify-content:center';this.alt='Image indisponible';this.removeAttribute('srcset')`;
+
     return `
       <figure class="my-8 rounded-xl overflow-hidden shadow-lg border border-border bg-muted/20">
         <img 
-          src="${src}" 
+          src="${optimizedSrc}" 
+          ${srcset ? `srcset="${srcset}"` : ''}
+          ${srcset ? `sizes="${sizesAttr}"` : ''}
           alt="${safeAlt}" 
           class="w-full h-auto object-cover min-h-[200px] bg-gradient-to-br from-orange-50 to-amber-50" 
           loading="lazy"
+          decoding="async"
+          fetchpriority="low"
+          onerror="${onErrorHandler}"
         />
         ${title ? `<figcaption class="text-center text-sm text-muted-foreground mt-2 py-2 italic">${title}</figcaption>` : ''}
       </figure>
@@ -357,6 +381,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           fill
           priority
           className="object-cover"
+          sizes="100vw"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-black/50" />
         

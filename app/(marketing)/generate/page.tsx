@@ -388,10 +388,11 @@ function GenerateContent() {
               <div className="relative rounded-[28px] overflow-hidden bg-[#f5f5f7] shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
                 <Image
                   src={imagePreview}
-                  alt="Votre pièce"
+                  alt="Votre pièce — aperçu avant transformation"
                   width={1200}
                   height={800}
                   className="w-full h-auto"
+                  sizes="(max-width: 768px) 100vw, 672px"
                   unoptimized
                 />
                 <button
@@ -586,10 +587,11 @@ function GenerateContent() {
                   <div className="rounded-[20px] overflow-hidden bg-[#f5f5f7]">
                     <Image
                       src={imagePreview!}
-                      alt="Avant"
+                      alt="Votre pièce avant transformation"
                       width={600}
                       height={400}
                       className="w-full h-auto"
+                      sizes="(max-width: 768px) 100vw, 50vw"
                       unoptimized
                     />
                   </div>
@@ -602,10 +604,11 @@ function GenerateContent() {
                   <div className="relative rounded-[20px] overflow-hidden bg-[#f5f5f7]">
                     <Image
                       src={generatedImage}
-                      alt="Après"
+                      alt="Résultat après transformation IA"
                       width={600}
                       height={400}
                       className="w-full h-auto"
+                      sizes="(max-width: 768px) 100vw, 50vw"
                     />
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                       <span 
