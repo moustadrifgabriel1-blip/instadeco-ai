@@ -181,19 +181,15 @@ export class FalImageGeneratorService implements IImageGeneratorService {
         // Fallback: utiliser l'URL originale
       }
 
+      // NOTE: easycontrols depth désactivé le 14/02/2026 — erreur tenseur côté fal.ai
+      // "The size of tensor a (3072) must match the size of tensor b (4096)"
+      // Le img2img avec strength préserve bien la structure sans easycontrols.
+      // Réactiver quand fal.ai corrige le bug (tester avec scripts/test-fal-ab.js)
       const result = await fal.run(MODEL_PATH, {
         input: {
           prompt: fullPrompt,
           image_url: falImageUrl,                  // Image source = base img2img
           strength: params.strength,               // Contrôle combien on modifie vs préserve
-          easycontrols: [
-            {
-              control_method_url: "depth",         // Contrôle de profondeur
-              image_url: falImageUrl,               // Même image pour le depth map
-              image_control_type: "spatial",        // Contrôle spatial (structure)
-              scale: params.depthScale              // Force du contrôle de profondeur
-            }
-          ],
           negative_prompt: STRUCTURAL_NEGATIVE_PROMPT,
           image_size: imageSize, 
           num_inference_steps: 28, 

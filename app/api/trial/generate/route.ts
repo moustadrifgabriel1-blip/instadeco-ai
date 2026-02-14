@@ -226,19 +226,15 @@ export async function POST(req: Request) {
     // Appel SYNCHRONE à fal.ai — retourne le résultat directement
     // Pas de queue/polling, car fal.queue.result() ré-exécute le modèle
     // et l'image uploadée expire entre-temps
+    // NOTE: easycontrols depth désactivé le 14/02/2026 — erreur tenseur côté fal.ai
+    // "The size of tensor a (3072) must match the size of tensor b (4096)"
+    // Le img2img avec strength=0.55 préserve bien la structure sans easycontrols.
+    // Réactiver quand fal.ai corrige le bug (tester avec scripts/test-fal-ab.js)
     const result = await fal.run(MODEL_PATH, {
       input: {
         prompt,
         image_url: uploadedImageUrl,
         strength: 0.55,
-        easycontrols: [
-          {
-            control_method_url: 'depth',
-            image_url: uploadedImageUrl,
-            image_control_type: 'spatial',
-            scale: 1.0,
-          },
-        ],
         negative_prompt: STRUCTURAL_NEGATIVE_PROMPT,
         image_size: imageSize,
         num_inference_steps: 28,
