@@ -105,8 +105,8 @@ export function useGenerate(): UseGenerateReturn {
           isLoading: false,
           isSuccess: true,
           isError: false,
-          progress: 5, // Démarrage du polling pour le statut async
-          statusMessage: 'Génération en cours...',
+          progress: 90, // Génération synchrone terminée, polling va confirmer
+          statusMessage: 'Finalisation...',
         });
 
         return response.generation;

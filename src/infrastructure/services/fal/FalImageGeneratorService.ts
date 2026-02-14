@@ -131,15 +131,38 @@ export class FalImageGeneratorService implements IImageGeneratorService {
         transformMode,
       });
 
-      const { request_id } = await fal.queue.submit(MODEL_PATH, {
+      // ✅ Utiliser fal.run() synchrone (fal.queue.submit + result re-exécute le modèle)
+      const startGen = Date.now();
+      
+      // Upload l'image vers fal.ai storage si c'est une URL externe (Supabase signed URL)
+      let falImageUrl = options.controlImageUrl;
+      if (options.controlImageUrl.startsWith('http')) {
+        try {
+          // Télécharger l'image depuis l'URL signée Supabase
+          const imgResponse = await fetch(options.controlImageUrl);
+          if (!imgResponse.ok) {
+            throw new Error(`Failed to download image: ${imgResponse.status}`);
+          }
+          const imgBlob = await imgResponse.blob();
+          const imgFile = new File([imgBlob], 'input.jpg', { type: imgBlob.type || 'image/jpeg' });
+          falImageUrl = await fal.storage.upload(imgFile);
+          console.log('[Fal.ai] ✅ Image uploaded to fal storage:', falImageUrl.slice(0, 80));
+        } catch (uploadErr: any) {
+          console.warn('[Fal.ai] ⚠️ fal.storage.upload failed, using original URL:', uploadErr?.message);
+          // Fallback: utiliser l'URL originale (Supabase signed URL valable 1h)
+          falImageUrl = options.controlImageUrl;
+        }
+      }
+
+      const result = await fal.run(MODEL_PATH, {
         input: {
           prompt: fullPrompt,
-          image_url: options.controlImageUrl,     // Image source = base img2img
+          image_url: falImageUrl,                  // Image source = base img2img
           strength: params.strength,               // Contrôle combien on modifie vs préserve
           easycontrols: [
             {
               control_method_url: "depth",         // Contrôle de profondeur
-              image_url: options.controlImageUrl,   // Même image pour le depth map
+              image_url: falImageUrl,               // Même image pour le depth map
               image_control_type: "spatial",        // Contrôle spatial (structure)
               scale: params.depthScale              // Force du contrôle de profondeur
             }
@@ -151,17 +174,29 @@ export class FalImageGeneratorService implements IImageGeneratorService {
           enable_safety_checker: true,
           output_format: "jpeg"
         } as any,
-        webhookUrl: process.env.NEXT_PUBLIC_APP_URL ? `${process.env.NEXT_PUBLIC_APP_URL}/api/v2/webhooks/fal` : undefined,
       });
 
-      console.log('[Fal.ai] ✅ Job submitted successfully:', { request_id });
+      const inferenceTime = (Date.now() - startGen) / 1000;
+      
+      // Extraire l'URL de l'image générée
+      const outputImageUrl = (result as any)?.data?.images?.[0]?.url 
+        || (result as any)?.images?.[0]?.url 
+        || (result as any)?.data?.image?.url
+        || (result as any)?.image?.url;
+      
+      if (!outputImageUrl) {
+        console.error('[Fal.ai] ❌ No image URL in result:', JSON.stringify(result).slice(0, 500));
+        return failure(new Error('Fal.ai returned no image URL'));
+      }
+
+      console.log('[Fal.ai] ✅ Generation completed in', inferenceTime, 's:', outputImageUrl.slice(0, 80));
 
       return success({
-        imageUrl: '',
-        providerId: request_id, 
-        status: 'pending',
-        inferenceTime: 0,
-        seed: 0,
+        imageUrl: outputImageUrl,
+        providerId: (result as any)?.requestId || '',
+        status: 'succeeded',
+        inferenceTime,
+        seed: (result as any)?.data?.seed || (result as any)?.seed || 0,
       });
 
     } catch (error: any) {

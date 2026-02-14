@@ -243,17 +243,41 @@ export class GenerateDesignUseCase {
     if (!genResult.success) {
       // Marquer comme failed
       await this.generationRepo.update(generation.id, { status: 'failed' });
-      this.logger.error('AI generation submission failed', genResult.error as Error, {
+      this.logger.error('AI generation failed', genResult.error as Error, {
         generationId: generation.id,
       });
-      return failure(new ImageGenerationError('La génération IA a échoué au lancement'));
+      return failure(new ImageGenerationError('La génération IA a échoué'));
     }
 
-    // 7. Mettre à jour avec le providerId
-    // On ne stocke pas encore l'image car elle n'est pas prête
+    // 7. L'image est déjà générée (fal.run synchrone) → Upload vers Supabase Storage
+    const outputImageUrl = genResult.data.imageUrl;
+    let finalOutputUrl = outputImageUrl;
+
+    if (outputImageUrl) {
+      const uploadOutputResult = await this.storage.uploadFromUrl(outputImageUrl, {
+        bucket: 'output-images',
+        fileName: `${input.userId}/${generation.id}.jpg`,
+        contentType: 'image/jpeg',
+      });
+
+      if (uploadOutputResult.success) {
+        finalOutputUrl = uploadOutputResult.data.url;
+        this.logger.info('Output image uploaded to Supabase Storage', {
+          generationId: generation.id,
+        });
+      } else {
+        // Fallback: utiliser l'URL fal.ai directement (temporaire)
+        this.logger.warn('Failed to upload output to storage, using fal.ai URL directly', {
+          error: (uploadOutputResult.error as Error)?.message,
+        });
+      }
+    }
+
+    // 8. Mettre à jour comme completed avec l'image finale
     const updateResult = await this.generationRepo.update(generation.id, {
-      status: 'processing', // Garder 'processing' (en attente de Fal.ai)
-      providerId: genResult.data.providerId,
+      status: 'completed',
+      outputImageUrl: finalOutputUrl,
+      providerId: genResult.data.providerId || '',
     });
 
      if (!updateResult.success) {
@@ -262,11 +286,11 @@ export class GenerateDesignUseCase {
     }
 
     const duration = Date.now() - startTime;
-    this.logger.info('Design generation submitted', {
+    this.logger.info('Design generation completed', {
       generationId: generation.id,
-      providerId: genResult.data.providerId,
       userId: input.userId,
       duration,
+      hasOutputImage: !!finalOutputUrl,
     });
 
     return success({

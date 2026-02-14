@@ -100,7 +100,7 @@ function GenerateContent() {
     }
   }, [generateState.isLoading, generateState.progress, generationId, isComplete, isFailed]);
 
-  const generatedImage = statusGeneration?.outputImageUrl || null;
+  const generatedImage = statusGeneration?.outputImageUrl || generateState.data?.outputImageUrl || null;
   const error = generateState.error || (isFailed ? 'La génération a échoué' : null);
 
   // Quand la génération démarre, stocker l'ID pour le polling
