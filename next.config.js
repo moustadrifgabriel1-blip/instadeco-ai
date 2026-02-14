@@ -13,6 +13,26 @@ const nextConfig = {
   async headers() {
     return [
       {
+        // Pages dynamiques/interactives : cache court avec revalidation fréquente
+        source: '/(essai|generate|dashboard|login|signup|credits|galerie|quiz|pricing)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=0, must-revalidate, s-maxage=60',
+          },
+        ],
+      },
+      {
+        // Page d'accueil : cache court pour voir rapidement les mises à jour
+        source: '/',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=300, s-maxage=600, stale-while-revalidate=3600',
+          },
+        ],
+      },
+      {
         // Appliquer à toutes les routes
         source: '/:path*',
         headers: [
