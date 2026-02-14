@@ -63,6 +63,7 @@ export async function GET(req: Request) {
       if (sdkStatus === 'COMPLETED') {
         try {
           const result = await fal.queue.result(MODEL_PATH, { requestId }) as any;
+          console.log(`[Trial Status] 📦 SDK result keys:`, Object.keys(result || {}), 'data keys:', Object.keys(result?.data || {}));
           const imageUrl = result?.data?.images?.[0]?.url 
             || result?.images?.[0]?.url
             || result?.data?.image?.url;
@@ -72,12 +73,34 @@ export async function GET(req: Request) {
             requestCache.delete(cacheKey);
             return NextResponse.json({ status: 'completed', imageUrl });
           } else {
-            console.error(`[Trial Status] ⚠️ Status=COMPLETED but no image URL in result:`, JSON.stringify(result).substring(0, 200));
+            console.error(`[Trial Status] ⚠️ Status=COMPLETED but no image URL in result:`, JSON.stringify(result).substring(0, 500));
             requestCache.delete(cacheKey);
             return NextResponse.json({ status: 'failed', error: 'Image introuvable dans le résultat' });
           }
         } catch (resultError: any) {
-          console.error(`[Trial Status] ❌ SDK result fetch failed:`, resultError?.message);
+          console.error(`[Trial Status] ❌ SDK result fetch failed:`, resultError?.message, resultError?.body || resultError?.status);
+          
+          // Fallback REST pour récupérer le résultat
+          try {
+            const resultUrl = `https://queue.fal.run/${MODEL_PATH}/requests/${requestId}`;
+            const resultResponse = await fetch(resultUrl, {
+              headers: { 'Authorization': `Key ${FAL_KEY}` },
+              signal: AbortSignal.timeout(15000),
+            });
+            if (resultResponse.ok) {
+              const resultData = await resultResponse.json();
+              const imageUrl = resultData?.images?.[0]?.url || resultData?.output?.images?.[0]?.url;
+              if (imageUrl) {
+                console.log(`[Trial Status] ✅ REST fallback got image: ${imageUrl.substring(0, 50)}...`);
+                requestCache.delete(cacheKey);
+                return NextResponse.json({ status: 'completed', imageUrl });
+              }
+            }
+            console.error(`[Trial Status] ❌ REST fallback also failed:`, resultResponse.status);
+          } catch (restErr: any) {
+            console.error(`[Trial Status] ❌ REST fallback error:`, restErr?.message);
+          }
+          
           requestCache.delete(cacheKey);
           return NextResponse.json({ status: 'failed', error: 'Erreur lors de la récupération du résultat' });
         }
