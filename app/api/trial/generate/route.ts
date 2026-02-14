@@ -204,22 +204,22 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Erreur lors de l\'upload de l\'image' }, { status: 500 });
     }
 
-    console.log(`[Trial] 🎨 Submitting to Fal.ai... style=${style}, room=${roomType}, imageSize=${imageSize}, promptLength=${prompt.length}`);
+    console.log(`[Trial] 🎨 Running fal.ai (synchronous)... style=${style}, room=${roomType}, imageSize=${imageSize}`);
 
-    // Submit à fal.ai (queue) — Image-to-Image
-    // L'image source sert de BASE (img2img) + EasyControls depth pour double verrou structurel.
-    // strength bas = on préserve la structure, on change meubles/déco
-    const { request_id } = await fal.queue.submit(MODEL_PATH, {
+    // Appel SYNCHRONE à fal.ai — retourne le résultat directement
+    // Pas de queue/polling, car fal.queue.result() ré-exécute le modèle
+    // et l'image uploadée expire entre-temps
+    const result = await fal.run(MODEL_PATH, {
       input: {
         prompt,
-        image_url: uploadedImageUrl,          // URL fal.ai storage (plus fiable que data URI)
-        strength: 0.55,                       // Préserver la structure (0=identique, 1=refaire)
+        image_url: uploadedImageUrl,
+        strength: 0.55,
         easycontrols: [
           {
             control_method_url: 'depth',
             image_url: uploadedImageUrl,
             image_control_type: 'spatial',
-            scale: 1.0,                       // Force élevée du contrôle de profondeur
+            scale: 1.0,
           },
         ],
         negative_prompt: STRUCTURAL_NEGATIVE_PROMPT,
@@ -229,16 +229,20 @@ export async function POST(req: Request) {
         enable_safety_checker: true,
         output_format: 'jpeg',
       } as any,
-    });
+    }) as any;
 
-    if (!request_id) {
-      console.error('[Trial] ❌ Fal.ai returned no request_id');
-      return NextResponse.json({ error: 'Erreur fal.ai: pas de request_id' }, { status: 500 });
+    const imageUrl = result?.data?.images?.[0]?.url
+      || result?.images?.[0]?.url
+      || result?.data?.image?.url;
+
+    if (!imageUrl) {
+      console.error('[Trial] ❌ No image URL in result:', JSON.stringify(result).substring(0, 500));
+      return NextResponse.json({ error: 'Image introuvable dans le résultat' }, { status: 500 });
     }
 
-    console.log('[Trial] ✅ Job submitted:', request_id);
+    console.log(`[Trial] ✅ Image generated: ${imageUrl.substring(0, 60)}...`);
 
-    // Couche 2 : Enregistrer l'essai dans Supabase (persistant entre redéploiements)
+    // Enregistrer l'essai dans Supabase (persistant entre redéploiements)
     if (!devMode) {
       await recordTrialUsage(clientIP, fingerprint, style, roomType);
     } else {
@@ -246,8 +250,8 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({
-      requestId: request_id,
-      message: 'Génération lancée',
+      imageUrl,
+      message: 'Génération terminée',
     });
   } catch (error: any) {
     console.error('[Trial] ❌ Unhandled error:', error?.message || error, error?.stack?.split('\n').slice(0, 3).join(' | '));

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState, useEffect, useRef } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -52,7 +52,6 @@ export default function EssaiPage() {
   const [trialEmail, setTrialEmail] = useState('');
   const [emailStatus, setEmailStatus] = useState<'idle' | 'loading' | 'error'>('idle');
   const [emailError, setEmailError] = useState('');
-  const pollingRef = useRef<NodeJS.Timeout | null>(null);
 
   // Vérifier si l'essai a déjà été utilisé (bypass si cookie dev)
   useEffect(() => {
@@ -65,13 +64,6 @@ export default function EssaiPage() {
     if (trialUsed) {
       setStep('trial-used');
     }
-  }, []);
-
-  // Nettoyage du polling
-  useEffect(() => {
-    return () => {
-      if (pollingRef.current) clearTimeout(pollingRef.current);
-    };
   }, []);
 
   // Upload handler
@@ -154,7 +146,17 @@ export default function EssaiPage() {
 
       console.log(`[Trial] 🚀 Starting generation: style=${selectedStyle}, room=${selectedRoom}, fingerprint=${fingerprint.substring(0, 8)}...`);
 
-      // Appeler l'API trial
+      // Animer la barre de progression pendant l'appel
+      const progressInterval = setInterval(() => {
+        setProgress((prev) => {
+          if (prev >= 90) return prev;
+          const remaining = 90 - prev;
+          const increment = Math.max(0.3, remaining / 40);
+          return prev + increment;
+        });
+      }, 300);
+
+      // Appeler l'API trial (appel synchrone, retourne l'image directement)
       const response = await fetch('/api/trial/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -179,91 +181,23 @@ export default function EssaiPage() {
         throw new Error(data.error || 'Erreur lors de la génération');
       }
 
-      const { requestId } = data;
-      
-      if (!requestId) {
-        console.error(`[Trial] ❌ No requestId in response:`, data);
-        throw new Error('Pas de requestId retourné par le serveur');
+      // L'API retourne directement l'image (appel synchrone fal.ai)
+      const { imageUrl } = data;
+
+      if (!imageUrl) {
+        console.error(`[Trial] ❌ No imageUrl in response:`, data);
+        throw new Error('Pas d\'image retournée par le serveur');
       }
 
-      console.log(`[Trial] ✅ Job submitted with requestId: ${requestId}`);
-
-      // Animer la progression
-      const progressInterval = setInterval(() => {
-        setProgress((prev) => {
-          if (prev >= 95) return prev;
-          const remaining = 95 - prev;
-          const increment = Math.max(0.3, remaining / 50);
-          return prev + increment;
-        });
-      }, 300);
-
-      // Polling séquentiel du statut (pas de setInterval pour éviter les requêtes qui se chevauchent)
-      let stopped = false;
-      const MAX_POLLS = 40; // ~2min max (40 * 3s)
-
-      const pollStatus = async (pollCount: number) => {
-        if (stopped || pollCount >= MAX_POLLS) {
-          if (!stopped) {
-            stopped = true;
-            clearInterval(progressInterval);
-            console.error(`[Trial] ⏰ Polling timeout after ${pollCount} attempts (~${Math.floor(pollCount * 3 / 60)}min)`);
-            setError('La génération a pris trop de temps. Veuillez réessayer avec une autre photo.');
-            setStep('options');
-          }
-          return;
-        }
-
-        try {
-          console.log(`[Trial] 🔄 Polling attempt ${pollCount + 1}/${MAX_POLLS} for requestId=${requestId}`);
-          const statusRes = await fetch(`/api/trial/status?requestId=${requestId}`);
-          if (stopped) return;
-          
-          if (!statusRes.ok) {
-            console.error(`[Trial] ❌ Status API error: ${statusRes.status} ${statusRes.statusText}`);
-            throw new Error(`Erreur serveur: ${statusRes.status}`);
-          }
-
-          const statusData = await statusRes.json();
-          console.log(`[Trial] 📊 Status response:`, statusData);
-
-          if (statusData.status === 'completed' && statusData.imageUrl) {
-            stopped = true;
-            clearInterval(progressInterval);
-            setProgress(100);
-            console.log(`[Trial] ✅ Generation completed! Image: ${statusData.imageUrl.substring(0, 50)}...`);
-            setGeneratedImage(statusData.imageUrl);
-            localStorage.setItem('instadeco_trial_used', 'true');
-            trackTrialComplete(selectedStyle, selectedRoom);
-            setTimeout(() => setStep('email-gate'), 500);
-            return;
-          }
-
-          if (statusData.status === 'failed') {
-            stopped = true;
-            clearInterval(progressInterval);
-            console.error(`[Trial] ❌ Generation failed:`, statusData.error);
-            setError(statusData.error || 'La génération a échoué');
-            setStep('options');
-            return;
-          }
-
-          // Toujours en cours → re-poller après 3s
-          console.log(`[Trial] ⏳ Still processing... Next poll in 3s`);
-          pollingRef.current = setTimeout(() => pollStatus(pollCount + 1), 3000);
-        } catch (err: any) {
-          if (stopped) return;
-          stopped = true;
-          clearInterval(progressInterval);
-          console.error(`[Trial] ❌ Polling error:`, err);
-          setError(err.message || 'Erreur réseau. Veuillez réessayer.');
-          setStep('options');
-        }
-      };
-
-      // Démarrer le polling après 2s (laisser le temps à fal.ai de démarrer)
-      pollingRef.current = setTimeout(() => pollStatus(0), 2000);
+      console.log(`[Trial] ✅ Generation completed! Image: ${imageUrl.substring(0, 50)}...`);
+      clearInterval(progressInterval);
+      setProgress(100);
+      setGeneratedImage(imageUrl);
+      localStorage.setItem('instadeco_trial_used', 'true');
+      trackTrialComplete(selectedStyle, selectedRoom);
+      setTimeout(() => setStep('email-gate'), 500);
     } catch (err: any) {
+      console.error(`[Trial] ❌ Generation error:`, err);
       setError(err.message || 'Erreur inattendue');
       setStep('options');
     }
