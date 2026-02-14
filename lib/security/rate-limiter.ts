@@ -6,25 +6,24 @@
  */
 
 /**
- * IPs whitelistées — aucune limite de rate pour ces adresses.
- * Configurable via la variable d'environnement WHITELISTED_IPS (séparées par des virgules).
- * Exemple : WHITELISTED_IPS=178.197.198.164,203.0.113.42
+ * Dev Bypass Token — permet de contourner TOUS les rate limits.
+ * À configurer dans Vercel : DEV_BYPASS_TOKEN=<token>
+ * Le navigateur doit avoir le cookie `instadeco_dev` avec cette valeur.
+ * 
+ * Pour activer : ouvrir la console du navigateur et taper :
+ *   document.cookie = "instadeco_dev=<token>;path=/;max-age=31536000;SameSite=Lax"
  */
-const HARDCODED_WHITELISTED_IPS: string[] = [
-  '178.197.198.164', // Gabriel — dev/test (ancienne IP)
-  '188.60.249.180', // Gabriel — dev/test (nouvelle IP)
-];
-
-function getWhitelistedIPs(): Set<string> {
-  const envIPs = process.env.WHITELISTED_IPS?.split(',').map(ip => ip.trim()).filter(Boolean) || [];
-  return new Set([...HARDCODED_WHITELISTED_IPS, ...envIPs]);
-}
+const DEV_BYPASS_TOKEN = process.env.DEV_BYPASS_TOKEN || '';
 
 /**
- * Vérifie si une IP est whitelistée (bypass rate limit)
+ * Vérifie si la requête contient un cookie dev bypass valide.
+ * Fonctionne indépendamment de l'IP (portable, bureau, VPN, etc.).
  */
-export function isIPWhitelisted(ip: string): boolean {
-  return getWhitelistedIPs().has(ip);
+export function isDevBypass(headers: Headers): boolean {
+  if (!DEV_BYPASS_TOKEN) return false;
+  const cookies = headers.get('cookie') || '';
+  const match = cookies.match(/instadeco_dev=([^;]+)/);
+  return match?.[1] === DEV_BYPASS_TOKEN;
 }
 
 interface RateLimitEntry {
@@ -65,21 +64,11 @@ export interface RateLimitResult {
 
 /**
  * Vérifie si une requête est autorisée selon le rate limit.
- * Les IPs whitelistées passent toujours.
  */
 export function checkRateLimit(
   identifier: string,
   config: RateLimitConfig
 ): RateLimitResult {
-  // Bypass pour les IPs whitelistées
-  if (isIPWhitelisted(identifier)) {
-    return {
-      success: true,
-      remaining: config.maxRequests,
-      resetAt: Date.now() + config.windowSeconds * 1000,
-    };
-  }
-
   const key = config.prefix ? `${config.prefix}:${identifier}` : identifier;
   const now = Date.now();
   const windowMs = config.windowSeconds * 1000;

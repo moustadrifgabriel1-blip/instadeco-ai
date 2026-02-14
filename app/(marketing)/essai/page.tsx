@@ -54,8 +54,13 @@ export default function EssaiPage() {
   const [emailError, setEmailError] = useState('');
   const pollingRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Vérifier si l'essai a déjà été utilisé
+  // Vérifier si l'essai a déjà été utilisé (bypass si cookie dev)
   useEffect(() => {
+    const isDevMode = document.cookie.includes('instadeco_dev=');
+    if (isDevMode) {
+      console.log('🔓 Dev mode actif — trial illimité');
+      return; // Ne pas bloquer
+    }
     const trialUsed = localStorage.getItem('instadeco_trial_used');
     if (trialUsed) {
       setStep('trial-used');
