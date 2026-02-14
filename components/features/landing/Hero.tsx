@@ -45,7 +45,7 @@ export function Hero() {
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold tracking-tight text-[#2D2D2D] leading-[1.1]">
                 Redécorez votre intérieur en style
                 <br />
-                <span className="text-gradient italic inline-grid px-2">
+                <span className="text-[#C95D3A] italic inline-grid px-2">
                   {styles.map((style, index) => (
                     <span
                       key={style}
