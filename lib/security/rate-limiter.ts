@@ -11,7 +11,8 @@
  * Exemple : WHITELISTED_IPS=178.197.198.164,203.0.113.42
  */
 const HARDCODED_WHITELISTED_IPS: string[] = [
-  '178.197.198.164', // Gabriel — dev/test
+  '178.197.198.164', // Gabriel — dev/test (ancienne IP)
+  '188.60.249.180', // Gabriel — dev/test (nouvelle IP)
 ];
 
 function getWhitelistedIPs(): Set<string> {
