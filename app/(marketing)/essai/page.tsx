@@ -70,12 +70,14 @@ export default function EssaiPage() {
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
     if (file) {
+      // Révoquer l'ancien blob URL si existant
+      if (imagePreview) URL.revokeObjectURL(imagePreview);
       setImageFile(file);
       setImagePreview(URL.createObjectURL(file));
       setStep('options');
       setError(null);
     }
-  }, []);
+  }, [imagePreview]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -156,46 +158,52 @@ export default function EssaiPage() {
         });
       }, 300);
 
-      // Appeler l'API trial (appel synchrone, retourne l'image directement)
-      const response = await fetch('/api/trial/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          imageBase64,
-          roomType: selectedRoom,
-          style: selectedStyle,
-          fingerprint,
-        }),
-      });
+      try {
+        // Appeler l'API trial (appel synchrone, retourne l'image directement)
+        const response = await fetch('/api/trial/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            imageBase64,
+            roomType: selectedRoom,
+            style: selectedStyle,
+            fingerprint,
+          }),
+        });
 
-      const data = await response.json();
-      console.log(`[Trial] 📡 Generate API response:`, data);
+        const data = await response.json();
+        console.log(`[Trial] 📡 Generate API response:`, data);
 
-      if (!response.ok) {
-        console.error(`[Trial] ❌ Generate API error: ${response.status}`, data);
-        if (data.code === 'TRIAL_USED') {
-          localStorage.setItem('instadeco_trial_used', 'true');
-          setStep('trial-used');
-          return;
+        if (!response.ok) {
+          console.error(`[Trial] ❌ Generate API error: ${response.status}`, data);
+          if (data.code === 'TRIAL_USED') {
+            localStorage.setItem('instadeco_trial_used', 'true');
+            clearInterval(progressInterval);
+            setStep('trial-used');
+            return;
+          }
+          throw new Error(data.error || 'Erreur lors de la génération');
         }
-        throw new Error(data.error || 'Erreur lors de la génération');
+
+        // L'API retourne directement l'image (appel synchrone fal.ai)
+        const { imageUrl } = data;
+
+        if (!imageUrl) {
+          console.error(`[Trial] ❌ No imageUrl in response:`, data);
+          throw new Error('Pas d\'image retournée par le serveur');
+        }
+
+        console.log(`[Trial] ✅ Generation completed! Image: ${imageUrl.substring(0, 50)}...`);
+        clearInterval(progressInterval);
+        setProgress(100);
+        setGeneratedImage(imageUrl);
+        localStorage.setItem('instadeco_trial_used', 'true');
+        trackTrialComplete(selectedStyle, selectedRoom);
+        setTimeout(() => setStep('email-gate'), 500);
+      } catch (innerErr) {
+        clearInterval(progressInterval);
+        throw innerErr;
       }
-
-      // L'API retourne directement l'image (appel synchrone fal.ai)
-      const { imageUrl } = data;
-
-      if (!imageUrl) {
-        console.error(`[Trial] ❌ No imageUrl in response:`, data);
-        throw new Error('Pas d\'image retournée par le serveur');
-      }
-
-      console.log(`[Trial] ✅ Generation completed! Image: ${imageUrl.substring(0, 50)}...`);
-      clearInterval(progressInterval);
-      setProgress(100);
-      setGeneratedImage(imageUrl);
-      localStorage.setItem('instadeco_trial_used', 'true');
-      trackTrialComplete(selectedStyle, selectedRoom);
-      setTimeout(() => setStep('email-gate'), 500);
     } catch (err: any) {
       console.error(`[Trial] ❌ Generation error:`, err);
       setError(err.message || 'Erreur inattendue');

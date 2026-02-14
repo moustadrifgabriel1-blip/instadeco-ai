@@ -134,11 +134,11 @@ export class FalImageGeneratorService implements IImageGeneratorService {
       // ✅ Utiliser fal.run() synchrone (fal.queue.submit + result re-exécute le modèle)
       const startGen = Date.now();
       
-      // Upload l'image vers fal.ai storage si c'est une URL externe (Supabase signed URL)
+      // Upload l'image vers fal.ai storage pour accès fiable
       let falImageUrl = options.controlImageUrl;
-      if (options.controlImageUrl.startsWith('http')) {
-        try {
-          // Télécharger l'image depuis l'URL signée Supabase
+      try {
+        if (options.controlImageUrl.startsWith('http')) {
+          // Télécharger l'image depuis l'URL externe (Supabase signed URL)
           const imgResponse = await fetch(options.controlImageUrl);
           if (!imgResponse.ok) {
             throw new Error(`Failed to download image: ${imgResponse.status}`);
@@ -147,11 +147,19 @@ export class FalImageGeneratorService implements IImageGeneratorService {
           const imgFile = new File([imgBlob], 'input.jpg', { type: imgBlob.type || 'image/jpeg' });
           falImageUrl = await fal.storage.upload(imgFile);
           console.log('[Fal.ai] ✅ Image uploaded to fal storage:', falImageUrl.slice(0, 80));
-        } catch (uploadErr: any) {
-          console.warn('[Fal.ai] ⚠️ fal.storage.upload failed, using original URL:', uploadErr?.message);
-          // Fallback: utiliser l'URL originale (Supabase signed URL valable 1h)
-          falImageUrl = options.controlImageUrl;
+        } else if (options.controlImageUrl.startsWith('data:')) {
+          // Base64 data URI → convertir en blob et uploader
+          const base64Data = options.controlImageUrl.split(',')[1];
+          const mimeType = options.controlImageUrl.split(';')[0].split(':')[1] || 'image/jpeg';
+          const buffer = Buffer.from(base64Data, 'base64');
+          const blob = new Blob([buffer], { type: mimeType });
+          falImageUrl = await fal.storage.upload(blob);
+          console.log('[Fal.ai] ✅ Base64 image uploaded to fal storage:', falImageUrl.slice(0, 80));
         }
+        // Si c'est déjà une fal.ai storage URL, on la garde telle quelle
+      } catch (uploadErr: any) {
+        console.warn('[Fal.ai] ⚠️ fal.storage.upload failed, using original URL:', uploadErr?.message);
+        // Fallback: utiliser l'URL originale
       }
 
       const result = await fal.run(MODEL_PATH, {

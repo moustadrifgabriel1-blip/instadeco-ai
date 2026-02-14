@@ -69,23 +69,26 @@ function GenerateContent() {
   } = useGenerationStatus(generationId);
 
   // États dérivés
-  const isGenerating = generateState.isLoading || (generationId && !isComplete && !isFailed);
+  // L'image est disponible dès la réponse synchrone OU via le polling
+  const generatedImage = generateState.data?.outputImageUrl || statusGeneration?.outputImageUrl || null;
+  const isGenerating = generateState.isLoading || (generationId && !isComplete && !isFailed && !generatedImage);
   const [progress, setProgress] = useState(0);
   
   // Effet pour animer la progression
   useEffect(() => {
     if (generateState.isLoading) {
-      // Phase initiale (upload, préparation)
+      // Phase initiale (upload, préparation, génération synchrone)
       setProgress(generateState.progress);
+    } else if (generatedImage) {
+      // Image disponible → 100%
+      setProgress(100);
     } else if (generationId && !isComplete && !isFailed) {
-      // Phase de polling (génération IA)
-      // On démarre à ce que useGenerate a laissé (ex: 5%)
+      // Fallback: polling si résultat pas encore disponible
       setProgress(prev => Math.max(prev, generateState.progress));
       
       const interval = setInterval(() => {
         setProgress(prev => {
           if (prev >= 95) return prev;
-          // Avance doucement (progression logarithmique)
           const remaining = 95 - prev;
           const increment = Math.max(0.1, remaining / 100);
           return prev + increment;
@@ -93,27 +96,30 @@ function GenerateContent() {
       }, 200);
       
       return () => clearInterval(interval);
-    } else if (isComplete) {
-      setProgress(100);
     } else if (isFailed) {
       setProgress(0);
     }
-  }, [generateState.isLoading, generateState.progress, generationId, isComplete, isFailed]);
+  }, [generateState.isLoading, generateState.progress, generationId, isComplete, isFailed, generatedImage]);
 
-  const generatedImage = statusGeneration?.outputImageUrl || generateState.data?.outputImageUrl || null;
   const error = generateState.error || (isFailed ? 'La génération a échoué' : null);
 
-  // Quand la génération démarre, stocker l'ID pour le polling
+  // Quand la génération démarre, stocker l'ID pour le polling (confirmation)
+  // Mais ne pas lancer le polling si le résultat est déjà complet
   useEffect(() => {
-    if (generateState.data?.id) {
+    if (generateState.data?.id && generateState.data?.status !== 'completed') {
+      setGenerationId(generateState.data.id);
+    } else if (generateState.data?.id && generateState.data?.status === 'completed') {
+      // Résultat déjà complet, pas besoin de polling
       setGenerationId(generateState.data.id);
     }
-  }, [generateState.data?.id]);
+  }, [generateState.data?.id, generateState.data?.status]);
 
   // Upload d'image avec drag & drop
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
     if (file) {
+      // Révoquer l'ancien blob URL si existant
+      if (imagePreview) URL.revokeObjectURL(imagePreview);
       setImageFile(file);
       setImagePreview(URL.createObjectURL(file));
       resetGenerate();
@@ -123,7 +129,7 @@ function GenerateContent() {
       fbTrackUploadPhoto();
       trackCTAClick('upload_photo', '/generate');
     }
-  }, [resetGenerate]);
+  }, [resetGenerate, imagePreview]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -135,6 +141,7 @@ function GenerateContent() {
   });
 
   const removeImage = () => {
+    if (imagePreview) URL.revokeObjectURL(imagePreview);
     setImageFile(null);
     setImagePreview(null);
     resetGenerate();
