@@ -45,7 +45,7 @@ export function Hero() {
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold tracking-tight text-[#2D2D2D] leading-[1.1]">
                 Redécorez votre intérieur en style
                 <br />
-                <span className="text-gradient italic inline-block min-h-[1.2em] px-2 overflow-visible">{styles[currentStyle]}</span>
+                <span className="text-gradient italic inline-block min-h-[1.2em] min-w-[280px] px-2">{styles[currentStyle]}</span>
               </h1>
             </div>
             
@@ -63,7 +63,7 @@ export function Hero() {
                 asChild
               >
                 <Link href="/generate" className="flex items-center gap-2">
-                  <span>Relooker ma pi\u00e8ce gratuitement</span>
+                  <span>Relooker ma pièce gratuitement</span>
                   <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </Button>
@@ -96,7 +96,7 @@ export function Hero() {
                 </div>
                 <div className="text-sm">
                   <p className="font-semibold text-[#2D2D2D]">10 000+ photos</p>
-                  <p className="text-[#6B6B6B]">d\u00e9j\u00e0 transform\u00e9es</p>
+                  <p className="text-[#6B6B6B]">déjà transformées</p>
                 </div>
               </div>
               
