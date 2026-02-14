@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { fal } from '@fal-ai/client';
-import { checkRateLimit, getClientIP } from '@/lib/security/rate-limiter';
+import { checkRateLimit, getClientIP, isIPWhitelisted } from '@/lib/security/rate-limiter';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 
 const MODEL_PATH = 'fal-ai/flux-general/image-to-image';
@@ -156,7 +156,13 @@ export async function POST(req: Request) {
     const { imageBase64, roomType, style, fingerprint } = validation.data;
 
     // Couche 2 : Vérification persistante Supabase (IP + fingerprint)
-    const alreadyUsed = await hasTrialBeenUsed(clientIP, fingerprint);
+    // Bypass pour les IPs whitelistées (dev/test)
+    const isWhitelisted = isIPWhitelisted(clientIP);
+    if (isWhitelisted) {
+      console.log(`[Trial] 🟢 IP ${clientIP} whitelistée — bypass trial_usage check`);
+    }
+
+    const alreadyUsed = isWhitelisted ? false : await hasTrialBeenUsed(clientIP, fingerprint);
     if (alreadyUsed) {
       console.warn(`[Trial] ⛔ Persistent check: trial already used for IP: ${clientIP}, fp: ${fingerprint?.substring(0, 8)}...`);
       return NextResponse.json(
@@ -217,7 +223,12 @@ export async function POST(req: Request) {
     console.log('[Trial] ✅ Job submitted:', request_id);
 
     // Couche 2 : Enregistrer l'essai dans Supabase (persistant entre redéploiements)
-    await recordTrialUsage(clientIP, fingerprint, style, roomType);
+    // Ne pas enregistrer pour les IPs whitelistées (permet les tests répétés)
+    if (!isWhitelisted) {
+      await recordTrialUsage(clientIP, fingerprint, style, roomType);
+    } else {
+      console.log(`[Trial] 🟢 IP whitelistée — skip recordTrialUsage`);
+    }
 
     return NextResponse.json({
       requestId: request_id,

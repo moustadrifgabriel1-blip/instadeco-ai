@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1640 624" width="1640" height="624">
+  <defs>
+    <!-- Gradient principal terracotta -->
+    <linearGradient id="mainGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFF8F5"/>
+      <stop offset="50%" style="stop-color:#FFE4D9"/>
+      <stop offset="100%" style="stop-color:#FFCDB3"/>
+    </linearGradient>
+    
+    <!-- Gradient texte -->
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#E07B54"/>
+      <stop offset="100%" style="stop-color:#D4603C"/>
+    </linearGradient>
+    
+    <!-- Ombre douce -->
+    <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="8"/>
+      <feOffset dx="0" dy="4" result="offsetblur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.2"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <!-- Ombre forte pour images -->
+    <filter id="imageShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="12"/>
+      <feOffset dx="0" dy="8" result="offsetblur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.3"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background dégradé -->
+  <rect width="1640" height="624" fill="url(#mainGrad)"/>
+  
+  <!-- Formes décoratives arrière-plan -->
+  <circle cx="150" cy="150" r="120" fill="#E07B54" opacity="0.08"/>
+  <circle cx="1500" cy="500" r="180" fill="#D4603C" opacity="0.06"/>
+  <circle cx="820" cy="-50" r="200" fill="#E07B54" opacity="0.05"/>
+  
+  <!-- Section AVANT (Gauche) -->
+  <g filter="url(#imageShadow)">
+    <!-- Cadre photo AVANT -->
+    <rect x="80" y="120" width="380" height="380" rx="24" fill="white"/>
+    <rect x="100" y="140" width="340" height="340" rx="12" fill="#F5F5F7"/>
+    
+    <!-- Placeholder AVANT (room sketch) -->
+    <line x1="120" y1="160" x2="420" y2="460" stroke="#D2D2D7" stroke-width="2" opacity="0.3"/>
+    <line x1="420" y1="160" x2="120" y2="460" stroke="#D2D2D7" stroke-width="2" opacity="0.3"/>
+    <rect x="200" y="240" width="140" height="140" rx="8" fill="none" stroke="#D2D2D7" stroke-width="3"/>
+    <text x="270" y="320" font-family="system-ui, -apple-system, sans-serif" font-size="48" fill="#A0A0A0" text-anchor="middle">?</text>
+    
+    <!-- Label AVANT -->
+    <rect x="100" y="500" width="340" height="48" rx="12" fill="#1D1D1F"/>
+    <text x="270" y="530" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="600" fill="white" text-anchor="middle">AVANT</text>
+  </g>
+  
+  <!-- Flèche magique au centre -->
+  <g transform="translate(750, 280)">
+    <!-- Cercle gradient -->
+    <circle cx="70" cy="32" r="55" fill="url(#textGrad)" opacity="0.15"/>
+    <circle cx="70" cy="32" r="50" fill="url(#textGrad)"/>
+    
+    <!-- Icône IA sparkle -->
+    <path d="M70 10 C70 10 74 22 77 25 C80 28 92 32 92 32 C92 32 80 36 77 39 C74 42 70 54 70 54 C70 54 66 42 63 39 C60 36 48 32 48 32 C48 32 60 28 63 25 C66 22 70 10 70 10Z" fill="white"/>
+    
+    <!-- Flèche droite -->
+    <path d="M100 32 L130 32 M120 22 L130 32 L120 42" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  
+  <!-- Section APRÈS (Droite) -->
+  <g filter="url(#imageShadow)">
+    <!-- Cadre photo APRÈS -->
+    <rect x="1180" y="120" width="380" height="380" rx="24" fill="white"/>
+    <rect x="1200" y="140" width="340" height="340" rx="12" fill="#E8F4E8"/>
+    
+    <!-- Placeholder APRÈS (styled room) -->
+    <rect x="1220" y="180" width="120" height="80" rx="8" fill="#8B7355" opacity="0.7"/>
+    <rect x="1360" y="200" width="80" height="60" rx="6" fill="#6B8E6F" opacity="0.6"/>
+    <circle cx="1500" cy="350" r="40" fill="#E07B54" opacity="0.5"/>
+    <rect x="1220" y="350" width="300" height="6" rx="3" fill="#D2D2D7" opacity="0.3"/>
+    <rect x="1220" y="370" width="240" height="6" rx="3" fill="#D2D2D7" opacity="0.3"/>
+    <path d="M1300 300 L1320 340 L1340 300 Z" fill="#C9A87C" opacity="0.5"/>
+    
+    <!-- Label APRÈS -->
+    <rect x="1200" y="500" width="340" height="48" rx="12" fill="url(#textGrad)"/>
+    <text x="1370" y="530" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="600" fill="white" text-anchor="middle">APRÈS (IA)</text>
+  </g>
+  
+  <!-- Texte accrocheur en haut -->
+  <text x="820" y="70" font-family="system-ui, -apple-system, sans-serif" font-size="52" font-weight="700" fill="url(#textGrad)" text-anchor="middle" letter-spacing="-0.5">
+    Transformez votre intérieur en 30 secondes
+  </text>
+  
+  <!-- Sous-titre -->
+  <text x="820" y="580" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="500" fill="#6B6B6B" text-anchor="middle">
+    20+ styles de décoration • IA générative • À partir de 0,99€
+  </text>
+  
+  <!-- Sparkles décoratifs -->
+  <g opacity="0.4">
+    <path d="M1580 100 C1580 100 1584 112 1586 114 C1588 116 1600 120 1600 120 C1600 120 1588 124 1586 126 C1584 128 1580 140 1580 140 C1580 140 1576 128 1574 126 C1572 124 1560 120 1560 120 C1560 120 1572 116 1574 114 C1576 112 1580 100 1580 100Z" fill="#E07B54"/>
+    <path d="M60 540 C60 540 63 548 65 550 C67 552 75 555 75 555 C75 555 67 558 65 560 C63 562 60 570 60 570 C60 570 57 562 55 560 C53 558 45 555 45 555 C45 555 53 552 55 550 C57 548 60 540 60 540Z" fill="#D4603C"/>
+    <path d="M520 80 C520 80 522 86 524 88 C526 90 532 92 532 92 C532 92 526 94 524 96 C522 98 520 104 520 104 C520 104 518 98 516 96 C514 94 508 92 508 92 C508 92 514 90 516 88 C518 86 520 80 520 80Z" fill="#E07B54"/>
+  </g>
+  
+  <!-- Badge "Essai gratuit" coin inférieur droit -->
+  <g transform="translate(1420, 20)">
+    <rect x="0" y="0" width="180" height="50" rx="25" fill="#1D1D1F" opacity="0.9"/>
+    <text x="90" y="33" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="600" fill="white" text-anchor="middle">
+      🎁 Essai gratuit
+    </text>
+  </g>
+</svg>

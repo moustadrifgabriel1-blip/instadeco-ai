@@ -37,7 +37,7 @@ export function CookieBanner() {
           <div className="flex-1">
             <p className="text-[14px] text-[#1d1d1f] leading-relaxed">
               <span className="font-semibold">🍪 Cookies & Analyse.</span>{' '}
-              Nous utilisons des cookies pour la connexion et des outils d'analyse (Google Analytics, Facebook Pixel) 
+              Nous utilisons des cookies pour la connexion et des outils d&apos;analyse (Google Analytics, Facebook Pixel) 
               afin de mesurer nos performances publicitaires.{' '}
               <Link 
                 href="/legal/privacy" 

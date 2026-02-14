@@ -5,6 +5,27 @@
  * Note: En production avec plusieurs instances, utiliser Redis ou Upstash.
  */
 
+/**
+ * IPs whitelistées — aucune limite de rate pour ces adresses.
+ * Configurable via la variable d'environnement WHITELISTED_IPS (séparées par des virgules).
+ * Exemple : WHITELISTED_IPS=178.197.198.164,203.0.113.42
+ */
+const HARDCODED_WHITELISTED_IPS: string[] = [
+  '178.197.198.164', // Gabriel — dev/test
+];
+
+function getWhitelistedIPs(): Set<string> {
+  const envIPs = process.env.WHITELISTED_IPS?.split(',').map(ip => ip.trim()).filter(Boolean) || [];
+  return new Set([...HARDCODED_WHITELISTED_IPS, ...envIPs]);
+}
+
+/**
+ * Vérifie si une IP est whitelistée (bypass rate limit)
+ */
+export function isIPWhitelisted(ip: string): boolean {
+  return getWhitelistedIPs().has(ip);
+}
+
 interface RateLimitEntry {
   count: number;
   resetAt: number;
@@ -42,12 +63,22 @@ export interface RateLimitResult {
 }
 
 /**
- * Vérifie si une requête est autorisée selon le rate limit
+ * Vérifie si une requête est autorisée selon le rate limit.
+ * Les IPs whitelistées passent toujours.
  */
 export function checkRateLimit(
   identifier: string,
   config: RateLimitConfig
 ): RateLimitResult {
+  // Bypass pour les IPs whitelistées
+  if (isIPWhitelisted(identifier)) {
+    return {
+      success: true,
+      remaining: config.maxRequests,
+      resetAt: Date.now() + config.windowSeconds * 1000,
+    };
+  }
+
   const key = config.prefix ? `${config.prefix}:${identifier}` : identifier;
   const now = Date.now();
   const windowMs = config.windowSeconds * 1000;

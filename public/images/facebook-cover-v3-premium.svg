@@ -1,0 +1,158 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1640 624" width="1640" height="624">
+  <defs>
+    <!-- Gradient principal -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1A1A1D"/>
+      <stop offset="50%" style="stop-color:#2D1B1E"/>
+      <stop offset="100%" style="stop-color:#3D2420"/>
+    </linearGradient>
+    
+    <!-- Gradient terracotta lumineux -->
+    <linearGradient id="glowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF9B7D"/>
+      <stop offset="50%" style="stop-color:#E07B54"/>
+      <stop offset="100%" style="stop-color:#C04E2A"/>
+    </linearGradient>
+    
+    <!-- Gradient doré -->
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD700"/>
+      <stop offset="50%" style="stop-color:#FFA500"/>
+      <stop offset="100%" style="stop-color:#FF8C00"/>
+    </linearGradient>
+    
+    <!-- Effet blur pour halos lumineux -->
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="20" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <filter id="strongGlow">
+      <feGaussianBlur stdDeviation="30" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <!-- Ombre portée 3D -->
+    <filter id="shadow3d">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="8"/>
+      <feOffset dx="0" dy="12" result="offsetblur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.4"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background sombre -->
+  <rect width="1640" height="624" fill="url(#bgGrad)"/>
+  
+  <!-- Halos lumineux ambiance -->
+  <circle cx="300" cy="150" r="250" fill="#E07B54" opacity="0.15" filter="url(#glow)"/>
+  <circle cx="1400" cy="450" r="300" fill="#FF9B7D" opacity="0.12" filter="url(#glow)"/>
+  <circle cx="820" cy="312" r="400" fill="#FFA500" opacity="0.08" filter="url(#glow)"/>
+  
+  <!-- Grille isométrique subtile en arrière-plan -->
+  <g opacity="0.05" stroke="#E07B54" stroke-width="1" fill="none">
+    <path d="M 0,312 L 410,156 L 820,0 L 1230,156 L 1640,312" />
+    <path d="M 0,312 L 410,468 L 820,624 L 1230,468 L 1640,312" />
+    <path d="M 410,156 L 410,468" />
+    <path d="M 820,0 L 820,624" />
+    <path d="M 1230,156 L 1230,468" />
+  </g>
+  
+  <!-- Titre principal 3D "InstaDeco" -->
+  <g transform="translate(820, 180)">
+    <!-- Ombre texte -->
+    <text x="0" y="8" font-family="system-ui, -apple-system, sans-serif" font-size="110" font-weight="900" fill="#0D0D0F" text-anchor="middle" letter-spacing="-3" opacity="0.6">
+      InstaDeco
+    </text>
+    <!-- Texte principal avec gradient -->
+    <text x="0" y="0" font-family="system-ui, -apple-system, sans-serif" font-size="110" font-weight="900" fill="url(#glowGrad)" text-anchor="middle" letter-spacing="-3" filter="url(#glow)">
+      InstaDeco
+    </text>
+  </g>
+  
+  <!-- Sous-titre "IA Générative" avec effet neon -->
+  <g transform="translate(820, 250)">
+    <text x="0" y="0" font-family="system-ui, -apple-system, sans-serif" font-size="36" font-weight="600" fill="#FFFFFF" text-anchor="middle" letter-spacing="8" opacity="0.9">
+      DÉCORATION • IA GÉNÉRATIVE
+    </text>
+    <line x1="-350" y1="15" x2="-150" y2="15" stroke="url(#goldGrad)" stroke-width="3" stroke-linecap="round" filter="url(#glow)"/>
+    <line x1="150" y1="15" x2="350" y2="15" stroke="url(#goldGrad)" stroke-width="3" stroke-linecap="round" filter="url(#glow)"/>
+  </g>
+  
+  <!-- Message clé avec effet holographique -->
+  <g transform="translate(820, 330)">
+    <text x="0" y="0" font-family="system-ui, -apple-system, sans-serif" font-size="44" font-weight="600" fill="#FFFFFF" text-anchor="middle" letter-spacing="-0.5">
+      Transformez votre intérieur en
+    </text>
+    <text x="0" y="50" font-family="system-ui, -apple-system, sans-serif" font-size="72" font-weight="800" fill="url(#goldGrad)" text-anchor="middle" letter-spacing="-2" filter="url(#strongGlow)">
+      30 secondes
+    </text>
+  </g>
+  
+  <!-- Stats avec effet carte 3D -->
+  <g transform="translate(0, 490)">
+    <!-- Carte 1: Styles -->
+    <g transform="translate(230, 0)">
+      <rect x="-90" y="-40" width="180" height="100" rx="16" fill="#2A2A2F" opacity="0.9" filter="url(#shadow3d)"/>
+      <rect x="-88" y="-38" width="176" height="96" rx="14" fill="none" stroke="url(#glowGrad)" stroke-width="2"/>
+      <text x="0" y="0" font-family="system-ui, -apple-system, sans-serif" font-size="42" font-weight="800" fill="url(#glowGrad)" text-anchor="middle">20+</text>
+      <text x="0" y="30" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="500" fill="#CCCCCC" text-anchor="middle">STYLES</text>
+    </g>
+    
+    <!-- Carte 2: Prix -->
+    <g transform="translate(820, 0)">
+      <rect x="-90" y="-40" width="180" height="100" rx="16" fill="#2A2A2F" opacity="0.9" filter="url(#shadow3d)"/>
+      <rect x="-88" y="-38" width="176" height="96" rx="14" fill="none" stroke="url(#goldGrad)" stroke-width="2"/>
+      <text x="0" y="0" font-family="system-ui, -apple-system, sans-serif" font-size="42" font-weight="800" fill="url(#goldGrad)" text-anchor="middle">0,99€</text>
+      <text x="0" y="30" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="500" fill="#CCCCCC" text-anchor="middle">PAR IMAGE</text>
+    </g>
+    
+    <!-- Carte 3: Vitesse -->
+    <g transform="translate(1410, 0)">
+      <rect x="-90" y="-40" width="180" height="100" rx="16" fill="#2A2A2F" opacity="0.9" filter="url(#shadow3d)"/>
+      <rect x="-88" y="-38" width="176" height="96" rx="14" fill="none" stroke="url(#glowGrad)" stroke-width="2"/>
+      <text x="0" y="0" font-family="system-ui, -apple-system, sans-serif" font-size="42" font-weight="800" fill="url(#glowGrad)" text-anchor="middle">30s</text>
+      <text x="0" y="30" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="500" fill="#CCCCCC" text-anchor="middle">RAPIDE</text>
+    </g>
+  </g>
+  
+  <!-- Badge "ESSAI GRATUIT" coin supérieur droit avec glow -->
+  <g transform="translate(1340, 40)">
+    <rect x="0" y="0" width="260" height="70" rx="35" fill="url(#glowGrad)" filter="url(#strongGlow)"/>
+    <text x="130" y="46" font-family="system-ui, -apple-system, sans-serif" font-size="26" font-weight="700" fill="#FFFFFF" text-anchor="middle" letter-spacing="1">
+      ESSAI GRATUIT
+    </text>
+  </g>
+  
+  <!-- Particules lumineuses flottantes -->
+  <g opacity="0.6">
+    <circle cx="200" cy="100" r="4" fill="#FFD700" filter="url(#glow)"/>
+    <circle cx="1450" cy="200" r="6" fill="#FFA500" filter="url(#glow)"/>
+    <circle cx="150" cy="500" r="3" fill="#E07B54" filter="url(#glow)"/>
+    <circle cx="1500" cy="550" r="5" fill="#FF9B7D" filter="url(#glow)"/>
+    <circle cx="820" cy="80" r="4" fill="#FFD700" filter="url(#glow)"/>
+    <circle cx="600" cy="580" r="3" fill="#FFA500" filter="url(#glow)"/>
+    <circle cx="1100" cy="120" r="4" fill="#E07B54" filter="url(#glow)"/>
+  </g>
+  
+  <!-- Sparkles AI symboliques -->
+  <g filter="url(#glow)">
+    <path d="M 120 250 L 125 265 L 130 250 L 145 255 L 130 260 L 125 275 L 120 260 L 105 255 Z" fill="url(#goldGrad)"/>
+    <path d="M 1520 400 L 1527 420 L 1534 400 L 1554 407 L 1534 414 L 1527 434 L 1520 414 L 1500 407 Z" fill="url(#goldGrad)"/>
+    <path d="M 420 580 L 425 592 L 430 580 L 442 585 L 430 590 L 425 602 L 420 590 L 408 585 Z" fill="url(#glowGrad)"/>
+  </g>
+  
+  <!-- Ligne d'accent en bas avec gradient -->
+  <rect x="0" y="620" width="1640" height="4" fill="url(#glowGrad)" opacity="0.5"/>
+</svg>
