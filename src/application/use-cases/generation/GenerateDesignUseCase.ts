@@ -262,10 +262,30 @@ export class GenerateDesignUseCase {
     if (!genResult.success) {
       // Marquer comme failed
       await this.generationRepo.update(generation.id, { status: 'failed' });
+      
+      // 🔴 REMBOURSEMENT — l'utilisateur ne doit JAMAIS perdre un crédit pour une génération ratée
+      const refundResult = await this.creditRepo.addCredits(
+        input.userId,
+        requiredCredits,
+        `Remboursement — échec génération #${generation.id.slice(0, 8)}`,
+      );
+      if (refundResult.success) {
+        this.logger.info('Credits refunded after AI failure', {
+          userId: input.userId,
+          generationId: generation.id,
+          amount: requiredCredits,
+        });
+      } else {
+        this.logger.error('CRITICAL: Failed to refund credits after AI failure', refundResult.error as Error, {
+          userId: input.userId,
+          generationId: generation.id,
+        });
+      }
+      
       this.logger.error('AI generation failed', genResult.error as Error, {
         generationId: generation.id,
       });
-      return failure(new ImageGenerationError('La génération IA a échoué'));
+      return failure(new ImageGenerationError('La génération IA a échoué. Votre crédit a été remboursé.'));
     }
 
     // 7. L'image est déjà générée (fal.run synchrone) → Upload vers Supabase Storage
@@ -301,7 +321,22 @@ export class GenerateDesignUseCase {
 
      if (!updateResult.success) {
       this.logger.error('Failed to update generation with providerId', updateResult.error as Error);
-      return failure(new ImageGenerationError('Échec de la mise à jour (providerId)'));
+      
+      // 🔴 REMBOURSEMENT — l'image existe mais l'update DB a échoué
+      const refundResult = await this.creditRepo.addCredits(
+        input.userId,
+        requiredCredits,
+        `Remboursement — échec mise à jour #${generation.id.slice(0, 8)}`,
+      );
+      if (refundResult.success) {
+        this.logger.info('Credits refunded after DB update failure', {
+          userId: input.userId, generationId: generation.id,
+        });
+      } else {
+        this.logger.error('CRITICAL: Failed to refund credits after DB update failure', refundResult.error as Error);
+      }
+      
+      return failure(new ImageGenerationError('Échec de la mise à jour. Votre crédit a été remboursé.'));
     }
 
     const duration = Date.now() - startTime;

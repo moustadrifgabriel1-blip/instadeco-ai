@@ -62,16 +62,18 @@ function GenerateContent() {
   const { generate, state: generateState, reset: resetGenerate } = useGenerate();
   
   // Polling du statut de génération
+  // Skip le polling si le résultat synchrone a déjà l'image
+  const skipPolling = !!(generateState.data?.status === 'completed' && generateState.data?.outputImageUrl);
   const { 
     generation: statusGeneration, 
     isComplete, 
     isFailed 
-  } = useGenerationStatus(generationId);
+  } = useGenerationStatus(generationId, { enabled: !skipPolling });
 
   // États dérivés
   // L'image est disponible dès la réponse synchrone OU via le polling
   const generatedImage = generateState.data?.outputImageUrl || statusGeneration?.outputImageUrl || null;
-  const isGenerating = generateState.isLoading || (generationId && !isComplete && !isFailed && !generatedImage);
+  const isGenerating = generateState.isLoading || (generationId && !isComplete && !isFailed && !generatedImage && !skipPolling);
   const [progress, setProgress] = useState(0);
   
   // Effet pour animer la progression
@@ -104,15 +106,12 @@ function GenerateContent() {
   const error = generateState.error || (isFailed ? 'La génération a échoué' : null);
 
   // Quand la génération démarre, stocker l'ID pour le polling (confirmation)
-  // Mais ne pas lancer le polling si le résultat est déjà complet
+  // Skip le polling si le résultat synchrone est déjà complet avec outputImageUrl
   useEffect(() => {
-    if (generateState.data?.id && generateState.data?.status !== 'completed') {
-      setGenerationId(generateState.data.id);
-    } else if (generateState.data?.id && generateState.data?.status === 'completed') {
-      // Résultat déjà complet, pas besoin de polling
+    if (generateState.data?.id) {
       setGenerationId(generateState.data.id);
     }
-  }, [generateState.data?.id, generateState.data?.status]);
+  }, [generateState.data?.id]);
 
   // Upload d'image avec drag & drop
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -137,7 +136,7 @@ function GenerateContent() {
       'image/*': ['.jpeg', '.jpg', '.png', '.webp'],
     },
     maxFiles: 1,
-    maxSize: 10 * 1024 * 1024,
+    maxSize: 4 * 1024 * 1024, // 4 Mo max (la limite Vercel body est ~4.5 Mo en base64)
   });
 
   const removeImage = () => {
@@ -442,16 +441,23 @@ function GenerateContent() {
                 <div className="flex flex-col items-center pt-2 gap-3">
                   <button
                     onClick={handleGenerate}
-                    className="group inline-flex items-center gap-2 bg-[#E07B54] text-white px-8 py-4 rounded-full text-[17px] font-semibold hover:bg-[#d06a45] transition-all duration-200 shadow-lg shadow-[#E07B54]/20 active:scale-95"
+                    disabled={user ? (credits ?? 0) < 1 : false}
+                    className="group inline-flex items-center gap-2 bg-[#E07B54] text-white px-8 py-4 rounded-full text-[17px] font-semibold hover:bg-[#d06a45] transition-all duration-200 shadow-lg shadow-[#E07B54]/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"
                   >
                     <Sparkles className="w-5 h-5" />
                     Transformer ma pièce
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" strokeWidth={2} />
                   </button>
                   {user ? (
-                    <span className="text-[12px] text-[#636366]">
-                      1 crédit sera utilisé • {credits} crédit{(credits ?? 0) > 1 ? 's' : ''} disponible{(credits ?? 0) > 1 ? 's' : ''}
-                    </span>
+                    (credits ?? 0) < 1 ? (
+                      <span className="text-[12px] text-[#ff3b30]">
+                        Plus de crédits — <a href="/credits" className="underline hover:text-[#d62d22]">Recharger</a>
+                      </span>
+                    ) : (
+                      <span className="text-[12px] text-[#636366]">
+                        1 crédit sera utilisé • {credits} crédit{(credits ?? 0) > 1 ? 's' : ''} disponible{(credits ?? 0) > 1 ? 's' : ''}
+                      </span>
+                    )
                   ) : (
                     <span className="text-[12px] text-[#636366]">
                       Gratuit — 3 crédits offerts à l&apos;inscription

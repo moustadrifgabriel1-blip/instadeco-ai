@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { 
   generateDesign, 
@@ -12,6 +12,9 @@ import {
   UseGenerateReturn, 
   GenerateDesignInput 
 } from '@/src/presentation/types';
+
+/** Timeout global pour la requête de génération (Vercel maxDuration=60s + marge) */
+const GENERATE_TIMEOUT_MS = 65_000;
 
 /**
  * Hook pour générer un design
@@ -31,6 +34,7 @@ import {
  */
 export function useGenerate(): UseGenerateReturn {
   const { user } = useAuth();
+  const abortControllerRef = useRef<AbortController | null>(null);
   
   const [state, setState] = useState<UseGenerateState>({
     data: null,
@@ -90,6 +94,15 @@ export function useGenerate(): UseGenerateReturn {
 
         setState((prev) => ({ ...prev, progress: 40, statusMessage: 'Lancement de la génération...' }));
 
+        // AbortController avec timeout de sécurité (65s)
+        if (abortControllerRef.current) {
+          abortControllerRef.current.abort();
+        }
+        abortControllerRef.current = new AbortController();
+        const timeoutId = setTimeout(() => {
+          abortControllerRef.current?.abort();
+        }, GENERATE_TIMEOUT_MS);
+
         // Appeler l'API
         const response = await generateDesign({
           userId: user.id,
@@ -97,7 +110,9 @@ export function useGenerate(): UseGenerateReturn {
           roomType: input.roomType,
           style: input.style,
           transformMode: input.transformMode,
-        });
+        }, { signal: abortControllerRef.current.signal });
+        
+        clearTimeout(timeoutId);
 
         setState({
           data: response.generation,
@@ -105,14 +120,17 @@ export function useGenerate(): UseGenerateReturn {
           isLoading: false,
           isSuccess: true,
           isError: false,
-          progress: 90, // Génération synchrone terminée, polling va confirmer
-          statusMessage: 'Finalisation...',
+          progress: response.generation.outputImageUrl ? 100 : 90,
+          statusMessage: response.generation.outputImageUrl ? 'Terminé !' : 'Finalisation...',
         });
 
         return response.generation;
 
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
+        const isAbort = error instanceof Error && error.name === 'AbortError';
+        const errorMessage = isAbort 
+          ? 'La génération a pris trop de temps. Veuillez réessayer.'
+          : (error instanceof Error ? error.message : 'Erreur inconnue');
         
         setState({
           data: null,
