@@ -189,6 +189,21 @@ export async function POST(req: Request) {
     // Extraire les dimensions pour déterminer le format
     const imageSize = guessImageSize(imageBase64);
 
+    // Upload l'image sur le storage fal.ai (les data URIs base64 ne fonctionnent pas en queue)
+    console.log(`[Trial] 📤 Uploading image to fal.ai storage...`);
+    let uploadedImageUrl: string;
+    try {
+      const base64Data = imageBase64.split(',')[1];
+      const mimeType = imageBase64.split(';')[0].split(':')[1] || 'image/jpeg';
+      const buffer = Buffer.from(base64Data, 'base64');
+      const blob = new Blob([buffer], { type: mimeType });
+      uploadedImageUrl = await fal.storage.upload(blob);
+      console.log(`[Trial] ✅ Image uploaded: ${uploadedImageUrl.substring(0, 60)}...`);
+    } catch (uploadError: any) {
+      console.error('[Trial] ❌ Image upload failed:', uploadError?.message);
+      return NextResponse.json({ error: 'Erreur lors de l\'upload de l\'image' }, { status: 500 });
+    }
+
     console.log(`[Trial] 🎨 Submitting to Fal.ai... style=${style}, room=${roomType}, imageSize=${imageSize}, promptLength=${prompt.length}`);
 
     // Submit à fal.ai (queue) — Image-to-Image
@@ -197,12 +212,12 @@ export async function POST(req: Request) {
     const { request_id } = await fal.queue.submit(MODEL_PATH, {
       input: {
         prompt,
-        image_url: imageBase64,              // Image source = base img2img
+        image_url: uploadedImageUrl,          // URL fal.ai storage (plus fiable que data URI)
         strength: 0.55,                       // Préserver la structure (0=identique, 1=refaire)
         easycontrols: [
           {
             control_method_url: 'depth',
-            image_url: imageBase64,
+            image_url: uploadedImageUrl,
             image_control_type: 'spatial',
             scale: 1.0,                       // Force élevée du contrôle de profondeur
           },

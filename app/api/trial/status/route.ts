@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { fal } from '@fal-ai/client';
 
 const MODEL_PATH = 'fal-ai/flux-general/image-to-image';
+// Path de la queue fal.ai (sans le suffixe /image-to-image)
+const QUEUE_BASE_PATH = 'fal-ai/flux-general';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
@@ -82,7 +84,7 @@ export async function GET(req: Request) {
           
           // Fallback REST pour récupérer le résultat
           try {
-            const resultUrl = `https://queue.fal.run/${MODEL_PATH}/requests/${requestId}`;
+            const resultUrl = `https://queue.fal.run/${QUEUE_BASE_PATH}/requests/${requestId}`;
             const resultResponse = await fetch(resultUrl, {
               headers: { 'Authorization': `Key ${FAL_KEY}` },
               signal: AbortSignal.timeout(15000),
@@ -122,7 +124,7 @@ export async function GET(req: Request) {
 
     // ── Méthode 2 : REST API fallback ──
     try {
-      const statusUrl = `https://queue.fal.run/${MODEL_PATH}/requests/${requestId}/status`;
+      const statusUrl = `https://queue.fal.run/${QUEUE_BASE_PATH}/requests/${requestId}/status`;
       const statusResponse = await fetch(statusUrl, {
         headers: { 'Authorization': `Key ${FAL_KEY}` },
         signal: AbortSignal.timeout(10000),
@@ -142,7 +144,7 @@ export async function GET(req: Request) {
         let imageUrl = statusData?.images?.[0]?.url || statusData?.response?.images?.[0]?.url;
 
         if (!imageUrl) {
-          const resultUrl = `https://queue.fal.run/${MODEL_PATH}/requests/${requestId}`;
+          const resultUrl = `https://queue.fal.run/${QUEUE_BASE_PATH}/requests/${requestId}`;
           const resultResponse = await fetch(resultUrl, {
             headers: { 'Authorization': `Key ${FAL_KEY}` },
             signal: AbortSignal.timeout(10000),
