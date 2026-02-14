@@ -8,6 +8,22 @@ import { GenerationNotFoundError } from '@/src/domain/errors/GenerationNotFoundE
 import { DomainError } from '@/src/domain/errors/DomainError';
 
 /**
+ * ⚠️ FICHIER CRITIQUE — NE PAS MODIFIER SANS RAISON MAJEURE
+ * 
+ * Ce Use Case est appelé par le polling client (GET /api/v2/generations/[id]/status)
+ * pour vérifier si une génération est terminée.
+ * 
+ * ARCHITECTURE (février 2026) :
+ * - La génération utilise fal.run() SYNCHRONE dans GenerateDesignUseCase
+ * - Le résultat est déjà en DB avec status='completed' + outputImageUrl quand ce use case est appelé
+ * - Ce use case ne fait QUE lire la DB et retourner le statut
+ * - Il NE contacte PAS fal.ai (plus besoin, tout est synchrone)
+ * 
+ * Si une génération est bloquée en 'processing' > 2 min, on la marque en 'failed'
+ * (sécurité anti-zombies si le serveur crash pendant fal.run).
+ */
+
+/**
  * Input pour récupérer le statut
  */
 export interface GetGenerationStatusInput {
@@ -17,8 +33,9 @@ export interface GetGenerationStatusInput {
 
 /**
  * Use Case: Récupérer le statut d'une génération
- * Si le statut local est 'pending' ou 'processing', on vérifie auprès du provider (Fal.ai)
- * et on met à jour si terminé.
+ * 
+ * Avec l'architecture synchrone (fal.run), le statut est déjà en DB.
+ * Ce use case gère aussi les cas zombies (génération bloquée).
  */
 export class GetGenerationStatusUseCase {
   constructor(
@@ -61,67 +78,26 @@ export class GetGenerationStatusUseCase {
       return success(generation);
     }
 
-    // Log pour debug
-    console.log('[GetStatus] Generation state:', {
-      id: generation.id,
-      status: generation.status,
-      providerId: generation.providerId,
-      hasProviderId: !!generation.providerId
-    });
+    // Protection anti-zombie : si une génération est en 'pending' ou 'processing'  
+    // depuis plus de 2 minutes, c'est que le serveur a crashé pendant fal.run()
+    // → marquer comme 'failed' pour débloquer l'utilisateur
+    if (generation.status === 'pending' || generation.status === 'processing') {
+      const ageMs = Date.now() - new Date(generation.updatedAt).getTime();
+      const TWO_MINUTES = 2 * 60 * 1000;
 
-    // Si en attente et providerId existe, vérifier le statut externe
-    if ((generation.status === 'pending' || generation.status === 'processing') && generation.providerId) {
-      if (typeof this.imageGenerator.checkStatus === 'function') {
-        console.log('[GetStatus] Checking Fal.ai status for:', generation.providerId);
-        
-        const statusCheck = await this.imageGenerator.checkStatus(generation.providerId);
-        
-        if (statusCheck.success) {
-          const { status, output } = statusCheck.data;
-          console.log('[GetStatus] Fal.ai response:', { status, hasOutput: !!output?.imageUrl });
-          
-          if (status === 'succeeded' && output?.imageUrl) {
-            // Télécharger et stocker l'image finale
-            console.log('[GetStatus] SUCCESS! Uploading image to Supabase...');
-            
-            const uploadResult = await this.storage.uploadFromUrl(output.imageUrl, {
-              bucket: 'output-images',
-              fileName: `${generation.userId}/${generation.id}.jpg`,
-              contentType: 'image/jpeg',
-            });
+      if (ageMs > TWO_MINUTES) {
+        this.logger.warn('Zombie generation detected, marking as failed', {
+          generationId: generation.id,
+          ageMs,
+          status: generation.status,
+        });
 
-            if (uploadResult.success) {
-              console.log('[GetStatus] Image uploaded, updating DB...', uploadResult.data.url);
-              
-              const updatedGen = await this.generationRepo.update(generation.id, {
-                 status: 'completed',
-                 outputImageUrl: uploadResult.data.url
-              });
-              
-              if (updatedGen.success) {
-                console.log('[GetStatus] ✅ Generation completed successfully!');
-                return success(updatedGen.data);
-              } else {
-                console.error('[GetStatus] ❌ Failed to update generation in DB', updatedGen.error);
-              }
-            } else {
-              console.error('[GetStatus] ❌ Failed to upload output image', uploadResult.error);
-              // CRITICAL FIX: Return the Fal.ai URL directly if Supabase upload fails
-              // This prevents the generation from being stuck forever
-              console.log('[GetStatus] Fallback: Using Fal.ai URL directly');
-              const fallbackUpdate = await this.generationRepo.update(generation.id, {
-                status: 'completed',
-                outputImageUrl: output.imageUrl
-              });
-              if (fallbackUpdate.success) return success(fallbackUpdate.data);
-            }
-          } else if (status === 'failed') {
-            console.error('[GetStatus] ❌ External generation failed');
-            const updatedGen = await this.generationRepo.update(generation.id, { status: 'failed' });
-             if (updatedGen.success) return success(updatedGen.data);
-          }
-        } else {
-          console.error('[GetStatus] ❌ External status check failed', statusCheck.error);
+        const updatedGen = await this.generationRepo.update(generation.id, {
+          status: 'failed',
+        });
+
+        if (updatedGen.success) {
+          return success(updatedGen.data);
         }
       }
     }

@@ -1,3 +1,14 @@
+/**
+ * ⚠️⚠️⚠️ FICHIER CRITIQUE — NE PAS MODIFIER SANS RAISON MAJEURE ⚠️⚠️⚠️
+ * 
+ * POST /api/v2/generate — Génération authentifiée (avec crédits).
+ * Appelle GenerateDesignUseCase qui utilise fal.run() SYNCHRONE.
+ * 
+ * FLUX : Auth → Validation → GenerateDesignUseCase.execute() → result complet (status=completed)
+ * Le résultat inclut déjà l'outputImageUrl — pas besoin de polling.
+ * 
+ * Lire docs/GENERATION_ARCHITECTURE.md pour l'architecture complète.
+ */
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { useCases } from '@/src/infrastructure/config/di-container';

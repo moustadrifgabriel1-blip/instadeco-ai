@@ -1,7 +1,10 @@
-import { Generation } from '@/src/domain/entities/Generation';
+import { Generation, GenerationStatus } from '@/src/domain/entities/Generation';
 
 /**
  * DTO pour la génération (exposé à l'API/UI)
+ * 
+ * ⚠️ NE PAS MODIFIER — Ce DTO est le contrat API entre le serveur et le client.
+ * Tout changement de type ici casse le frontend.
  */
 export interface GenerationDTO {
   id: string;
@@ -10,7 +13,7 @@ export interface GenerationDTO {
   roomType: string;
   inputImageUrl: string;
   outputImageUrl: string | null;
-  status: string;
+  status: GenerationStatus;
   createdAt: string;
   updatedAt: string;
 }

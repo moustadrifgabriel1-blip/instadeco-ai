@@ -1,3 +1,22 @@
+/**
+ * ⚠️⚠️⚠️ FICHIER CRITIQUE — NE PAS MODIFIER SANS RAISON MAJEURE ⚠️⚠️⚠️
+ * 
+ * Ce fichier gère la génération d'images via Fal.ai.
+ * Il utilise fal.run() en mode SYNCHRONE (pas de queue/polling).
+ * 
+ * HISTORIQUE DES BUGS (février 2026) :
+ * - fal.queue.submit() + fal.queue.result() RÉ-EXÉCUTE le modèle au lieu de retourner le cache
+ * - Les URLs temporaires de fal.ai expirent entre submit et result
+ * - Solution : fal.run() synchrone qui retourne l'image directement
+ * 
+ * RÈGLES :
+ * 1. TOUJOURS utiliser fal.run() — JAMAIS fal.queue.submit()
+ * 2. TOUJOURS uploader l'image via fal.storage.upload() AVANT fal.run()
+ * 3. Ne JAMAIS envoyer de data URI base64 directement à fal.ai
+ * 4. checkStatus() est DEPRECATED et ne doit PAS être réactivé
+ * 
+ * Lire docs/GENERATION_ARCHITECTURE.md pour l'architecture complète.
+ */
 import { fal } from '@fal-ai/client';
 import { Result, success, failure } from '@/src/shared/types/Result';
 import { 
@@ -208,112 +227,19 @@ export class FalImageGeneratorService implements IImageGeneratorService {
       });
 
     } catch (error: any) {
-      console.error('[Fal.ai] ❌ Generation submission failed:', error?.message || error);
-      return failure(new Error(`Fal.ai submission failed: ${error?.message || error}`));
+      console.error('[Fal.ai] ❌ Generation failed:', error?.message || error);
+      return failure(new Error(`Fal.ai generation failed: ${error?.message || error}`));
     }
   }
 
+  /**
+   * @deprecated Plus utilisé — la génération est synchrone via fal.run().
+   * Gardé pour conformité avec l'interface IImageGeneratorService.
+   * NE PAS RÉACTIVER sans lire docs/GENERATION_ARCHITECTURE.md
+   */
   async checkStatus(predictionId: string): Promise<Result<any>> {
-    try {
-      console.log('[Fal.ai] 🔄 Checking status for:', predictionId);
-      
-      // Utiliser l'API REST directement pour plus de contrôle
-      const FAL_KEY = process.env.FAL_KEY || process.env.FAL_API_KEY;
-      const statusUrl = `https://queue.fal.run/${MODEL_PATH}/requests/${predictionId}/status`;
-      
-      const statusResponse = await fetch(statusUrl, {
-        headers: {
-          'Authorization': `Key ${FAL_KEY}`,
-        }
-      });
-      
-      if (!statusResponse.ok) {
-        console.error('[Fal.ai] Status request failed:', statusResponse.status);
-        return failure(new Error(`Status check failed: ${statusResponse.status}`));
-      }
-      
-      const statusData = await statusResponse.json();
-      const statusCode = (statusData?.status || 'UNKNOWN').toUpperCase();
-
-      console.log(`[Fal.ai] Status: ${statusCode} (${predictionId})`);
-      console.log('[Fal.ai] Status response keys:', Object.keys(statusData || {}));
-
-      if (statusCode === 'COMPLETED' || statusCode === 'SUCCEEDED' || statusCode === 'OK') {
-        console.log('[Fal.ai] ✅ Job completed, fetching result...');
-        
-        // D'abord vérifier si le résultat est déjà dans la réponse de status
-        // (certaines versions de l'API retournent le résultat directement)
-        if (statusData?.images?.[0]?.url) {
-          console.log('[Fal.ai] ✅ Image found directly in status response');
-          return success({ 
-            status: 'succeeded',
-            output: { imageUrl: statusData.images[0].url }
-          });
-        }
-        
-        if (statusData?.response?.images?.[0]?.url) {
-          console.log('[Fal.ai] ✅ Image found in status.response');
-          return success({ 
-            status: 'succeeded',
-            output: { imageUrl: statusData.response.images[0].url }
-          });
-        }
-        
-        // Sinon, utiliser l'API REST pour récupérer le résultat
-        const resultUrl = `https://queue.fal.run/${MODEL_PATH}/requests/${predictionId}`;
-        
-        try {
-          const resultResponse = await fetch(resultUrl, {
-            headers: {
-              'Authorization': `Key ${FAL_KEY}`,
-            }
-          });
-          
-          const responseText = await resultResponse.text();
-          console.log('[Fal.ai] Result response status:', resultResponse.status);
-          console.log('[Fal.ai] Result response body (first 500 chars):', responseText.slice(0, 500));
-          
-          if (!resultResponse.ok) {
-            console.error('[Fal.ai] ❌ Result request failed:', resultResponse.status, responseText);
-            return failure(new Error(`Result fetch failed: ${resultResponse.status}`));
-          }
-          
-          const data = JSON.parse(responseText);
-          console.log('[Fal.ai] Result data keys:', Object.keys(data || {}));
-          
-          // Flux returns 'images': [{url: ...}]
-          const imageUrl = data?.images?.[0]?.url || data?.image?.url || data?.response?.images?.[0]?.url;
-
-          if (!imageUrl) {
-            console.error('[Fal.ai] ❌ No image URL in result:', JSON.stringify(data).slice(0, 500));
-            return failure(new Error('No image URL in result'));
-          }
-          
-          console.log('[Fal.ai] ✅ Image URL found:', imageUrl.slice(0, 80) + '...');
-          
-          return success({ 
-            status: 'succeeded',
-            output: { imageUrl }
-          });
-        } catch (resultError: any) {
-          console.error('[Fal.ai] ❌ Error fetching result:', resultError?.message || resultError);
-          return failure(new Error(`Failed to fetch result: ${resultError?.message || resultError}`));
-        }
-      } else if (['IN_PROGRESS', 'IN_QUEUE', 'QUEUED', 'PENDING', 'RUNNING', 'STARTING'].includes(statusCode)) {
-        return success({ status: 'processing', logs: statusData.logs });
-      } else if (statusCode === 'FAILED' || statusCode === 'ERROR') {
-        const errorMsg = statusData.error || 'Fal.ai job failed';
-        return failure(new Error(errorMsg));
-      } else {
-        return success({ status: 'processing' });
-      }
-    } catch (error) {
-      console.error('[Fal.ai] ❌ Status check failed:', error);
-      if ((error as any)?.message?.includes('404')) {
-         return failure(new Error('Job not found (404)'));
-      }
-      return failure(error instanceof Error ? error : new Error('Status check failed'));
-    }
+    console.warn('[Fal.ai] ⚠️ checkStatus() appelé mais plus nécessaire (génération synchrone)');
+    return success({ status: 'succeeded' });
   }
 
   async cancel(predictionId: string): Promise<Result<void>> {

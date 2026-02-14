@@ -1,3 +1,20 @@
+/**
+ * ⚠️⚠️⚠️ FICHIER CRITIQUE — NE PAS MODIFIER SANS RAISON MAJEURE ⚠️⚠️⚠️
+ * 
+ * POST /api/trial/generate — Essai gratuit sans authentification.
+ * Utilise fal.run() en mode SYNCHRONE (10-20s).
+ * 
+ * FLUX : Image base64 → fal.storage.upload() → fal.run() → imageUrl retournée directement
+ * 
+ * ANTI-ABUS : 3 couches (mémoire rate limit + Supabase IP/fingerprint + localStorage)
+ * 
+ * RÈGLES :
+ * 1. TOUJOURS fal.storage.upload() avant fal.run()
+ * 2. JAMAIS fal.queue.submit() (re-exécute le modèle)
+ * 3. JAMAIS de polling/webhook (tout est synchrone)
+ * 
+ * Lire docs/GENERATION_ARCHITECTURE.md pour l'architecture complète.
+ */
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { fal } from '@fal-ai/client';

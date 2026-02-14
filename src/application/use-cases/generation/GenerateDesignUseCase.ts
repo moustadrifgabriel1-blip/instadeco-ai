@@ -1,3 +1,22 @@
+/**
+ * ⚠️⚠️⚠️ FICHIER CRITIQUE — NE PAS MODIFIER SANS RAISON MAJEURE ⚠️⚠️⚠️
+ * 
+ * Use Case : Générer un design d'intérieur (flow authentifié).
+ * 
+ * PIPELINE SYNCHRONE :
+ * 1. Vérifier crédits → 2. Upload image source → 3. Créer en DB (pending)
+ * 4. Déduire crédits → 5. fal.run() synchrone (~10-20s) → 6. Upload output → 7. DB: completed
+ * 
+ * Le résultat est COMPLET quand ce use case retourne (status=completed + outputImageUrl).
+ * Le polling client (GetGenerationStatusUseCase) ne fait que lire la DB pour confirmer.
+ * 
+ * RÈGLES :
+ * 1. JAMAIS réintroduire fal.queue.submit() (re-exécute le modèle)
+ * 2. TOUJOURS uploader l'image via fal.storage dans FalImageGeneratorService
+ * 3. TOUJOURS retourner un résultat complet (pas de status 'processing')
+ * 
+ * Lire docs/GENERATION_ARCHITECTURE.md pour l'architecture complète.
+ */
 import { Result, success, failure } from '@/src/shared/types/Result';
 import { Generation, CreateGenerationInput } from '@/src/domain/entities/Generation';
 import { IGenerationRepository } from '@/src/domain/ports/repositories/IGenerationRepository';

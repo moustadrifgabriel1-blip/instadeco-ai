@@ -6,6 +6,11 @@ Ce projet est un **SaaS B2C de décoration d'intérieur par IA** utilisant Flux.
 
 **⚠️ IMPORTANT:** À chaque nouvelle session, **lire le fichier `../docs/CONTEXT.md`** pour synchroniser le contexte complet du projet.
 
+**🔴 CRITIQUE — GÉNÉRATION D'IMAGES :**  
+Avant de toucher à **TOUT fichier lié à la génération d'images**, lire **obligatoirement** `../docs/GENERATION_ARCHITECTURE.md`.  
+Les fichiers marqués `⚠️⚠️⚠️ FICHIER CRITIQUE` ne doivent **JAMAIS** être modifiés sans raison majeure confirmée.  
+**Règle absolue : NE JAMAIS utiliser `fal.queue.submit()` — toujours `fal.run()` synchrone.**
+
 ## Stack Technique
 
 - **Frontend:** Next.js 14 (App Router), TypeScript, Tailwind CSS
@@ -202,6 +207,7 @@ STRIPE_SECRET_KEY=...
 ## Ressources Importantes
 
 - **Contexte Complet:** `../docs/CONTEXT.md`
+- **🔴 Architecture Génération:** `../docs/GENERATION_ARCHITECTURE.md` — **LIRE AVANT TOUTE MODIF DE GÉNÉRATION**
 - **Schéma DB:** Voir section "Structure de la Base de Données" dans CONTEXT.md
 - **Endpoints API:** Voir section "Endpoints API" dans CONTEXT.md
 - **Next.js Docs:** https://nextjs.org/docs
@@ -216,8 +222,10 @@ STRIPE_SECRET_KEY=...
 - **Optimiser pour les performances (Server Components, lazy loading)**
 - **Inclure la validation Zod dans les suggestions**
 - **Respecter l'architecture en couches (lib/, components/, app/)**
+- **🔴 NE JAMAIS modifier les fichiers marqués `⚠️⚠️⚠️ FICHIER CRITIQUE` sans confirmation explicite**
+- **🔴 NE JAMAIS utiliser `fal.queue.submit()` — toujours `fal.run()` synchrone**
 
 ---
 
-**Version:** 1.0.0  
-**Dernière mise à jour:** 16 janvier 2026
+**Version:** 1.1.0  
+**Dernière mise à jour:** 14 février 2026
