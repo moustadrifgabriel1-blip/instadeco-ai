@@ -257,9 +257,14 @@ fal-ai/flux-general/image-to-image
   "num_inference_steps": 28,
   "guidance_scale": 3.5,
   "enable_safety_checker": true,
-  "output_format": "jpeg",
-  "easycontrols": [{ "control_method_url": "depth", "image_control_type": "spatial" }]
+  "output_format": "jpeg"
 }
+```
+
+> **Note (14 fév 2026)** : `easycontrols` depth désactivé en raison d'un bug tenseur côté fal.ai
+> (`"The size of tensor a (3072) must match the size of tensor b (4096)"`).  
+> Le img2img avec `strength` préserve bien la structure sans easycontrols.  
+> Tester la réactivation avec `scripts/test-fal-ab.js`.
 ```
 
 ### Negative Prompt (structurel)
@@ -381,6 +386,7 @@ DEV_BYPASS_TOKEN=0e42f7f1...       # Token pour bypass rate limit en dev
 | 14 fév 2026 | Webhook: marqué deprecated | Plus appelé en mode synchrone |
 | 14 fév 2026 | GenerationDTO.status: `string` → `GenerationStatus` | Type safety |
 | 14 fév 2026 | Audit complet + documentation | Préparation lancement pub |
+| 14 fév 2026 | Désactivation easycontrols depth | Bug tenseur côté fal.ai (3072 vs 4096) |
 
 ---
 
