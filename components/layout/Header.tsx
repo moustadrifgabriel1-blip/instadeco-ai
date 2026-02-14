@@ -132,7 +132,7 @@ export function Header() {
                     Connexion
                   </Button>
                 </Link>
-                <Link href="/signup">
+                <Link href="/essai">
                   <Button 
                     size="sm" 
                     className="btn-primary rounded-lg"
@@ -215,7 +215,7 @@ export function Header() {
                         Connexion
                       </Button>
                     </Link>
-                    <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>
+                    <Link href="/essai" onClick={() => setMobileMenuOpen(false)}>
                       <Button className="w-full rounded-lg btn-primary">
                         Essai gratuit
                       </Button>

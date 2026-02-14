@@ -45,7 +45,7 @@ export function Hero() {
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold tracking-tight text-[#2D2D2D] leading-[1.1]">
                 Redécorez votre intérieur en style
                 <br />
-                <span className="text-[#C95D3A] italic inline-grid px-2">
+                <span className="text-[#C95D3A] italic inline-grid overflow-visible px-4">
                   {styles.map((style, index) => (
                     <span
                       key={style}
@@ -71,7 +71,7 @@ export function Hero() {
                 className="group h-12 px-6 text-base sm:h-14 sm:px-8 sm:text-lg rounded-xl btn-primary" 
                 asChild
               >
-                <Link href="/generate" className="flex items-center gap-2">
+                <Link href="/essai" className="flex items-center gap-2">
                   <span>Relooker ma pièce gratuitement</span>
                   <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
