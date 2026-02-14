@@ -76,16 +76,7 @@ export function Hero() {
                   <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </Button>
-              <Button 
-                size="lg" 
-                variant="outline"
-                className="group h-12 px-6 text-base sm:h-14 sm:px-8 sm:text-lg rounded-xl border-[#F0E6E0] text-[#2D2D2D] hover:bg-[#FFF8F5] hover:text-[#E07B54]" 
-                asChild
-              >
-                <Link href="/exemples" className="flex items-center gap-2">
-                  <span>Voir des exemples</span>
-                </Link>
-              </Button>
+
             </div>
 
             {/* Social Proof */}

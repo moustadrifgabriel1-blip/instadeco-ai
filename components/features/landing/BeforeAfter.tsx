@@ -46,8 +46,8 @@ export function BeforeAfter() {
     <div className="relative w-full">
       {/* Titre de la transformation */}
       <div className="text-center mb-4">
-        <h3 className="text-lg font-semibold text-white">{currentPair.title}</h3>
-        <p className="text-sm text-white/60">{currentPair.description}</p>
+        <h3 className="text-lg font-semibold text-[#2D2D2D]">{currentPair.title}</h3>
+        <p className="text-sm text-[#6B6B6B]">{currentPair.description}</p>
       </div>
 
       {/* Slider de comparaison */}
