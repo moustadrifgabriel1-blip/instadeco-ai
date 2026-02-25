@@ -76,6 +76,7 @@ export async function GET(request: NextRequest) {
       { limit: 50, sortBy: 'publishedAt', sortOrder: 'desc' }
     );
     const usedKeywords = recentArticles.flatMap((a) => a.tags);
+    const recentTitles = recentArticles.map((a) => a.title);
 
     // 5. Sélectionner un thème aléatoire non utilisé
     let selectedTheme = selectRandomTheme(usedKeywords);
@@ -94,13 +95,21 @@ export async function GET(request: NextRequest) {
 
     console.log(`Cron: Génération article pour "${selectedTheme.primaryKeyword}"`);
 
+    // 5.1 Construire la liste des titres récents à éviter pour le prompt
+    const titlesToAvoid = recentTitles.slice(0, 20).map((t) => `- "${t}"`).join('\n');
+
     // 6. Générer le contenu via IA (2000+ mots pour un contenu substantiel)
     const generatedContent = await aiService.generateArticle({
       theme: selectedTheme.primaryKeyword,
       sessionType: getSessionTypeFromTime(),
       minWords: 2000,
       temperature: 0.75,
-      additionalInstructions: `Mots-clés secondaires à intégrer: ${selectedTheme.secondaryKeywords.join(', ')}. Type de contenu: ${selectedTheme.themeType}. Cible: ${selectedTheme.targetCountry === 'ALL' ? 'Suisse, France, Belgique' : selectedTheme.targetCountry}. IMPORTANT: Inclure des prix réels de produits (IKEA, Maisons du Monde, La Redoute), des dimensions concrètes, et au moins 1 tableau comparatif HTML. Le titre doit être EVERGREEN (pas de date). Chaque conseil doit être ACTIONNABLE immédiatement.`,
+      additionalInstructions: `Mots-clés secondaires à intégrer: ${selectedTheme.secondaryKeywords.join(', ')}. Type de contenu: ${selectedTheme.themeType}. Cible: ${selectedTheme.targetCountry === 'ALL' ? 'Suisse, France, Belgique' : selectedTheme.targetCountry}. IMPORTANT: Inclure des prix réels de produits (IKEA, Maisons du Monde, La Redoute), des dimensions concrètes, et au moins 1 tableau comparatif HTML. Le titre doit être EVERGREEN (pas de date). Chaque conseil doit être ACTIONNABLE immédiatement.
+
+⚠️ TITRES INTERDITS — Ces titres existent déjà sur notre blog. Ton titre doit être COMPLÈTEMENT DIFFÉRENT (angle différent, formulation différente, accroche différente). NE REPRENDS AUCUN de ces titres ni même une formulation proche :
+${titlesToAvoid}
+
+Crée un titre avec un ANGLE UNIQUE : chiffre précis, question provocante, formule originale, erreur à éviter, secret de pro, etc.`,
     });
 
     // 7. Post-traitement anti-AI
@@ -118,8 +127,21 @@ export async function GET(request: NextRequest) {
 
     // 9. Créer l'entité article
     let slug = generateSlug(generatedContent.title);
+    let finalTitle = generatedContent.title;
     
-    // 9.1 Vérifier que le slug n'existe pas déjà
+    // 9.1 Vérifier que le titre n'est pas trop similaire à un titre existant
+    const titleIsSimilar = await repository.titleExistsSimilar(finalTitle, 90);
+    if (titleIsSimilar) {
+      console.warn(`Cron: Titre trop similaire détecté: "${finalTitle}"`);
+      // Ajouter un préfixe unique pour le différencier
+      const prefixes = ['Le Guide Pro :', 'Secrets de Déco :', 'Astuces Maison :', 'Nos Conseils :', 'Inspiration :', 'L\'Essentiel :'];
+      const randomPrefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+      finalTitle = `${randomPrefix} ${finalTitle}`;
+      slug = generateSlug(finalTitle);
+      console.log(`Cron: Titre renommé en: "${finalTitle}"`);
+    }
+    
+    // 9.2 Vérifier que le slug n'existe pas déjà
     const existingArticle = await repository.findBySlug(slug);
     if (existingArticle) {
       // Ajouter un suffixe unique pour éviter le conflit
@@ -130,7 +152,7 @@ export async function GET(request: NextRequest) {
     
     const article = createBlogArticle({
       id: crypto.randomUUID(),
-      title: generatedContent.title,
+      title: finalTitle,
       slug: slug,
       content: linkResult.content,
       metaDescription: generatedContent.metaDescription,
