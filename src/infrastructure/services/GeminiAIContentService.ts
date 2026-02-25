@@ -23,6 +23,7 @@ interface GeminiResponse {
 export class GeminiAIContentService implements IAIContentService {
   private apiKey: string;
   private baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
+  private maxRetries = 2;
 
   constructor() {
     this.apiKey = process.env.GEMINI_API_KEY || '';
@@ -39,54 +40,73 @@ export class GeminiAIContentService implements IAIContentService {
 
     const prompt = this.buildPrompt(options);
 
-    try {
-      const response = await fetch(`${this.baseUrl}?key=${this.apiKey}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [{ text: prompt }],
-            },
-          ],
-          generationConfig: {
-            temperature: options.temperature ?? 0.7,
-            maxOutputTokens: 8192,
-            topP: 0.95,
+    let lastError: Error | null = null;
+    
+    for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
+      try {
+        console.log(`[Gemini] 🚀 Tentative ${attempt}/${this.maxRetries} pour "${options.theme}"`);
+        
+        const response = await fetch(`${this.baseUrl}?key=${this.apiKey}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
           },
-        }),
-      });
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [{ text: prompt }],
+              },
+            ],
+            generationConfig: {
+              temperature: options.temperature ?? 0.7,
+              maxOutputTokens: 65536,
+              topP: 0.95,
+            },
+          }),
+        });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new ArticleGenerationError(
-          `Erreur API Gemini: ${response.status} - ${errorText}`,
-          'GEMINI_API_ERROR'
-        );
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new ArticleGenerationError(
+            `Erreur API Gemini: ${response.status} - ${errorText}`,
+            'GEMINI_API_ERROR'
+          );
+        }
+
+        const data: GeminiResponse = await response.json();
+        const rawContent = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+        if (!rawContent) {
+          throw new ArticleGenerationError(
+            'Réponse Gemini vide ou invalide',
+            'GEMINI_EMPTY_RESPONSE'
+          );
+        }
+
+        const result = this.parseGeneratedContent(rawContent, options);
+        console.log(`[Gemini] ✅ Article généré avec succès (tentative ${attempt}): "${result.title}"`);
+        return result;
+
+      } catch (error) {
+        lastError = error instanceof Error ? error : new Error(String(error));
+        console.error(`[Gemini] ❌ Tentative ${attempt}/${this.maxRetries} échouée:`, lastError.message);
+        
+        if (attempt < this.maxRetries) {
+          const delay = attempt * 3000; // 3s, 6s
+          console.log(`[Gemini] ⏳ Retry dans ${delay / 1000}s...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
       }
-
-      const data: GeminiResponse = await response.json();
-      const rawContent = data.candidates?.[0]?.content?.parts?.[0]?.text;
-
-      if (!rawContent) {
-        throw new ArticleGenerationError(
-          'Réponse Gemini vide ou invalide',
-          'GEMINI_EMPTY_RESPONSE'
-        );
-      }
-
-      return this.parseGeneratedContent(rawContent, options);
-    } catch (error) {
-      if (error instanceof ArticleGenerationError) {
-        throw error;
-      }
-      throw new ArticleGenerationError(
-        `Erreur lors de la génération: ${(error as Error).message}`,
-        'GEMINI_GENERATION_FAILED'
-      );
     }
+
+    // Toutes les tentatives ont échoué
+    if (lastError instanceof ArticleGenerationError) {
+      throw lastError;
+    }
+    throw new ArticleGenerationError(
+      `Échec après ${this.maxRetries} tentatives: ${lastError?.message}`,
+      'GEMINI_GENERATION_FAILED'
+    );
   }
 
   async improveContent(content: string, instructions?: string): Promise<string> {

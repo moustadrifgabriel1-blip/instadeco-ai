@@ -17,7 +17,7 @@ import { selectRandomTheme, BLOG_THEMES, getSessionTypeFromTime } from '@/src/sh
 import { createBlogArticle, generateSlug } from '@/src/domain/entities/BlogArticle';
 
 export const runtime = 'nodejs';
-export const maxDuration = 60; // 60 secondes max pour la génération
+export const maxDuration = 120; // 120 secondes max (retry Gemini inclus)
 
 /**
  * Vérifie le secret CRON
@@ -117,7 +117,16 @@ export async function GET(request: NextRequest) {
     console.log(`Cron: ${linkResult.linksAdded} liens internes ajoutés`);
 
     // 9. Créer l'entité article
-    const slug = generateSlug(generatedContent.title);
+    let slug = generateSlug(generatedContent.title);
+    
+    // 9.1 Vérifier que le slug n'existe pas déjà
+    const existingArticle = await repository.findBySlug(slug);
+    if (existingArticle) {
+      // Ajouter un suffixe unique pour éviter le conflit
+      const suffix = Date.now().toString(36);
+      slug = `${slug}-${suffix}`;
+      console.warn(`Cron: Slug en doublon détecté, renommé en "${slug}"`);
+    }
     
     const article = createBlogArticle({
       id: crypto.randomUUID(),

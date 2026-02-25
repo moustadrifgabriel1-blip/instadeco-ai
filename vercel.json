@@ -4,6 +4,9 @@
     "app/api/v2/generate/route.ts": {
       "maxDuration": 60
     },
+    "app/api/cron/generate-articles/route.ts": {
+      "maxDuration": 120
+    },
     "app/blog/[slug]/page.tsx": {
       "maxDuration": 30
     }
