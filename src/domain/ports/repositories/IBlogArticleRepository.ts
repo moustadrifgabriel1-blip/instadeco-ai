@@ -108,4 +108,9 @@ export interface IBlogArticleRepository {
    * Récupère les articles liés (même tags)
    */
   findRelated(articleId: string, limit?: number): Promise<BlogArticle[]>;
+
+  /**
+   * Récupère les articles liés par tags (évite un findById supplémentaire)
+   */
+  findRelatedByTags(articleId: string, tags: string[], limit?: number): Promise<BlogArticle[]>;
 }

@@ -14,6 +14,7 @@ export interface GenerationDTO {
   inputImageUrl: string;
   outputImageUrl: string | null;
   status: GenerationStatus;
+  prompt: string | null;
   createdAt: string;
   updatedAt: string;
 }

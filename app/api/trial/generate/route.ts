@@ -24,11 +24,6 @@ import { supabaseAdmin } from '@/lib/supabase/admin';
 const MODEL_PATH = 'fal-ai/flux-general/image-to-image';
 
 /**
- * Negative prompt pour empêcher toute modification structurelle.
- */
-const STRUCTURAL_NEGATIVE_PROMPT = 'different room layout, changed walls, modified windows, different room proportions, architectural changes, different ceiling, changed floor plan, different room shape, added windows, removed windows, moved doors, different perspective, different camera angle, distorted proportions, extra rooms, merged rooms, wider room, narrower room, taller ceiling, lower ceiling, different flooring material change';
-
-/**
  * Schéma de validation pour l'essai gratuit
  */
 const trialRequestSchema = z.object({
@@ -228,17 +223,19 @@ export async function POST(req: Request) {
     // et l'image uploadée expire entre-temps
     // NOTE: easycontrols depth désactivé le 14/02/2026 — erreur tenseur côté fal.ai
     // "The size of tensor a (3072) must match the size of tensor b (4096)"
-    // Le img2img avec strength=0.55 préserve bien la structure sans easycontrols.
+    // Compensation : strength recalibré + guidance_scale élevé.
     // Réactiver quand fal.ai corrige le bug (tester avec scripts/test-fal-ab.js)
     const result = await fal.run(MODEL_PATH, {
       input: {
         prompt,
         image_url: uploadedImageUrl,
-        strength: 0.55,
-        negative_prompt: STRUCTURAL_NEGATIVE_PROMPT,
+        strength: 0.72,
+        negative_prompt: 'different room shape, modified walls, moved windows, changed doors, different ceiling height, altered room proportions, different camera angle, different perspective, empty unfurnished room, construction site, unfinished renovation, blurry, low quality, watermark, text overlay, deformed, cartoon, painting, illustration, 3d render',
         image_size: imageSize,
-        num_inference_steps: 28,
-        guidance_scale: 3.5,
+        num_inference_steps: 30,
+        guidance_scale: 5.5,
+        nag_scale: 4,
+        nag_end: 0.35,
         enable_safety_checker: true,
         output_format: 'jpeg',
       } as any,
@@ -280,12 +277,17 @@ export async function POST(req: Request) {
  */
 function buildTrialPrompt(style: string, roomType: string): string {
   const styleDescriptions: Record<string, string> = {
-    moderne: 'modern minimalist with clean lines, neutral colors, contemporary furniture',
-    scandinave: 'Scandinavian with light oak wood, white walls, cozy wool textiles, hygge atmosphere',
-    boheme: 'bohemian with layered textiles, macramé, indoor plants, warm terracotta colors',
-    japandi: 'Japandi combining Japanese zen minimalism with Scandinavian warmth',
-    industriel: 'industrial loft with exposed brick walls, black metal fixtures, Edison bulbs',
-    classique: 'classic French elegance with rich fabrics, carved wood furniture, chandeliers',
+    moderne: 'contemporary modern interior, clean architectural lines, matte white walls, warm neutral upholstery, light hardwood floors, sculptural low-profile furniture, recessed LED and geometric pendant lighting',
+    scandinave: 'Scandinavian hygge interior, warm white textured walls, light oak plank floors, bouclé upholstery, sheepskin throws draped over furniture, clustered white candles, woven wool area rug, pendant globe lights, soft cream palette',
+    boheme: 'bohemian interior, layered Persian and kilim rugs, macramé wall hangings, abundant trailing indoor plants, rattan and wicker furniture, terracotta and ochre palette, vintage brass lanterns, embroidered cushions',
+    japandi: 'Japandi interior, wabi-sabi handcrafted ceramics, light ash wood furniture, dried pampas grass, neutral linen textiles, paper lantern pendants, muted earth tones, organic natural textures',
+    industriel: 'industrial loft interior, exposed red brick accent wall, black steel frame elements, Edison filament bulb pendant cluster, raw concrete floor, aged brown leather Chesterfield sofa, matte black pipe shelving',
+    minimaliste: 'ultra-minimalist interior, pure white space with warm wood accents, essential furniture only, generous negative space, monochrome palette, Japanese-inspired serenity, soft diffused light',
+    haussmannien: 'classic Parisian Haussmannian interior, ornate plaster crown moldings, herringbone oak parquet, white marble fireplace, floor-to-ceiling French windows, crystal chandelier, navy velvet upholstery',
+    artdeco: 'Art Deco interior, bold geometric patterns and brass inlays, emerald green velvet tufted seating, black lacquered surfaces, sunburst mirrors, dramatic pendant lighting, jewel tones with gold',
+    midcentury: 'mid-century modern interior, Eames-inspired organic forms, warm teak and walnut wood, tapered legs, mustard and olive palette, Nelson bubble pendant, bold abstract art on walls',
+    coastal: 'coastal interior, ocean blue and sandy white palette, whitewashed shiplap paneling, woven seagrass pendants, natural linen slipcovers, weathered driftwood accents, sisal rug, sheer curtains',
+    luxe: 'luxury interior, book-matched Calacatta marble surfaces, polished brass fixtures, deep velvet upholstery, crystal chandelier, champagne gold accents, plush mohair throws, sculptural art objects',
   };
 
   const roomDescriptions: Record<string, string> = {
@@ -297,24 +299,21 @@ function buildTrialPrompt(style: string, roomType: string): string {
     'salle-a-manger': 'dining room',
   };
 
-  const styleDesc = styleDescriptions[style] || 'modern minimalist, clean lines, neutral colors';
+  const roomFurniture: Record<string, string> = {
+    salon: 'designer sofa, sculptural coffee table, accent armchair, bookshelf, floor lamp',
+    chambre: 'upholstered bed with layered bedding, nightstands with lamps, elegant wardrobe',
+    cuisine: 'premium cabinetry, stone countertops, integrated appliances, pendant-lit island',
+    'salle-de-bain': 'floating vanity, backlit mirror, rainfall shower, premium fixtures',
+    bureau: 'executive desk, ergonomic chair, open shelving, task and ambient lighting',
+    'salle-a-manger': 'dining table set for six, designer chairs, sideboard, overhead pendant',
+  };
+
+  const styleDesc = styleDescriptions[style] || 'modern minimalist interior, clean lines, neutral tones, contemporary furniture';
   const roomDesc = roomDescriptions[roomType] || 'living room';
+  const furniture = roomFurniture[roomType] || 'beautiful designer furniture';
 
-  return `Interior design transformation of this exact ${roomDesc}.
-
-STRICT RULES — NEVER MODIFY:
-- Walls, ceiling, floor shape and proportions must be IDENTICAL to the photo
-- Windows, doors, radiators: exact same position, size, shape
-- Room depth, width, height: exact same proportions
-- Camera angle and perspective: identical
-
-ONLY CHANGE furniture and decoration:
-- Replace furniture with ${styleDesc} pieces
-- Add ${style} decorative elements, textiles, lighting
-- Keep furniture appropriate for a ${roomDesc}
-
-Result: same room structure, new ${style} interior design.
-Professional architectural photograph, photorealistic, 8k, natural lighting.`;
+  return `Stunning ${style} ${roomDesc}, award-winning complete interior redesign. ${styleDesc}. Fully furnished with ${furniture}. Cohesive ${style} design language on every surface — walls, flooring, textiles, and light fixtures. Warm inviting atmosphere with layered ambient and accent lighting. Beautifully styled with curated objects, fresh greenery, and designer textiles. Published in Architectural Digest.
+Editorial interior design photography, photorealistic, hyperdetailed textures and materials, natural daylight, 8k.`;
 }
 
 /**

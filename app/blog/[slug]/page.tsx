@@ -4,6 +4,7 @@
  * Affiche le contenu complet d'un article avec articles liés.
  */
 
+import { cache } from 'react';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
@@ -103,8 +104,9 @@ interface ArticleData {
   }>;
 }
 
-// Fonction pour récupérer un article
-async function getArticle(slug: string): Promise<ArticleData | null> {
+// Fonction pour récupérer un article — wrappée avec React.cache()
+// pour dédupliquer les appels entre generateMetadata et ArticlePage
+const getArticle = cache(async (slug: string): Promise<ArticleData | null> => {
   try {
     const repository = new SupabaseBlogArticleRepository();
     const useCase = new GetBlogArticleBySlugUseCase(repository);
@@ -147,7 +149,7 @@ async function getArticle(slug: string): Promise<ArticleData | null> {
     }
     return null;
   }
-}
+});
 
 // Génération des métadonnées dynamiques
 export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
@@ -269,8 +271,15 @@ function ArticleContent({ content, slug }: { content: string, slug: string }) {
   };
 
   // Parsing synchrone puis sanitization
-  const rawHtml = marked.parse(content, { renderer, async: false });
-  let htmlContent = sanitizeHtml(rawHtml as string);
+  // Protégé par try/catch pour éviter un crash SSR si le contenu est invalide
+  let htmlContent: string;
+  try {
+    const rawHtml = marked.parse(content || '', { renderer, async: false });
+    htmlContent = sanitizeHtml(rawHtml as string);
+  } catch (error) {
+    console.error('[ArticleContent] Erreur marked.parse:', error);
+    htmlContent = '<p>Le contenu de cet article est temporairement indisponible.</p>';
+  }
 
   // Post-traitement : remplacer les images placeholder.jpg restantes
   // (certaines viennent de blocs HTML bruts dans le markdown, non traités par renderer.image)

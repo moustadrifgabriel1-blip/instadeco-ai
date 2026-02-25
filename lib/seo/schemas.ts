@@ -83,6 +83,13 @@ export function generateWebSiteSchema() {
  * Schema SoftwareApplication pour la page d'outil
  */
 export function generateSoftwareAppSchema() {
+  // priceValidUntil : 1 an à partir d'aujourd'hui (requis par Google)
+  const priceValidUntil = new Date(
+    new Date().getFullYear() + 1,
+    new Date().getMonth(),
+    new Date().getDate()
+  ).toISOString().split('T')[0];
+
   return {
     '@type': 'SoftwareApplication',
     name: SEO_CONFIG.siteName,
@@ -96,6 +103,7 @@ export function generateSoftwareAppSchema() {
       highPrice: '34.90',
       priceCurrency: 'EUR',
       offerCount: 3,
+      priceValidUntil,
     },
     screenshot: getFullUrl(SEO_CONFIG.ogImage),
     featureList: [
@@ -110,6 +118,9 @@ export function generateSoftwareAppSchema() {
 
 /**
  * Schema Product/Offer pour la page pricing
+ * 
+ * Inclut shippingDetails (produit digital = livraison immédiate)
+ * et hasMerchantReturnPolicy (requis par Google Merchant)
  */
 export function generateProductSchema(plans: Array<{
   name: string;
@@ -123,6 +134,43 @@ export function generateProductSchema(plans: Array<{
     new Date().getMonth(),
     new Date().getDate()
   ).toISOString().split('T')[0];
+
+  // Politique de retour pour produit numérique (non remboursable après utilisation)
+  const returnPolicy = {
+    '@type': 'MerchantReturnPolicy',
+    applicableCountry: ['FR', 'BE', 'CH'],
+    returnPolicyCategory: 'https://schema.org/MerchantReturnNotPermitted',
+    merchantReturnDays: 0,
+  };
+
+  // Livraison digitale = instantanée, gratuite
+  const shippingDetails = {
+    '@type': 'OfferShippingDetails',
+    shippingRate: {
+      '@type': 'MonetaryAmount',
+      value: '0',
+      currency: 'EUR',
+    },
+    shippingDestination: {
+      '@type': 'DefinedRegion',
+      addressCountry: 'FR',
+    },
+    deliveryTime: {
+      '@type': 'ShippingDeliveryTime',
+      handlingTime: {
+        '@type': 'QuantitativeValue',
+        minValue: 0,
+        maxValue: 0,
+        unitCode: 'DAY',
+      },
+      transitTime: {
+        '@type': 'QuantitativeValue',
+        minValue: 0,
+        maxValue: 0,
+        unitCode: 'DAY',
+      },
+    },
+  };
 
   return {
     '@type': 'Product',
@@ -142,6 +190,9 @@ export function generateProductSchema(plans: Array<{
       priceValidUntil,
       availability: 'https://schema.org/InStock',
       url: getCanonicalUrl('/pricing'),
+      image: getFullUrl(SEO_CONFIG.ogImage),
+      hasMerchantReturnPolicy: returnPolicy,
+      shippingDetails,
     })),
   };
 }
@@ -322,6 +373,11 @@ export function generateServiceSchema(city: {
       lowPrice: '9.99',
       highPrice: '34.99',
       priceCurrency: city.country === 'CH' ? 'CHF' : 'EUR',
+      priceValidUntil: new Date(
+        new Date().getFullYear() + 1,
+        new Date().getMonth(),
+        new Date().getDate()
+      ).toISOString().split('T')[0],
     },
     availableChannel: {
       '@type': 'ServiceChannel',

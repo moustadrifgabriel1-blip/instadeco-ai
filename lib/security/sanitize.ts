@@ -27,6 +27,7 @@ const FORBIDDEN_TAGS = new Set([
 const ALLOWED_ATTR = new Set([
   'href', 'title', 'target', 'rel',
   'src', 'alt', 'width', 'height', 'loading',
+  'srcset', 'sizes', 'decoding', 'fetchpriority',
   'class',
 ]);
 

@@ -246,16 +246,16 @@ fal-ai/flux-general/image-to-image
 
 | Mode | strength | depthScale | Description |
 |------|----------|------------|-------------|
-| `full_redesign` | 0.55 | 1.0 | Meubles + déco changés, architecture conservée |
-| `keep_layout` | 0.45 | 1.2 | Style meubles changé, positions conservées |
-| `decor_only` | 0.35 | 1.3 | Déco/accessoires changés, meubles conservés |
+| `full_redesign` | 0.72 | 1.0 | Transformation agressive — meubles + déco entièrement changés, architecture conservée |
+| `keep_layout` | 0.58 | 1.2 | Style meubles changé, positions strictement conservées |
+| `decor_only` | 0.42 | 1.3 | Déco/accessoires changés, meubles identiques |
 
 ### Paramètres Fixes
 
 ```json
 {
-  "num_inference_steps": 28,
-  "guidance_scale": 3.5,
+  "num_inference_steps": 30,
+  "guidance_scale": 5.5,
   "enable_safety_checker": true,
   "output_format": "jpeg"
 }
@@ -267,15 +267,15 @@ fal-ai/flux-general/image-to-image
 > Tester la réactivation avec `scripts/test-fal-ab.js`.
 ```
 
-### Negative Prompt (structurel)
+### Negative Prompt (par mode)
 
-```
-different room layout, changed walls, modified windows, different room proportions,
-architectural changes, different ceiling, changed floor plan, different room shape,
-added windows, removed windows, moved doors, different perspective, different camera angle,
-distorted proportions, extra rooms, merged rooms, wider room, narrower room,
-taller ceiling, lower ceiling, different flooring material change
-```
+Chaque mode a un negative prompt spécifique dans `NEGATIVE_PROMPTS` (FalImageGeneratorService.ts) :
+
+- **full_redesign** : empêche les modifications architecturales + pièce vide
+- **keep_layout** : empêche les modifications architecturales + changements de positions
+- **decor_only** : empêche les modifications architecturales + changements de meubles
+
+> Les negative prompts incluent également des termes qualité négative : `blurry, low quality, watermark`
 
 ---
 

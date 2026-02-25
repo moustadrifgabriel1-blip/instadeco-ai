@@ -47,7 +47,6 @@ export const STYLE_CATEGORIES_WITH_STYLES: DecorStyleCategory[] = [
     category: 'Classiques',
     styles: [
       { id: 'haussmannien', slug: 'haussmannien', name: 'Haussmannien', desc: 'Parisien chic avec moulures' },
-      { id: 'classique', slug: 'classique', name: 'Classique', desc: 'Élégance traditionnelle française' },
       { id: 'artdeco', slug: 'artdeco', name: 'Art Déco', desc: 'Glamour géométrique années 20' },
       { id: 'midcentury', slug: 'midcentury', name: 'Mid-Century', desc: 'Rétro iconique 50-60' },
     ]
@@ -57,40 +56,19 @@ export const STYLE_CATEGORIES_WITH_STYLES: DecorStyleCategory[] = [
     styles: [
       { id: 'scandinave', slug: 'scandinave', name: 'Scandinave', desc: 'Cocooning nordique lumineux' },
       { id: 'boheme', slug: 'boheme', name: 'Bohème', desc: 'Chaleur éclectique colorée' },
-      { id: 'provencal', slug: 'provencal', name: 'Provençal', desc: 'Charme du Sud de la France' },
-      { id: 'chalet', slug: 'chalet', name: 'Chalet Alpin', desc: 'Montagne cosy suisse/savoyard' },
     ]
   },
   {
-    category: 'Urbains',
+    category: 'Urbain & Bord de mer',
     styles: [
       { id: 'industriel', slug: 'industriel', name: 'Industriel', desc: 'Loft urbain brut et moderne' },
-      { id: 'contemporain', slug: 'contemporain', name: 'Contemporain', desc: 'Design actuel audacieux' },
-      { id: 'loft', slug: 'loft', name: 'Loft New-Yorkais', desc: 'Grand espace urbain chic' },
-    ]
-  },
-  {
-    category: 'Nature & Détente',
-    styles: [
       { id: 'coastal', slug: 'coastal', name: 'Bord de mer', desc: 'Vacances, bleu et blanc' },
-      { id: 'farmhouse', slug: 'farmhouse', name: 'Campagne chic', desc: 'Rustique élégant' },
-      { id: 'nature', slug: 'nature', name: 'Nature', desc: 'Organique, bois et plantes' },
-      { id: 'zen', slug: 'zen', name: 'Zen', desc: 'Sérénité et méditation' },
     ]
   },
   {
-    category: 'Luxe & Audace',
+    category: 'Luxe',
     styles: [
       { id: 'luxe', slug: 'luxe', name: 'Luxe', desc: 'Prestige et matériaux nobles' },
-      { id: 'baroque', slug: 'baroque', name: 'Baroque', desc: 'Opulent et théâtral' },
-      { id: 'eclectique', slug: 'eclectique', name: 'Éclectique', desc: 'Mix audacieux de styles' },
-    ]
-  },
-  {
-    category: 'Spécialisés',
-    styles: [
-      { id: 'ludique', slug: 'ludique', name: 'Enfant / Ludique', desc: 'Joyeux et stimulant' },
-      { id: 'ado', slug: 'ado', name: 'Ado / Jeune', desc: 'Moderne et personnalisé' },
     ]
   },
 ];

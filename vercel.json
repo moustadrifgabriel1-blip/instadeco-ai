@@ -3,6 +3,9 @@
   "functions": {
     "app/api/v2/generate/route.ts": {
       "maxDuration": 60
+    },
+    "app/blog/[slug]/page.tsx": {
+      "maxDuration": 30
     }
   },
   "crons": [

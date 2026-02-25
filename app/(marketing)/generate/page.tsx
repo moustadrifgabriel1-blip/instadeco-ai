@@ -1,10 +1,10 @@
 'use client';
 
-import { useCallback, useState, useEffect, useMemo } from 'react';
+import { useCallback, useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { useDropzone } from 'react-dropzone';
 import Image from 'next/image';
-import { Plus, X, ArrowRight, Download, Check, ChevronDown, Sparkles, Star, Shield, Zap, UserPlus, Eye, Users } from 'lucide-react';
+import { Plus, X, ArrowRight, Download, Check, ChevronDown, Sparkles, Star, Shield, Zap, UserPlus, Eye, Users, Info } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { useGenerate } from '@/src/presentation/hooks/useGenerate';
 import { useGenerationStatus } from '@/src/presentation/hooks/useGenerationStatus';
@@ -57,6 +57,8 @@ function GenerateContent() {
   const [selectedMode, setSelectedMode] = useState('full_redesign');
   const [generationId, setGenerationId] = useState<string | null>(null);
   const [showAuthPrompt, setShowAuthPrompt] = useState(false);
+  const [showPromptDetails, setShowPromptDetails] = useState(false);
+  const resultRef = useRef<HTMLDivElement>(null);
 
   // Hooks de la couche Presentation
   const { generate, state: generateState, reset: resetGenerate } = useGenerate();
@@ -73,6 +75,7 @@ function GenerateContent() {
   // États dérivés
   // L'image est disponible dès la réponse synchrone OU via le polling
   const generatedImage = generateState.data?.outputImageUrl || statusGeneration?.outputImageUrl || null;
+  const generatedPrompt = generateState.data?.prompt || statusGeneration?.prompt || null;
   const isGenerating = generateState.isLoading || (generationId && !isComplete && !isFailed && !generatedImage && !skipPolling);
   const [progress, setProgress] = useState(0);
   
@@ -104,6 +107,15 @@ function GenerateContent() {
   }, [generateState.isLoading, generateState.progress, generationId, isComplete, isFailed, generatedImage]);
 
   const error = generateState.error || (isFailed ? 'La génération a échoué' : null);
+
+  // Auto-scroll vers le résultat quand l'image est générée
+  useEffect(() => {
+    if (generatedImage && resultRef.current) {
+      setTimeout(() => {
+        resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  }, [generatedImage]);
 
   // Quand la génération démarre, stocker l'ID pour le polling (confirmation)
   // Skip le polling si le résultat synchrone est déjà complet avec outputImageUrl
@@ -561,7 +573,7 @@ function GenerateContent() {
 
           {/* Result */}
           {generatedImage && imagePreview && (
-            <div className="space-y-10">
+            <div ref={resultRef} className="space-y-10 scroll-mt-4">
               {/* Before/After */}
               <div className="grid md:grid-cols-2 gap-5">
                 <div className="space-y-3">
@@ -597,6 +609,26 @@ function GenerateContent() {
                   </div>
                 </div>
               </div>
+
+              {/* Prompt utilisé */}
+              {generatedPrompt && (
+                <div className="max-w-2xl mx-auto">
+                  <button
+                    onClick={() => setShowPromptDetails(!showPromptDetails)}
+                    className="flex items-center gap-2 text-[13px] text-[#636366] hover:text-[#1d1d1f] transition-colors mx-auto"
+                  >
+                    <Info className="w-3.5 h-3.5" />
+                    Voir le prompt utilisé
+                    <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showPromptDetails ? 'rotate-180' : ''}`} />
+                  </button>
+                  {showPromptDetails && (
+                    <div className="mt-3 p-4 rounded-2xl bg-[#f5f5f7] border border-[#e8e8ed]">
+                      <p className="text-[11px] font-medium text-[#636366] uppercase tracking-[.1em] mb-2">Prompt envoyé à l&apos;IA</p>
+                      <p className="text-[13px] text-[#1d1d1f] leading-relaxed font-mono break-words">{generatedPrompt}</p>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Actions */}
               <div className="max-w-lg mx-auto">

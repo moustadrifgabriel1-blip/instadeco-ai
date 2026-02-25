@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState, useEffect } from 'react';
+import { useCallback, useState, useEffect, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -52,6 +52,7 @@ export default function EssaiPage() {
   const [trialEmail, setTrialEmail] = useState('');
   const [emailStatus, setEmailStatus] = useState<'idle' | 'loading' | 'error'>('idle');
   const [emailError, setEmailError] = useState('');
+  const resultRef = useRef<HTMLDivElement>(null);
 
   // Vérifier si l'essai a déjà été utilisé (bypass si cookie dev)
   useEffect(() => {
@@ -199,7 +200,13 @@ export default function EssaiPage() {
         setGeneratedImage(imageUrl);
         localStorage.setItem('instadeco_trial_used', 'true');
         trackTrialComplete(selectedStyle, selectedRoom);
-        setTimeout(() => setStep('email-gate'), 500);
+        setTimeout(() => {
+          setStep('email-gate');
+          // Auto-scroll vers le résultat après changement d'étape
+          setTimeout(() => {
+            resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 100);
+        }, 500);
       } catch (innerErr) {
         clearInterval(progressInterval);
         throw innerErr;
@@ -416,7 +423,7 @@ export default function EssaiPage() {
 
           {/* ── ÉTAPE 3.5 : EMAIL GATE (avant le résultat) ── */}
           {step === 'email-gate' && generatedImage && (
-            <div className="flex flex-col items-center py-12">
+            <div ref={resultRef} className="flex flex-col items-center py-12 scroll-mt-4">
               <div className="max-w-md w-full bg-white rounded-[28px] border border-black/5 shadow-xl overflow-hidden">
                 {/* Preview floutée */}
                 <div className="relative h-48 overflow-hidden">
@@ -472,6 +479,9 @@ export default function EssaiPage() {
                         trackLeadCaptured('trial_email_gate');
                         localStorage.setItem('trial_lead_email', trialEmail);
                         setStep('result');
+                        setTimeout(() => {
+                          resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }, 100);
                       } catch {
                         setEmailError('Erreur, réessayez');
                         setEmailStatus('error');
@@ -509,7 +519,12 @@ export default function EssaiPage() {
                   </form>
 
                   <button
-                    onClick={() => setStep('result')}
+                    onClick={() => {
+                      setStep('result');
+                      setTimeout(() => {
+                        resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }, 100);
+                    }}
                     className="w-full mt-3 text-[12px] text-[#636366] hover:text-[#1d1d1f] transition-colors py-2"
                   >
                     Passer →
@@ -525,7 +540,7 @@ export default function EssaiPage() {
 
           {/* ── ÉTAPE 4 : RÉSULTAT ── */}
           {step === 'result' && generatedImage && imagePreview && (
-            <div className="space-y-8">
+            <div ref={step === 'result' ? resultRef : undefined} className="space-y-8 scroll-mt-4">
               {/* Avant / Après */}
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">

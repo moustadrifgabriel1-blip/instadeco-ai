@@ -44,7 +44,8 @@ export class GetBlogArticleBySlugUseCase {
 
     if (includeRelated) {
       try {
-        const related = await this.articleRepository.findRelated(article.id, relatedLimit);
+        // Utiliser findRelatedByTags pour éviter une requête findById redondante
+        const related = await this.articleRepository.findRelatedByTags(article.id, article.tags, relatedLimit);
         relatedArticles = BlogArticleMapper.toListDTOArray(related);
       } catch (error) {
         console.warn(`[GetBlogArticleBySlugUseCase] Failed to fetch related articles for ${slug}:`, error);

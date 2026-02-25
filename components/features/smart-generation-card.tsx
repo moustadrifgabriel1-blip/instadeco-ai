@@ -45,6 +45,7 @@ export function SmartGenerationCard({ generation, onStatusChange, children }: Sm
       outputImageUrl={currentGeneration.outputImageUrl || undefined}
       status={currentGeneration.status as 'pending' | 'processing' | 'completed' | 'failed'}
       createdAt={currentGeneration.createdAt}
+      prompt={currentGeneration.prompt || undefined}
     >
       {children}
     </GenerationCard>

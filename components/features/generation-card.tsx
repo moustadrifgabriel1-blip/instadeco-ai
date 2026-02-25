@@ -2,9 +2,10 @@
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Download, Loader2, AlertCircle, Clock, Share2 } from 'lucide-react';
+import { Download, Loader2, AlertCircle, Clock, Share2, ChevronDown, Info } from 'lucide-react';
 import { OptimizedRemoteImage, IMAGE_SIZES } from '@/components/ui/optimized-image';
 import { ShareButtons } from './share-buttons';
+import { useState } from 'react';
 
 interface GenerationCardProps {
   id: string;
@@ -15,6 +16,7 @@ interface GenerationCardProps {
   status: 'pending' | 'processing' | 'completed' | 'failed';
   createdAt: string;
   errorMessage?: string;
+  prompt?: string;
   children?: React.ReactNode;
 }
 
@@ -27,8 +29,10 @@ export function GenerationCard({
   status,
   createdAt,
   errorMessage,
+  prompt,
   children
 }: GenerationCardProps) {
+  const [showPrompt, setShowPrompt] = useState(false);
   const handleDownload = async () => {
     try {
       // Téléchargement via l'API
@@ -162,6 +166,26 @@ export function GenerationCard({
           })}</span>
           <span className="text-gray-400 hidden sm:inline">ID: {id.slice(0, 8)}</span>
         </div>
+
+        {/* Prompt utilisé */}
+        {prompt && status === 'completed' && (
+          <div className="mt-2">
+            <button
+              onClick={() => setShowPrompt(!showPrompt)}
+              className="flex items-center gap-1.5 text-[11px] text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <Info className="w-3 h-3" />
+              Prompt
+              <ChevronDown className={`w-3 h-3 transition-transform ${showPrompt ? 'rotate-180' : ''}`} />
+            </button>
+            {showPrompt && (
+              <div className="mt-2 p-2.5 rounded-lg bg-gray-50 border border-gray-100">
+                <p className="text-[10px] text-gray-600 leading-relaxed font-mono break-words">{prompt}</p>
+              </div>
+            )}
+          </div>
+        )}
+
         {children && <div className="mt-3 pt-3 border-t">{children}</div>}
       </CardContent>
     </Card>

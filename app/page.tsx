@@ -57,7 +57,7 @@ const homepageFAQ = [
   },
   {
     question: 'Quels styles de décoration sont disponibles ?',
-    answer: 'InstaDeco propose plus de 20 styles : Moderne, Scandinave, Industriel, Bohème, Japandi, Minimaliste, Art Déco, Contemporain, Haussmannien, Provençal, Chalet Alpin, Bord de mer, Luxe et bien d’autres. Chaque style peut être appliqué à tous les types de pièces.',
+    answer: 'InstaDeco propose 12 styles soigneusement sélectionnés : Moderne, Scandinave, Industriel, Bohème, Japandi, Minimaliste, Art Déco, Haussmannien, Mid-Century, Bord de mer, Luxe et une option « Garder mon style » pour améliorer votre pièce sans tout changer. Chaque style peut être appliqué à tous les types de pièces.',
   },
   {
     question: 'Puis-je utiliser InstaDeco pour du home staging virtuel ?',

@@ -296,13 +296,21 @@ export class SupabaseBlogArticleRepository implements IBlogArticleRepository {
       return [];
     }
 
+    return this.findRelatedByTags(articleId, article.tags, limit);
+  }
+
+  async findRelatedByTags(articleId: string, tags: string[], limit: number = 3): Promise<BlogArticle[]> {
+    if (tags.length === 0) {
+      return [];
+    }
+
     // Chercher les articles avec des tags similaires
     const { data, error } = await this.supabase
       .from('blog_articles')
       .select('*')
       .eq('status', 'published')
       .neq('id', articleId)
-      .overlaps('tags', article.tags)
+      .overlaps('tags', tags)
       .order('published_at', { ascending: false })
       .limit(limit);
 

@@ -37,20 +37,40 @@ import {
 const MODEL_PATH = 'fal-ai/flux-general/image-to-image';
 
 /**
- * Negative prompt pour empêcher toute modification structurelle.
+ * Negative prompts spécifiques par mode de transformation.
+ * Chaque mode a ses propres contraintes sur ce qui ne doit PAS changer.
+ * 
  * Utilisé avec NAG (Normalized Attention Guidance) de Flux.
+ * Streamlinés : chaque terme est unique et impactant, pas de redondance.
+ * Inclut anti-artefacts IA (cartoon, painting, deformed).
+ * 
+ * IMPORTANT: Le negative prompt varie selon le mode :
+ * - full_redesign : empêcher modifications architecturales uniquement
+ * - keep_layout : empêcher changements de positions + architecture
+ * - decor_only : empêcher changements de meubles + positions + architecture
  */
-const STRUCTURAL_NEGATIVE_PROMPT = 'different room layout, changed walls, modified windows, different room proportions, architectural changes, different ceiling, changed floor plan, different room shape, added windows, removed windows, moved doors, different perspective, different camera angle, distorted proportions, extra rooms, merged rooms, wider room, narrower room, taller ceiling, lower ceiling, different flooring material change';
+const NEGATIVE_PROMPTS: Record<string, string> = {
+  full_redesign: 'different room shape, modified walls, moved windows, changed doors, different ceiling height, altered room proportions, different camera angle, different perspective, empty unfurnished room, construction site, unfinished renovation, blurry, low quality, watermark, text overlay, deformed, cartoon, painting, illustration, 3d render',
+  keep_layout: 'different room shape, modified walls, moved windows, changed doors, different ceiling height, altered room proportions, different camera angle, rearranged furniture, different furniture positions, moved sofa, shifted table, different layout spacing, empty areas where furniture was, missing furniture pieces, blurry, low quality, watermark, text overlay, deformed, cartoon, painting, illustration',
+  decor_only: 'different room shape, modified walls, moved windows, changed doors, different ceiling height, altered room proportions, different camera angle, different furniture, new sofa, new table, new bed, replaced furniture, different upholstery material, changed furniture style, different furniture shape, rearranged positions, blurry, low quality, watermark, text overlay, deformed, cartoon, painting, illustration',
+};
 
 /**
  * Paramètres de contrôle par mode de transformation.
  * strength: combien l'image originale est modifiée (0=aucun, 1=total)
  * depthScale: force du contrôle de profondeur (structure spatiale)
+ * 
+ * RECALIBRÉ (14 fév 2026) :
+ * L'ancien strength 0.55 pour full_redesign était trop bas → l'IA reproduisait l'image source.
+ * Sans ControlNet actif, on compense en augmentant :
+ *   - strength (plus de liberté pour transformer)
+ *   - guidance_scale (5.5 au lieu de 3.5 pour mieux suivre le prompt)
+ *   - negative prompts spécifiques par mode
  */
 const TRANSFORM_PARAMS: Record<string, { strength: number; depthScale: number }> = {
-  full_redesign:  { strength: 0.55, depthScale: 1.0 },   // Changer meubles + déco, garder architecture
-  keep_layout:    { strength: 0.45, depthScale: 1.2 },   // Changer style meubles, garder positions
-  decor_only:     { strength: 0.35, depthScale: 1.3 },   // Changer uniquement déco/accessoires
+  full_redesign:  { strength: 0.72, depthScale: 1.0 },   // Transformation agressive — meubles + déco entièrement changés
+  keep_layout:    { strength: 0.58, depthScale: 1.2 },   // Transformation modérée — style changé, positions préservées
+  decor_only:     { strength: 0.42, depthScale: 1.3 },   // Transformation légère — uniquement accessoires déco
 };
 
 /**
@@ -131,8 +151,9 @@ export class FalImageGeneratorService implements IImageGeneratorService {
       let fullPrompt = options.prompt;
       
       // Ajouter les mots-clés de qualité photo à la fin
-      const qualityKeywords = 'Professional architectural photograph, shot on 50mm lens, f/2.8, ISO 200, realistic textures, natural lighting, 8k resolution, photorealistic, highly detailed.';
-      fullPrompt = `${fullPrompt}\n\n${qualityKeywords}`;
+      // Concis et optimisé pour Flux T5 — chaque token compte
+      const qualityKeywords = 'Editorial interior design photography, photorealistic, hyperdetailed textures and materials, natural daylight, 8k ultra high resolution.';
+      fullPrompt = `${fullPrompt}\n${qualityKeywords}`;
 
       // 2. Déterminer le format d'image optimal basé sur l'image source
       const imageSize = getOptimalImageSize(options.width || 1024, options.height || 1024);
@@ -183,17 +204,23 @@ export class FalImageGeneratorService implements IImageGeneratorService {
 
       // NOTE: easycontrols depth désactivé le 14/02/2026 — erreur tenseur côté fal.ai
       // "The size of tensor a (3072) must match the size of tensor b (4096)"
-      // Le img2img avec strength préserve bien la structure sans easycontrols.
+      // Compensation : strength recalibré + guidance_scale élevé + negative prompts par mode.
       // Réactiver quand fal.ai corrige le bug (tester avec scripts/test-fal-ab.js)
+      
+      // Sélectionner le negative prompt spécifique au mode de transformation
+      const negativePrompt = NEGATIVE_PROMPTS[transformMode] || NEGATIVE_PROMPTS.full_redesign;
+      
       const result = await fal.run(MODEL_PATH, {
         input: {
           prompt: fullPrompt,
           image_url: falImageUrl,                  // Image source = base img2img
           strength: params.strength,               // Contrôle combien on modifie vs préserve
-          negative_prompt: STRUCTURAL_NEGATIVE_PROMPT,
+          negative_prompt: negativePrompt,         // Negative prompt adapté au mode
           image_size: imageSize, 
-          num_inference_steps: 28, 
-          guidance_scale: 3.5,
+          num_inference_steps: 30,                 // 30 steps pour qualité pro
+          guidance_scale: 5.5,                     // Guidance élevé pour suivre le prompt
+          nag_scale: 4,                            // NAG renforcé (défaut 3) — negative prompt plus respecté
+          nag_end: 0.35,                           // NAG appliqué sur 35% des steps (défaut 25%) — préservation architecture plus longue
           enable_safety_checker: true,
           output_format: "jpeg"
         } as any,

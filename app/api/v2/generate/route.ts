@@ -199,63 +199,37 @@ export async function POST(req: Request) {
 
 /**
  * ============================================================================
- * SYSTÈME DE PROMPTS - GESTION DE TOUTES LES COMBINAISONS
+ * SYSTÈME DE PROMPTS — NIVEAU AGENCE
  * ============================================================================
  * 
- * MATRICE DES COMBINAISONS:
- * - 3 modes: full_redesign, keep_layout, decor_only
- * - 9 types de pièce: salon, chambre, chambre-enfant, cuisine, salle-de-bain, bureau, salle-a-manger, entree, terrasse
- * - 12+ styles: original, moderne, minimaliste, boheme, industriel, classique, japandi, midcentury, coastal, farmhouse, artdeco, ludique
+ * PHILOSOPHIE :
+ * Les modèles de diffusion ne comprennent pas les INSTRUCTIONS ("Replace X", "NEVER change Y").
+ * Ils comprennent des DESCRIPTIONS VISUELLES de ce que l'image finale doit être.
+ * → Chaque prompt décrit le RÉSULTAT FINAL comme s'il existait déjà.
+ * → Les interdictions vont dans le NEGATIVE PROMPT (géré par FalService).
+ * → Concis et front-loaded : les 50 premiers tokens sont les plus importants.
  * 
- * RÈGLES CLÉS:
- * 1. Le TYPE DE PIÈCE doit TOUJOURS être respecté (chambre = lit, salon = canapé)
- * 2. Le STYLE s'applique différemment selon le mode
- * 3. Le MODE définit ce qui peut changer et ce qui doit rester
+ * MATRICE : 3 modes × 12 styles × 9 pièces = 324 combinaisons
  */
 function buildPrompt(style: string, roomType: string, transformMode: string = 'full_redesign'): string {
   
   // ============================================================================
-  // 1. DICTIONNAIRES DE BASE
+  // 1. DESCRIPTIONS DE STYLE — ultra-spécifiques, matériaux réels, textures précises
   // ============================================================================
   
   const styleDescriptions: Record<string, string> = {
-    // Tendances
-    original: 'the existing style, enhanced and improved',
-    moderne: 'modern minimalist with clean lines, neutral colors, contemporary furniture',
-    minimaliste: 'ultra minimalist with essential furniture only, monochrome palette, zen simplicity',
-    japandi: 'Japandi combining Japanese zen minimalism with Scandinavian warmth and hygge',
-    
-    // Classiques
-    haussmannien: 'Parisian Haussmann style with ornate crown moldings, herringbone parquet floors, marble fireplaces, high ceilings, classic French windows',
-    classique: 'classic French elegance with rich fabrics, carved wood furniture, chandeliers, refined traditional decor',
-    artdeco: 'Art Deco with geometric patterns, gold and brass accents, velvet fabrics, glamorous 1920s atmosphere',
-    midcentury: 'mid-century modern with organic curves, teak and walnut wood, iconic 50s-60s designer furniture',
-    
-    // Chaleureux
-    scandinave: 'Scandinavian with light oak wood, white walls, cozy wool textiles, candles, hygge atmosphere',
-    boheme: 'bohemian with layered textiles, macramé, indoor plants, warm terracotta colors, eclectic global decor',
-    provencal: 'Provençal French country with lavender accents, terracotta tiles, whitewashed walls, wrought iron, olive wood',
-    chalet: 'Alpine chalet style with warm wood paneling, stone fireplace, sheepskin rugs, mountain lodge atmosphere',
-    
-    // Urbains
-    industriel: 'industrial loft with exposed brick walls, black metal fixtures, Edison bulbs, raw concrete, leather accents',
-    contemporain: 'contemporary design with bold artistic elements, statement pieces, cutting-edge designer furniture',
-    loft: 'New York loft style with high ceilings, large windows, open space, urban sophistication, metal and glass',
-    
-    // Nature & Détente  
-    coastal: 'coastal with ocean blues, sandy whites, driftwood, nautical accents, breezy seaside atmosphere',
-    farmhouse: 'modern farmhouse with rustic reclaimed wood, shiplap walls, linen textiles, vintage charm',
-    nature: 'biophilic design with abundant plants, natural wood, stone, organic shapes, earth tones, botanical prints',
-    zen: 'zen sanctuary with bamboo, water elements, meditation space, natural materials, peaceful minimalism',
-    
-    // Luxe & Audace
-    luxe: 'luxury design with marble, brass, velvet, premium materials, elegant proportions, sophisticated lighting',
-    baroque: 'opulent baroque with gilded mirrors, rich velvet, crystal chandeliers, dramatic ornate details',
-    eclectique: 'eclectic bold mix with contrasting styles, statement art, unexpected color combinations, curated chaos',
-    
-    // Spécialisés
-    ludique: 'playful children space with vibrant colors, creative shapes, fun patterns, safe and stimulating design',
-    ado: 'modern teen room with cool aesthetics, personal expression, gaming/study zones, trendy urban style',
+    original: 'the current design direction, refined and elevated to premium designer quality',
+    moderne: 'contemporary modern interior, clean architectural lines, matte white walls, warm neutral upholstery, light hardwood floors, sculptural low-profile furniture, recessed LED and geometric pendant lighting, minimal curated accessories',
+    minimaliste: 'ultra-minimalist interior, pure white space with warm wood accents, essential furniture only, generous negative space, hidden storage, monochrome palette with organic textures, Japanese-inspired serene simplicity, soft diffused natural light',
+    japandi: 'Japandi interior, wabi-sabi handcrafted ceramics, light ash wood furniture, dried pampas grass arrangements, neutral linen and raw cotton textiles, paper lantern pendants, muted earth tones, organic natural textures throughout',
+    haussmannien: 'classic Parisian Haussmannian interior, ornate plaster crown moldings, herringbone oak parquet floor, white marble fireplace mantel, floor-to-ceiling French windows, crystal chandelier, navy velvet upholstery, gilded frames, polished brass hardware',
+    artdeco: 'Art Deco interior, bold geometric patterns and brass inlays, emerald green velvet tufted seating, black lacquered surfaces, sunburst mirrors, terrazzo accents, dramatic pendant lighting, jewel tones with polished gold and chrome',
+    midcentury: 'mid-century modern interior, Eames and Noguchi-inspired organic forms, warm teak and walnut wood, tapered legs, mustard yellow and olive green palette, Nelson bubble pendant, bold abstract art on walls, clean functional lines',
+    scandinave: 'Scandinavian hygge interior, warm white textured walls, light oak plank floors, bouclé upholstery, sheepskin throws draped over furniture, clustered white candles, woven wool area rug, pendant globe lights, soft cream and blush palette',
+    boheme: 'bohemian interior, layered Persian and kilim rugs, macramé wall hangings, abundant trailing indoor plants on shelves, rattan and wicker furniture, terracotta and ochre palette, vintage brass lanterns, collected global textiles and embroidered cushions',
+    industriel: 'industrial loft interior, exposed red brick accent wall, black steel frame elements, Edison filament bulb pendant cluster, raw concrete or dark reclaimed wood floor, aged brown leather Chesterfield sofa, matte black pipe shelving, galvanized metal accents',
+    coastal: 'coastal interior, ocean blue and sandy white palette, whitewashed shiplap wood paneling, woven seagrass pendant fixtures, natural linen slipcover sofa, weathered driftwood coffee table, blue-white striped textiles, sisal area rug, sheer white linen curtains billowing',
+    luxe: 'luxury interior, book-matched Calacatta marble surfaces, polished brass hardware and fixtures, deep emerald or navy velvet upholstery, crystal pendant chandelier, champagne gold accents, plush mohair throws, sculptural art objects, warm indirect LED cove lighting',
   };
 
   const roomDescriptions: Record<string, string> = {
@@ -271,223 +245,79 @@ function buildPrompt(style: string, roomType: string, transformMode: string = 'f
   };
 
   // ============================================================================
-  // 2. CONTRAINTES PAR TYPE DE PIÈCE (meubles obligatoires)
+  // 2. DESCRIPTIONS DE MOBILIER PAR PIÈCE — langage descriptif, pas impératif
   // ============================================================================
   
-  const roomConstraints: Record<string, { mustHave: string; mustNot: string; keyFurniture: string }> = {
-    salon: {
-      mustHave: 'sofa/couch, coffee table, seating area, TV console or bookshelf',
-      mustNot: 'beds, cribs, kitchen appliances',
-      keyFurniture: 'sofa and armchairs'
-    },
-    chambre: {
-      mustHave: 'adult bed with headboard, nightstands, wardrobe or dresser',
-      mustNot: 'sofas, dining tables, office desks as main furniture',
-      keyFurniture: 'bed with bedding'
-    },
-    'chambre-enfant': {
-      mustHave: 'child bed or bunk bed, toy storage, playful furniture, desk for homework',
-      mustNot: 'adult-sized beds, bar furniture, office equipment',
-      keyFurniture: 'child-sized bed and play area'
-    },
-    cuisine: {
-      mustHave: 'kitchen cabinets, countertops, sink, stove/oven, refrigerator',
-      mustNot: 'beds, sofas, bathroom fixtures',
-      keyFurniture: 'kitchen island or dining counter'
-    },
-    'salle-de-bain': {
-      mustHave: 'sink with vanity, toilet, shower or bathtub, mirror',
-      mustNot: 'beds, sofas, kitchen appliances, dining furniture',
-      keyFurniture: 'vanity and shower/tub'
-    },
-    bureau: {
-      mustHave: 'desk, office chair, bookshelves or storage, good lighting',
-      mustNot: 'beds as main furniture, kitchen appliances',
-      keyFurniture: 'desk and ergonomic chair'
-    },
-    'salle-a-manger': {
-      mustHave: 'dining table, dining chairs (4-8), sideboard or buffet',
-      mustNot: 'beds, sofas as main seating, bathroom fixtures',
-      keyFurniture: 'dining table with chairs'
-    },
-    entree: {
-      mustHave: 'console table, mirror, coat hooks or rack, shoe storage',
-      mustNot: 'beds, large sofas, kitchen appliances',
-      keyFurniture: 'entryway console and mirror'
-    },
-    terrasse: {
-      mustHave: 'outdoor furniture, plants, weather-resistant materials',
-      mustNot: 'indoor upholstered furniture, beds, kitchen appliances',
-      keyFurniture: 'outdoor seating and plants'
-    },
+  // Pour full_redesign : décrit les meubles du résultat final
+  const roomFurniture: Record<string, string> = {
+    salon: 'designer sofa with accent armchair, sculptural coffee table, media console or bookshelf, cozy reading corner with floor lamp',
+    chambre: 'upholstered king bed with layered premium bedding, designer nightstands with ceramic table lamps, elegant wardrobe',
+    'chambre-enfant': 'playful child bed with cozy patterned bedding, creative toy storage, colorful study desk with chair, whimsical wall art',
+    cuisine: 'premium handleless cabinetry, stone countertops, integrated appliances, kitchen island with designer pendant lighting above',
+    'salle-de-bain': 'designer floating vanity with integrated basin, large backlit mirror, walk-in rainfall shower behind glass, premium fixtures',
+    bureau: 'executive writing desk, ergonomic designer chair, floor-to-ceiling open shelving with curated objects, focused task lamp',
+    'salle-a-manger': 'large dining table set for six, designer dining chairs, elegant sideboard with decorative objects, dramatic overhead pendant',
+    entree: 'slim console table with large decorative mirror above, designer wall hooks, accent pendant, curated small accessories',
+    terrasse: 'weather-resistant lounge sofa and armchairs, lush potted plants and Mediterranean greenery, outdoor dining area, string lights',
+  };
+
+  // Pour keep_layout et decor_only : identifie les pièces à préserver
+  const roomKeyPieces: Record<string, string> = {
+    salon: 'sofa, armchairs, and coffee table',
+    chambre: 'bed, nightstands, and wardrobe',
+    'chambre-enfant': 'child bed, desk, and storage',
+    cuisine: 'cabinets, countertops, and appliances',
+    'salle-de-bain': 'vanity, shower, and fixtures',
+    bureau: 'desk, chair, and shelving',
+    'salle-a-manger': 'dining table and chairs',
+    entree: 'console table and mirror',
+    terrasse: 'outdoor seating and planters',
   };
 
   // ============================================================================
-  // 3. CONSTRUCTION DES ÉLÉMENTS DU PROMPT
+  // 3. RÉSOLUTION DES VARIABLES
   // ============================================================================
   
   const styleDesc = styleDescriptions[style] || style;
   const roomDesc = roomDescriptions[roomType] || roomType;
-  const constraints = roomConstraints[roomType] || {
-    mustHave: 'appropriate furniture for the room type',
-    mustNot: 'furniture inappropriate for this room',
-    keyFurniture: 'main furniture pieces'
-  };
-
+  const furniture = roomFurniture[roomType] || 'beautiful designer furniture appropriate for the room';
+  const keyPieces = roomKeyPieces[roomType] || 'all furniture pieces';
   const isOriginalStyle = style === 'original';
 
-  // Contraintes architecturales (communes à tous les modes)
-  const architectureBlock = `
-🏗️ ARCHITECTURE (NEVER CHANGE — MUST BE IDENTICAL TO PHOTO):
-- Room dimensions, walls, ceiling height: IDENTICAL
-- Window positions, sizes, shapes: IDENTICAL
-- Door positions and sizes: IDENTICAL
-- Built-in features (columns, beams, alcoves, radiators): IDENTICAL
-- Room proportions and camera perspective: IDENTICAL
-- Floor shape and boundaries: IDENTICAL`;
-
-  // Contraintes de type de pièce (communes à tous les modes)
-  const roomTypeBlock = `
-🏠 ROOM TYPE: ${roomDesc.toUpperCase()}
-✓ MUST INCLUDE: ${constraints.mustHave}
-✗ MUST NOT INCLUDE: ${constraints.mustNot}
-🔑 KEY FURNITURE: ${constraints.keyFurniture}`;
-
   // ============================================================================
-  // 4. GÉNÉRATION DU PROMPT SELON MODE + STYLE
+  // 4. PROMPTS PAR MODE — descriptifs, visuels, concis (~60-80 mots)
+  //    Chaque prompt décrit le RÉSULTAT FINAL, pas un processus de transformation.
+  //    Pas d'emojis, pas de bullet points — du langage naturel dense en tokens visuels.
   // ============================================================================
 
   // ----- MODE: FULL_REDESIGN -----
   if (transformMode === 'full_redesign') {
     if (isOriginalStyle) {
-      // full_redesign + original = améliorer sans changer de style
-      return `TASK: ENHANCE AND IMPROVE THIS ${roomDesc.toUpperCase()}
-
-Keep the existing style but make it look professionally designed and organized.
-
-${roomTypeBlock}
-${architectureBlock}
-
-WHAT TO DO:
-✓ Keep the same general style and color palette
-✓ Upgrade furniture to higher quality versions of similar style
-✓ Improve organization and declutter
-✓ Better lighting and atmosphere
-✓ Add tasteful decorative elements
-✓ Make the space feel more polished and intentional
-
-WHAT NOT TO DO:
-✗ Don't change the fundamental style (modern stays modern, rustic stays rustic)
-✗ Don't change room function (bedroom stays bedroom)
-✗ Don't remove key furniture pieces, upgrade them
-
-Result: The same room, but looking like a professional interior designer organized and upgraded it.
-Professional photography, natural lighting, magazine quality, 8k.`;
+      return `This ${roomDesc} elevated to luxury interior magazine standard, same design direction professionally refined by a top decorator. Premium ${roomDesc} furniture in the same style family, harmonized tonal palette, decluttered and beautifully staged. Refined materials, rich textures, and elevated finishes on every surface. Layered warm ambient and accent lighting. Curated coffee table books, fresh greenery in ceramic vessels, quality throw textiles. A polished, aspirational version ready for Elle Décoration.`;
     } else {
-      // full_redesign + specific style = transformation complète
-      return `TASK: COMPLETE ${style.toUpperCase()} TRANSFORMATION
-
-Transform this ${roomDesc} into a stunning ${styleDesc} design.
-
-${roomTypeBlock}
-${architectureBlock}
-
-COMPLETE TRANSFORMATION:
-→ Replace ALL furniture with ${style} style pieces
-→ New furniture arrangement optimized for the space
-→ Wall colors and textures matching ${style} aesthetic
-→ Flooring update if needed (wood, tiles, carpet)
-→ ${style} lighting fixtures
-→ Complete ${style} decor: rugs, art, plants, textiles
-→ Color palette: typical ${style} colors
-
-Create a magazine-worthy ${style} ${roomDesc}.
-Professional interior photography, ${styleDesc}, architectural digest quality, 8k, photorealistic.`;
+      return `Stunning ${style} ${roomDesc}, award-winning complete interior redesign. ${styleDesc}. Fully furnished with ${furniture}. Cohesive ${style} design language on every surface — walls, flooring, textiles, and light fixtures. Warm inviting atmosphere with layered ambient and accent lighting. Beautifully styled with curated decorative objects, fresh greenery in artisan vessels, and coordinated designer textiles throughout. Published in Architectural Digest.`;
     }
   }
 
   // ----- MODE: KEEP_LAYOUT -----
   if (transformMode === 'keep_layout') {
     if (isOriginalStyle) {
-      // keep_layout + original = pas de changement majeur (améliorer qualité)
-      return `TASK: ENHANCE THIS ${roomDesc.toUpperCase()} - KEEP EXACT LAYOUT
-
-Improve the room while keeping everything in the exact same position.
-
-${roomTypeBlock}
-${architectureBlock}
-
-KEEP 100% IDENTICAL:
-✓ Every furniture position - nothing moves
-✓ Furniture types and general style
-✓ Room layout and arrangement
-
-SUBTLE IMPROVEMENTS ALLOWED:
-→ Better lighting quality
-→ Cleaner, more organized look
-→ Higher quality textures and materials
-→ Professional staging and styling
-
-Result: Same room, same layout, but photographed like a professional interior shoot.
-Professional photography, perfect lighting, magazine quality.`;
+      return `This ${roomDesc} with every furniture piece in its exact current position, elevated to professional interior photography standards. Identical spatial arrangement with ${keyPieces} unmoved. Refined materials and finishes, warm balanced lighting, professionally staged with quality accessories, fresh greenery, and coordinated textiles. Same room, same layout, polished to magazine-quality presentation.`;
     } else {
-      // keep_layout + specific style = même positions, nouveau style
-      return `TASK: ${style.toUpperCase()} STYLE - SAME LAYOUT
-
-Transform this ${roomDesc} to ${styleDesc} while keeping furniture in EXACT SAME POSITIONS.
-
-${roomTypeBlock}
-${architectureBlock}
-
-CRITICAL - POSITIONS DON'T MOVE:
-✓ ${constraints.keyFurniture} stays in exact same spot
-✓ Every piece of furniture keeps its position
-✓ Layout and spacing remain identical
-
-STYLE TRANSFORMATION:
-→ Replace each furniture with ${style} style equivalent IN SAME POSITION
-→ Sofa → ${style} style sofa (same spot)
-→ Table → ${style} style table (same spot)
-→ Wall colors updated to ${style} palette
-→ ${style} decor elements added
-
-The layout is a perfect overlay of the original - only the style changes.
-Professional photography, ${styleDesc}, magazine quality.`;
+      return `${style} ${roomDesc} interior with furniture in the exact same spatial arrangement as the source photo — identical positions for ${keyPieces}. ${styleDesc}. Complete material and color transformation applied over the existing layout. Each piece replaced with its ${style} equivalent in the same location and same approximate size. ${style} wall treatment, coordinated textiles, matching light fixtures, and curated ${style} accessories filling the space.`;
     }
   }
 
   // ----- MODE: DECOR_ONLY -----
   if (transformMode === 'decor_only') {
-    const decorStyle = isOriginalStyle ? 'matching the existing aesthetic' : `in ${style} style`;
-    
-    return `TASK: DECOR REFRESH ONLY - ${roomDesc.toUpperCase()}
-
-Keep ALL furniture exactly as-is. Only update decorative elements ${decorStyle}.
-
-${roomTypeBlock}
-${architectureBlock}
-
-🚫 DO NOT CHANGE (KEEP 100% IDENTICAL):
-- ${constraints.keyFurniture} - same items, same positions
-- All major furniture pieces
-- Furniture colors and materials
-- Furniture arrangement
-
-✅ ONLY CHANGE THESE DECOR ELEMENTS:
-→ Wall color/paint ${isOriginalStyle ? '(subtle refresh)' : '(to match ' + style + ')'}
-→ Throw pillows and blankets
-→ Plants and vases
-→ Wall art and frames
-→ Rugs and textiles
-→ Curtains/drapes
-→ Decorative accessories
-→ Table styling (books, candles, trays)
-
-The main furniture is IDENTICAL. Only styling and decor items change.
-Professional photography, beautiful styling, ${isOriginalStyle ? 'enhanced version' : styleDesc + ' decor'}.`;
+    if (isOriginalStyle) {
+      return `This ${roomDesc} with all existing furniture completely preserved — identical ${keyPieces}, same positions, same upholstery, same materials and finishes. Only decorative accents refined and elevated: fresh coordinated throw pillows and blankets, quality area rug, curated framed wall art, trailing indoor plants in ceramic pots, updated curtains, warm candles and small sculptural accessories on surfaces. A polished, professionally styled decor refresh.`;
+    } else {
+      return `This ${roomDesc} with all existing furniture completely preserved — identical ${keyPieces}, same positions, same upholstery, same wood finish, same materials. Only decorative accents refreshed in ${style} style: ${style} wall color, coordinated ${style} throw pillows and blankets, ${style} area rug, curated ${style} wall art and frames, fresh plants in ${style} vessels, ${style} curtains, candles and small accessories on surfaces. A subtle but visually striking ${style} decor layer over unchanged furniture.`;
+    }
   }
 
-  // ----- FALLBACK (should not reach here) -----
-  return `Professional ${roomDesc} interior design, ${styleDesc}, photorealistic, 8k quality.`;
+  // ----- FALLBACK -----
+  return `Beautiful ${roomDesc} interior design, ${styleDesc}, photorealistic, 8k, award-winning interior photography.`;
 }
 

@@ -96,6 +96,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly',
       priority: 0.5,
     },
+    {
+      url: `${BASE_URL}/tiktok-generator`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
   ];
 
   // ============================================
@@ -145,24 +151,31 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // ============================================
   // PAGES VILLES (SEO LOCAL)
   // ============================================
-  const { CITIES } = await import('@/src/shared/constants/cities');
-  
-  // Page index des villes
-  const cityIndexPage: MetadataRoute.Sitemap = [
-    {
-      url: `${BASE_URL}/architecte-interieur`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-  ];
+  let cityIndexPage: MetadataRoute.Sitemap = [];
+  let cityPages: MetadataRoute.Sitemap = [];
 
-  const cityPages: MetadataRoute.Sitemap = CITIES.map((city) => ({
-    url: `${BASE_URL}/architecte-interieur/${city.slug}`,
-    lastModified: now,
-    changeFrequency: 'monthly' as const,
-    priority: 0.6,
-  }));
+  try {
+    const { CITIES } = await import('@/src/shared/constants/cities');
+    
+    // Page index des villes
+    cityIndexPage = [
+      {
+        url: `${BASE_URL}/architecte-interieur`,
+        lastModified: now,
+        changeFrequency: 'weekly',
+        priority: 0.8,
+      },
+    ];
+
+    cityPages = CITIES.map((city) => ({
+      url: `${BASE_URL}/architecte-interieur/${city.slug}`,
+      lastModified: now,
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
+    }));
+  } catch (error) {
+    console.error('Error loading cities for sitemap:', error);
+  }
 
   // ============================================
   // PAGES PROGRAMMATIQUES (STYLES DE DÉCO)
