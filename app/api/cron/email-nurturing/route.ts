@@ -155,13 +155,15 @@ export async function GET(req: Request) {
 
     const { data: quizLeads } = await supabaseAdmin
       .from('leads')
-      .select('id, email, name, source, metadata')
+      .select('id, email, name, source, metadata, unsubscribed')
       .eq('source', 'quiz_style_deco')
       .gte('created_at', oneDayAgoMin.toISOString())
       .lt('created_at', oneDayAgo.toISOString());
 
     for (const lead of (quizLeads || [])) {
       if (!lead.email) continue;
+      // RGPD: respecter la désinscription
+      if (lead.unsubscribed === true) continue;
 
       // Extraire le style du quiz depuis les metadata
       const quizStyle = lead.metadata?.style || 'Moderne';
@@ -185,13 +187,15 @@ export async function GET(req: Request) {
     // ========================================
     const { data: trialJ1Leads } = await supabaseAdmin
       .from('leads')
-      .select('id, email, name, source, metadata')
+      .select('id, email, name, source, metadata, unsubscribed')
       .eq('source', 'trial_email_gate')
       .gte('created_at', oneDayAgoMin.toISOString())
       .lt('created_at', oneDayAgo.toISOString());
 
     for (const lead of (trialJ1Leads || [])) {
       if (!lead.email) continue;
+      // RGPD: respecter la désinscription
+      if (lead.unsubscribed === true) continue;
       // Vérifier qu'ils ne se sont pas inscrits
       const { count: userCount } = await supabaseAdmin
         .from('profiles')
@@ -219,13 +223,15 @@ export async function GET(req: Request) {
     // ========================================
     const { data: trialJ3Leads } = await supabaseAdmin
       .from('leads')
-      .select('id, email, name, source, metadata')
+      .select('id, email, name, source, metadata, unsubscribed')
       .eq('source', 'trial_email_gate')
       .gte('created_at', threeDaysAgoMin.toISOString())
       .lt('created_at', threeDaysAgo.toISOString());
 
     for (const lead of (trialJ3Leads || [])) {
       if (!lead.email) continue;
+      // RGPD: respecter la désinscription
+      if (lead.unsubscribed === true) continue;
       const { count: userCount } = await supabaseAdmin
         .from('profiles')
         .select('id', { count: 'exact', head: true })
@@ -251,13 +257,15 @@ export async function GET(req: Request) {
     // ========================================
     const { data: trialJ7Leads } = await supabaseAdmin
       .from('leads')
-      .select('id, email, name, source, metadata')
+      .select('id, email, name, source, metadata, unsubscribed')
       .eq('source', 'trial_email_gate')
       .gte('created_at', sevenDaysAgoMin.toISOString())
       .lt('created_at', sevenDaysAgo.toISOString());
 
     for (const lead of (trialJ7Leads || [])) {
       if (!lead.email) continue;
+      // RGPD: respecter la désinscription
+      if (lead.unsubscribed === true) continue;
       const { count: userCount } = await supabaseAdmin
         .from('profiles')
         .select('id', { count: 'exact', head: true })

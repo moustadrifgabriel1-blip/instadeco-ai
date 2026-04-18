@@ -610,25 +610,59 @@ function GenerateContent() {
                 </div>
               </div>
 
-              {/* Prompt utilisé */}
-              {generatedPrompt && (
-                <div className="max-w-2xl mx-auto">
-                  <button
-                    onClick={() => setShowPromptDetails(!showPromptDetails)}
-                    className="flex items-center gap-2 text-[13px] text-[#636366] hover:text-[#1d1d1f] transition-colors mx-auto"
-                  >
-                    <Info className="w-3.5 h-3.5" />
-                    Voir le prompt utilisé
-                    <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showPromptDetails ? 'rotate-180' : ''}`} />
-                  </button>
-                  {showPromptDetails && (
-                    <div className="mt-3 p-4 rounded-2xl bg-[#f5f5f7] border border-[#e8e8ed]">
-                      <p className="text-[11px] font-medium text-[#636366] uppercase tracking-[.1em] mb-2">Prompt envoyé à l&apos;IA</p>
-                      <p className="text-[13px] text-[#1d1d1f] leading-relaxed font-mono break-words">{generatedPrompt}</p>
-                    </div>
-                  )}
+              {/* Options sélectionnées */}
+              <div className="max-w-2xl mx-auto">
+                <div className="flex flex-wrap justify-center gap-2.5">
+                  {/* Style */}
+                  <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#f5f5f7] border border-[#e8e8ed]">
+                    <span className="text-[15px]">🎨</span>
+                    <span className="text-[13px] font-semibold text-[#1d1d1f]">
+                      {selectedStyleInfo?.name ?? selectedStyle}
+                    </span>
+                  </div>
+                  {/* Pièce */}
+                  {(() => {
+                    const room = ROOM_TYPES.find(r => r.id === selectedRoomType || r.slug === selectedRoomType);
+                    return (
+                      <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#f5f5f7] border border-[#e8e8ed]">
+                        <span className="text-[15px]">{room?.icon ?? '🏠'}</span>
+                        <span className="text-[13px] font-semibold text-[#1d1d1f]">
+                          {room?.name ?? selectedRoomType}
+                        </span>
+                      </div>
+                    );
+                  })()}
+                  {/* Mode */}
+                  {(() => {
+                    const mode = TRANSFORM_MODES.find(m => m.id === selectedMode);
+                    return mode ? (
+                      <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#f5f5f7] border border-[#e8e8ed]">
+                        <span className="text-[15px]">{mode.icon}</span>
+                        <span className="text-[13px] font-semibold text-[#1d1d1f]">{mode.name}</span>
+                      </div>
+                    ) : null;
+                  })()}
                 </div>
-              )}
+
+                {/* Prompt technique — masqué par défaut */}
+                {generatedPrompt && (
+                  <div className="mt-4 text-center">
+                    <button
+                      onClick={() => setShowPromptDetails(!showPromptDetails)}
+                      className="flex items-center gap-1.5 text-[12px] text-[#aeaeb2] hover:text-[#636366] transition-colors mx-auto"
+                    >
+                      <Info className="w-3 h-3" />
+                      {showPromptDetails ? 'Masquer le prompt IA' : 'Voir le prompt IA'}
+                      <ChevronDown className={`w-3 h-3 transition-transform ${showPromptDetails ? 'rotate-180' : ''}`} />
+                    </button>
+                    {showPromptDetails && (
+                      <div className="mt-2 p-3 rounded-xl bg-[#f5f5f7] border border-[#e8e8ed] text-left">
+                        <p className="text-[11px] text-[#1d1d1f] leading-relaxed font-mono break-words">{generatedPrompt}</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
 
               {/* Actions */}
               <div className="max-w-lg mx-auto">

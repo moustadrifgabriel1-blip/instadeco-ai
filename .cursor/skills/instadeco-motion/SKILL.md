@@ -23,7 +23,15 @@ description: >-
 4. **Style**: rester aligné sur les tokens existants (couleurs `#2D2D2D`, `#C95D3A`, `rounded-xl`, `shadow-warm`, etc.) — l’animation ne remplace pas le design system.
 5. **Perf**: éviter les animations sur `filter` / `box-shadow` massifs ; préférer `opacity`, `transform`, `will-change` avec parcimonie.
 
-## Pattern recommandé (fade + léger slide)
+## Presets partagés
+
+Fichier: `lib/motion/instadeco.ts`
+
+- `fadeUpBlock(reduceMotion, { delay? })` — bloc unique (fade + léger `y`), utilisé p.ex. pour la colonne visuelle du Hero.
+- `heroStaggerVariants(reduceMotion)` — `{ container, item }` pour une cascade badge → titre → texte → CTA → preuve sociale (stagger désactivé si `reduceMotion`).
+- `EASE_OUT_SOFT` — courbe commune pour rester cohérent.
+
+## Pattern inline (sans preset)
 
 ```tsx
 'use client';
@@ -51,8 +59,8 @@ export function ExampleBlock() {
 
 ## Références projet
 
-- Exemple d’usage: `components/features/landing/Hero.tsx` (entrée hero colonnes texte / visuel).
-- Homepage: `app/page.tsx` (compose des sections dynamiques — même logique qu’ajouter d’autres blocs animés en client).
+- `components/features/landing/Hero.tsx` — stagger + colonne visuelle + désactivation de `animate-float` (CSS) si `useReducedMotion`.
+- `app/page.tsx` — compose les sections ; réutiliser `lib/motion/instadeco` pour d’autres blocs client.
 
 ## Anti-patterns
 

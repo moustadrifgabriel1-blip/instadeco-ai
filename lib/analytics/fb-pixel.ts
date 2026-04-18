@@ -17,7 +17,7 @@
  * Configuration : Ajouter NEXT_PUBLIC_FB_PIXEL_ID dans .env
  */
 
-export const FB_PIXEL_ID = process.env.NEXT_PUBLIC_FB_PIXEL_ID || '';
+export const FB_PIXEL_ID = (process.env.NEXT_PUBLIC_FB_PIXEL_ID || '').trim();
 
 function isFbqAvailable(): boolean {
   return typeof window !== 'undefined' && typeof window.fbq === 'function' && !!FB_PIXEL_ID;

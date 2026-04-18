@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
 import { addCredits } from '@/lib/supabase/credits';
 import { requireAuth } from '@/lib/security/api-auth';
+import { sendReferralNotificationEmail } from '@/lib/notifications/marketing-emails';
 
 /**
  * GET /api/v2/referral — Récupérer les infos de parrainage de l'utilisateur authentifié
@@ -88,7 +89,7 @@ export async function POST(req: Request) {
     // 1. Trouver le parrain via le code
     const { data: referrer, error: refError } = await supabaseAdmin
       .from('profiles')
-      .select('id, email')
+      .select('id, email, full_name')
       .eq('referral_code', referralCode.toUpperCase().trim())
       .single();
 
@@ -153,6 +154,15 @@ export async function POST(req: Request) {
       .eq('id', newUserId);
 
     console.log(`[Referral] ✅ ${referrer.email} → new user ${newUserId} (${REFERRER_BONUS}+${REFERRED_BONUS} crédits)`);
+
+    // 8. Notifier le parrain par email (en arrière-plan)
+    sendReferralNotificationEmail(
+      referrer.email,
+      referrer.full_name || null,
+      REFERRER_BONUS,
+    ).catch((err) => {
+      console.error('[Referral] Email notification failed:', err);
+    });
 
     return NextResponse.json({
       success: true,

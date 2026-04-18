@@ -8,6 +8,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { usePurchaseCredits } from '@/src/presentation/hooks/usePurchaseCredits';
 import { createSubscriptionSession } from '@/src/presentation/api/client';
 import { SocialProofToast } from '@/components/features/social-proof-toast';
+import { LeadCaptureLazy } from '@/components/features/lead-capture-lazy';
 import { CreditPackId, SubscriptionPlanId, BillingInterval } from '@/src/presentation/types';
 
 // v2 - force rebuild (cache Vercel stale après suppression footer dupliqué)
@@ -792,6 +793,8 @@ function PricingPage() {
         </div>
       </div>
       <SocialProofToast initialDelay={6000} interval={20000} maxNotifications={8} />
+      {/* Exit-intent popup pour capturer les emails avant départ */}
+      <LeadCaptureLazy variant="popup" delay={20000} />
     </div>
   );
 }

@@ -158,9 +158,15 @@ import { OptimizedRemoteImage } from '@/components/ui/optimized-image';
 
 ## Workflow de Développement
 
-### Phase Actuelle: **Milestone 2 - Backend Crédits & Stripe**
+### Phase Actuelle: **Milestone 3 - Production & Acquisition**
 
-Voir `../docs/CONTEXT.md` section "Milestones de Développement" pour le plan complet.
+**Statut :** 🟢 EN PRODUCTION  
+- Stripe en mode LIVE (paiements réels activés)  
+- Première campagne Facebook Ads lancée le 2 mars 2026 (budget 150€)  
+- Sitemap soumis à Google Search Console  
+- Flux complet validé : Essai → Inscription → Génération → Paiement  
+
+Voir `../docs/CONTEXT.md` pour le contexte complet.
 
 ### Avant de Coder
 
@@ -227,5 +233,5 @@ STRIPE_SECRET_KEY=...
 
 ---
 
-**Version:** 1.1.0  
-**Dernière mise à jour:** 14 février 2026
+**Version:** 1.2.0  
+**Dernière mise à jour:** 3 mars 2026

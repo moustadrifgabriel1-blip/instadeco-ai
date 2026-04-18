@@ -27,12 +27,19 @@ SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 
 ---
 
-## 3️⃣ Gemini AI (MANQUANT ❌)
+## 3️⃣ Gemini AI (**OBLIGATOIRE pour le blog**)
 
 **Nom** : `GEMINI_API_KEY`  
-**Valeur** : Obtenir sur https://ai.google.dev/
+**Valeur** : `AIzaSyD0j-rEkffCDrSn1X-twz_7yHXa1hYvT0o` (clé actuellement dans `.env.local`)
 
-**Comment obtenir** :
+**⚠️ CRITIQUE** : Sans cette variable, le cron de génération échoue silencieusement !  
+→ Si aucun article n'est publié depuis 48h : vérifier cette clé EN PREMIER.
+
+**Nom** : `GEMINI_MODEL` *(optionnel — pour override du modèle)*  
+**Valeur par défaut** : `gemini-2.0-flash` (rapide ~2-15s, recommandé)  
+**Alternatives** : `gemini-2.0-flash-lite` (ultra-rapide), `gemini-1.5-flash` (fallback)
+
+**Comment obtenir une nouvelle clé** :
 1. Aller sur https://makersuite.google.com/app/apikey
 2. Créer une clé API
 3. Copier la valeur

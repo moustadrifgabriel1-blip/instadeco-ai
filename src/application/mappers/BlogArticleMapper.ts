@@ -16,6 +16,13 @@ function parseSupabaseDate(value: unknown, fallback: Date): Date {
   return Number.isFinite(d.getTime()) ? d : fallback;
 }
 
+/** Chaînes ISO issues des DTO / API */
+function parseIsoStringToDate(iso: string | undefined, fallback: Date): Date {
+  if (iso == null || iso === '') return fallback;
+  const d = new Date(iso);
+  return Number.isFinite(d.getTime()) ? d : fallback;
+}
+
 function toIsoStringSafe(d: Date, fallback: Date): string {
   const t = d.getTime();
   return Number.isFinite(t) ? d.toISOString() : fallback.toISOString();
@@ -78,6 +85,10 @@ export class BlogArticleMapper {
    * Convertit un DTO en entité
    */
   static toEntity(dto: BlogArticleDTO): BlogArticle {
+    const now = new Date();
+    const createdAt = parseIsoStringToDate(dto.createdAt, now);
+    const updatedAt = parseIsoStringToDate(dto.updatedAt, createdAt);
+    const publishedAt = parseIsoStringToDate(dto.publishedAt, createdAt);
     return {
       id: dto.id,
       title: dto.title,
@@ -91,9 +102,9 @@ export class BlogArticleMapper {
       antiAIScore: dto.antiAIScore,
       sessionType: dto.sessionType,
       source: dto.source,
-      publishedAt: new Date(dto.publishedAt),
-      createdAt: new Date(dto.createdAt),
-      updatedAt: new Date(dto.updatedAt),
+      publishedAt,
+      createdAt,
+      updatedAt,
     };
   }
 
@@ -130,6 +141,7 @@ export class BlogArticleMapper {
    * Convertit une entité en format Supabase pour insertion
    */
   static toSupabase(article: BlogArticle): Record<string, unknown> {
+    const created = toIsoStringSafe(article.createdAt, new Date());
     return {
       id: article.id,
       title: article.title,
@@ -143,9 +155,9 @@ export class BlogArticleMapper {
       anti_ai_score: article.antiAIScore,
       session_type: article.sessionType,
       source: article.source,
-      published_at: article.publishedAt.toISOString(),
-      created_at: article.createdAt.toISOString(),
-      updated_at: article.updatedAt.toISOString(),
+      published_at: toIsoStringSafe(article.publishedAt, new Date(created)),
+      created_at: created,
+      updated_at: toIsoStringSafe(article.updatedAt, new Date(created)),
     };
   }
 }

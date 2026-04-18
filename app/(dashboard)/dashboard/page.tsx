@@ -45,6 +45,7 @@ import {
 import { useGenerations } from '@/src/presentation/hooks/useGenerations';
 import { useCredits } from '@/src/presentation/hooks/useCredits';
 import { STYLES, ROOM_TYPES } from '@/src/shared/constants/styles';
+import { trackReferralShared } from '@/lib/analytics/gtag';
 
 // ============================================
 // TYPES
@@ -887,7 +888,7 @@ export default function DashboardPageV2() {
                         Invitez vos amis, gagnez des crédits
                       </h2>
                       <p className="text-sm text-[#6B6B6B]">
-                        Pour chaque ami qui s&apos;inscrit avec votre code, vous recevez tous les deux <span className="font-bold text-[#E07B54]">3 crédits gratuits</span>. 
+                        Pour chaque ami qui s&apos;inscrit avec votre code, vous recevez tous les deux <span className="font-bold text-[#E07B54]">5 crédits gratuits</span>. 
                         Plus vous parrainez, plus vous créez !
                       </p>
                     </div>
@@ -939,7 +940,8 @@ export default function DashboardPageV2() {
                         variant="outline"
                         className="flex-1"
                         onClick={() => {
-                          const text = `Essaie InstaDeco AI pour redécorer ton intérieur ! Utilise mon code ${referralCode} pour obtenir 3 crédits gratuits 🎁 https://instadeco.app/signup?ref=${referralCode}`;
+                          const text = `Essaie InstaDeco AI pour redécorer ton intérieur ! Utilise mon code ${referralCode} pour obtenir 5 crédits gratuits 🎁 https://instadeco.app/signup?ref=${referralCode}`;
+                          trackReferralShared();
                           if (navigator.share) {
                             navigator.share({ title: 'InstaDeco AI', text });
                           } else {
@@ -956,8 +958,9 @@ export default function DashboardPageV2() {
                         variant="outline"
                         className="flex-1"
                         onClick={() => {
-                          const text = encodeURIComponent(`Essaie InstaDeco AI pour redécorer ton intérieur ! Utilise mon code ${referralCode} pour 3 crédits gratuits 🎁`);
+                          const text = encodeURIComponent(`Essaie InstaDeco AI pour redécorer ton intérieur ! Utilise mon code ${referralCode} pour 5 crédits gratuits 🎁`);
                           const url = encodeURIComponent(`https://instadeco.app/signup?ref=${referralCode}`);
+                          trackReferralShared();
                           window.open(`https://wa.me/?text=${text}%20${url}`, '_blank');
                         }}
                       >
@@ -999,7 +1002,7 @@ export default function DashboardPageV2() {
                       {[
                         { step: '1', title: 'Partagez votre code', desc: 'Envoyez votre code unique à vos amis par message, email ou réseaux sociaux.' },
                         { step: '2', title: 'Ils s\'inscrivent', desc: 'Vos amis créent un compte et saisissent votre code lors de l\'inscription.' },
-                        { step: '3', title: 'Vous gagnez tous les deux', desc: 'Vous recevez chacun 3 crédits gratuits instantanément !' },
+                        { step: '3', title: 'Vous gagnez tous les deux', desc: 'Vous recevez chacun 5 crédits gratuits instantanément !' },
                       ].map(item => (
                         <div key={item.step} className="flex items-start gap-4">
                           <div className="w-8 h-8 rounded-full bg-[#E07B54] text-white flex items-center justify-center flex-shrink-0 text-sm font-bold">

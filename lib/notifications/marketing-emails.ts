@@ -272,3 +272,80 @@ export async function sendGenerationCompleteEmail(
     return { success: false, error: err instanceof Error ? err.message : 'Unknown error' };
   }
 }
+
+// ============================================
+// 3. EMAIL DE NOTIFICATION AU PARRAIN
+// ============================================
+function buildReferralNotificationEmail(
+  name: string,
+  creditsAwarded: number,
+): string {
+  return emailWrapper(`
+    <h2 style="color: #1d1d1f; font-size: 22px; margin: 0 0 16px; text-align: center;">
+      Bonne nouvelle ! 🎉
+    </h2>
+    
+    <p style="color: #6B6B6B; line-height: 1.6; margin: 0 0 16px; text-align: center;">
+      Bonjour ${name}, un ami vient de s'inscrire grâce à votre code de parrainage !
+    </p>
+
+    <div style="background: linear-gradient(135deg, #FFF8F5, #FFF0EB); border-radius: 16px; padding: 24px; margin: 0 0 24px; border: 2px solid #E07B54; text-align: center;">
+      <p style="font-size: 36px; font-weight: 800; color: #E07B54; margin: 0 0 8px;">+${creditsAwarded}</p>
+      <p style="font-size: 18px; font-weight: 600; color: #1d1d1f; margin: 0 0 4px;">crédits ajoutés à votre compte</p>
+      <p style="color: #6B6B6B; font-size: 14px; margin: 0;">
+        Utilisez-les pour transformer vos pièces !
+      </p>
+    </div>
+
+    <div style="text-align: center; margin: 24px 0;">
+      <a href="https://instadeco.app/generate"
+         style="display: inline-block; background: linear-gradient(135deg, #E07B54, #D4603C); color: white; text-decoration: none; padding: 14px 32px; border-radius: 50px; font-weight: 600; font-size: 16px;">
+        Utiliser mes crédits →
+      </a>
+    </div>
+
+    <div style="background: #f5f5f7; border-radius: 12px; padding: 16px; margin: 24px 0; text-align: center;">
+      <p style="margin: 0; color: #636366; font-size: 14px;">
+        💡 Continuez à partager votre code pour gagner encore plus de crédits !<br />
+        <a href="https://instadeco.app/dashboard" style="color: #E07B54; text-decoration: none; font-weight: 500;">
+          Voir mon code de parrainage →
+        </a>
+      </p>
+    </div>
+  `);
+}
+
+/**
+ * Envoie un email de notification au parrain quand un filleul s'inscrit
+ */
+export async function sendReferralNotificationEmail(
+  referrerEmail: string,
+  referrerName: string | null,
+  creditsAwarded: number,
+): Promise<{ success: boolean; error?: string }> {
+  const resend = getResend();
+  if (!resend) {
+    console.warn('[Referral Email] RESEND_API_KEY non configurée');
+    return { success: false, error: 'RESEND_API_KEY not configured' };
+  }
+
+  try {
+    const { error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: [referrerEmail],
+      subject: `🎁 +${creditsAwarded} crédits — Un ami a utilisé votre code !`,
+      html: buildReferralNotificationEmail(referrerName || 'là', creditsAwarded),
+    });
+
+    if (error) {
+      console.error('[Referral Email] Resend error:', error);
+      return { success: false, error: error.message };
+    }
+
+    console.log(`[Referral Email] ✅ Notification envoyée à ${referrerEmail}`);
+    return { success: true };
+  } catch (err) {
+    console.error('[Referral Email] Erreur:', err);
+    return { success: false, error: err instanceof Error ? err.message : 'Unknown error' };
+  }
+}

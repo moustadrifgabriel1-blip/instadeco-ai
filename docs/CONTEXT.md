@@ -1,8 +1,8 @@
 # 🏠 InstaDeco AI - Contrat de Contexte Global
 
 **Date de création :** 16 janvier 2026  
-**Dernière mise à jour :** 11 février 2026  
-**Version :** 2.2.0  
+**Dernière mise à jour :** 3 mars 2026  
+**Version :** 2.3.0  
 **Type de projet :** SaaS B2C - Décoration d'intérieur par IA  
 **🏗️ Architecture :** Hexagonale (Ports & Adapters)  
 **🎨 Branding :** InstaDeco AI  
@@ -90,7 +90,7 @@
 
 ## 📅 État d'Avancement (Journal de Bord)
 
-### ✅ Récemment Complété (11 Février 2026)
+### ✅ Récemment Complété (3 Mars 2026)
 1.  **Migration Auth & DB** : Finalisation du passage de Firebase à Supabase.
 2.  **Fix RLS** : Correction des politiques "Infinite Recursion" sur Supabase.
 3.  **Fix Header UI** : Le composant `Header` affiche correctement les crédits.
@@ -104,15 +104,28 @@
 6.  **Blog SEO** : Intégration complète avec génération automatique d'articles.
 7.  **Fix Sécurité DB** : Correction de 10 warnings `function_search_path_mutable` — ajout de `SET search_path = ''` sur toutes les fonctions PostgreSQL.
 8.  **Mise à jour CONTEXT.md** : Suppression de toutes les références obsolètes à Replicate.
+9.  **✅ Fix Erreur Génération 500** : Résolu — problème de configuration des variables d'environnement sur Vercel.
+10. **✅ Flux complet validé** : Upload → Génération → Déduction Crédit → Affichage — tout fonctionne.
+11. **✅ Stripe passé en mode LIVE** : Clés `sk_live_` et `pk_live_` configurées sur Vercel. Paiements réels activés.
+12. **✅ Sitemap soumis** : Envoyé à Google Search Console et Bing Webmaster.
+13. **✅ Première campagne Facebook Ads lancée** (2 mars 2026) : Budget initial 150€, campagne active.
+14. **✅ Fix RGPD Nurturing** : Ajout vérification `leads.unsubscribed` dans le cron email-nurturing (4 séquences corrigées).
+15. **✅ Programme parrainage activé** : Bonus aligné à 5 crédits (API + UI), page `/parrainage` publique créée, analytics `trackReferralShared` branché, email de notification au parrain implémenté.
+16. **✅ Exit intent popup** ajouté sur la page `/pricing` (LeadCapture popup, délai 20s).
 
-### 🚧 En Cours de Débogage
-1.  **Erreur Génération 500** : Le processus de génération lève une erreur interne.
-    *   *Action* : Vérifier les logs Vercel pour identifier la cause exacte.
+### 🚧 En Cours
+1.  **Campagne Facebook Ads** : Première campagne lancée le 2 mars 2026 avec un budget de 150€.
+    *   *Action* : Surveiller les KPIs (CPM, CTR, CPC, ROAS) quotidiennement.
+    *   *Objectif* : CAC < 15€, ROAS > 2x.
+2.  **SEO Organique** : Blog auto-généré actif (3 articles/jour), sitemap indexé.
 
 ### 🔜 Prochaines Étapes
-1.  Identifier la cause exacte de l'erreur 500 (via logs Vercel).
-2.  Valider le flux complet : Upload -> Génération -> Déduction Crédit -> Affichage.
-3.  Soumettre le sitemap à Google Search Console et Bing.
+1.  Analyser les premiers résultats de la campagne FB (J3-J5) — couper les créatives sous-performantes.
+2.  Optimiser le taux de conversion landing page (objectif > 3%).
+3.  Activer le retargeting (visiteurs sans achat 14j).
+4.  Afficher le pack 100 crédits (59,90€) sur la page pricing.
+5.  Configurer les alertes Vercel (monitoring erreurs 500).
+6.  Implémenter Google Consent Mode v2 (conformité RGPD France).
 
 ---
 
@@ -769,7 +782,8 @@ images: {
 
 ---
 
-**Version:** 2.0.0  
+**Version:** 2.3.0  
 **Architecture:** Hexagonale (Ports & Adapters)  
 **Stack:** Next.js 14 + Supabase + Fal.ai + Stripe  
-**Dernière mise à jour:** 11 février 2026
+**Statut:** 🟢 EN PRODUCTION — Stripe LIVE, Campagne FB active  
+**Dernière mise à jour:** 3 mars 2026
