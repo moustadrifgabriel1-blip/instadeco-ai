@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { motion, useReducedMotion } from 'framer-motion';
 import { Sparkles, ArrowRight, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -10,17 +11,24 @@ import { BeforeAfter } from './BeforeAfter';
 // Styles disponibles pour l'animation
 const styles = ['Moderne', 'Scandinave', 'Bohème', 'Japandi', 'Industrial'];
 
+const easeOut = [0.22, 1, 0.36, 1] as const;
+
 export function Hero() {
   const [currentStyle, setCurrentStyle] = useState(0);
-  const [isVisible, setIsVisible] = useState(false);
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
-    setIsVisible(true);
     const interval = setInterval(() => {
       setCurrentStyle((prev) => (prev + 1) % styles.length);
     }, 2500);
     return () => clearInterval(interval);
   }, []);
+
+  const fadeY = reduceMotion ? 0 : 24;
+  const enterTransition = reduceMotion
+    ? { duration: 0 }
+    : { duration: 0.55, ease: easeOut };
+  const enterDelay = reduceMotion ? 0 : 0.12;
 
   return (
     <section className="relative min-h-[90vh] flex items-center overflow-hidden gradient-hero">
@@ -32,7 +40,12 @@ export function Hero() {
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           
           {/* Contenu texte */}
-          <div className={`flex flex-col gap-8 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <motion.div
+            className="flex flex-col gap-8"
+            initial={{ opacity: reduceMotion ? 1 : 0, y: fadeY }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={enterTransition}
+          >
             
             {/* Badge */}
             <div className="badge-primary w-fit">
@@ -110,10 +123,19 @@ export function Hero() {
                 <span className="text-sm font-medium text-[#2D2D2D]">Top qualité</span>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Visuel interactif */}
-          <div className={`relative transition-all duration-700 delay-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <motion.div
+            className="relative"
+            initial={{ opacity: reduceMotion ? 1 : 0, y: fadeY }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={
+              reduceMotion
+                ? { duration: 0 }
+                : { duration: 0.55, delay: enterDelay, ease: easeOut }
+            }
+          >
             {/* Container principal */}
             <div className="relative rounded-2xl overflow-hidden shadow-warm-lg border border-[#F0E6E0]">
               <BeforeAfter />
@@ -131,7 +153,7 @@ export function Hero() {
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>
