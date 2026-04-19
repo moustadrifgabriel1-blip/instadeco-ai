@@ -79,20 +79,20 @@ export function useGenerate(): UseGenerateReturn {
         isSuccess: false,
         isError: false,
         progress: 10,
-        statusMessage: 'Préparation de l\'image...',
+        statusMessage: 'Préparation de votre visuel…',
       });
 
       try {
         // Convertir le fichier en base64 si nécessaire
         let imageUrl: string;
         if (input.imageFile instanceof File) {
-          setState((prev) => ({ ...prev, progress: 20, statusMessage: 'Upload de l\'image...' }));
+          setState((prev) => ({ ...prev, progress: 22, statusMessage: 'Envoi sécurisé de votre photo…' }));
           imageUrl = await fileToBase64(input.imageFile);
         } else {
           imageUrl = input.imageFile;
         }
 
-        setState((prev) => ({ ...prev, progress: 40, statusMessage: 'Lancement de la génération...' }));
+        setState((prev) => ({ ...prev, progress: 42, statusMessage: 'Création de votre planche — rendu haut de gamme…' }));
 
         // AbortController avec timeout de sécurité (65s)
         if (abortControllerRef.current) {
@@ -121,7 +121,7 @@ export function useGenerate(): UseGenerateReturn {
           isSuccess: true,
           isError: false,
           progress: response.generation.outputImageUrl ? 100 : 90,
-          statusMessage: response.generation.outputImageUrl ? 'Terminé !' : 'Finalisation...',
+          statusMessage: response.generation.outputImageUrl ? 'Votre planche est prête.' : 'Finalisation…',
         });
 
         return response.generation;

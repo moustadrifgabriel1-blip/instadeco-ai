@@ -103,8 +103,8 @@ export interface GenerateDesignInput {
   roomType: string;
   imageBase64: string;
   prompt: string;
-  /** Mode de transformation: full_redesign, keep_layout, decor_only */
-  transformMode?: 'full_redesign' | 'keep_layout' | 'decor_only';
+  /** Mode de transformation: full_redesign, keep_layout, decor_only, home_staging */
+  transformMode?: 'full_redesign' | 'keep_layout' | 'decor_only' | 'home_staging';
 }
 
 /**
@@ -255,8 +255,6 @@ export class GenerateDesignUseCase {
       transformMode: input.transformMode || 'full_redesign',
       width: imageWidth,
       height: imageHeight,
-      numInferenceSteps: 25,
-      guidanceScale: 3.5,
     });
 
     if (!genResult.success) {

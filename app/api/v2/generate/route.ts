@@ -30,7 +30,7 @@ const generateRequestSchema = z.object({
   roomType: z.string().max(50).regex(/^[a-z0-9-]+$/, 'Format invalide').default('salon'),
   style: z.string().max(50).regex(/^[a-z0-9-]+$/, 'Format invalide').default('moderne'),
   userId: z.string().uuid('ID utilisateur invalide').optional(), // Optionnel : on prend l'userId de la session si absent
-  transformMode: z.enum(['full_redesign', 'keep_layout', 'decor_only']).default('full_redesign'),
+  transformMode: z.enum(['full_redesign', 'keep_layout', 'decor_only', 'home_staging']).default('home_staging'),
 });
 
 export const maxDuration = 60; // Set max duration to 60 seconds (Hobby limit usually 10s, Pro 300s)
@@ -120,7 +120,7 @@ export async function POST(req: Request) {
       roomType,
       imageBase64: imageUrl, // Le storage service gère base64 et URL
       prompt,
-      transformMode: transformMode as 'full_redesign' | 'keep_layout' | 'decor_only',
+      transformMode: transformMode as 'full_redesign' | 'keep_layout' | 'decor_only' | 'home_staging',
     });
     
     const duration = Date.now() - startTime;
@@ -306,6 +306,16 @@ function buildPrompt(style: string, roomType: string, transformMode: string = 'f
     } else {
       return `${style} ${roomDesc} interior with furniture in the exact same spatial arrangement as the source photo — identical positions for ${keyPieces}. ${styleDesc}. Complete material and color transformation applied over the existing layout. Each piece replaced with its ${style} equivalent in the same location and same approximate size. ${style} wall treatment, coordinated textiles, matching light fixtures, and curated ${style} accessories filling the space.`;
     }
+  }
+
+  // ----- MODE: HOME_STAGING -----
+  // Structure, sol, fenêtres, portes, plinthes, prises, radiateurs, four/plaque encastrés : FIGÉS.
+  // Seuls meubles libres, déco, textiles, couleur des murs, tableaux changent.
+  if (transformMode === 'home_staging') {
+    if (isOriginalStyle) {
+      return `This exact same ${roomDesc}, virtually home-staged. The architectural shell and all non-movable elements are frozen pixel-identical: same windows, same doors, same baseboards, same floor, same radiators, same wall outlets, same built-in appliances, same ceiling lights. Only free-standing furniture, decor, textiles, artwork and wall paint are refined to a professionally staged magazine-quality presentation. Warm curated atmosphere, fresh greenery, quality accessories.`;
+    }
+    return `Virtually home-staged ${style} ${roomDesc}. The architectural shell is frozen pixel-identical to the source photo: same windows with identical frames and sills, same doors and door frames, same baseboards, same floor (material and pattern unchanged), same radiators in place, same wall outlets and switches, same built-in kitchen appliances in place, same ceiling light positions, same camera angle. Only movable elements are restyled to ${style}: ${styleDesc}. Free-standing furniture, soft furnishings, rugs, curtains, artwork, cushions, plants and decor accessories arranged by a professional stylist. Wall paint color may be adjusted to a ${style} palette. No renovation, no construction, no structural change.`;
   }
 
   // ----- MODE: DECOR_ONLY -----

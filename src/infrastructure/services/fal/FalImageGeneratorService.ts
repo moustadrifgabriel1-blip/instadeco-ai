@@ -24,6 +24,16 @@ import {
   ImageGenerationOptions, 
   ImageGenerationResult 
 } from '@/src/domain/ports/services/IImageGeneratorService';
+import {
+  FLUX_IMG2IMG_INFERENCE_STEPS,
+  FLUX_NEGATIVE_SUFFIX,
+  FLUX_QUALITY_SUFFIX,
+  GUIDANCE_BY_MODE,
+  NAG_SCALE_BY_MODE,
+  HOME_STAGING_STRENGTH,
+  HOME_STAGING_LOCK_PROMPT,
+  HOME_STAGING_NEGATIVE,
+} from '@/src/infrastructure/services/fal/flux-presets';
 
 // --- CONSTANTS & MAPPINGS ---
 
@@ -71,6 +81,7 @@ const TRANSFORM_PARAMS: Record<string, { strength: number; depthScale: number }>
   full_redesign:  { strength: 0.72, depthScale: 1.0 },   // Transformation agressive — meubles + déco entièrement changés
   keep_layout:    { strength: 0.58, depthScale: 1.2 },   // Transformation modérée — style changé, positions préservées
   decor_only:     { strength: 0.42, depthScale: 1.3 },   // Transformation légère — uniquement accessoires déco
+  home_staging:   { strength: HOME_STAGING_STRENGTH, depthScale: 1.4 }, // Structure verrouillée — seuls meubles/déco changent
 };
 
 /**
@@ -149,11 +160,14 @@ export class FalImageGeneratorService implements IImageGeneratorService {
       // 1. Utiliser le prompt personnalisé fourni (inclut les instructions du transformMode)
       // Le prompt est construit par l'API route avec buildPrompt() qui gère les différents modes
       let fullPrompt = options.prompt;
-      
-      // Ajouter les mots-clés de qualité photo à la fin
-      // Concis et optimisé pour Flux T5 — chaque token compte
-      const qualityKeywords = 'Editorial interior design photography, photorealistic, hyperdetailed textures and materials, natural daylight, 8k ultra high resolution.';
-      fullPrompt = `${fullPrompt}\n${qualityKeywords}`;
+
+      // Mode home_staging : on PRÉFIXE avec la contrainte structurelle (plus fort en début de prompt)
+      if (transformMode === 'home_staging') {
+        fullPrompt = `${HOME_STAGING_LOCK_PROMPT}\n\nStyling direction: ${fullPrompt}`;
+      }
+
+      // Suffixe qualité (partagé avec /api/trial/generate via flux-presets)
+      fullPrompt = `${fullPrompt}\n${FLUX_QUALITY_SUFFIX}`;
 
       // 2. Déterminer le format d'image optimal basé sur l'image source
       const imageSize = getOptimalImageSize(options.width || 1024, options.height || 1024);
@@ -164,11 +178,25 @@ export class FalImageGeneratorService implements IImageGeneratorService {
       // strength bas = on préserve la structure, on change meubles/déco
       // depthScale élevé = la profondeur 3D de la pièce est strictement respectée
       const params = TRANSFORM_PARAMS[transformMode] || TRANSFORM_PARAMS.full_redesign;
-      
+      const modeKey: 'full_redesign' | 'keep_layout' | 'decor_only' | 'home_staging' =
+        transformMode === 'keep_layout'
+        || transformMode === 'decor_only'
+        || transformMode === 'home_staging'
+          ? transformMode
+          : 'full_redesign';
+      const guidanceScale =
+        options.guidanceScale ?? GUIDANCE_BY_MODE[modeKey];
+      const nagScale = NAG_SCALE_BY_MODE[modeKey];
+      const numSteps =
+        options.numInferenceSteps ?? FLUX_IMG2IMG_INFERENCE_STEPS;
+
       console.log('[Fal.ai] 🔧 Parameters:', {
         strength: params.strength,
         depthScale: params.depthScale,
         transformMode,
+        guidanceScale,
+        numInferenceSteps: numSteps,
+        nagScale,
       });
 
       // ✅ Utiliser fal.run() synchrone (fal.queue.submit + result re-exécute le modèle)
@@ -208,8 +236,14 @@ export class FalImageGeneratorService implements IImageGeneratorService {
       // Réactiver quand fal.ai corrige le bug (tester avec scripts/test-fal-ab.js)
       
       // Sélectionner le negative prompt spécifique au mode de transformation
-      const negativePrompt = NEGATIVE_PROMPTS[transformMode] || NEGATIVE_PROMPTS.full_redesign;
-      
+      // home_staging : on utilise le negative ultra strict (structure + sol + prises + plinthes…)
+      const negativePrompt = transformMode === 'home_staging'
+        ? [HOME_STAGING_NEGATIVE, FLUX_NEGATIVE_SUFFIX].join(', ')
+        : [
+            NEGATIVE_PROMPTS[transformMode] || NEGATIVE_PROMPTS.full_redesign,
+            FLUX_NEGATIVE_SUFFIX,
+          ].join(', ');
+
       const result = await fal.run(MODEL_PATH, {
         input: {
           prompt: fullPrompt,
@@ -217,10 +251,13 @@ export class FalImageGeneratorService implements IImageGeneratorService {
           strength: params.strength,               // Contrôle combien on modifie vs préserve
           negative_prompt: negativePrompt,         // Negative prompt adapté au mode
           image_size: imageSize, 
-          num_inference_steps: 30,                 // 30 steps pour qualité pro
-          guidance_scale: 5.5,                     // Guidance élevé pour suivre le prompt
-          nag_scale: 4,                            // NAG renforcé (défaut 3) — negative prompt plus respecté
-          nag_end: 0.35,                           // NAG appliqué sur 35% des steps (défaut 25%) — préservation architecture plus longue
+          num_inference_steps: numSteps,
+          guidance_scale: guidanceScale,
+          nag_scale: nagScale,
+          nag_end:
+            modeKey === 'home_staging' ? 0.55
+            : modeKey === 'decor_only' ? 0.38
+            : 0.35,
           enable_safety_checker: true,
           output_format: "jpeg"
         } as any,

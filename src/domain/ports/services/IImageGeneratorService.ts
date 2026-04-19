@@ -21,8 +21,8 @@ export interface ImageGenerationOptions {
   styleSlug?: string;
   /** Type de pièce (salon, chambre, etc.) */
   roomType?: string;
-  /** Mode de transformation (full_redesign, keep_layout, decor_only) */
-  transformMode?: 'full_redesign' | 'keep_layout' | 'decor_only';
+  /** Mode de transformation (full_redesign, keep_layout, decor_only, home_staging) */
+  transformMode?: 'full_redesign' | 'keep_layout' | 'decor_only' | 'home_staging';
   width?: number;
   height?: number;
   numInferenceSteps?: number;

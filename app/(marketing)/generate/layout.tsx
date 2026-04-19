@@ -11,8 +11,8 @@ import { generateSoftwareAppSchema, generateBreadcrumbList } from '@/lib/seo/sch
 import { getCanonicalUrl } from '@/lib/seo/config';
 
 export const metadata: Metadata = {
-  title: 'Générer votre Décoration par IA - Transformation en 10 secondes | InstaDeco',
-  description: 'Uploadez une photo de votre pièce et obtenez un rendu professionnel en 10 secondes. 12+ styles disponibles : Moderne, Scandinave, Japandi, Bohème. Home staging virtuel.',
+  title: 'Rendu d\'intérieur premium par IA | Planche déco professionnelle | InstaDeco',
+  description: 'Créez une planche d\'ambiance digne d\'une agence : importez une photo, choisissez un style (Moderne, Japandi, Haussmannien…). Rendu photoréaliste, téléchargement HD. Home staging et relooking virtuels.',
   keywords: [
     'générer décoration IA',
     'transformer pièce IA',
@@ -24,16 +24,16 @@ export const metadata: Metadata = {
     'avant après décoration IA',
   ],
   openGraph: {
-    title: 'Transformez votre pièce par IA - InstaDeco AI',
-    description: 'Uploadez une photo, choisissez un style → obtenez un rendu pro en 10 secondes.',
+    title: 'Planche déco premium par IA — InstaDeco',
+    description: 'Un rendu d\'intérieur soigné, prêt à être présenté. Styles haut de gamme, résultat en une trentaine de secondes.',
     type: 'website',
     url: getCanonicalUrl('/generate'),
     images: [getCanonicalUrl('/og-image.png')],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Décoration par IA en 10 secondes - InstaDeco',
-    description: 'L\'outil de décoration intérieure par IA le plus rapide.',
+    title: 'InstaDeco — rendu d\'intérieur niveau agence',
+    description: 'Planches déco photoréalistes, styles premium, export HD.',
   },
   alternates: {
     canonical: getCanonicalUrl('/generate'),

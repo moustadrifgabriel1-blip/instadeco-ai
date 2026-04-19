@@ -20,6 +20,13 @@ import { z } from 'zod';
 import { fal } from '@fal-ai/client';
 import { checkRateLimit, getClientIP, isDevBypass } from '@/lib/security/rate-limiter';
 import { supabaseAdmin } from '@/lib/supabase/admin';
+import {
+  FLUX_IMG2IMG_INFERENCE_STEPS,
+  FLUX_NEGATIVE_SUFFIX,
+  FLUX_QUALITY_SUFFIX,
+  GUIDANCE_BY_MODE,
+  NAG_SCALE_BY_MODE,
+} from '@/src/infrastructure/services/fal/flux-presets';
 
 const MODEL_PATH = 'fal-ai/flux-general/image-to-image';
 
@@ -225,16 +232,21 @@ export async function POST(req: Request) {
     // "The size of tensor a (3072) must match the size of tensor b (4096)"
     // Compensation : strength recalibré + guidance_scale élevé.
     // Réactiver quand fal.ai corrige le bug (tester avec scripts/test-fal-ab.js)
+    const trialNegative = [
+      'different room shape, modified walls, moved windows, changed doors, different ceiling height, altered room proportions, different camera angle, different perspective, empty unfurnished room, construction site, unfinished renovation, blurry, low quality, watermark, text overlay, deformed, cartoon, painting, illustration, 3d render',
+      FLUX_NEGATIVE_SUFFIX,
+    ].join(', ');
+
     const result = await fal.run(MODEL_PATH, {
       input: {
         prompt,
         image_url: uploadedImageUrl,
         strength: 0.72,
-        negative_prompt: 'different room shape, modified walls, moved windows, changed doors, different ceiling height, altered room proportions, different camera angle, different perspective, empty unfurnished room, construction site, unfinished renovation, blurry, low quality, watermark, text overlay, deformed, cartoon, painting, illustration, 3d render',
+        negative_prompt: trialNegative,
         image_size: imageSize,
-        num_inference_steps: 30,
-        guidance_scale: 5.5,
-        nag_scale: 4,
+        num_inference_steps: FLUX_IMG2IMG_INFERENCE_STEPS,
+        guidance_scale: GUIDANCE_BY_MODE.full_redesign,
+        nag_scale: NAG_SCALE_BY_MODE.full_redesign,
         nag_end: 0.35,
         enable_safety_checker: true,
         output_format: 'jpeg',
@@ -313,7 +325,7 @@ function buildTrialPrompt(style: string, roomType: string): string {
   const furniture = roomFurniture[roomType] || 'beautiful designer furniture';
 
   return `Stunning ${style} ${roomDesc}, award-winning complete interior redesign. ${styleDesc}. Fully furnished with ${furniture}. Cohesive ${style} design language on every surface — walls, flooring, textiles, and light fixtures. Warm inviting atmosphere with layered ambient and accent lighting. Beautifully styled with curated objects, fresh greenery, and designer textiles. Published in Architectural Digest.
-Editorial interior design photography, photorealistic, hyperdetailed textures and materials, natural daylight, 8k.`;
+${FLUX_QUALITY_SUFFIX}`;
 }
 
 /**
