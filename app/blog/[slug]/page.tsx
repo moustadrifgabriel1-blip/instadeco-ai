@@ -24,6 +24,9 @@ import { sanitizeHtml, sanitizeJsonLd } from '@/lib/security/sanitize';
 import { SupabaseBlogArticleRepository } from '@/src/infrastructure/repositories/SupabaseBlogArticleRepository';
 import { GetBlogArticleBySlugUseCase } from '@/src/application/use-cases/blog/GetBlogArticleBySlugUseCase';
 import { BlogArticleMapper } from '@/src/application/mappers/BlogArticleMapper';
+import { SEO_CONFIG, getCanonicalUrl } from '@/lib/seo/config';
+
+const SITE_URL = SEO_CONFIG.siteUrl.replace(/\/$/, '');
 
 export const dynamic = 'force-dynamic';
 
@@ -177,7 +180,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
       publishedTime: article.publishedAt,
       tags: article.tags,
       images: [imageUrl],
-      url: `https://instadeco.app/blog/${article.slug}`,
+      url: `${SITE_URL}/blog/${article.slug}`,
       authors: ['InstaDeco AI'],
     },
     twitter: {
@@ -187,7 +190,13 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
       images: [imageUrl],
     },
     alternates: {
-      canonical: `https://instadeco.app/blog/${article.slug}`,
+      canonical: `${SITE_URL}/blog/${article.slug}`,
+      languages: {
+        'fr-FR': `${SITE_URL}/blog/${article.slug}`,
+        'fr-CH': `${SITE_URL}/blog/${article.slug}`,
+        'fr-BE': `${SITE_URL}/blog/${article.slug}`,
+        'x-default': `${SITE_URL}/blog/${article.slug}`,
+      },
     },
   };
 }
@@ -445,7 +454,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             <div className="text-xs font-semibold text-muted-foreground uppercase tracking-widest py-4 writing-mode-vertical">Partager</div>
             <ShareButton 
               title={formatBlogTitle(article.title)} 
-              url={`https://instadeco.app/blog/${article.slug}`}
+              url={`${SITE_URL}/blog/${article.slug}`}
               variant="sidebar"
             />
           </div>
@@ -527,27 +536,28 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             '@type': 'BlogPosting',
             headline: formatBlogTitle(article.title),
             description: article.metaDescription,
-            url: `https://instadeco.app/blog/${article.slug}`,
+            url: `${SITE_URL}/blog/${article.slug}`,
             datePublished: article.publishedAt,
             dateModified: article.publishedAt,
+            inLanguage: 'fr',
             author: {
               '@type': 'Organization',
               name: 'InstaDeco AI',
-              url: 'https://instadeco.app',
+              url: SITE_URL,
             },
             publisher: {
               '@type': 'Organization',
               name: 'InstaDeco AI',
-              url: 'https://instadeco.app',
+              url: SITE_URL,
               logo: {
                 '@type': 'ImageObject',
-                url: 'https://instadeco.app/images/logo-v3-house-sparkle.svg',
+                url: `${SITE_URL}/images/logo-v3-house-sparkle.svg`,
               },
             },
             image: heroImageUrl,
             mainEntityOfPage: {
               '@type': 'WebPage',
-              '@id': `https://instadeco.app/blog/${article.slug}`,
+              '@id': `${SITE_URL}/blog/${article.slug}`,
             },
             keywords: article.tags.join(', '),
             wordCount: article.wordCount,

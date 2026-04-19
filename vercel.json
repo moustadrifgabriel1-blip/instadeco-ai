@@ -10,6 +10,9 @@
     "app/api/cron/blog-monitor/route.ts": {
       "maxDuration": 30
     },
+    "app/api/cron/seo-health-check/route.ts": {
+      "maxDuration": 300
+    },
     "app/blog/[slug]/page.tsx": {
       "maxDuration": 30
     }
@@ -54,6 +57,10 @@
     {
       "path": "/api/cron/blog-monitor",
       "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/seo-health-check",
+      "schedule": "0 7 1,15 * *"
     }
   ],
   "headers": [

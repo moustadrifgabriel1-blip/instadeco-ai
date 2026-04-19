@@ -79,6 +79,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'fr_FR',
+    alternateLocale: ['fr_CH', 'fr_BE'],
     url: BASE_URL,
     siteName: 'InstaDeco AI',
     title: 'InstaDeco AI - Décoration d\'intérieur par Intelligence Artificielle',
@@ -106,9 +107,17 @@ export const metadata: Metadata = {
   
   // ============================================
   // LIENS ALTERNATIFS
+  // Hreflang : une seule URL canonique FR, déclarée pour FR, CH et BE
+  // Signal à Google que le site cible les 3 marchés francophones.
   // ============================================
   alternates: {
     canonical: BASE_URL,
+    languages: {
+      'fr-FR': BASE_URL,
+      'fr-CH': BASE_URL,
+      'fr-BE': BASE_URL,
+      'x-default': BASE_URL,
+    },
   },
   
   // ============================================
@@ -131,6 +140,7 @@ export const metadata: Metadata = {
   // ============================================
   other: {
     ...(SEO_CONFIG.googleSiteVerification ? { 'google-site-verification': SEO_CONFIG.googleSiteVerification } : {}),
+    ...(process.env.BING_SITE_VERIFICATION ? { 'msvalidate.01': process.env.BING_SITE_VERIFICATION } : {}),
     'p:domain_verify': 'cafe11f55ab96fa778747680609afb75',
   },
 };

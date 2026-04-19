@@ -244,6 +244,11 @@ export class FalImageGeneratorService implements IImageGeneratorService {
             FLUX_NEGATIVE_SUFFIX,
           ].join(', ');
 
+      // Safety checker : les photos d’intérieur (chambre, salle de bain, reflets, enfants)
+      // déclenchent souvent des faux positifs → génération “vide” ou erreur côté API.
+      // Réactiver explicitement avec FAL_ENABLE_SAFETY_CHECKER=true sur Vercel si besoin.
+      const enableSafetyChecker = process.env.FAL_ENABLE_SAFETY_CHECKER === 'true';
+
       const result = await fal.run(MODEL_PATH, {
         input: {
           prompt: fullPrompt,
@@ -258,21 +263,27 @@ export class FalImageGeneratorService implements IImageGeneratorService {
             modeKey === 'home_staging' ? 0.55
             : modeKey === 'decor_only' ? 0.38
             : 0.35,
-          enable_safety_checker: true,
+          enable_safety_checker: enableSafetyChecker,
           output_format: "jpeg"
         } as any,
       });
 
       const inferenceTime = (Date.now() - startGen) / 1000;
       
+      const data = (result as any)?.data ?? result;
+      const nsfw = Array.isArray(data?.has_nsfw_concepts) ? data.has_nsfw_concepts[0] : undefined;
+
       // Extraire l'URL de l'image générée
-      const outputImageUrl = (result as any)?.data?.images?.[0]?.url 
+      const outputImageUrl = data?.images?.[0]?.url 
         || (result as any)?.images?.[0]?.url 
-        || (result as any)?.data?.image?.url
+        || data?.image?.url
         || (result as any)?.image?.url;
       
       if (!outputImageUrl) {
-        console.error('[Fal.ai] ❌ No image URL in result:', JSON.stringify(result).slice(0, 500));
+        console.error('[Fal.ai] ❌ No image URL in result. has_nsfw:', nsfw, JSON.stringify(result).slice(0, 1200));
+        if (nsfw === true && enableSafetyChecker) {
+          return failure(new Error('Fal.ai: image bloquée par le filtre de sécurité (essayez une autre photo ou contactez le support).'));
+        }
         return failure(new Error('Fal.ai returned no image URL'));
       }
 
@@ -286,9 +297,16 @@ export class FalImageGeneratorService implements IImageGeneratorService {
         seed: (result as any)?.data?.seed || (result as any)?.seed || 0,
       });
 
-    } catch (error: any) {
-      console.error('[Fal.ai] ❌ Generation failed:', error?.message || error);
-      return failure(new Error(`Fal.ai generation failed: ${error?.message || error}`));
+    } catch (error: unknown) {
+      const err = error as { message?: string; body?: unknown; status?: number };
+      const detail =
+        err?.body != null
+          ? (typeof err.body === 'string' ? err.body : JSON.stringify(err.body)).slice(0, 800)
+          : '';
+      console.error('[Fal.ai] ❌ Generation failed:', err?.message || error, err?.status ?? '', detail);
+      return failure(
+        new Error(`Fal.ai generation failed: ${err?.message || String(error)}`),
+      );
     }
   }
 

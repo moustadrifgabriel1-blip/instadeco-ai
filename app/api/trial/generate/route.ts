@@ -237,6 +237,8 @@ export async function POST(req: Request) {
       FLUX_NEGATIVE_SUFFIX,
     ].join(', ');
 
+    const enableSafetyChecker = process.env.FAL_ENABLE_SAFETY_CHECKER === 'true';
+
     const result = await fal.run(MODEL_PATH, {
       input: {
         prompt,
@@ -248,7 +250,7 @@ export async function POST(req: Request) {
         guidance_scale: GUIDANCE_BY_MODE.full_redesign,
         nag_scale: NAG_SCALE_BY_MODE.full_redesign,
         nag_end: 0.35,
-        enable_safety_checker: true,
+        enable_safety_checker: enableSafetyChecker,
         output_format: 'jpeg',
       } as any,
     }) as any;

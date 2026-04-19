@@ -1,21 +1,22 @@
 import { MetadataRoute } from 'next';
+import { SEO_CONFIG } from '@/lib/seo/config';
 
 export const dynamic = 'force-dynamic';
 
 /**
  * Sitemap dynamique pour SEO
- * 
+ *
  * Génère automatiquement le sitemap.xml avec :
  * - Pages statiques du site
  * - Articles de blog dynamiques depuis Supabase
  * - Pages villes SEO local (57+ villes)
  * - Pages programmatiques de styles et pièces
- * 
+ *
  * @see https://nextjs.org/docs/app/api-reference/file-conventions/metadata/sitemap
  */
 
-// Hardcodé pour éviter les problèmes de formatage des variables d'environnement
-const BASE_URL = 'https://instadeco.app';
+// Source unique de vérité : SEO_CONFIG.siteUrl (lit NEXT_PUBLIC_APP_URL avec fallback)
+const BASE_URL = SEO_CONFIG.siteUrl.replace(/\/$/, '');
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
