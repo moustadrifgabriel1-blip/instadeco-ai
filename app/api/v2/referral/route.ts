@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
-import { addCredits } from '@/lib/supabase/credits';
+import { useCases } from '@/src/infrastructure/config/di-container';
 import { requireAuth } from '@/lib/security/api-auth';
 import { sendReferralNotificationEmail } from '@/lib/notifications/marketing-emails';
 
@@ -141,11 +141,19 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Erreur création parrainage' }, { status: 500 });
     }
 
-    // 5. Ajouter les crédits au parrain
-    await addCredits(referrer.id, REFERRER_BONUS, undefined, undefined, 'referral_bonus');
+    // 5. Ajouter les crédits au parrain (RPC atomique via le repository)
+    await useCases.addCredits.execute({
+      userId: referrer.id,
+      amount: REFERRER_BONUS,
+      description: 'Bonus parrainage',
+    });
 
-    // 6. Ajouter les crédits au filleul
-    await addCredits(newUserId, REFERRED_BONUS, undefined, undefined, 'referral_welcome');
+    // 6. Ajouter les crédits au filleul (RPC atomique via le repository)
+    await useCases.addCredits.execute({
+      userId: newUserId,
+      amount: REFERRED_BONUS,
+      description: 'Bonus de bienvenue (parrainage)',
+    });
 
     // 7. Mettre à jour referred_by sur le profil du filleul
     await supabaseAdmin

@@ -1,13 +1,6 @@
-import { createClient as createSupabaseClient } from '@supabase/supabase-js';
+import { supabaseAdmin } from './admin-client';
 
-// Export du client admin Supabase (bypass RLS)
-export const supabaseAdmin = createSupabaseClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
-// Re-export des fonctions de crédits pour compatibilité
-export { deductCredits, addCredits, getUserCredits } from './credits';
+export { supabaseAdmin, getSupabaseAdmin } from './admin-client';
 
 // Re-export des fonctions de storage pour compatibilité
 export { uploadImageFromBase64, uploadImageFromUrl } from './storage';
