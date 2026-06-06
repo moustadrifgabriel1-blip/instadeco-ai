@@ -10,9 +10,10 @@ import { SupabaseGenerationRepository } from '../repositories/supabase/SupabaseG
 import { SupabaseUserRepository } from '../repositories/supabase/SupabaseUserRepository';
 import { SupabaseCreditRepository } from '../repositories/supabase/SupabaseCreditRepository';
 import { SupabaseStyleRepository } from '../repositories/supabase/SupabaseStyleRepository';
+import { SupabaseProcessedEventRepository } from '../repositories/supabase/SupabaseProcessedEventRepository';
 
 // Services
-import { FalImageGeneratorService } from '../services/fal/FalImageGeneratorService';
+import { createImageGeneratorService } from '../services/image-generator-factory';
 import { StripePaymentService } from '../services/stripe/StripePaymentService';
 import { SupabaseStorageService } from '../services/supabase/SupabaseStorageService';
 import { ConsoleLoggerService } from '../services/logger/ConsoleLoggerService';
@@ -26,12 +27,14 @@ import { AddCreditsUseCase } from '@/src/application/use-cases/credits/AddCredit
 import { GetUserCreditsUseCase } from '@/src/application/use-cases/credits/GetUserCreditsUseCase';
 import { GetCreditHistoryUseCase } from '@/src/application/use-cases/credits/GetCreditHistoryUseCase';
 import { ProcessStripeWebhookUseCase } from '@/src/application/use-cases/webhooks/ProcessStripeWebhookUseCase';
+import { TrialGenerateUseCase } from '@/src/application/use-cases/trial/TrialGenerateUseCase';
 
 // Types
 import { IGenerationRepository } from '@/src/domain/ports/repositories/IGenerationRepository';
 import { IUserRepository } from '@/src/domain/ports/repositories/IUserRepository';
 import { ICreditRepository } from '@/src/domain/ports/repositories/ICreditRepository';
 import { IStyleRepository } from '@/src/domain/ports/repositories/IStyleRepository';
+import { IProcessedEventRepository } from '@/src/domain/ports/repositories/IProcessedEventRepository';
 import { IImageGeneratorService } from '@/src/domain/ports/services/IImageGeneratorService';
 import { IPaymentService } from '@/src/domain/ports/services/IPaymentService';
 import { IStorageService } from '@/src/domain/ports/services/IStorageService';
@@ -46,6 +49,7 @@ class DIContainer {
   private _userRepo: IUserRepository | null = null;
   private _creditRepo: ICreditRepository | null = null;
   private _styleRepo: IStyleRepository | null = null;
+  private _processedEventRepo: IProcessedEventRepository | null = null;
 
   // Instances singleton des services
   private _imageGenerator: IImageGeneratorService | null = null;
@@ -83,11 +87,19 @@ class DIContainer {
     return this._styleRepo;
   }
 
+  get processedEventRepository(): IProcessedEventRepository {
+    if (!this._processedEventRepo) {
+      this._processedEventRepo = new SupabaseProcessedEventRepository();
+    }
+    return this._processedEventRepo;
+  }
+
   // ============ SERVICES ============
 
   get imageGeneratorService(): IImageGeneratorService {
     if (!this._imageGenerator) {
-      this._imageGenerator = new FalImageGeneratorService();
+      // Provider sélectionné via IMAGE_PROVIDER ('gemini' | 'fal', défaut 'fal').
+      this._imageGenerator = createImageGeneratorService();
     }
     return this._imageGenerator;
   }
@@ -128,6 +140,7 @@ class DIContainer {
   get getGenerationStatusUseCase(): GetGenerationStatusUseCase {
     return new GetGenerationStatusUseCase(
       this.generationRepository,
+      this.creditRepository,
       this.imageGeneratorService,
       this.storageService,
       this.logger,
@@ -176,7 +189,12 @@ class DIContainer {
       this.generationRepository,
       this.paymentService,
       this.logger,
+      this.processedEventRepository,
     );
+  }
+
+  get trialGenerateUseCase(): TrialGenerateUseCase {
+    return new TrialGenerateUseCase(this.imageGeneratorService);
   }
 
   // ============ TESTING ============
@@ -189,6 +207,7 @@ class DIContainer {
     this._userRepo = null;
     this._creditRepo = null;
     this._styleRepo = null;
+    this._processedEventRepo = null;
     this._imageGenerator = null;
     this._paymentService = null;
     this._storageService = null;
@@ -212,6 +231,10 @@ class DIContainer {
 
   setStyleRepository(repo: IStyleRepository): void {
     this._styleRepo = repo;
+  }
+
+  setProcessedEventRepository(repo: IProcessedEventRepository): void {
+    this._processedEventRepo = repo;
   }
 
   setImageGeneratorService(service: IImageGeneratorService): void {
@@ -248,4 +271,5 @@ export const useCases = {
   get getUserCredits() { return container.getUserCreditsUseCase; },
   get getCreditHistory() { return container.getCreditHistoryUseCase; },
   get processStripeWebhook() { return container.processStripeWebhookUseCase; },
+  get trialGenerate() { return container.trialGenerateUseCase; },
 };

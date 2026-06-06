@@ -1,40 +1,27 @@
 /**
  * ⚠️⚠️⚠️ FICHIER CRITIQUE — NE PAS MODIFIER SANS RAISON MAJEURE ⚠️⚠️⚠️
- * 
+ *
  * POST /api/trial/generate — Essai gratuit sans authentification.
- * Utilise fal.run() en mode SYNCHRONE (10-20s).
- * 
- * FLUX : Image base64 → fal.storage.upload() → fal.run() → imageUrl retournée directement
- * 
- * ANTI-ABUS : 3 couches (mémoire rate limit + Supabase IP/fingerprint + localStorage)
- * 
- * RÈGLES :
- * 1. TOUJOURS fal.storage.upload() avant fal.run()
- * 2. JAMAIS fal.queue.submit() (re-exécute le modèle)
- * 3. JAMAIS de polling/webhook (tout est synchrone)
- * 
+ *
+ * La GÉNÉRATION passe désormais par la clean architecture :
+ *   route → TrialGenerateUseCase → IImageGeneratorService (provider factory).
+ * Le provider (Flux / Gemini) est choisi par IMAGE_PROVIDER. Le comportement
+ * reste SYNCHRONE (le service Fal fait fal.storage.upload() + fal.run(), JAMAIS
+ * de queue/polling — voir FalImageGeneratorService).
+ *
+ * Cette route ne garde que ses préoccupations TRANSPORT / ANTI-ABUS :
+ *   1. Rate limit mémoire (1 essai/IP/24h)
+ *   2. Supabase trial_usage (IP + fingerprint) — persistant
+ *   3. localStorage côté client — UX immédiate (hors backend)
+ *
  * Lire docs/GENERATION_ARCHITECTURE.md pour l'architecture complète.
  */
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { fal } from '@fal-ai/client';
 import { checkRateLimit, getClientIP, isDevBypass } from '@/lib/security/rate-limiter';
 import { supabaseAdmin } from '@/lib/supabase/admin';
-import {
-  FLUX_IMG2IMG_INFERENCE_STEPS,
-  FLUX_NEGATIVE_SUFFIX,
-  FLUX_QUALITY_SUFFIX,
-  GUIDANCE_BY_MODE,
-  NAG_SCALE_BY_MODE,
-} from '@/src/infrastructure/services/fal/flux-presets';
-import { getFalImageSizeFromBase64, isSupportedImageBase64 } from '@/src/shared/utils/image-size';
-import {
-  getRoomFurniture,
-  getRoomLabel,
-  getStyleDescription,
-} from '@/src/shared/constants/interior-design';
-
-const MODEL_PATH = 'fal-ai/flux-general/image-to-image';
+import { isSupportedImageBase64 } from '@/src/shared/utils/image-size';
+import { useCases } from '@/src/infrastructure/config/di-container';
 
 /**
  * Schéma de validation pour l'essai gratuit
@@ -65,19 +52,19 @@ async function hasTrialBeenUsed(ip: string, fingerprint?: string): Promise<boole
     // Vérifier par IP (dernières 48h)
     const since = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
     console.log(`[Trial] 🔍 Checking trial usage for IP: ${ip}, fingerprint: ${fingerprint?.substring(0, 8) || 'none'}`);
-    
+
     const { data: ipMatch, error: ipError } = await supabaseAdmin
       .from('trial_usage')
       .select('id')
       .eq('ip_address', ip)
       .gte('created_at', since)
       .limit(1);
-    
+
     if (ipError) {
       console.warn(`[Trial] ⚠️ Supabase IP check error (table may not exist):`, ipError.message, ipError.code);
       return false; // Fallback: pas de blocage si table absente
     }
-    
+
     if (ipMatch && ipMatch.length > 0) {
       console.log(`[Trial] ⛔ IP ${ip} already used trial`);
       return true;
@@ -90,12 +77,12 @@ async function hasTrialBeenUsed(ip: string, fingerprint?: string): Promise<boole
         .select('id')
         .eq('fingerprint', fingerprint)
         .limit(1);
-      
+
       if (fpError) {
         console.warn(`[Trial] ⚠️ Supabase fingerprint check error:`, fpError.message);
         return false;
       }
-      
+
       if (fpMatch && fpMatch.length > 0) {
         console.log(`[Trial] ⛔ Fingerprint ${fingerprint.substring(0, 8)} already used trial`);
         return true;
@@ -125,7 +112,7 @@ async function recordTrialUsage(ip: string, fingerprint?: string, style?: string
         style,
         room_type: roomType,
       });
-    
+
     if (error) {
       console.warn(`[Trial] ⚠️ Failed to record trial (table may not exist):`, error.message, error.code);
       // Ne pas bloquer la génération si l'enregistrement échoue
@@ -140,7 +127,7 @@ async function recordTrialUsage(ip: string, fingerprint?: string, style?: string
 
 /**
  * POST /api/trial/generate
- * 
+ *
  * Essai gratuit sans authentification.
  * Anti-abus multi-couche :
  *  1. Rate limit mémoire (1 essai/IP/24h) — protection immédiate
@@ -204,78 +191,19 @@ export async function POST(req: Request) {
       );
     }
 
-    // Configurer fal.ai
-    const falKey = process.env.FAL_KEY || process.env.FAL_API_KEY;
-    if (!falKey) {
-      console.error('[Trial] ❌ FAL_KEY manquant');
-      return NextResponse.json({ error: 'Configuration serveur manquante' }, { status: 500 });
-    }
-    fal.config({ credentials: falKey });
+    // Génération SYNCHRONE déléguée au use case (provider sélectionné par IMAGE_PROVIDER).
+    console.log(`[Trial] 🎨 Generating (synchronous via use case)... style=${style}, room=${roomType}`);
+    const result = await useCases.trialGenerate.execute({ imageBase64, style, roomType });
 
-    // Construire un prompt simple
-    const prompt = buildTrialPrompt(style, roomType);
-
-    // Déterminer le format Fal à partir des dimensions RÉELLES de la photo.
-    // Fix : auparavant `guessImageSize` retournait toujours 'landscape_4_3',
-    // ce qui déformait/recadrait les photos portrait (majorité des photos smartphone).
-    const imageSize = getFalImageSizeFromBase64(imageBase64);
-
-    // Upload l'image sur le storage fal.ai (les data URIs base64 ne fonctionnent pas en queue)
-    console.log(`[Trial] 📤 Uploading image to fal.ai storage...`);
-    let uploadedImageUrl: string;
-    try {
-      const base64Data = imageBase64.split(',')[1];
-      const mimeType = imageBase64.split(';')[0].split(':')[1] || 'image/jpeg';
-      const buffer = Buffer.from(base64Data, 'base64');
-      const blob = new Blob([buffer], { type: mimeType });
-      uploadedImageUrl = await fal.storage.upload(blob);
-      console.log(`[Trial] ✅ Image uploaded: ${uploadedImageUrl.substring(0, 60)}...`);
-    } catch (uploadError: any) {
-      console.error('[Trial] ❌ Image upload failed:', uploadError?.message);
-      return NextResponse.json({ error: 'Erreur lors de l\'upload de l\'image' }, { status: 500 });
+    if (!result.success) {
+      console.error('[Trial] ❌ Generation failed:', (result.error as Error)?.message);
+      return NextResponse.json(
+        { error: 'Erreur lors de la génération. Réessayez.', detail: (result.error as Error)?.message },
+        { status: 500 }
+      );
     }
 
-    console.log(`[Trial] 🎨 Running fal.ai (synchronous)... style=${style}, room=${roomType}, imageSize=${imageSize}`);
-
-    // Appel SYNCHRONE à fal.ai — retourne le résultat directement
-    // Pas de queue/polling, car fal.queue.result() ré-exécute le modèle
-    // et l'image uploadée expire entre-temps
-    // NOTE: easycontrols depth désactivé le 14/02/2026 — erreur tenseur côté fal.ai
-    // "The size of tensor a (3072) must match the size of tensor b (4096)"
-    // Compensation : strength recalibré + guidance_scale élevé.
-    // Réactiver quand fal.ai corrige le bug (tester avec scripts/test-fal-ab.js)
-    const trialNegative = [
-      'different room shape, modified walls, moved windows, changed doors, different ceiling height, altered room proportions, different camera angle, different perspective, empty unfurnished room, construction site, unfinished renovation, blurry, low quality, watermark, text overlay, deformed, cartoon, painting, illustration, 3d render',
-      FLUX_NEGATIVE_SUFFIX,
-    ].join(', ');
-
-    const enableSafetyChecker = process.env.FAL_ENABLE_SAFETY_CHECKER === 'true';
-
-    const result = await fal.run(MODEL_PATH, {
-      input: {
-        prompt,
-        image_url: uploadedImageUrl,
-        strength: 0.72,
-        negative_prompt: trialNegative,
-        image_size: imageSize,
-        num_inference_steps: FLUX_IMG2IMG_INFERENCE_STEPS,
-        guidance_scale: GUIDANCE_BY_MODE.full_redesign,
-        nag_scale: NAG_SCALE_BY_MODE.full_redesign,
-        nag_end: 0.35,
-        enable_safety_checker: enableSafetyChecker,
-        output_format: 'jpeg',
-      } as any,
-    }) as any;
-
-    const imageUrl = result?.data?.images?.[0]?.url
-      || result?.images?.[0]?.url
-      || result?.data?.image?.url;
-
-    if (!imageUrl) {
-      console.error('[Trial] ❌ No image URL in result:', JSON.stringify(result).substring(0, 500));
-      return NextResponse.json({ error: 'Image introuvable dans le résultat' }, { status: 500 });
-    }
-
+    const { imageUrl } = result.data;
     console.log(`[Trial] ✅ Image generated: ${imageUrl.substring(0, 60)}...`);
 
     // Enregistrer l'essai dans Supabase (persistant entre redéploiements)
@@ -296,16 +224,4 @@ export async function POST(req: Request) {
       { status: 500 }
     );
   }
-}
-
-/**
- * Prompt simplifié pour l'essai
- */
-function buildTrialPrompt(style: string, roomType: string): string {
-  const styleDesc = getStyleDescription(style);
-  const roomDesc = getRoomLabel(roomType);
-  const furniture = getRoomFurniture(roomType);
-
-  return `Stunning ${style} ${roomDesc}, award-winning complete interior redesign. ${styleDesc}. Fully furnished with ${furniture}. Cohesive ${style} design language on every surface — walls, flooring, textiles, and light fixtures. Warm inviting atmosphere with layered ambient and accent lighting. Beautifully styled with curated objects, fresh greenery, and designer textiles. Published in Architectural Digest.
-${FLUX_QUALITY_SUFFIX}`;
 }
