@@ -22,6 +22,7 @@ export function createMockPaymentService(overrides: Partial<IPaymentService> = {
       metadata: {},
     })),
     verifyWebhook: vi.fn().mockResolvedValue(success({
+      eventId: 'evt_test_123',
       type: 'checkout.session.completed',
       sessionId: 'cs_test_123',
       customerId: 'cus_test',

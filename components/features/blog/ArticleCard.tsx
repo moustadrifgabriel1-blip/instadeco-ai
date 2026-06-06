@@ -4,7 +4,7 @@
  * Carte d'aperçu pour un article de blog.
  */
 
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import Image from 'next/image';
 import { CalendarDays, Clock, Tag } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';

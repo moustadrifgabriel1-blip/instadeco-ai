@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
-import { checkRateLimit, getClientIP } from '@/lib/security/rate-limiter';
+import { checkRateLimitDistributed, getClientIP } from '@/lib/security/rate-limiter';
 import { z } from 'zod';
 
 const leadSchema = z.object({
@@ -19,7 +19,7 @@ export async function POST(req: Request) {
   try {
     // Rate limiting
     const ip = getClientIP(req.headers);
-    const rateLimit = checkRateLimit(ip, {
+    const rateLimit = await checkRateLimitDistributed(ip, {
       maxRequests: 3,
       windowSeconds: 300,
       prefix: 'leads',

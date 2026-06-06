@@ -1,25 +1,20 @@
 /**
- * Tests d'intégration pour les routes API V2
- * 
- * Ces tests vérifient que les routes Next.js appellent correctement
- * les Use Cases et retournent les bonnes réponses HTTP.
+ * Tests d'intégration pour GET /api/v2/credits
+ *
+ * Auth : userId extrait du token JWT via requireAuth (supabase.auth.getUser).
  */
 import { describe, it, expect, vi, beforeEach, Mock } from 'vitest';
-import { NextRequest } from 'next/server';
+
+// Mock de l'auth Supabase serveur (requireAuth utilise createClient en interne)
+const mockGetUser = vi.hoisted(() => vi.fn());
+vi.mock('@/lib/supabase/server', () => ({
+  createClient: vi.fn(async () => ({ auth: { getUser: mockGetUser } })),
+}));
 
 // Mock du DI container
 vi.mock('@/src/infrastructure/config/di-container', () => ({
   useCases: {
     getUserCredits: {
-      execute: vi.fn(),
-    },
-    getCreditHistory: {
-      execute: vi.fn(),
-    },
-    addCredits: {
-      execute: vi.fn(),
-    },
-    purchaseCredits: {
       execute: vi.fn(),
     },
   },
@@ -32,29 +27,33 @@ import { useCases } from '@/src/infrastructure/config/di-container';
 describe('GET /api/v2/credits', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockGetUser.mockResolvedValue({
+      data: { user: { id: 'user123', email: 'test@example.com' } },
+      error: null,
+    });
   });
 
-  it('devrait retourner 400 si userId manquant', async () => {
+  it('devrait retourner 401 si non authentifié', async () => {
+    mockGetUser.mockResolvedValue({ data: { user: null }, error: { message: 'No session' } });
+
     const request = new Request('http://localhost/api/v2/credits');
-    
+
     const response = await GET(request);
-    const data = await response.json();
-    
-    expect(response.status).toBe(400);
-    expect(data.error).toBe('Paramètres invalides');
+
+    expect(response.status).toBe(401);
   });
 
-  it('devrait retourner les crédits pour un userId valide', async () => {
+  it('devrait retourner les crédits de l\'utilisateur authentifié', async () => {
     (useCases.getUserCredits.execute as Mock).mockResolvedValue({
       success: true,
       data: { balance: 42 },
     });
 
-    const request = new Request('http://localhost/api/v2/credits?userId=user123');
-    
+    const request = new Request('http://localhost/api/v2/credits');
+
     const response = await GET(request);
     const data = await response.json();
-    
+
     expect(response.status).toBe(200);
     expect(data.credits).toBe(42);
     expect(data.userId).toBe('user123');
@@ -67,11 +66,11 @@ describe('GET /api/v2/credits', () => {
       error: { message: 'Utilisateur non trouvé', statusCode: 404 },
     });
 
-    const request = new Request('http://localhost/api/v2/credits?userId=unknown');
-    
+    const request = new Request('http://localhost/api/v2/credits');
+
     const response = await GET(request);
     const data = await response.json();
-    
+
     expect(response.status).toBe(404);
     expect(data.error).toBe('Utilisateur non trouvé');
   });
@@ -81,13 +80,12 @@ describe('GET /api/v2/credits', () => {
       new Error('Database connection failed')
     );
 
-    const request = new Request('http://localhost/api/v2/credits?userId=user123');
-    
+    const request = new Request('http://localhost/api/v2/credits');
+
     const response = await GET(request);
     const data = await response.json();
-    
+
     expect(response.status).toBe(500);
     expect(data.error).toBe('Erreur lors de la récupération des crédits');
-    expect(data.details).toBe('Database connection failed');
   });
 });

@@ -1,11 +1,13 @@
 import { Result, success, failure } from '@/src/shared/types/Result';
 import { Generation } from '@/src/domain/entities/Generation';
 import { IGenerationRepository } from '@/src/domain/ports/repositories/IGenerationRepository';
+import { ICreditRepository } from '@/src/domain/ports/repositories/ICreditRepository';
 import { IImageGeneratorService } from '@/src/domain/ports/services/IImageGeneratorService';
 import { IStorageService } from '@/src/domain/ports/services/IStorageService';
 import { ILoggerService } from '@/src/domain/ports/services/ILoggerService';
 import { GenerationNotFoundError } from '@/src/domain/errors/GenerationNotFoundError';
 import { DomainError } from '@/src/domain/errors/DomainError';
+import { CREDIT_COSTS } from '@/src/shared/constants/pricing';
 
 /**
  * ⚠️ FICHIER CRITIQUE — NE PAS MODIFIER SANS RAISON MAJEURE
@@ -40,6 +42,7 @@ export interface GetGenerationStatusInput {
 export class GetGenerationStatusUseCase {
   constructor(
     private readonly generationRepo: IGenerationRepository,
+    private readonly creditRepo: ICreditRepository,
     private readonly imageGenerator: IImageGeneratorService,
     private readonly storage: IStorageService,
     private readonly logger: ILoggerService,
@@ -92,13 +95,50 @@ export class GetGenerationStatusUseCase {
           status: generation.status,
         });
 
-        const updatedGen = await this.generationRepo.update(generation.id, {
-          status: 'failed',
-        });
+        // Transition conditionnelle atomique : garantit qu'UN SEUL appelant
+        // (sous polling concurrent toutes les 3s) effectue réellement la
+        // transition processing/pending → failed, et donc qu'on ne rembourse
+        // qu'une seule fois.
+        const transitionResult = await this.generationRepo.markFailedIfPending(generation.id);
 
-        if (updatedGen.success) {
-          return success(updatedGen.data);
+        if (!transitionResult.success) {
+          this.logger.error(
+            'Failed to mark zombie generation as failed',
+            transitionResult.error as Error,
+            { generationId: generation.id },
+          );
+          // On retourne l'état lu : l'utilisateur retentera au prochain poll.
+          return success(generation);
         }
+
+        const { transitioned, generation: updatedGen } = transitionResult.data;
+
+        // 🔴 REMBOURSEMENT — l'utilisateur ne doit JAMAIS perdre un crédit pour
+        // une génération ratée. On ne rembourse QUE si CET appel a réellement
+        // effectué la transition (anti double-remboursement).
+        if (transitioned) {
+          const refundResult = await this.creditRepo.addCredits(
+            updatedGen.userId,
+            CREDIT_COSTS.GENERATION,
+            `Remboursement — génération zombie #${updatedGen.id.slice(0, 8)}`,
+          );
+
+          if (refundResult.success) {
+            this.logger.info('Credits refunded for zombie generation', {
+              userId: updatedGen.userId,
+              generationId: updatedGen.id,
+              amount: CREDIT_COSTS.GENERATION,
+            });
+          } else {
+            this.logger.error(
+              'CRITICAL: Failed to refund credits for zombie generation',
+              refundResult.error as Error,
+              { userId: updatedGen.userId, generationId: updatedGen.id },
+            );
+          }
+        }
+
+        return success(updatedGen);
       }
     }
 

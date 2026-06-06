@@ -27,6 +27,21 @@ export interface IGenerationRepository {
   update(id: string, input: UpdateGenerationInput): Promise<Result<Generation>>;
 
   /**
+   * Transition conditionnelle (et atomique) 'pending'/'processing' → 'failed'.
+   *
+   * Idempotent : la mise à jour n'a lieu QUE si le statut courant est encore
+   * 'pending' ou 'processing'. Permet de garantir qu'un seul appelant (sous
+   * polling concurrent) effectue réellement la transition — et donc qu'un
+   * remboursement de crédit n'est déclenché qu'une seule fois.
+   *
+   * @returns `transitioned: true` si CET appel a effectué la transition,
+   *          `false` si la ligne était déjà dans un autre statut (déjà transité
+   *          par un appel concurrent, ou déjà completed/failed).
+   *          `generation` reflète l'état courant en base dans les deux cas.
+   */
+  markFailedIfPending(id: string): Promise<Result<{ transitioned: boolean; generation: Generation }>>;
+
+  /**
    * Supprime une génération
    */
   delete(id: string): Promise<Result<void>>;

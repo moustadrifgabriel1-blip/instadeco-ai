@@ -7,11 +7,12 @@ import {
   GenerateDesignResponse 
 } from '@/src/presentation/api/client';
 import { GenerationDTO } from '@/src/application/dtos/GenerationDTO';
-import { 
-  UseGenerateState, 
-  UseGenerateReturn, 
-  GenerateDesignInput 
+import {
+  UseGenerateState,
+  UseGenerateReturn,
+  GenerateDesignInput
 } from '@/src/presentation/types';
+import { compressImageToDataUrl } from '@/lib/image/compress-client';
 
 /** Timeout global pour la requête de génération (Vercel maxDuration=60s + marge) */
 const GENERATE_TIMEOUT_MS = 65_000;
@@ -47,15 +48,11 @@ export function useGenerate(): UseGenerateReturn {
   });
 
   /**
-   * Convertit un File en base64
+   * Compresse + convertit un File en data URI base64 (redimension ~1600px,
+   * JPEG ~0.85) afin d'alléger le body POST. Fallback base64 brut interne.
    */
   const fileToBase64 = useCallback(async (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
+    return compressImageToDataUrl(file);
   }, []);
 
   /**

@@ -5,15 +5,18 @@
       "maxDuration": 60
     },
     "app/api/cron/generate-articles/route.ts": {
-      "maxDuration": 300
+      "maxDuration": 60
     },
     "app/api/cron/blog-monitor/route.ts": {
       "maxDuration": 30
     },
     "app/api/cron/seo-health-check/route.ts": {
-      "maxDuration": 300
+      "maxDuration": 60
     },
-    "app/blog/[slug]/page.tsx": {
+    "app/api/cron/storage-cleanup/route.ts": {
+      "maxDuration": 60
+    },
+    "app/[locale]/(marketing)/blog/[slug]/page.tsx": {
       "maxDuration": 30
     }
   },
@@ -21,14 +24,6 @@
     {
       "path": "/api/cron/generate-articles",
       "schedule": "0 6 * * *"
-    },
-    {
-      "path": "/api/cron/generate-articles",
-      "schedule": "0 12 * * *"
-    },
-    {
-      "path": "/api/cron/generate-articles",
-      "schedule": "0 18 * * *"
     },
     {
       "path": "/api/cron/check-milestones",
@@ -61,6 +56,10 @@
     {
       "path": "/api/cron/seo-health-check",
       "schedule": "0 7 1,15 * *"
+    },
+    {
+      "path": "/api/cron/storage-cleanup",
+      "schedule": "0 4 * * 0"
     }
   ],
   "headers": [

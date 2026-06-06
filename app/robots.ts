@@ -24,13 +24,14 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: '*',
         allow: '/',
         disallow: [
-          '/api/',           // API routes
-          '/dashboard/',     // Dashboard privé
-          '/auth/',          // Callback auth
-          '/login',          // Page login (pas de valeur SEO)
-          '/signup',         // Page signup (pas de valeur SEO)
-          '/credits/',       // Pages post-paiement
-          '/_next/',         // Next.js internals
+          '/api/',
+          '/auth/',
+          '/_next/',
+          '/*/dashboard/',
+          '/*/credits/',
+          '/*/login',
+          '/*/signup',
+          '/*/reset-password',
         ],
       },
     ],

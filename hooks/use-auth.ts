@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
 import { User, Session } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
 import { getCredits } from '@/src/presentation/api/client';
+import { useSupabaseBrowser } from '@/hooks/use-supabase-browser';
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
@@ -12,73 +12,91 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
   const [credits, setCredits] = useState<number>(0);
   const router = useRouter();
-  const supabase = createClient();
+  const supabase = useSupabaseBrowser();
+
+  const hasSupabaseEnv =
+    typeof process !== 'undefined' &&
+    !!process.env.NEXT_PUBLIC_SUPABASE_URL &&
+    !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   useEffect(() => {
-    // Récupérer l'utilisateur authentifié (vérifié via le serveur Supabase)
+    if (!hasSupabaseEnv) {
+      setLoading(false);
+      return;
+    }
+    if (!supabase) {
+      return;
+    }
+
+    let cancelled = false;
+
     const getInitialSession = async () => {
       try {
-        // ✅ getUser() valide le token côté serveur au lieu de juste lire le JWT local
-        const { data: { user } } = await supabase.auth.getUser();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (cancelled) return;
         setUser(user);
-        // Récupérer la session pour les métadonnées de session
-        const { data: { session } } = await supabase.auth.getSession();
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        if (cancelled) return;
         setSession(session);
       } catch (error) {
         console.error('Error getting user:', error);
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     };
 
-    getInitialSession();
+    void getInitialSession();
 
-    // Écouter les changements d'authentification
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('[Auth] Event:', event, session?.user?.email);
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
-      }
-    );
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (cancelled) return;
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
 
     return () => {
+      cancelled = true;
       subscription.unsubscribe();
     };
-  }, [supabase.auth]);
+  }, [hasSupabaseEnv, supabase]);
 
-  // Écouter les crédits en temps réel
   useEffect(() => {
-    if (!user?.id) {
-      setCredits(0);
+    if (!hasSupabaseEnv || !supabase || !user?.id) {
+      if (!user?.id) {
+        setCredits(0);
+      }
       return;
     }
 
-    // Récupérer les crédits via l'API (auth via cookie)
     const fetchCreditsData = async () => {
       try {
         const response = await getCredits();
         setCredits(response.credits);
       } catch (error) {
         console.error('[Auth] Error fetching credits from API:', error);
-        
-        // Fallback: Essayer via Supabase direct (si RLS fonctionne)
+
         const { data: profile } = await supabase
           .from('profiles')
           .select('credits')
           .eq('id', user.id)
           .single();
-          
+
         if (profile) {
           setCredits(profile.credits);
         }
       }
     };
 
-    fetchCreditsData();
+    void fetchCreditsData();
 
-    // S'abonner aux changements en temps réel
     const channel = supabase
       .channel(`profile-${user.id}`)
       .on(
@@ -90,7 +108,6 @@ export function useAuth() {
           filter: `id=eq.${user.id}`,
         },
         (payload) => {
-          console.log('[Auth] Credits updated:', payload.new);
           setCredits((payload.new as { credits: number }).credits || 0);
         }
       )
@@ -99,9 +116,10 @@ export function useAuth() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user?.id, supabase]);
+  }, [hasSupabaseEnv, user?.id, supabase]);
 
   const signOut = async () => {
+    if (!supabase) return;
     try {
       await supabase.auth.signOut();
       router.push('/');
@@ -110,13 +128,12 @@ export function useAuth() {
     }
   };
 
-  return { 
-    user, 
+  return {
+    user,
     session,
-    loading, 
-    credits, 
+    loading,
+    credits,
     signOut,
-    // Alias pour compatibilité avec les anciens composants
     uid: user?.id,
     email: user?.email,
   };

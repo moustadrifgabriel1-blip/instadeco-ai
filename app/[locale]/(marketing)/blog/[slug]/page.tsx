@@ -7,7 +7,8 @@
 import { cache } from 'react';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
+import { setRequestLocale } from 'next-intl/server';
 import Image from 'next/image';
 import { marked } from 'marked';
 import { CalendarDays, Clock, ChevronLeft, Tag, Share2, User } from 'lucide-react';
@@ -24,11 +25,11 @@ import { sanitizeHtml, sanitizeJsonLd } from '@/lib/security/sanitize';
 import { SupabaseBlogArticleRepository } from '@/src/infrastructure/repositories/SupabaseBlogArticleRepository';
 import { GetBlogArticleBySlugUseCase } from '@/src/application/use-cases/blog/GetBlogArticleBySlugUseCase';
 import { BlogArticleMapper } from '@/src/application/mappers/BlogArticleMapper';
-import { SEO_CONFIG, getCanonicalUrl } from '@/lib/seo/config';
+import { SEO_CONFIG, getCanonicalUrl, getLocalizedCanonicalUrl } from '@/lib/seo/config';
 
 const SITE_URL = SEO_CONFIG.siteUrl.replace(/\/$/, '');
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 
 // Images de décoration intérieure fiables (URLs directes Unsplash)
 const BLOG_IMAGES = [
@@ -79,6 +80,7 @@ function getBlogImageUrl(tag: string, slug: string, w = 1200, h = 600): string {
 
 interface ArticlePageProps {
   params: Promise<{
+    locale: string;
     slug: string;
   }>;
 }
@@ -157,6 +159,7 @@ const getArticle = cache(async (slug: string): Promise<ArticleData | null> => {
 // Génération des métadonnées dynamiques
 export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
   const resolvedParams = await params;
+  const { locale } = resolvedParams;
   const slug = decodeURIComponent(resolvedParams.slug);
   const article = await getArticle(slug);
 
@@ -168,6 +171,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
 
   const mainTag = article.tags[0] || 'deco';
   const imageUrl = getBlogImageUrl(mainTag, article.slug, 1200, 630);
+  const canonical = getLocalizedCanonicalUrl(locale, `/blog/${article.slug}`);
 
   return {
     title: `${formatBlogTitle(article.title)} | Blog InstaDeco`,
@@ -180,7 +184,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
       publishedTime: article.publishedAt,
       tags: article.tags,
       images: [imageUrl],
-      url: `${SITE_URL}/blog/${article.slug}`,
+      url: canonical,
       authors: ['InstaDeco AI'],
     },
     twitter: {
@@ -190,12 +194,12 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
       images: [imageUrl],
     },
     alternates: {
-      canonical: `${SITE_URL}/blog/${article.slug}`,
+      canonical,
       languages: {
-        'fr-FR': `${SITE_URL}/blog/${article.slug}`,
-        'fr-CH': `${SITE_URL}/blog/${article.slug}`,
-        'fr-BE': `${SITE_URL}/blog/${article.slug}`,
-        'x-default': `${SITE_URL}/blog/${article.slug}`,
+        'fr-FR': getLocalizedCanonicalUrl('fr', `/blog/${article.slug}`),
+        en: getLocalizedCanonicalUrl('en', `/blog/${article.slug}`),
+        de: getLocalizedCanonicalUrl('de', `/blog/${article.slug}`),
+        'x-default': getLocalizedCanonicalUrl('fr', `/blog/${article.slug}`),
       },
     },
   };
@@ -373,12 +377,16 @@ function ArticleContent({ content, slug }: { content: string, slug: string }) {
 // Page principale
 export default async function ArticlePage({ params }: ArticlePageProps) {
   const resolvedParams = await params;
+  const { locale } = resolvedParams;
+  setRequestLocale(locale);
   const slug = decodeURIComponent(resolvedParams.slug);
   const article = await getArticle(slug);
 
   if (!article) {
     notFound();
   }
+
+  const canonicalUrl = getLocalizedCanonicalUrl(locale, `/blog/${article.slug}`);
 
   const formattedDate = new Date(article.publishedAt).toLocaleDateString('fr-FR', {
     day: 'numeric',
@@ -454,7 +462,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             <div className="text-xs font-semibold text-muted-foreground uppercase tracking-widest py-4 writing-mode-vertical">Partager</div>
             <ShareButton 
               title={formatBlogTitle(article.title)} 
-              url={`${SITE_URL}/blog/${article.slug}`}
+              url={``}
               variant="sidebar"
             />
           </div>
@@ -536,10 +544,10 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             '@type': 'BlogPosting',
             headline: formatBlogTitle(article.title),
             description: article.metaDescription,
-            url: `${SITE_URL}/blog/${article.slug}`,
+            url: ``,
             datePublished: article.publishedAt,
             dateModified: article.publishedAt,
-            inLanguage: 'fr',
+            inLanguage: locale,
             author: {
               '@type': 'Organization',
               name: 'InstaDeco AI',
@@ -557,7 +565,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             image: heroImageUrl,
             mainEntityOfPage: {
               '@type': 'WebPage',
-              '@id': `${SITE_URL}/blog/${article.slug}`,
+              '@id': ``,
             },
             keywords: article.tags.join(', '),
             wordCount: article.wordCount,

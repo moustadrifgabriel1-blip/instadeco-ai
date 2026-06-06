@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/client';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useSupabaseBrowser } from '@/hooks/use-supabase-browser';
 import Image from 'next/image';
 import { Suspense } from 'react';
 
@@ -11,7 +11,7 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get('redirect') || '/generate';
-  const supabase = createClient();
+  const supabase = useSupabaseBrowser();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -19,11 +19,15 @@ function LoginForm() {
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!supabase) {
+      setError('Configuration indisponible. Réessayez dans un instant.');
+      return;
+    }
     setLoading(true);
     setError('');
 
     try {
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+      const { error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -46,6 +50,10 @@ function LoginForm() {
   };
 
   const handleGoogleLogin = async () => {
+    if (!supabase) {
+      setError('Configuration indisponible. Réessayez dans un instant.');
+      return;
+    }
     setLoading(true);
     setError('');
 

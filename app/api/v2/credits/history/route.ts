@@ -28,7 +28,7 @@ export async function GET(req: Request) {
     const url = new URL(req.url);
 
     const validation = querySchema.safeParse({
-      limit: url.searchParams.get('limit'),
+      limit: url.searchParams.get('limit') ?? undefined,
     });
 
     if (!validation.success) {

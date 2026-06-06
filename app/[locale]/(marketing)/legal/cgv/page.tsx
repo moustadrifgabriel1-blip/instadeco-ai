@@ -1,11 +1,31 @@
 import { Metadata } from 'next';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
+import { getTranslations } from 'next-intl/server';
+import { getLocalizedCanonicalUrl } from '@/lib/seo/config';
+import { LegalFrenchBodyNotice } from '@/components/legal/LegalFrenchBodyNotice';
 
-export const metadata: Metadata = {
-  title: 'Conditions Générales de Vente (CGV) | InstaDeco AI',
-  description: 'Conditions générales de vente du service InstaDeco AI - Crédits, paiements, droit de rétractation et utilisation du service.',
-  robots: 'index, follow',
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'LegalMeta' });
+  return {
+    title: t('cgvTitle'),
+    description: t('cgvDescription'),
+    robots: 'index, follow',
+    alternates: {
+      canonical: getLocalizedCanonicalUrl(locale, '/legal/cgv'),
+      languages: {
+        'fr-FR': getLocalizedCanonicalUrl('fr', '/legal/cgv'),
+        en: getLocalizedCanonicalUrl('en', '/legal/cgv'),
+        de: getLocalizedCanonicalUrl('de', '/legal/cgv'),
+        'x-default': getLocalizedCanonicalUrl('fr', '/legal/cgv'),
+      },
+    },
+  };
+}
 
 export default function CGVPage() {
   const lastUpdated = '22 janvier 2026';
@@ -13,6 +33,7 @@ export default function CGVPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 py-16">
+        <LegalFrenchBodyNotice />
         <h1 className="text-4xl font-bold text-gray-900 mb-4">Conditions Générales de Vente</h1>
         
         <p className="text-lg text-gray-600 mb-2">

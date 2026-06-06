@@ -1,104 +1,96 @@
 /**
- * Metadata SEO pour la page Pricing
- * 
- * Les pages 'use client' ne peuvent pas exporter metadata,
- * donc on utilise un layout server component pour les injecter.
+ * Metadata SEO pour la page Pricing + JSON-LD
  */
 
 import { Metadata } from 'next';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { generateProductSchema, generateFAQSchema, generateBreadcrumbList } from '@/lib/seo/schemas';
-import { getCanonicalUrl } from '@/lib/seo/config';
+import { getLocalizedCanonicalUrl, withLocalePath } from '@/lib/seo/config';
+import { getMessages, getTranslations } from 'next-intl/server';
 
-export const metadata: Metadata = {
-  title: 'Tarifs & Crédits - Décoration IA sans Abonnement | InstaDeco AI',
-  description: 'Achetez des crédits sans abonnement pour transformer vos pièces par IA. À partir de 9,90€ pour 10 générations HD. Crédits sans expiration. Paiement sécurisé Stripe.',
-  keywords: [
-    'tarifs décoration IA',
-    'prix home staging virtuel',
-    'crédits InstaDeco',
-    'décoration intérieur prix',
-    'home staging virtuel tarif',
-    'générer décoration IA coût',
-    'décoration sans abonnement',
-  ],
-  openGraph: {
-    title: 'Tarifs InstaDeco AI - Décoration IA à partir de 9,90€',
-    description: 'Pas d\'abonnement, pas de surprise. Achetez des crédits et transformez vos pièces par IA quand vous voulez.',
-    type: 'website',
-    url: getCanonicalUrl('/pricing'),
-    images: [getCanonicalUrl('/og-image.png')],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Tarifs InstaDeco AI - À partir de 9,90€',
-    description: 'Crédits sans abonnement pour décorer par IA. Paiement sécurisé.',
-  },
-  alternates: {
-    canonical: getCanonicalUrl('/pricing'),
-  },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'PricingMeta' });
 
-// FAQ data for structured data
-const pricingFAQ = [
-  {
-    question: "Combien coûte une génération d'image ?",
-    answer: "1 crédit = 1 génération. Chaque génération vous donne une image en haute qualité (1024×1024 pixels) que vous pouvez télécharger immédiatement."
-  },
-  {
-    question: "Mes crédits expirent-ils ?",
-    answer: "Non, jamais ! Vos crédits restent sur votre compte indéfiniment. Utilisez-les quand vous voulez, à votre rythme."
-  },
-  {
-    question: "Quelle est la qualité des images générées ?",
-    answer: "Toutes les images sont en haute définition (1024×1024 pixels). Vous pouvez aussi débloquer la version HD+ (2048×2048) pour seulement 4,99€ par image."
-  },
-  {
-    question: "Puis-je utiliser les images pour mon activité pro ?",
-    answer: "Absolument ! Toutes les images que vous générez vous appartiennent. Vous pouvez les utiliser pour vos projets personnels, votre portfolio, vos clients, vos réseaux sociaux. Aucune restriction d'usage commercial."
-  },
-  {
-    question: "Comment choisir le bon style pour ma pièce ?",
-    answer: "On propose plus de 20 styles différents (Moderne, Scandinave, Japandi, Bohème, Haussmannien, Chalet Alpin...). Choisissez le style qui correspond à l'ambiance que vous voulez créer, et ajustez l'intensité de transformation selon vos goûts."
-  },
-  {
-    question: "Quels moyens de paiement acceptez-vous ?",
-    answer: "On accepte toutes les cartes bancaires (Visa, Mastercard, American Express), ainsi qu'Apple Pay et Google Pay. Paiement 100% sécurisé via Stripe."
-  },
-  {
-    question: "Puis-je obtenir un remboursement ?",
-    answer: "Oui ! Si vous n'avez pas utilisé vos crédits, vous pouvez demander un remboursement intégral sous 14 jours après l'achat. Les crédits déjà utilisés ne sont pas remboursables."
-  },
-  {
-    question: "Que faire si le résultat ne me plaît pas ?",
-    answer: "L'IA est créative ! Si un résultat ne vous convient pas, relancez simplement une génération avec les mêmes paramètres pour obtenir une nouvelle proposition. Vous pouvez aussi ajuster l'intensité de transformation ou changer de style."
-  },
-  {
-    question: "Quels types de photos fonctionnent le mieux ?",
-    answer: "Pour de meilleurs résultats : prenez une photo bien éclairée, de face (pas d'angle extrême), et qui montre bien l'espace. Les pièces vides ou peu meublées donnent plus de liberté à l'IA."
-  },
-];
+  return {
+    title: t('title'),
+    description: t('description'),
+    keywords: [
+      'tarifs décoration IA',
+      'prix home staging virtuel',
+      'crédits InstaDeco',
+      'décoration intérieur prix',
+      'home staging virtuel tarif',
+      'générer décoration IA coût',
+      'décoration sans abonnement',
+    ],
+    openGraph: {
+      title: t('ogTitle'),
+      description: t('ogDescription'),
+      type: 'website',
+      url: getLocalizedCanonicalUrl(locale, '/pricing'),
+      images: [getLocalizedCanonicalUrl(locale, '/og-image.png')],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: t('twitterTitle'),
+      description: t('twitterDescription'),
+    },
+    alternates: {
+      canonical: getLocalizedCanonicalUrl(locale, '/pricing'),
+      languages: {
+        'fr-FR': getLocalizedCanonicalUrl('fr', '/pricing'),
+        en: getLocalizedCanonicalUrl('en', '/pricing'),
+        de: getLocalizedCanonicalUrl('de', '/pricing'),
+        'x-default': getLocalizedCanonicalUrl('fr', '/pricing'),
+      },
+    },
+  };
+}
 
-const pricingPlans = [
-  { name: 'Découverte', price: 9.90, credits: 10, description: 'Parfait pour tester' },
-  { name: 'Créatif', price: 19.90, credits: 25, description: 'Le plus populaire' },
-  { name: 'Pro', price: 34.90, credits: 50, description: 'Pour les passionnés' },
-];
-
-export default function PricingLayout({
+export default async function PricingLayout({
   children,
+  params,
 }: {
   children: React.ReactNode;
+  params: Promise<{ locale: string }>;
 }) {
+  const { locale } = await params;
+  const messages = await getMessages();
+  const pricing = messages.Pricing as {
+    creditPacks: Array<{ name: string; price: number; credits: number; description: string }>;
+    faq: Array<{ question: string; answer: string }>;
+  };
+
+  const pricingPlans = pricing.creditPacks.map((p) => ({
+    name: p.name,
+    price: p.price,
+    credits: p.credits,
+    description: p.description,
+  }));
+
+  const pricingFAQ = pricing.faq.map((item) => ({
+    question: item.question,
+    answer: item.answer,
+  }));
+
+  const tMeta = await getTranslations({ locale, namespace: 'PricingMeta' });
+
   return (
     <>
-      <JsonLd data={[
-        generateProductSchema(pricingPlans),
-        generateFAQSchema(pricingFAQ),
-        generateBreadcrumbList([
-          { label: 'Tarifs', path: '/pricing' },
-        ]),
-      ]} />
+      <JsonLd
+        data={[
+          generateProductSchema(pricingPlans),
+          generateFAQSchema(pricingFAQ),
+          generateBreadcrumbList([{ label: tMeta('breadcrumb'), path: withLocalePath(locale, '/pricing') }], {
+            home: { name: tMeta('breadcrumbHome'), url: withLocalePath(locale, '/') },
+          }),
+        ]}
+      />
       {children}
     </>
   );

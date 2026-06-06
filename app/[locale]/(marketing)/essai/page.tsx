@@ -10,6 +10,7 @@ import { ShareButtons } from '@/components/features/share-buttons';
 import { SocialProofToast } from '@/components/features/social-proof-toast';
 import { LeadCaptureLazy } from '@/components/features/lead-capture-lazy';
 import { trackTrialStart, trackTrialComplete, trackLeadCaptured } from '@/lib/analytics/gtag';
+import { compressImageToDataUrl } from '@/lib/image/compress-client';
 
 // Styles populaires pour l'essai (6 max)
 const TRIAL_STYLES = [
@@ -87,14 +88,10 @@ export default function EssaiPage() {
     maxSize: 10 * 1024 * 1024,
   });
 
-  // Convertir fichier en base64
+  // Compresse + convertit le fichier en base64 (redimension ~1600px, JPEG ~0.85)
+  // pour alléger le body POST. Fallback base64 brut géré en interne.
   const fileToBase64 = async (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
+    return compressImageToDataUrl(file);
   };
 
   // Générer un fingerprint navigateur simple (non-invasif, basé sur des données publiques)

@@ -1,71 +1,73 @@
 /**
  * Composant: Footer (v2 - nettoyé)
- * 
+ *
  * Pied de page du site InstaDeco AI.
- * Optimisé pour le maillage interne SEO avec liens
- * vers les pages villes, styles et outils.
  */
 
 'use client';
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
+import { Link, usePathname } from '@/i18n/navigation';
 import { Heart } from 'lucide-react';
 import Image from 'next/image';
 
-const footerLinks = {
-  product: [
-    { href: '/generate', label: 'Générer une image' },
-    { href: '/galerie', label: 'Galerie Before/After' },
-    { href: '/quiz', label: 'Quiz : Mon style déco' },
-    { href: '/exemples', label: 'Exemples' },
-    { href: '/pricing', label: 'Tarifs' },
-    { href: '/blog', label: 'Blog' },
-    { href: '/pro', label: 'Pour les Pros' },
-  ],
-  hubs: [
-    { href: '/styles', label: 'Tous les styles' },
-    { href: '/pieces', label: 'Toutes les pièces' },
-    { href: '/solutions', label: 'Toutes les solutions' },
-  ],
-  services: [
-    { href: '/architecte-interieur', label: 'Architecte intérieur IA' },
-    { href: '/architecte-interieur/paris', label: 'Déco Paris' },
-    { href: '/architecte-interieur/lyon', label: 'Déco Lyon' },
-    { href: '/architecte-interieur/geneve', label: 'Déco Genève' },
-    { href: '/architecte-interieur/bruxelles', label: 'Déco Bruxelles' },
-  ],
-  styles: [
-    { href: '/style/moderne', label: 'Style Moderne' },
-    { href: '/style/scandinave', label: 'Style Scandinave' },
-    { href: '/style/industriel', label: 'Style Industriel' },
-    { href: '/style/japandi', label: 'Style Japandi' },
-    { href: '/style/boheme', label: 'Style Bohème' },
-  ],
-  solutions: [
-    { href: '/solution/home-staging-virtuel', label: 'Home Staging Virtuel' },
-    { href: '/solution/simulateur-decoration-interieur', label: 'Simulateur Déco' },
-    { href: '/solution/logiciel-home-staging', label: 'Logiciel Home Staging' },
-    { href: '/solution/avant-apres-decoration', label: 'Avant / Après Déco' },
-  ],
-  legal: [
-    { href: '/legal/mentions-legales', label: 'Mentions légales' },
-    { href: '/legal/privacy', label: 'Confidentialité' },
-    { href: '/legal/cgv', label: 'CGV' },
-    { href: '/a-propos', label: 'À propos' },
-  ],
-  social: [
-    { href: 'https://twitter.com/instadeco_ai', label: 'Twitter' },
-    { href: 'https://instagram.com/instadeco_ai', label: 'Instagram' },
-    { href: 'https://pinterest.com/instadeco_ai', label: 'Pinterest' },
-  ],
-};
+const PRODUCT_LINKS: { href: string; key: string }[] = [
+  { href: '/generate', key: 'generate' },
+  { href: '/galerie', key: 'gallery' },
+  { href: '/quiz', key: 'quiz' },
+  { href: '/exemples', key: 'examples' },
+  { href: '/pricing', key: 'pricing' },
+  { href: '/blog', key: 'blog' },
+  { href: '/pro', key: 'pro' },
+];
+
+const HUB_LINKS: { href: string; labelKey: 'hubAllStyles' | 'hubAllRooms' | 'hubAllSolutions' }[] = [
+  { href: '/styles', labelKey: 'hubAllStyles' },
+  { href: '/pieces', labelKey: 'hubAllRooms' },
+  { href: '/solutions', labelKey: 'hubAllSolutions' },
+];
+
+const SERVICE_LINKS: { href: string; key: string }[] = [
+  { href: '/architecte-interieur', key: 'architect' },
+  { href: '/architecte-interieur/paris', key: 'paris' },
+  { href: '/architecte-interieur/lyon', key: 'lyon' },
+  { href: '/architecte-interieur/geneve', key: 'geneve' },
+  { href: '/architecte-interieur/bruxelles', key: 'bruxelles' },
+];
+
+const STYLE_LINKS: { href: string; key: string }[] = [
+  { href: '/style/moderne', key: 'styleModerne' },
+  { href: '/style/scandinave', key: 'styleScandinave' },
+  { href: '/style/industriel', key: 'styleIndustriel' },
+  { href: '/style/japandi', key: 'styleJapandi' },
+  { href: '/style/boheme', key: 'styleBoheme' },
+];
+
+const SOLUTION_LINKS: { href: string; key: string }[] = [
+  { href: '/solution/home-staging-virtuel', key: 'solStaging' },
+  { href: '/solution/simulateur-decoration-interieur', key: 'solSimulator' },
+  { href: '/solution/logiciel-home-staging', key: 'solSoftware' },
+  { href: '/solution/avant-apres-decoration', key: 'solAvantApres' },
+];
+
+const LEGAL_LINKS: { href: string; key: string }[] = [
+  { href: '/legal/mentions-legales', key: 'legalMentions' },
+  { href: '/legal/privacy', key: 'legalPrivacy' },
+  { href: '/legal/cgv', key: 'legalCgv' },
+  { href: '/a-propos', key: 'about' },
+];
+
+const SOCIAL_LINKS: { href: string; key: string }[] = [
+  { href: 'https://twitter.com/instadeco_ai', key: 'twitter' },
+  { href: 'https://instagram.com/instadeco_ai', key: 'instagram' },
+  { href: 'https://pinterest.com/instadeco_ai', key: 'pinterest' },
+];
 
 export function Footer() {
   const pathname = usePathname();
   const currentYear = new Date().getFullYear();
+  const t = useTranslations('Footer');
 
-  // Masquer le footer sur les pages dashboard (elles ont leur propre layout)
   if (pathname.startsWith('/dashboard') || pathname.startsWith('/credits') || pathname === '/essai') {
     return null;
   }
@@ -74,7 +76,6 @@ export function Footer() {
     <footer className="border-t border-[#F0E6E0] bg-[#FFF8F5]">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-8 gap-6 lg:gap-8 mb-12">
-          {/* Brand */}
           <div className="col-span-2 sm:col-span-3 lg:col-span-2">
             <Link href="/" className="flex items-center gap-2 font-bold text-xl mb-4 group">
               <Image
@@ -87,121 +88,111 @@ export function Footer() {
               <span className="text-[#2D2D2D]">InstaDeco</span>
               <span className="text-gradient font-extrabold">AI</span>
             </Link>
-            <p className="text-sm text-[#6B6B6B] mb-4">
-              Transformez vos intérieurs grâce à l&apos;intelligence artificielle.
-            </p>
+            <p className="text-sm text-[#6B6B6B] mb-4">{t('tagline')}</p>
           </div>
 
-          {/* Produit */}
           <div>
-            <h3 className="font-semibold mb-4 text-[#2D2D2D]">Produit</h3>
+            <h3 className="font-semibold mb-4 text-[#2D2D2D]">{t('productTitle')}</h3>
             <ul className="space-y-3">
-              {footerLinks.product.map((link) => (
+              {PRODUCT_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
                     className="text-sm text-[#6B6B6B] hover:text-[#E07B54] transition-colors"
                   >
-                    {link.label}
+                    {t(`links.${link.key}`)}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Services par ville */}
           <div>
-            <h3 className="font-semibold mb-4 text-[#2D2D2D]">Par ville</h3>
+            <h3 className="font-semibold mb-4 text-[#2D2D2D]">{t('cityTitle')}</h3>
             <ul className="space-y-3">
-              {footerLinks.services.map((link) => (
+              {SERVICE_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
                     className="text-sm text-[#6B6B6B] hover:text-[#E07B54] transition-colors"
                   >
-                    {link.label}
+                    {t(`links.${link.key}`)}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Styles */}
           <div>
-            <h3 className="font-semibold mb-4 text-[#2D2D2D]">Styles</h3>
+            <h3 className="font-semibold mb-4 text-[#2D2D2D]">{t('stylesTitle')}</h3>
             <ul className="space-y-3">
-              {footerLinks.styles.map((link) => (
+              {STYLE_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
                     className="text-sm text-[#6B6B6B] hover:text-[#E07B54] transition-colors"
                   >
-                    {link.label}
+                    {t(`links.${link.key}`)}
                   </Link>
                 </li>
               ))}
-              {footerLinks.hubs.slice(0, 1).map((link) => (
+              <li>
+                <Link
+                  href="/styles"
+                  className="text-sm text-[#E07B54] hover:underline font-medium"
+                >
+                  → {t('hubAllStyles')}
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="font-semibold mb-4 text-[#2D2D2D]">{t('solutionsTitle')}</h3>
+            <ul className="space-y-3">
+              {SOLUTION_LINKS.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-[#6B6B6B] hover:text-[#E07B54] transition-colors"
+                  >
+                    {t(`links.${link.key}`)}
+                  </Link>
+                </li>
+              ))}
+              {HUB_LINKS.filter((h) => h.labelKey !== 'hubAllStyles').map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
                     className="text-sm text-[#E07B54] hover:underline font-medium"
                   >
-                    → {link.label}
+                    → {t(link.labelKey)}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Solutions */}
           <div>
-            <h3 className="font-semibold mb-4 text-[#2D2D2D]">Solutions</h3>
+            <h3 className="font-semibold mb-4 text-[#2D2D2D]">{t('legalTitle')}</h3>
             <ul className="space-y-3">
-              {footerLinks.solutions.map((link) => (
+              {LEGAL_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
                     className="text-sm text-[#6B6B6B] hover:text-[#E07B54] transition-colors"
                   >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-              {footerLinks.hubs.slice(1).map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-[#E07B54] hover:underline font-medium"
-                  >
-                    → {link.label}
+                    {t(`links.${link.key}`)}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Légal */}
           <div>
-            <h3 className="font-semibold mb-4 text-[#2D2D2D]">Légal</h3>
+            <h3 className="font-semibold mb-4 text-[#2D2D2D]">{t('followTitle')}</h3>
             <ul className="space-y-3">
-              {footerLinks.legal.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-[#6B6B6B] hover:text-[#E07B54] transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Réseaux sociaux */}
-          <div>
-            <h3 className="font-semibold mb-4 text-[#2D2D2D]">Suivez-nous</h3>
-            <ul className="space-y-3">
-              {footerLinks.social.map((link) => (
+              {SOCIAL_LINKS.map((link) => (
                 <li key={link.href}>
                   <a
                     href={link.href}
@@ -209,7 +200,7 @@ export function Footer() {
                     rel="noopener noreferrer"
                     className="text-sm text-[#6B6B6B] hover:text-[#E07B54] transition-colors"
                   >
-                    {link.label}
+                    {t(`links.${link.key}`)}
                   </a>
                 </li>
               ))}
@@ -217,14 +208,28 @@ export function Footer() {
           </div>
         </div>
 
-        {/* SEO Internal Links - Villes additionnelles */}
         <div className="border-t border-[#F0E6E0] pt-6 mb-6">
-          <p className="text-xs text-[#9B9B9B] mb-3">Décoration intérieur IA disponible dans :</p>
+          <p className="text-xs text-[#9B9B9B] mb-3">{t('citySeoLine')}</p>
           <div className="flex flex-wrap gap-x-3 gap-y-1">
             {[
-              'marseille', 'toulouse', 'nice', 'nantes', 'montpellier', 'strasbourg',
-              'bordeaux', 'lille', 'rennes', 'lausanne', 'fribourg', 'neuchatel',
-              'liege', 'namur', 'charleroi', 'annecy', 'grenoble', 'dijon',
+              'marseille',
+              'toulouse',
+              'nice',
+              'nantes',
+              'montpellier',
+              'strasbourg',
+              'bordeaux',
+              'lille',
+              'rennes',
+              'lausanne',
+              'fribourg',
+              'neuchatel',
+              'liege',
+              'namur',
+              'charleroi',
+              'annecy',
+              'grenoble',
+              'dijon',
             ].map((city) => (
               <Link
                 key={city}
@@ -237,12 +242,10 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Copyright */}
         <div className="border-t border-[#F0E6E0] pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-[#6B6B6B]">
-          <p className="flex items-center gap-1">
-            © {currentYear} InstaDeco AI. Fait avec 
-            <Heart className="h-4 w-4 text-[#E07B54] fill-current" />
-            pour votre intérieur.
+          <p className="flex items-center gap-1 flex-wrap justify-center">
+            {t('copyright', { year: currentYear })} <Heart className="h-4 w-4 text-[#E07B54] fill-current" />{' '}
+            {t('copyrightEnd')}
           </p>
         </div>
       </div>

@@ -5,7 +5,7 @@
  * aux spécifications Schema.org pour les rich snippets Google.
  */
 
-import { SEO_CONFIG, getCanonicalUrl, getFullUrl } from './config';
+import { SEO_CONFIG, getCanonicalUrl, getFullUrl, getLocalizedCanonicalUrl } from './config';
 
 // ============================================
 // ORGANISATION & SITE
@@ -68,7 +68,7 @@ export function generateWebSiteSchema() {
       '@type': 'SearchAction',
       target: {
         '@type': 'EntryPoint',
-        urlTemplate: `${SEO_CONFIG.siteUrl}/blog?search={search_term_string}`,
+        urlTemplate: `${getLocalizedCanonicalUrl('fr', '/blog')}?search={search_term_string}`,
       },
       'query-input': 'required name=search_term_string',
     },
@@ -239,12 +239,15 @@ export function generateBlogPostingSchema(article: {
   author?: string;
   tags?: string[];
   wordCount?: number;
+  locale?: string;
 }) {
+  const locale = article.locale || 'fr';
+  const blogUrl = getLocalizedCanonicalUrl(locale, `/blog/${article.slug}`);
   return {
     '@type': 'BlogPosting',
     headline: article.title,
     description: article.description,
-    url: getCanonicalUrl(`/blog/${article.slug}`),
+    url: blogUrl,
     datePublished: article.publishedAt,
     dateModified: article.updatedAt || article.publishedAt,
     image: article.image || getFullUrl(SEO_CONFIG.ogImage),
@@ -264,11 +267,11 @@ export function generateBlogPostingSchema(article: {
     },
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': getCanonicalUrl(`/blog/${article.slug}`),
+      '@id': blogUrl,
     },
     keywords: article.tags?.join(', '),
     wordCount: article.wordCount,
-    inLanguage: SEO_CONFIG.language,
+    inLanguage: locale,
   };
 }
 
@@ -327,9 +330,13 @@ export function generateBreadcrumbSchema(items: Array<{
 /**
  * Helper pour générer les breadcrumbs à partir d'un chemin
  */
-export function generateBreadcrumbList(segments: Array<{ label: string; path: string }>) {
+export function generateBreadcrumbList(
+  segments: Array<{ label: string; path: string }>,
+  options?: { home?: { name: string; url: string } },
+) {
+  const home = options?.home ?? { name: 'Accueil', url: '/' };
   const items = [
-    { name: 'Accueil', url: '/' },
+    { name: home.name, url: home.url },
     ...segments.map((s) => ({ name: s.label, url: s.path })),
   ];
   return generateBreadcrumbSchema(items);

@@ -1,121 +1,109 @@
 import { MetadataRoute } from 'next';
 import { SEO_CONFIG } from '@/lib/seo/config';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 
-/**
- * Sitemap dynamique pour SEO
- *
- * Génère automatiquement le sitemap.xml avec :
- * - Pages statiques du site
- * - Articles de blog dynamiques depuis Supabase
- * - Pages villes SEO local (57+ villes)
- * - Pages programmatiques de styles et pièces
- *
- * @see https://nextjs.org/docs/app/api-reference/file-conventions/metadata/sitemap
- */
-
-// Source unique de vérité : SEO_CONFIG.siteUrl (lit NEXT_PUBLIC_APP_URL avec fallback)
 const BASE_URL = SEO_CONFIG.siteUrl.replace(/\/$/, '');
+
+const LOCALES = ['fr', 'en', 'de'] as const;
+
+function localizedUrl(locale: string, path: string) {
+  const p = path === '/' ? '' : path.startsWith('/') ? path : `/${path}`;
+  return `${BASE_URL}/${locale}${p}`;
+}
+
+function alternatesForPath(path: string): Record<string, string> {
+  const p = path === '/' ? '' : path.startsWith('/') ? path : `/${path}`;
+  return {
+    'fr-FR': `${BASE_URL}/fr${p}`,
+    en: `${BASE_URL}/en${p}`,
+    de: `${BASE_URL}/de${p}`,
+    'x-default': `${BASE_URL}/fr${p}`,
+  };
+}
+
+function withAlternatesForAllLocales(
+  path: string,
+  meta: Omit<MetadataRoute.Sitemap[number], 'url' | 'alternates'>,
+): MetadataRoute.Sitemap {
+  return LOCALES.map((locale) => ({
+    url: localizedUrl(locale, path),
+    ...meta,
+    alternates: { languages: alternatesForPath(path) },
+  }));
+}
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 
-  // ============================================
-  // PAGES STATIQUES
-  // ============================================
   const staticPages: MetadataRoute.Sitemap = [
-    {
-      url: BASE_URL,
+    ...withAlternatesForAllLocales('/', {
       lastModified: now,
       changeFrequency: 'weekly',
       priority: 1.0,
-    },
-    {
-      url: `${BASE_URL}/generate`,
+    }),
+    ...withAlternatesForAllLocales('/generate', {
       lastModified: now,
       changeFrequency: 'weekly',
       priority: 0.9,
-    },
-    {
-      url: `${BASE_URL}/exemples`,
+    }),
+    ...withAlternatesForAllLocales('/exemples', {
       lastModified: now,
       changeFrequency: 'weekly',
       priority: 0.8,
-    },
-    {
-      url: `${BASE_URL}/pricing`,
+    }),
+    ...withAlternatesForAllLocales('/pricing', {
       lastModified: now,
       changeFrequency: 'weekly',
       priority: 0.8,
-    },
-    {
-      url: `${BASE_URL}/pro`,
+    }),
+    ...withAlternatesForAllLocales('/pro', {
       lastModified: now,
       changeFrequency: 'weekly',
       priority: 0.8,
-    },
-    {
-      url: `${BASE_URL}/quiz`,
+    }),
+    ...withAlternatesForAllLocales('/quiz', {
       lastModified: now,
       changeFrequency: 'monthly',
       priority: 0.8,
-    },
-    {
-      url: `${BASE_URL}/galerie`,
+    }),
+    ...withAlternatesForAllLocales('/galerie', {
       lastModified: now,
       changeFrequency: 'daily',
       priority: 0.7,
-    },
-    {
-      url: `${BASE_URL}/essai`,
+    }),
+    ...withAlternatesForAllLocales('/essai', {
       lastModified: now,
       changeFrequency: 'monthly',
       priority: 0.8,
-    },
-    {
-      url: `${BASE_URL}/styles`,
+    }),
+    ...withAlternatesForAllLocales('/styles', {
       lastModified: now,
       changeFrequency: 'weekly',
       priority: 0.8,
-    },
-    {
-      url: `${BASE_URL}/pieces`,
+    }),
+    ...withAlternatesForAllLocales('/pieces', {
       lastModified: now,
       changeFrequency: 'weekly',
       priority: 0.8,
-    },
-    {
-      url: `${BASE_URL}/solutions`,
+    }),
+    ...withAlternatesForAllLocales('/solutions', {
       lastModified: now,
       changeFrequency: 'weekly',
       priority: 0.8,
-    },
-    {
-      url: `${BASE_URL}/a-propos`,
+    }),
+    ...withAlternatesForAllLocales('/a-propos', {
       lastModified: now,
       changeFrequency: 'monthly',
       priority: 0.5,
-    },
-    {
-      url: `${BASE_URL}/tiktok-generator`,
+    }),
+    ...withAlternatesForAllLocales('/tiktok-generator', {
       lastModified: now,
       changeFrequency: 'monthly',
       priority: 0.7,
-    },
+    }),
   ];
 
-  // ============================================
-  // PAGES LÉGALES
-  // ============================================
-  // Pages légales : exclues du sitemap.
-  // Elles sont bloquées dans robots.txt, les soumettre au sitemap
-  // enverrait des signaux contradictoires à Google.
-  // Elles restent accessibles via les liens internes du footer.
-
-  // ============================================
-  // ARTICLES DE BLOG (DYNAMIQUE)
-  // ============================================
   let articlePages: MetadataRoute.Sitemap = [];
 
   try {
@@ -129,116 +117,113 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .order('published_at', { ascending: false })
       .limit(1000);
 
-    articlePages = (articles || []).map((article) => ({
-      url: `${BASE_URL}/blog/${article.slug}`,
-      lastModified: new Date(article.updated_at),
-      changeFrequency: 'monthly' as const,
-      priority: 0.7,
-    }));
+    articlePages = (articles || []).flatMap((article) =>
+      withAlternatesForAllLocales(`/blog/${article.slug}`, {
+        lastModified: new Date(article.updated_at),
+        changeFrequency: 'monthly' as const,
+        priority: 0.7,
+      }),
+    );
   } catch (error) {
     console.error('Error fetching blog articles for sitemap:', error);
   }
 
-  // Page index du blog
-  const blogIndexPage: MetadataRoute.Sitemap = [
-    {
-      url: `${BASE_URL}/blog`,
-      lastModified: now,
-      changeFrequency: 'daily',
-      priority: 0.9,
-    },
-  ];
+  const blogIndexPage: MetadataRoute.Sitemap = withAlternatesForAllLocales('/blog', {
+    lastModified: now,
+    changeFrequency: 'daily',
+    priority: 0.9,
+  });
 
-  // ============================================
-  // PAGES VILLES (SEO LOCAL)
-  // ============================================
   let cityIndexPage: MetadataRoute.Sitemap = [];
   let cityPages: MetadataRoute.Sitemap = [];
 
   try {
     const { CITIES } = await import('@/src/shared/constants/cities');
-    
-    // Page index des villes
-    cityIndexPage = [
-      {
-        url: `${BASE_URL}/architecte-interieur`,
-        lastModified: now,
-        changeFrequency: 'weekly',
-        priority: 0.8,
-      },
-    ];
 
-    cityPages = CITIES.map((city) => ({
-      url: `${BASE_URL}/architecte-interieur/${city.slug}`,
+    cityIndexPage = withAlternatesForAllLocales('/architecte-interieur', {
       lastModified: now,
-      changeFrequency: 'monthly' as const,
-      priority: 0.6,
-    }));
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    });
+
+    cityPages = CITIES.flatMap((city) =>
+      withAlternatesForAllLocales(`/architecte-interieur/${city.slug}`, {
+        lastModified: now,
+        changeFrequency: 'monthly' as const,
+        priority: 0.6,
+      }),
+    );
   } catch (error) {
     console.error('Error loading cities for sitemap:', error);
   }
 
-  // ============================================
-  // PAGES PROGRAMMATIQUES (STYLES DE DÉCO)
-  // ============================================
   const stylePages: MetadataRoute.Sitemap = [
-    'moderne', 'scandinave', 'industriel', 'boheme', 'minimaliste',
-    'japandi', 'art-deco', 'contemporain', 'rustique', 'coastal',
-    'mid-century', 'luxe',
-  ].map((style) => ({
-    url: `${BASE_URL}/style/${style}`,
-    lastModified: now,
-    changeFrequency: 'monthly' as const,
-    priority: 0.6,
-  }));
+    'moderne',
+    'scandinave',
+    'industriel',
+    'boheme',
+    'minimaliste',
+    'japandi',
+    'art-deco',
+    'contemporain',
+    'rustique',
+    'coastal',
+    'mid-century',
+    'luxe',
+  ].flatMap((style) =>
+    withAlternatesForAllLocales(`/style/${style}`, {
+      lastModified: now,
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
+    }),
+  );
 
-  // ============================================
-  // PAGES PROGRAMMATIQUES (TYPES DE PIÈCES)
-  // ============================================
   const roomPages: MetadataRoute.Sitemap = [
-    'salon', 'chambre', 'cuisine', 'salle-de-bain', 'bureau',
-    'entree', 'terrasse', 'salle-a-manger',
-  ].map((room) => ({
-    url: `${BASE_URL}/piece/${room}`,
-    lastModified: now,
-    changeFrequency: 'monthly' as const,
-    priority: 0.6,
-  }));
+    'salon',
+    'chambre',
+    'cuisine',
+    'salle-de-bain',
+    'bureau',
+    'entree',
+    'terrasse',
+    'salle-a-manger',
+  ].flatMap((room) =>
+    withAlternatesForAllLocales(`/piece/${room}`, {
+      lastModified: now,
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
+    }),
+  );
 
-  // ============================================
-  // PAGES SEO CROISÉES (STYLE × PIÈCE)
-  // Seules les combinaisons à fort volume de recherche sont soumises.
-  // Doit être synchronisé avec PRIORITY_COMBOS dans deco/[style]/[piece]/page.tsx
-  // Les autres pages existent mais sont en noindex.
-  // ============================================
   const priorityCombos = [
-    // Top salon
-    'moderne/salon', 'scandinave/salon', 'industriel/salon', 'boheme/salon', 'japandi/salon',
-    // Top chambre
-    'scandinave/chambre', 'boheme/chambre', 'japandi/chambre', 'minimaliste/chambre',
-    // Top cuisine
-    'moderne/cuisine', 'industriel/cuisine', 'contemporain/cuisine',
-    // Top bureau
-    'scandinave/bureau', 'industriel/bureau', 'minimaliste/bureau',
-    // Top salle de bain
-    'japandi/salle-de-bain', 'moderne/salle-de-bain',
-    // Top salle à manger
-    'scandinave/salle-a-manger', 'rustique/salle-a-manger',
+    'moderne/salon',
+    'scandinave/salon',
+    'industriel/salon',
+    'boheme/salon',
+    'japandi/salon',
+    'scandinave/chambre',
+    'boheme/chambre',
+    'japandi/chambre',
+    'minimaliste/chambre',
+    'moderne/cuisine',
+    'industriel/cuisine',
+    'contemporain/cuisine',
+    'scandinave/bureau',
+    'industriel/bureau',
+    'minimaliste/bureau',
+    'japandi/salle-de-bain',
+    'moderne/salle-de-bain',
+    'scandinave/salle-a-manger',
+    'rustique/salle-a-manger',
   ];
-  const decoPages: MetadataRoute.Sitemap = priorityCombos.map(combo => ({
-    url: `${BASE_URL}/deco/${combo}`,
-    lastModified: now,
-    changeFrequency: 'monthly' as const,
-    priority: 0.6,
-  }));
+  const decoPages: MetadataRoute.Sitemap = priorityCombos.flatMap((combo) =>
+    withAlternatesForAllLocales(`/deco/${combo}`, {
+      lastModified: now,
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
+    }),
+  );
 
-  // Pages /g/[id] : volontairement exclues du sitemap.
-  // Elles servent au partage social (OG) et sont en noindex
-  // pour éviter l'index bloat (thin content UGC).
-
-  // ============================================
-  // PAGES SEO INTENT (SOLUTIONS)
-  // ============================================
   const solutionPages: MetadataRoute.Sitemap = [
     'home-staging-virtuel',
     'simulateur-decoration-interieur',
@@ -248,19 +233,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     'decoration-salon',
     'decoration-chambre',
     'avant-apres-decoration',
-  ].map((slug) => ({
-    url: `${BASE_URL}/solution/${slug}`,
-    lastModified: now,
-    changeFrequency: 'monthly' as const,
-    priority: 0.7,
-  }));
+  ].flatMap((slug) =>
+    withAlternatesForAllLocales(`/solution/${slug}`, {
+      lastModified: now,
+      changeFrequency: 'monthly' as const,
+      priority: 0.7,
+    }),
+  );
 
   return [
-    ...staticPages, 
-    ...blogIndexPage, 
-    ...articlePages, 
+    ...staticPages,
+    ...blogIndexPage,
+    ...articlePages,
     ...cityIndexPage,
-    ...cityPages, 
+    ...cityPages,
     ...stylePages,
     ...roomPages,
     ...solutionPages,

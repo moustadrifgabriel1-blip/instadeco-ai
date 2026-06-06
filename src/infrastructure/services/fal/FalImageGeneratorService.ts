@@ -34,6 +34,7 @@ import {
   HOME_STAGING_LOCK_PROMPT,
   HOME_STAGING_NEGATIVE,
 } from '@/src/infrastructure/services/fal/flux-presets';
+import { safeFetchImage } from '@/src/shared/utils/safe-url';
 
 // --- CONSTANTS & MAPPINGS ---
 
@@ -207,7 +208,8 @@ export class FalImageGeneratorService implements IImageGeneratorService {
       try {
         if (options.controlImageUrl.startsWith('http')) {
           // Télécharger l'image depuis l'URL externe (Supabase signed URL)
-          const imgResponse = await fetch(options.controlImageUrl);
+          // safeFetchImage = garde anti-SSRF (rejette IP internes/metadata) + timeout
+          const imgResponse = await safeFetchImage(options.controlImageUrl);
           if (!imgResponse.ok) {
             throw new Error(`Failed to download image: ${imgResponse.status}`);
           }

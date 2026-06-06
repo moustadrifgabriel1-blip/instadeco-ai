@@ -1,18 +1,23 @@
 'use client';
 
 import { useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useSupabaseBrowser } from '@/hooks/use-supabase-browser';
 
 export default function ResetPasswordPage() {
-  const supabase = createClient();
+  const supabase = useSupabaseBrowser();
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [error, setError] = useState('');
 
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!supabase) {
+      setError('Configuration indisponible. Réessayez dans un instant.');
+      setStatus('error');
+      return;
+    }
     setStatus('loading');
     setError('');
 

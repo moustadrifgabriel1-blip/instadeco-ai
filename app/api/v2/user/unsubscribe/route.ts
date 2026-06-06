@@ -13,7 +13,12 @@ import crypto from 'crypto';
 export const dynamic = 'force-dynamic';
 
 function generateUnsubscribeToken(email: string): string {
-  const secret = process.env.CRON_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY || 'fallback-secret';
+  // Secret dédié de préférence ; repli sur CRON_SECRET (roté). Plus de littéral
+  // prédictible 'fallback-secret' (qui rendait les tokens forgeables).
+  const secret = process.env.UNSUBSCRIBE_SECRET || process.env.CRON_SECRET;
+  if (!secret) {
+    throw new Error('UNSUBSCRIBE_SECRET (ou CRON_SECRET) requis pour signer les liens de désinscription.');
+  }
   return crypto.createHmac('sha256', secret).update(email.toLowerCase()).digest('hex').slice(0, 32);
 }
 

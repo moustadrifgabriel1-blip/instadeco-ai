@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      const url = `${siteUrl}/blog/${article.slug}`;
+      const url = `${siteUrl}/fr/blog/${article.slug}`;
       const results = await seoService.notifyAll(url);
 
       return NextResponse.json({
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
         { limit: 10, sortBy: 'publishedAt', sortOrder: 'desc' }
       );
 
-      const urls = articles.map((a) => `${siteUrl}/blog/${a.slug}`);
+      const urls = articles.map((a) => `${siteUrl}/fr/blog/${a.slug}`);
       const batchResult = await seoService.notifyBatch(urls);
 
       // Ping également le sitemap

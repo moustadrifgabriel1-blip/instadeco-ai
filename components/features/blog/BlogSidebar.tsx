@@ -4,7 +4,7 @@
  * Sidebar avec tags populaires et articles récents.
  */
 
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { Tag, TrendingUp, Clock } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';

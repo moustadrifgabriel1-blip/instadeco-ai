@@ -106,6 +106,80 @@ export function checkRateLimit(
 }
 
 /**
+ * ============================================================
+ * Rate-limiting DISTRIBUÉ (Supabase) — sec-05
+ *
+ * La Map mémoire ci-dessus est process-local : sur Vercel
+ * serverless multi-instance, chaque instance a son propre compteur,
+ * ce qui rend les limites (trial 1/IP/24h, generate 10/min)
+ * contournables. `checkRateLimitDistributed` utilise une table
+ * Supabase partagée (RPC atomique `increment_rate_limit`) avec
+ * fallback automatique sur la Map mémoire si la DB est indisponible.
+ *
+ * La signature publique de `checkRateLimit` reste inchangée pour
+ * ne pas casser les appelants existants.
+ * ============================================================
+ */
+
+/**
+ * Vérifie un rate limit via le store Supabase partagé (atomique).
+ * Fallback transparent sur le cache mémoire si la table/DB est
+ * indisponible (erreur réseau, RPC manquante, env non configuré).
+ *
+ * Retourne le même `RateLimitResult` que `checkRateLimit`.
+ */
+export async function checkRateLimitDistributed(
+  identifier: string,
+  config: RateLimitConfig
+): Promise<RateLimitResult> {
+  const key = config.prefix ? `${config.prefix}:${identifier}` : identifier;
+
+  try {
+    // Import dynamique pour éviter de charger le client admin (et ses
+    // env vars) lors d'un usage purement mémoire / au build.
+    const { getSupabaseAdmin } = await import('@/lib/supabase/admin-client');
+    const supabase = getSupabaseAdmin();
+
+    // Timeout court : un rate-limit ne doit JAMAIS faire hang une requête.
+    // Si Supabase traîne / est injoignable (DNS, réseau), on abandonne vite
+    // et on retombe sur le fallback mémoire (catch ci-dessous).
+    const { data, error } = await supabase
+      .rpc('increment_rate_limit', {
+        p_key: key,
+        p_max: config.maxRequests,
+        p_window_seconds: config.windowSeconds,
+      })
+      .abortSignal(AbortSignal.timeout(1500));
+
+    if (error || !data) {
+      throw error ?? new Error('increment_rate_limit returned no data');
+    }
+
+    const row = data as {
+      allowed: boolean;
+      remaining: number;
+      retry_after: number;
+      reset_at: number;
+    };
+
+    return {
+      success: row.allowed,
+      remaining: Math.max(0, row.remaining ?? 0),
+      resetAt: row.reset_at ?? Date.now() + config.windowSeconds * 1000,
+      retryAfter: row.allowed ? undefined : Math.max(1, row.retry_after ?? config.windowSeconds),
+    };
+  } catch (err) {
+    // Fallback mémoire : conservateur, ne fail jamais ouvert silencieusement
+    // côté process, mais reste fonctionnel si la DB est down.
+    console.warn(
+      `[RateLimit] Supabase store indisponible, fallback mémoire (key=${key}):`,
+      err instanceof Error ? err.message : err
+    );
+    return checkRateLimit(identifier, config);
+  }
+}
+
+/**
  * Configurations prédéfinies pour différents endpoints
  */
 export const RATE_LIMIT_CONFIGS = {

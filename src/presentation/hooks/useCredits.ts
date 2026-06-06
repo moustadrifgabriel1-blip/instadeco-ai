@@ -19,7 +19,6 @@ import { createClient } from '@/lib/supabase/client';
  */
 export function useCredits(): UseCreditsReturn {
   const { user } = useAuth();
-  const supabase = createClient();
   const abortControllerRef = useRef<AbortController | null>(null);
 
   const [credits, setCredits] = useState<number>(0);
@@ -103,11 +102,27 @@ export function useCredits(): UseCreditsReturn {
 
   // Charger au montage et écouter les changements en temps réel
   useEffect(() => {
-    fetchCredits();
+    void fetchCredits();
 
-    // Écouter les changements via Supabase Realtime
-    if (!user) return;
+    if (!user) {
+      return () => {
+        if (abortControllerRef.current) {
+          abortControllerRef.current.abort();
+        }
+      };
+    }
 
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!url || !key) {
+      return () => {
+        if (abortControllerRef.current) {
+          abortControllerRef.current.abort();
+        }
+      };
+    }
+
+    const supabase = createClient();
     const channel = supabase
       .channel(`credits-hook-${user.id}`)
       .on(
@@ -136,7 +151,7 @@ export function useCredits(): UseCreditsReturn {
         abortControllerRef.current.abort();
       }
     };
-  }, [user, fetchCredits, supabase, formatCredits]);
+  }, [user, fetchCredits, formatCredits]);
 
   return {
     credits,

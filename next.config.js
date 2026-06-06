@@ -18,7 +18,7 @@ const nextConfig = {
     return [
       {
         // Pages dynamiques/interactives : cache court avec revalidation fréquente
-        source: '/(essai|generate|dashboard|login|signup|credits|galerie|quiz|pricing)',
+        source: '/:locale(fr|en|de)/(essai|generate|dashboard|login|signup|credits|galerie|quiz|pricing)',
         headers: [
           {
             key: 'Cache-Control',
@@ -28,7 +28,7 @@ const nextConfig = {
       },
       {
         // Page d'accueil : cache court pour voir rapidement les mises à jour
-        source: '/',
+        source: '/:locale(fr|en|de)',
         headers: [
           {
             key: 'Cache-Control',
@@ -113,8 +113,8 @@ const nextConfig = {
         ],
       },
       {
-        // Cache modéré pour le blog (mis à jour 3x/jour)
-        source: '/blog/:slug*',
+        // Cache modéré pour le blog (mis à jour 3x/jour) — routes localisées
+        source: '/:locale(fr|en|de)/blog/:slug*',
         headers: [
           {
             key: 'Cache-Control',
@@ -146,6 +146,18 @@ const nextConfig = {
         source: '/:path*',
         has: [{ type: 'host', value: 'www.instadeco.app' }],
         destination: 'https://instadeco.app/:path*',
+        permanent: true,
+      },
+      // Blog migré sous /[locale]/blog — préserve le jus SEO des URLs déjà indexées
+      // (301 vers la locale par défaut /fr). La query string est conservée automatiquement.
+      {
+        source: '/blog',
+        destination: '/fr/blog',
+        permanent: true,
+      },
+      {
+        source: '/blog/:slug+',
+        destination: '/fr/blog/:slug+',
         permanent: true,
       },
       // Trailing slash removal

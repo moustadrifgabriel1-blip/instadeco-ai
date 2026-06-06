@@ -6,38 +6,57 @@
 
 import { Suspense } from 'react';
 import { Metadata } from 'next';
+import { Link } from '@/i18n/navigation';
+import { setRequestLocale } from 'next-intl/server';
 import { Newspaper } from 'lucide-react';
 import { ArticleCard, ArticleCardSkeleton, BlogSidebar, Pagination } from '@/components/features/blog';
 import { SupabaseBlogArticleRepository } from '@/src/infrastructure/repositories/SupabaseBlogArticleRepository';
 import { ListBlogArticlesUseCase } from '@/src/application/use-cases/blog/ListBlogArticlesUseCase';
 import { BlogArticleMapper } from '@/src/application/mappers/BlogArticleMapper';
+import { getLocalizedCanonicalUrl } from '@/lib/seo/config';
 
-// Métadonnées SEO
-export const metadata: Metadata = {
-  title: 'Blog Décoration Intérieure | Conseils & Tendances | InstaDeco AI',
-  description: 'Découvrez nos articles sur la décoration intérieure, les tendances 2026, conseils de home staging et idées d\'aménagement pour votre maison en Suisse, France et Belgique.',
-  keywords: [
-    'blog décoration intérieure',
-    'tendances décoration 2026',
-    'conseils aménagement maison',
-    'home staging',
-    'rénovation intérieur',
-    'décoration Suisse',
-    'décoration France',
-    'décoration Belgique',
-  ],
-  openGraph: {
-    title: 'Blog Décoration Intérieure | InstaDeco AI',
-    description: 'Conseils, tendances et inspirations pour transformer votre intérieur.',
-    type: 'website',
-    url: 'https://instadeco.app/blog',
-  },
-  alternates: {
-    canonical: 'https://instadeco.app/blog',
-  },
-};
+// Métadonnées SEO (localisées)
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return {
+    title: 'Blog Décoration Intérieure | Conseils & Tendances | InstaDeco AI',
+    description: 'Découvrez nos articles sur la décoration intérieure, les tendances 2026, conseils de home staging et idées d\'aménagement pour votre maison en Suisse, France et Belgique.',
+    keywords: [
+      'blog décoration intérieure',
+      'tendances décoration 2026',
+      'conseils aménagement maison',
+      'home staging',
+      'rénovation intérieur',
+      'décoration Suisse',
+      'décoration France',
+      'décoration Belgique',
+    ],
+    openGraph: {
+      title: 'Blog Décoration Intérieure | InstaDeco AI',
+      description: 'Conseils, tendances et inspirations pour transformer votre intérieur.',
+      type: 'website',
+      url: getLocalizedCanonicalUrl(locale, '/blog'),
+    },
+    alternates: {
+      canonical: getLocalizedCanonicalUrl(locale, '/blog'),
+      languages: {
+        'fr-FR': getLocalizedCanonicalUrl('fr', '/blog'),
+        en: getLocalizedCanonicalUrl('en', '/blog'),
+        de: getLocalizedCanonicalUrl('de', '/blog'),
+        'x-default': getLocalizedCanonicalUrl('fr', '/blog'),
+      },
+    },
+  };
+}
 
 interface BlogPageProps {
+  params: Promise<{
+    locale: string;
+  }>;
   searchParams: Promise<{
     page?: string;
     tag?: string;
@@ -169,11 +188,13 @@ function ArticleGridSkeleton() {
 }
 
 // Page principale
-export default async function BlogPage({ searchParams }: BlogPageProps) {
-  const params = await searchParams;
-  const currentPage = Number(params.page) || 1;
-  const tag = params.tag;
-  const search = params.search;
+export default async function BlogPage({ params, searchParams }: BlogPageProps) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const sp = await searchParams;
+  const currentPage = Number(sp.page) || 1;
+  const tag = sp.tag;
+  const search = sp.search;
 
   // Récupérer les données en parallèle
   const [articlesData, sidebarData] = await Promise.all([
@@ -204,13 +225,13 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
           <span className="text-muted-foreground">Filtré par :</span>
           <span className="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
             {tag}
-            <a
+            <Link
               href="/blog"
               className="ml-2 text-primary/70 hover:text-primary"
               aria-label="Supprimer le filtre"
             >
               ×
-            </a>
+            </Link>
           </span>
         </div>
       )}
@@ -255,7 +276,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
             '@type': 'Blog',
             name: 'Blog InstaDeco AI',
             description: 'Conseils et tendances en décoration intérieure',
-            url: 'https://instadeco.app/blog',
+            url: getLocalizedCanonicalUrl(locale, '/blog'),
             publisher: {
               '@type': 'Organization',
               name: 'InstaDeco AI',
@@ -269,7 +290,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
             }) => ({
               '@type': 'BlogPosting',
               headline: article.title,
-              url: `https://instadeco.app/blog/${article.slug}`,
+              url: getLocalizedCanonicalUrl(locale, `/blog/${article.slug}`),
               description: article.metaDescription,
               datePublished: article.publishedAt,
             })),

@@ -1,14 +1,9 @@
 import { NextResponse } from 'next/server';
-import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
 import { buildUnsubscribeUrl } from '@/lib/utils/unsubscribe';
+import { supabaseAdmin } from '@/lib/supabase/admin-client';
 
 export const dynamic = 'force-dynamic';
-
-const supabaseAdmin = createSupabaseClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'InstaDeco AI <contact@instadeco.app>';
 
@@ -43,6 +38,42 @@ export async function GET(req: Request) {
     const results = { j3: 0, j7: 0, j14: 0, quiz: 0, trial_j1: 0, trial_j3: 0, trial_j7: 0, errors: 0 };
 
     // ========================================
+    // CAP QUOTIDIEN GLOBAL D'ENVOIS (cost-004)
+    // Resend free tier = 100 emails/jour. On plafonne sous ce seuil
+    // pour ne jamais basculer sur la facturation payante (~20$/mois).
+    // Configurable via RESEND_DAILY_CAP (defaut 90).
+    // ========================================
+    const DAILY_EMAIL_CAP = (() => {
+      const raw = Number(process.env.RESEND_DAILY_CAP);
+      return Number.isFinite(raw) && raw > 0 ? Math.floor(raw) : 90;
+    })();
+    let sentCount = 0;
+    let deferredCount = 0;
+
+    /**
+     * Envoie un email si le cap quotidien n'est pas atteint.
+     * Retourne 'sent' | 'deferred' | 'error'.
+     * Quand le cap est atteint, l'envoi est reporte au prochain run du cron
+     * (les utilisateurs restent dans la fenetre de selection au run suivant).
+     */
+    const sendCapped = async (
+      payload: Parameters<NonNullable<typeof resend>['emails']['send']>[0]
+    ): Promise<'sent' | 'deferred' | 'error'> => {
+      if (sentCount >= DAILY_EMAIL_CAP) {
+        deferredCount++;
+        return 'deferred';
+      }
+      try {
+        await resend.emails.send(payload);
+        sentCount++;
+        return 'sent';
+      } catch {
+        results.errors++;
+        return 'error';
+      }
+    };
+
+    // ========================================
     // J+3 : Relance "Votre pièce attend"
     // ========================================
     const threeDaysAgo = new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000);
@@ -65,16 +96,13 @@ export async function GET(req: Request) {
         .eq('user_id', user.id);
 
       if ((count || 0) === 0) {
-        try {
-          await resend.emails.send({
-            from: FROM_EMAIL,
-            to: [user.email],
-            subject: '🏠 Votre pièce attend d\'être transformée !',
-            html: buildJ3Email(user.full_name || 'là', user.email),
-          });
+        if (await sendCapped({
+          from: FROM_EMAIL,
+          to: [user.email],
+          subject: '🏠 Votre pièce attend d\'être transformée !',
+          html: buildJ3Email(user.full_name || 'là', user.email),
+        }) === 'sent') {
           results.j3++;
-        } catch {
-          results.errors++;
         }
       }
     }
@@ -95,16 +123,13 @@ export async function GET(req: Request) {
       // Vérifier le consentement marketing (RGPD: opt-in strict)
       if (user.consent_marketing === false) continue;
 
-      try {
-        await resend.emails.send({
-          from: FROM_EMAIL,
-          to: [user.email],
-          subject: '✨ 3 transformations qui vont vous inspirer',
-          html: buildJ7Email(user.full_name || 'là', user.email),
-        });
+      if (await sendCapped({
+        from: FROM_EMAIL,
+        to: [user.email],
+        subject: '✨ 3 transformations qui vont vous inspirer',
+        html: buildJ7Email(user.full_name || 'là', user.email),
+      }) === 'sent') {
         results.j7++;
-      } catch {
-        results.errors++;
       }
     }
 
@@ -132,16 +157,13 @@ export async function GET(req: Request) {
         .eq('type', 'purchase');
 
       if ((count || 0) === 0) {
-        try {
-          await resend.emails.send({
-            from: FROM_EMAIL,
-            to: [user.email],
-            subject: '🎁 Offre exclusive : -20% sur votre premier pack',
-            html: buildJ14Email(user.full_name || 'là', user.email),
-          });
+        if (await sendCapped({
+          from: FROM_EMAIL,
+          to: [user.email],
+          subject: '🎁 Offre exclusive : -20% sur votre premier pack',
+          html: buildJ14Email(user.full_name || 'là', user.email),
+        }) === 'sent') {
           results.j14++;
-        } catch {
-          results.errors++;
         }
       }
     }
@@ -168,16 +190,13 @@ export async function GET(req: Request) {
       // Extraire le style du quiz depuis les metadata
       const quizStyle = lead.metadata?.style || 'Moderne';
 
-      try {
-        await resend.emails.send({
-          from: FROM_EMAIL,
-          to: [lead.email],
-          subject: `🎨 Votre style ${quizStyle} vous attend — testez-le sur vos photos !`,
-          html: buildQuizFollowUpEmail(lead.name || 'là', lead.email, quizStyle),
-        });
+      if (await sendCapped({
+        from: FROM_EMAIL,
+        to: [lead.email],
+        subject: `🎨 Votre style ${quizStyle} vous attend — testez-le sur vos photos !`,
+        html: buildQuizFollowUpEmail(lead.name || 'là', lead.email, quizStyle),
+      }) === 'sent') {
         results.quiz++;
-      } catch {
-        results.errors++;
       }
     }
 
@@ -205,16 +224,13 @@ export async function GET(req: Request) {
       if ((userCount || 0) > 0) continue; // Déjà inscrit, skip
 
       const style = lead.metadata?.style || 'Moderne';
-      try {
-        await resend.emails.send({
-          from: FROM_EMAIL,
-          to: [lead.email],
-          subject: '🏠 Votre transformation déco vous attend !',
-          html: buildTrialJ1Email(lead.name || 'là', lead.email, style),
-        });
+      if (await sendCapped({
+        from: FROM_EMAIL,
+        to: [lead.email],
+        subject: '🏠 Votre transformation déco vous attend !',
+        html: buildTrialJ1Email(lead.name || 'là', lead.email, style),
+      }) === 'sent') {
         results.trial_j1++;
-      } catch {
-        results.errors++;
       }
     }
 
@@ -239,16 +255,13 @@ export async function GET(req: Request) {
 
       if ((userCount || 0) > 0) continue;
 
-      try {
-        await resend.emails.send({
-          from: FROM_EMAIL,
-          to: [lead.email],
-          subject: '✨ 3 crédits offerts — Transformez toutes vos pièces',
-          html: buildTrialJ3Email(lead.name || 'là', lead.email),
-        });
+      if (await sendCapped({
+        from: FROM_EMAIL,
+        to: [lead.email],
+        subject: '✨ 3 crédits offerts — Transformez toutes vos pièces',
+        html: buildTrialJ3Email(lead.name || 'là', lead.email),
+      }) === 'sent') {
         results.trial_j3++;
-      } catch {
-        results.errors++;
       }
     }
 
@@ -273,24 +286,26 @@ export async function GET(req: Request) {
 
       if ((userCount || 0) > 0) continue;
 
-      try {
-        await resend.emails.send({
-          from: FROM_EMAIL,
-          to: [lead.email],
-          subject: '🎁 Dernière chance : -20% sur vos crédits déco',
-          html: buildTrialJ7Email(lead.name || 'là', lead.email),
-        });
+      if (await sendCapped({
+        from: FROM_EMAIL,
+        to: [lead.email],
+        subject: '🎁 Dernière chance : -20% sur vos crédits déco',
+        html: buildTrialJ7Email(lead.name || 'là', lead.email),
+      }) === 'sent') {
         results.trial_j7++;
-      } catch {
-        results.errors++;
       }
     }
 
     console.log(`[Email Nurturing] ✅ J3: ${results.j3}, J7: ${results.j7}, J14: ${results.j14}, Quiz: ${results.quiz}, Trial-J1: ${results.trial_j1}, Trial-J3: ${results.trial_j3}, Trial-J7: ${results.trial_j7}, Errors: ${results.errors}`);
+    console.log(`[Email Nurturing] 📊 Envoyes: ${sentCount}/${DAILY_EMAIL_CAP} (cap quotidien). Reportes au prochain run: ${deferredCount}`);
+    if (deferredCount > 0) {
+      console.warn(`[Email Nurturing] ⚠️ Cap quotidien Resend atteint (${DAILY_EMAIL_CAP}). ${deferredCount} email(s) reporte(s) au prochain run pour rester sur le free tier.`);
+    }
 
     return NextResponse.json({
       success: true,
       results,
+      cap: { limit: DAILY_EMAIL_CAP, sent: sentCount, deferred: deferredCount },
       executedAt: now.toISOString(),
     });
   } catch (error) {

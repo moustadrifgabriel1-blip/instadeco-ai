@@ -56,8 +56,9 @@ export async function requireAuth(): Promise<
 export function verifyFalWebhookSecret(req: Request): boolean {
   const secret = process.env.FAL_WEBHOOK_SECRET;
   if (!secret) {
-    // Si pas de secret configuré, rejeter par défaut en production
-    return process.env.NODE_ENV !== 'production';
+    // Fail-closed : sans secret configuré, on rejette TOUJOURS (y compris hors prod).
+    // Un fail-open en dev/preview laissait passer des webhooks non signés.
+    return false;
   }
   const headerSecret = req.headers.get('x-fal-webhook-secret') 
     || req.headers.get('authorization')?.replace('Bearer ', '');

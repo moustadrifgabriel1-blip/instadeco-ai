@@ -2,14 +2,14 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/client';
+import { useSupabaseBrowser } from '@/hooks/use-supabase-browser';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 
 function SignupForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const supabase = createClient();
+  const supabase = useSupabaseBrowser();
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -28,6 +28,10 @@ function SignupForm() {
 
   const handleEmailSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!supabase) {
+      setError('Configuration indisponible. Réessayez dans un instant.');
+      return;
+    }
     setLoading(true);
     setError('');
 
@@ -97,6 +101,10 @@ function SignupForm() {
   const handleGoogleSignup = async () => {
     if (!acceptTerms) {
       setError('Veuillez accepter les CGV et la Politique de Confidentialité.');
+      return;
+    }
+    if (!supabase) {
+      setError('Configuration indisponible. Réessayez dans un instant.');
       return;
     }
     setLoading(true);

@@ -47,8 +47,8 @@ export async function GET() {
       (article) => `
     <item>
       <title><![CDATA[${article.title}]]></title>
-      <link>${BASE_URL}/blog/${article.slug}</link>
-      <guid isPermaLink="true">${BASE_URL}/blog/${article.slug}</guid>
+      <link>${BASE_URL}/fr/blog/${article.slug}</link>
+      <guid isPermaLink="true">${BASE_URL}/fr/blog/${article.slug}</guid>
       <description><![CDATA[${article.meta_description}]]></description>
       <pubDate>${new Date(article.published_at).toUTCString()}</pubDate>
       ${article.tags?.map((tag: string) => `<category>${tag}</category>`).join('\n      ') || ''}
@@ -60,7 +60,7 @@ export async function GET() {
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
   <channel>
     <title>${SEO_CONFIG.siteName} - Blog Décoration Intérieure</title>
-    <link>${BASE_URL}/blog</link>
+    <link>${BASE_URL}/fr/blog</link>
     <description>${SEO_CONFIG.siteDescription}</description>
     <language>fr</language>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>

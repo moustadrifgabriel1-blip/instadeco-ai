@@ -19,9 +19,8 @@ function verifyCronSecret(request: NextRequest): boolean {
   if (!cronSecret) return false;
   if (authHeader === `Bearer ${cronSecret}`) return true;
 
-  // Vercel v2 signature
-  const vercelSignature = request.headers.get('x-vercel-signature');
-  return !!vercelSignature;
+  // Pas de confiance à x-vercel-signature seul (header spoofable → bypass).
+  return false;
 }
 
 export async function GET(request: NextRequest) {

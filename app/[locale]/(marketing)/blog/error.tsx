@@ -5,7 +5,7 @@
  * Capture et affiche les erreurs côté client et serveur
  */
 
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { useEffect } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';

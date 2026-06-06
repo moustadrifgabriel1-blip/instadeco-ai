@@ -32,14 +32,10 @@ function verifyCronSecret(request: NextRequest): boolean {
   }
 
   // Vercel envoie le secret dans le header Authorization: Bearer <CRON_SECRET>
+  // (fourni automatiquement par Vercel Cron quand CRON_SECRET est défini en env var).
+  // NOTE: on ne fait PAS confiance à la simple présence de x-vercel-signature
+  // (header spoofable → bypass d'auth + coût IA déclenché par un tiers).
   if (authHeader === `Bearer ${cronSecret}`) {
-    return true;
-  }
-
-  // Vercel peut aussi émettre vers des routes via x-vercel-signature (v2)
-  const vercelSignature = request.headers.get('x-vercel-signature');
-  if (vercelSignature) {
-    // Si Vercel gère la signature, on fait aussi confiance
     return true;
   }
 
@@ -250,7 +246,7 @@ Crée un titre avec un ANGLE UNIQUE : chiffre précis, question provocante, form
 
     // 11. Notifier les moteurs de recherche
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://instadeco.app';
-    const articleUrl = `${siteUrl}/blog/${savedArticle.slug}`;
+    const articleUrl = `${siteUrl}/fr/blog/${savedArticle.slug}`;
     
     const seoResults = await seoService.notifyAll(articleUrl);
     const successfulNotifications = seoResults.filter((r) => r.success).length;

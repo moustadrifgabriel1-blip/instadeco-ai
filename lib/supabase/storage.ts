@@ -1,10 +1,6 @@
-import { createClient as createSupabaseClient } from '@supabase/supabase-js';
-
-// Client admin (bypass RLS) 
-const supabaseAdmin = createSupabaseClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import type { SupabaseClient } from '@supabase/supabase-js';
+import { supabaseAdmin } from './admin-client';
+import { safeFetchImage } from '@/src/shared/utils/safe-url';
 
 /**
  * Upload une image base64 vers Supabase Storage (côté serveur)
@@ -75,8 +71,8 @@ export async function uploadImageFromUrl(
   try {
     console.log(`[Storage] Downloading image from: ${imageUrl}`);
 
-    // Télécharger l'image depuis l'URL
-    const response = await fetch(imageUrl);
+    // Télécharger l'image depuis l'URL (garde anti-SSRF + timeout)
+    const response = await safeFetchImage(imageUrl);
     if (!response.ok) {
       throw new Error(`Failed to fetch image: ${response.statusText}`);
     }
@@ -144,7 +140,7 @@ export async function uploadImageToStorageClient(
   file: File | Blob,
   userId: string,
   folder: 'inputs' | 'outputs' = 'inputs',
-  supabaseClient: ReturnType<typeof createSupabaseClient>
+  supabaseClient: SupabaseClient
 ): Promise<string> {
   try {
     const timestamp = Date.now();

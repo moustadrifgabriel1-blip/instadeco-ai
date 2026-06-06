@@ -3,12 +3,12 @@
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
+import { Link } from '@/i18n/navigation';
 
 export function CreditBadge() {
   const { user } = useAuth();
   const [credits, setCredits] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
-  const supabase = createClient();
 
   useEffect(() => {
     if (!user) {
@@ -16,6 +16,15 @@ export function CreditBadge() {
       setLoading(false);
       return;
     }
+
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!url || !key) {
+      setLoading(false);
+      return;
+    }
+
+    const supabase = createClient();
 
     // Récupérer les crédits initiaux
     const fetchCredits = async () => {
@@ -57,7 +66,7 @@ export function CreditBadge() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, supabase]);
+  }, [user]);
 
   if (loading) {
     return (
@@ -79,12 +88,12 @@ export function CreditBadge() {
         {credits} {credits > 1 ? 'crédits' : 'crédit'}
       </span>
       {credits === 0 && (
-        <a 
-          href="/pricing" 
+        <Link
+          href="/pricing"
           className="ml-2 text-xs text-blue-600 hover:underline"
         >
           Recharger
-        </a>
+        </Link>
       )}
     </div>
   );

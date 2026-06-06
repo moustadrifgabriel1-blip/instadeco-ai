@@ -2,7 +2,7 @@
  * Page 404 du blog
  */
 
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { FileQuestion } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 

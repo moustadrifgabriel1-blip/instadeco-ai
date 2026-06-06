@@ -1,11 +1,31 @@
 import { Metadata } from 'next';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
+import { getTranslations } from 'next-intl/server';
+import { getLocalizedCanonicalUrl } from '@/lib/seo/config';
+import { LegalFrenchBodyNotice } from '@/components/legal/LegalFrenchBodyNotice';
 
-export const metadata: Metadata = {
-  title: 'Mentions Légales | InstaDeco AI',
-  description: 'Informations légales sur InstaDeco AI - Éditeur, hébergeur et conditions d\'utilisation du service.',
-  robots: 'index, follow',
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'LegalMeta' });
+  return {
+    title: t('mentionsTitle'),
+    description: t('mentionsDescription'),
+    robots: 'index, follow',
+    alternates: {
+      canonical: getLocalizedCanonicalUrl(locale, '/legal/mentions-legales'),
+      languages: {
+        'fr-FR': getLocalizedCanonicalUrl('fr', '/legal/mentions-legales'),
+        en: getLocalizedCanonicalUrl('en', '/legal/mentions-legales'),
+        de: getLocalizedCanonicalUrl('de', '/legal/mentions-legales'),
+        'x-default': getLocalizedCanonicalUrl('fr', '/legal/mentions-legales'),
+      },
+    },
+  };
+}
 
 export default function MentionsLegalesPage() {
   const lastUpdated = '22 janvier 2026';
@@ -13,6 +33,7 @@ export default function MentionsLegalesPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 py-16">
+        <LegalFrenchBodyNotice />
         <h1 className="text-4xl font-bold text-gray-900 mb-8">Mentions Légales</h1>
         
         <p className="text-sm text-gray-500 mb-8">

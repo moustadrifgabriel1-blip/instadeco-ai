@@ -26,6 +26,8 @@ export interface CheckoutSessionResult {
  * Événement de webhook Stripe
  */
 export interface PaymentWebhookEvent {
+  /** Identifiant unique de l'événement Stripe (evt_...), clé d'idempotence. */
+  eventId: string;
   type: string;
   sessionId: string;
   customerId: string;

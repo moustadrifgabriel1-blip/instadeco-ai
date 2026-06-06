@@ -83,6 +83,29 @@ export function getCanonicalUrl(path: string): string {
 }
 
 /**
+ * URL canonique avec préfixe de locale (/fr, /en, /de).
+ * @param locale Code langue (fr | en | de)
+ * @param path Chemin sans locale, ex: '/' ou '/pricing'
+ */
+export function getLocalizedCanonicalUrl(locale: string, path: string): string {
+  const base = SEO_CONFIG.siteUrl.replace(/\/$/, '');
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  if (cleanPath === '/') {
+    return `${base}/${locale}`;
+  }
+  return `${base}/${locale}${cleanPath}`;
+}
+
+/** Chemin relatif avec préfixe locale (ex: withLocalePath('fr', '/pricing') → '/fr/pricing') */
+export function withLocalePath(locale: string, path: string): string {
+  if (path === '/' || path === '') {
+    return `/${locale}`;
+  }
+  const clean = path.startsWith('/') ? path : `/${path}`;
+  return `/${locale}${clean}`;
+}
+
+/**
  * Génère l'URL complète pour les ressources (images, etc.)
  */
 export function getFullUrl(path: string): string {

@@ -1,10 +1,32 @@
 'use client';
 
-import { useState, useEffect, useCallback, Suspense } from 'react';
-import Link from 'next/link';
-import { Check, Sparkles, Clock, CreditCard, Image, Download, Palette, Building2, HelpCircle, ChevronDown, Heart, Shield, Zap, Users, TrendingUp, ArrowRight, Repeat, Crown } from 'lucide-react';
+import { useState, useEffect, useCallback, Suspense, useMemo } from 'react';
+import { Link } from '@/i18n/navigation';
+import { useLocale, useMessages, useTranslations } from 'next-intl';
+import type { LucideIcon } from 'lucide-react';
+import {
+  Check,
+  Sparkles,
+  Clock,
+  CreditCard,
+  Image,
+  Download,
+  Palette,
+  Building2,
+  HelpCircle,
+  ChevronDown,
+  Heart,
+  Shield,
+  Zap,
+  Users,
+  TrendingUp,
+  ArrowRight,
+  Repeat,
+  Crown,
+} from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from '@/i18n/navigation';
+import { useSearchParams } from 'next/navigation';
 import { usePurchaseCredits } from '@/src/presentation/hooks/usePurchaseCredits';
 import { createSubscriptionSession } from '@/src/presentation/api/client';
 import { SocialProofToast } from '@/components/features/social-proof-toast';
@@ -15,205 +37,28 @@ import { CreditPackId, SubscriptionPlanId, BillingInterval } from '@/src/present
 
 type PricingMode = 'credits' | 'subscription';
 
-const PRICING_PLANS = [
-  {
-    id: 'pack_10' as CreditPackId,
-    name: 'Découverte',
-    credits: 10,
-    price: 9.90,
-    pricePerCredit: 0.99,
-    popular: false,
-    emoji: '🌱',
-    description: 'Parfait pour tester',
-    savings: null,
-    cta: 'Commencer maintenant',
-  },
-  {
-    id: 'pack_25' as CreditPackId,
-    name: 'Créatif',
-    credits: 25,
-    price: 19.90,
-    pricePerCredit: 0.80,
-    popular: true,
-    emoji: '✨',
-    description: 'Le plus populaire',
-    savings: 20,
-    cta: 'Choisir le Créatif',
-  },
-  {
-    id: 'pack_50' as CreditPackId,
-    name: 'Pro',
-    credits: 50,
-    price: 34.90,
-    pricePerCredit: 0.70,
-    popular: false,
-    emoji: '🚀',
-    description: 'Meilleur rapport qualité-prix',
-    savings: 30,
-    cta: 'Passer au Pro',
-  },
+/** Icônes FAQ — ordre identique à `Pricing.faq` dans les fichiers de messages */
+const FAQ_ICONS_ORDER: LucideIcon[] = [
+  CreditCard,
+  Clock,
+  Image,
+  Building2,
+  Palette,
+  Download,
+  CreditCard,
+  HelpCircle,
+  Repeat,
+  Crown,
+  Sparkles,
+  Image,
 ];
 
-const SUBSCRIPTION_PLANS = [
-  {
-    id: 'sub_essentiel' as SubscriptionPlanId,
-    name: 'Essentiel',
-    creditsPerMonth: 30,
-    monthlyPrice: 19,
-    annualPrice: 15,
-    annualTotal: 180,
-    popular: false,
-    emoji: '🏠',
-    description: 'Pour les passionnés de déco',
-    pricePerCredit: { monthly: 0.63, annual: 0.50 },
-    features: [
-      '30 crédits / mois',
-      '20+ styles de déco',
-      'Téléchargement illimité',
-      'Usage commercial inclus',
-      'Support par email',
-    ],
-    cta: 'Choisir Essentiel',
-  },
-  {
-    id: 'sub_pro' as SubscriptionPlanId,
-    name: 'Pro',
-    creditsPerMonth: 80,
-    monthlyPrice: 39,
-    annualPrice: 31,
-    annualTotal: 372,
-    popular: true,
-    emoji: '⭐',
-    description: 'Pour les professionnels',
-    pricePerCredit: { monthly: 0.49, annual: 0.39 },
-    features: [
-      '80 crédits / mois',
-      '20+ styles de déco',
-      'HD+ inclus (2048px)',
-      'Usage commercial inclus',
-      'Support prioritaire',
-      'Crédits non utilisés reportés',
-    ],
-    cta: 'Choisir Pro',
-  },
-  {
-    id: 'sub_business' as SubscriptionPlanId,
-    name: 'Business',
-    creditsPerMonth: 200,
-    monthlyPrice: 79,
-    annualPrice: 63,
-    annualTotal: 756,
-    popular: false,
-    emoji: '🏢',
-    description: 'Pour les agences & entreprises',
-    pricePerCredit: { monthly: 0.40, annual: 0.32 },
-    features: [
-      '200 crédits / mois',
-      '20+ styles de déco',
-      'HD+ inclus (2048px)',
-      'Usage commercial illimité',
-      'Support dédié',
-      'Crédits non utilisés reportés',
-    ],
-    cta: 'Choisir Business',
-  },
-];
-
-const USE_CASE_HIGHLIGHTS = [
-  {
-    profile: 'Propriétaires',
-    icon: '🏠',
-    text: 'Testez plusieurs styles sur votre propre photo avant de vous engager dans des travaux. Comparez moderne, scandinave ou japandi en quelques secondes.',
-    pack: 'Découverte',
-  },
-  {
-    profile: 'Agents immobiliers',
-    icon: '🏢',
-    text: 'Meublez virtuellement vos biens vides pour aider les acheteurs à se projeter. Un complément au home staging physique, rapide et économique.',
-    pack: 'Pro',
-  },
-  {
-    profile: 'Architectes d\'intérieur',
-    icon: '🎨',
-    text: 'Montrez un avant/après instantané à vos clients pour valider la direction déco avant de réaliser le projet. Idéal en phase de proposition.',
-    pack: 'Créatif',
-  },
-];
-
-const FAQ_ITEMS = [
-  {
-    category: 'credits',
-    icon: CreditCard,
-    question: "Combien coûte une génération d'image ?",
-    answer: "1 crédit = 1 génération. C'est aussi simple que ça ! Chaque génération vous donne une image en haute qualité (1024×1024 pixels) que vous pouvez télécharger immédiatement."
-  },
-  {
-    category: 'credits',
-    icon: Clock,
-    question: "Mes crédits expirent-ils ?",
-    answer: "Non, jamais ! 🎉 Vos crédits restent sur votre compte indéfiniment. Utilisez-les quand vous voulez, à votre rythme. Pas de pression, pas de date limite."
-  },
-  {
-    category: 'quality',
-    icon: Image,
-    question: "Quelle est la qualité des images générées ?",
-    answer: "Toutes les images sont en haute définition (1024×1024 pixels). Vous pouvez aussi débloquer la version HD+ (2048×2048) pour seulement 4,99€ par image - parfait pour l'impression grand format !"
-  },
-  {
-    category: 'usage',
-    icon: Building2,
-    question: "Puis-je utiliser les images pour mon activité pro ?",
-    answer: "Absolument ! Toutes les images que vous générez vous appartiennent. Vous pouvez les utiliser pour vos projets personnels, votre portfolio, vos clients, vos réseaux sociaux... Aucune restriction d'usage commercial."
-  },
-  {
-    category: 'quality',
-    icon: Palette,
-    question: "Comment choisir le bon style pour ma pièce ?",
-    answer: "On propose 12 styles différents (Moderne, Scandinave, Japandi, Bohème...). Notre conseil : choisissez le style qui correspond à l'ambiance que vous voulez créer, et ajustez l'intensité de transformation selon vos goûts. Le mode 'Décor uniquement' garde vos meubles et change juste la déco !"
-  },
-  {
-    category: 'usage',
-    icon: Download,
-    question: "Comment télécharger mes créations ?",
-    answer: "Super simple ! Une fois l'image générée, cliquez sur 'Télécharger' et c'est fait. L'image se sauvegarde automatiquement sur votre appareil. Vous retrouvez aussi tout votre historique dans votre tableau de bord."
-  },
-  {
-    category: 'payment',
-    icon: CreditCard,
-    question: "Quels moyens de paiement acceptez-vous ?",
-    answer: "On accepte toutes les cartes bancaires (Visa, Mastercard, American Express), ainsi qu'Apple Pay et Google Pay. Paiement 100% sécurisé via Stripe, leader mondial du paiement en ligne."
-  },
-  {
-    category: 'payment',
-    icon: HelpCircle,
-    question: "Puis-je obtenir un remboursement ?",
-    answer: "Oui ! Si vous n'avez pas utilisé vos crédits, vous pouvez demander un remboursement intégral sous 14 jours après l'achat. Il suffit de nous contacter par email. Les crédits déjà utilisés ne sont pas remboursables."
-  },
-  {
-    category: 'subscription',
-    icon: Repeat,
-    question: "Comment fonctionne l'abonnement ?",
-    answer: "Vous recevez vos crédits chaque mois automatiquement. Pas de surprise, tout est transparent. Vous pouvez annuler à tout moment depuis votre espace client, sans frais ni justification. L'annuel offre 20% de réduction supplémentaire."
-  },
-  {
-    category: 'subscription',
-    icon: Crown,
-    question: "Mes crédits non utilisés sont-ils reportés ?",
-    answer: "Oui, avec les abonnements Pro et Business, vos crédits non utilisés sont reportés au mois suivant (dans la limite de 2 mois). Rien ne se perd !"
-  },
-  {
-    category: 'quality',
-    icon: Sparkles,
-    question: "Que faire si le résultat ne me plaît pas ?",
-    answer: "L'IA est créative ! Si un résultat ne vous convient pas, relancez simplement une génération avec les mêmes paramètres : vous obtiendrez une nouvelle proposition. Vous pouvez aussi ajuster l'intensité de transformation ou changer de style."
-  },
-  {
-    category: 'usage',
-    icon: Image,
-    question: "Quels types de photos fonctionnent le mieux ?",
-    answer: "Pour de meilleurs résultats : prenez une photo bien éclairée, de face (pas d'angle extrême), et qui montre bien l'espace. Évitez les photos floues ou trop sombres. Les pièces vides ou peu meublées donnent plus de liberté à l'IA !"
-  },
-];
+const TRUST_ICON_MAP: Record<string, LucideIcon> = {
+  stripe: Shield,
+  credits: Clock,
+  refund: ArrowRight,
+  speed: Zap,
+};
 
 export default function PricingPageWrapper() {
   return (
@@ -224,6 +69,37 @@ export default function PricingPageWrapper() {
 }
 
 function PricingPage() {
+  const P = useMessages().Pricing as Record<string, unknown>;
+  const t = useTranslations('Pricing');
+  const PRICING_PLANS = P.creditPacks as PricingPlan[];
+  const SUBSCRIPTION_PLANS = P.subscriptions as SubscriptionPlan[];
+  const USE_CASE_HIGHLIGHTS = P.useCases as {
+    icon: string;
+    profile: string;
+    text: string;
+    pack: string;
+  }[];
+  const FAQ_ITEMS = useMemo(
+    () =>
+      (P.faq as Array<{ category: string; question: string; answer: string }>).map((item, index) => ({
+        ...item,
+        icon: FAQ_ICONS_ORDER[index] ?? HelpCircle,
+      })),
+    [P],
+  );
+
+  const howItWorksSteps = P.howItWorksSteps as Array<{
+    step: string;
+    emoji: string;
+    title: string;
+    desc: string;
+  }>;
+  const compareRows = P.compareRows as Array<{ label: string; us: string; them: string }>;
+  const trustBadges = P.trustBadges as Array<{ key: string; label: string }>;
+  const creditPacksBullets = P.creditPacksBullets as string[];
+  const subscriptionBulletList = P.subscriptionBullets as string[];
+
+  const locale = useLocale();
   const { user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -246,8 +122,8 @@ function PricingPage() {
 
     const checkoutUrl = await purchase({
       packId: planId,
-      successUrl: `${window.location.origin}/dashboard?payment=success`,
-      cancelUrl: `${window.location.origin}/pricing?payment=cancelled`,
+      successUrl: `${window.location.origin}/${locale}/dashboard?payment=success`,
+      cancelUrl: `${window.location.origin}/${locale}/pricing?payment=cancelled`,
       couponId: couponFromUrl,
     });
 
@@ -269,19 +145,19 @@ function PricingPage() {
       const response = await createSubscriptionSession({
         planId,
         interval: billingInterval,
-        successUrl: `${window.location.origin}/dashboard?subscription=success`,
-        cancelUrl: `${window.location.origin}/pricing?subscription=cancelled`,
+        successUrl: `${window.location.origin}/${locale}/dashboard?subscription=success`,
+        cancelUrl: `${window.location.origin}/${locale}/pricing?subscription=cancelled`,
       });
 
       if (response.checkoutUrl) {
         window.location.href = response.checkoutUrl;
       }
     } catch (err) {
-      setSubError(err instanceof Error ? err.message : 'Erreur lors de la souscription');
+      setSubError(err instanceof Error ? err.message : t('subscriptionError'));
     } finally {
       setSubLoading(false);
     }
-  }, [user, router, billingInterval]);
+  }, [user, router, billingInterval, locale, t]);
 
   const displayError = error || subError;
   const isAnyLoading = isLoading || subLoading;
@@ -295,19 +171,17 @@ function PricingPage() {
         
         <div className="inline-flex items-center gap-2 bg-[#FFF0EB] text-[#D4603C] px-4 py-2 rounded-full text-sm font-medium mb-6">
           <Heart className="w-4 h-4" />
-          Choisissez la formule qui vous convient
+          {t('heroBadge')}
         </div>
         
         <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[56px] font-semibold tracking-[-0.025em] text-[#2D2D2D] leading-[1.1] sm:leading-[1.07] mb-4">
-          Des tarifs simples,<br />
+          {t('heroTitleLine1')}<br />
           <span className="bg-gradient-to-r from-[#E07B54] to-[#D4603C] bg-clip-text text-transparent">
-            comme votre déco
+            {t('heroTitleLine2')}
           </span>
         </h1>
-        <p className="text-base sm:text-lg md:text-[21px] text-[#6B6B6B] max-w-2xl mx-auto mb-8">
-          Crédits à l&apos;unité ou abonnement mensuel.
-          <br className="hidden sm:block" />
-          Trouvez la formule idéale pour vos projets déco.
+        <p className="text-base sm:text-lg md:text-[21px] text-[#6B6B6B] max-w-2xl mx-auto mb-8 whitespace-pre-line">
+          {t('heroSubtitle')}
         </p>
 
         {/* Toggle Crédits / Abonnements */}
@@ -322,7 +196,7 @@ function PricingPage() {
               }`}
             >
               <CreditCard className="w-4 h-4 hidden sm:block" />
-              Packs de crédits
+              {t('toggleCredits')}
             </button>
             <button
               onClick={() => setPricingMode('subscription')}
@@ -333,9 +207,9 @@ function PricingPage() {
               }`}
             >
               <Repeat className="w-4 h-4 hidden sm:block" />
-              Abonnements
+              {t('toggleSubscriptions')}
               <span className="absolute -top-2.5 -right-2 bg-[#4CAF50] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full animate-pulse">
-                NEW
+                {t('newBadge')}
               </span>
             </button>
           </div>
@@ -346,7 +220,7 @@ function PricingPage() {
           <div className="flex flex-col items-center gap-3 mb-4">
             <div className="flex items-center gap-3">
               <span className={`text-sm ${billingInterval === 'monthly' ? 'text-[#2D2D2D] font-medium' : 'text-[#6B6B6B]'}`}>
-                Mensuel
+                {t('monthly')}
               </span>
               <button
                 onClick={() => setBillingInterval(billingInterval === 'monthly' ? 'annual' : 'monthly')}
@@ -361,11 +235,11 @@ function PricingPage() {
                 />
               </button>
               <span className={`text-sm ${billingInterval === 'annual' ? 'text-[#2D2D2D] font-medium' : 'text-[#6B6B6B]'}`}>
-                Annuel
+                {t('annual')}
               </span>
               {billingInterval === 'annual' && (
                 <span className="bg-[#E8F4E5] text-[#2E7D32] text-xs font-bold px-2.5 py-1 rounded-full">
-                  -20%
+                  {t('annualDiscount')}
                 </span>
               )}
             </div>
@@ -373,10 +247,7 @@ function PricingPage() {
             {/* Savings highlight banner */}
             <div className="bg-gradient-to-r from-[#E8F4E5] to-[#D5EDD0] rounded-full px-4 py-1.5 text-sm">
               <span className="text-[#2E7D32] font-medium">
-                {billingInterval === 'annual' 
-                  ? '💰 Économisez jusqu\'à 192€/an avec l\'annuel' 
-                  : '✨ Jusqu\'à 60% moins cher que les packs crédits'
-                }
+                {billingInterval === 'annual' ? t('annualSavingsBanner') : t('monthlySavingsBanner')}
               </span>
             </div>
           </div>
@@ -385,16 +256,16 @@ function PricingPage() {
         {/* Social proof — faits vérifiables uniquement */}
         <div className="flex flex-wrap justify-center gap-8 sm:gap-12 mt-6">
           <div className="text-center">
-            <div className="text-2xl sm:text-3xl font-bold text-[#2D2D2D]">20+</div>
-            <div className="text-sm text-[#6B6B6B]">styles de déco</div>
+            <div className="text-2xl sm:text-3xl font-bold text-[#2D2D2D]">{t('socialProof20')}</div>
+            <div className="text-sm text-[#6B6B6B]">{t('statStyles')}</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl sm:text-3xl font-bold text-[#2D2D2D]">8</div>
-            <div className="text-sm text-[#6B6B6B]">types de pièces</div>
+            <div className="text-2xl sm:text-3xl font-bold text-[#2D2D2D]">{t('socialProof8')}</div>
+            <div className="text-sm text-[#6B6B6B]">{t('statRooms')}</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl sm:text-3xl font-bold text-[#2D2D2D]">~30s</div>
-            <div className="text-sm text-[#6B6B6B]">par génération</div>
+            <div className="text-2xl sm:text-3xl font-bold text-[#2D2D2D]">{t('socialProof30')}</div>
+            <div className="text-sm text-[#6B6B6B]">{t('statSpeed')}</div>
           </div>
         </div>
       </div>
@@ -434,17 +305,17 @@ function PricingPage() {
 
             {/* Upsell banner credits → abonnement */}
             <div className="mt-8 bg-gradient-to-r from-[#FFF8F5] to-[#FFF0EB] rounded-2xl p-6 border border-[#F5D5C8] text-center">
-              <p className="text-[#2D2D2D] font-medium mb-1">
-                💡 Besoin régulier ? L&apos;abonnement est <span className="text-[#E07B54] font-bold">jusqu&apos;à 60% moins cher</span>
+              <p className="text-[#2D2D2D] font-medium mb-1 whitespace-pre-line">
+                {t('upsellTitle')}
               </p>
               <p className="text-sm text-[#6B6B6B] mb-3">
-                Dès 0.32€/image avec un abonnement vs 0.70€ à l&apos;unité
+                {t('upsellSubtitle')}
               </p>
               <button 
                 onClick={() => setPricingMode('subscription')}
                 className="inline-flex items-center gap-2 text-[#E07B54] font-semibold text-sm hover:underline"
               >
-                Voir les abonnements <ArrowRight className="w-4 h-4" />
+                {t('upsellCta')} <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           </>
@@ -476,24 +347,22 @@ function PricingPage() {
 
         {/* Trust Badges */}
         <div className="flex flex-wrap justify-center gap-x-8 gap-y-3 mt-10">
-          {[
-            { icon: Shield, label: 'Paiement sécurisé Stripe' },
-            { icon: Clock, label: 'Crédits sans expiration' },
-            { icon: ArrowRight, label: 'Remboursement 14 jours' },
-            { icon: Zap, label: 'Résultat en 10 secondes' },
-          ].map(({ icon: Icon, label }) => (
-            <div key={label} className="flex items-center gap-2 text-sm text-[#6B6B6B]">
-              <div className="w-5 h-5 rounded-full bg-[#E8F4E5] flex items-center justify-center">
-                <Icon className="w-3 h-3 text-[#4CAF50]" />
+          {trustBadges.map((row) => {
+            const Icon = TRUST_ICON_MAP[row.key] ?? Shield;
+            return (
+              <div key={row.key} className="flex items-center gap-2 text-sm text-[#6B6B6B]">
+                <div className="w-5 h-5 rounded-full bg-[#E8F4E5] flex items-center justify-center">
+                  <Icon className="w-3 h-3 text-[#4CAF50]" />
+                </div>
+                {row.label}
               </div>
-              {label}
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Payment logos */}
         <div className="flex flex-wrap items-center justify-center gap-4 mt-6 opacity-50">
-          <span className="text-xs text-[#6B6B6B]">Paiement par</span>
+          <span className="text-xs text-[#6B6B6B]">{t('paymentBy')}</span>
           <span className="text-sm font-semibold text-[#635BFF]">stripe</span>
           <span className="text-xs text-[#6B6B6B]">•</span>
           <span className="text-xs text-[#6B6B6B]">Visa</span>
@@ -510,18 +379,14 @@ function PricingPage() {
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 bg-[#FFF0EB] text-[#D4603C] px-4 py-2 rounded-full text-sm font-medium mb-4">
               <Zap className="w-4 h-4" />
-              Simple comme 1-2-3
+              {t('howItWorksBadge')}
             </div>
             <h2 className="text-2xl sm:text-3xl md:text-[36px] font-semibold text-[#2D2D2D] mb-3">
-              Comment ça marche ?
+              {t('howItWorksTitle')}
             </h2>
           </div>
           <div className="grid sm:grid-cols-3 gap-8">
-            {[
-              { step: '1', emoji: '📸', title: 'Prenez une photo', desc: 'Photographiez votre pièce avec votre smartphone. C\'est tout.' },
-              { step: '2', emoji: '🎨', title: 'Choisissez un style', desc: '12 styles disponibles : Moderne, Scandinave, Japandi, Bohème...' },
-              { step: '3', emoji: '✨', title: 'Admirez le résultat', desc: 'En 10 secondes, découvrez votre pièce transformée par l\'IA.' },
-            ].map(item => (
+            {howItWorksSteps.map((item) => (
               <div key={item.step} className="text-center">
                 <div className="text-4xl mb-4">{item.emoji}</div>
                 <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#E07B54] text-white text-sm font-bold mb-3">
@@ -537,7 +402,7 @@ function PricingPage() {
               href="/essai"
               className="inline-flex items-center gap-2 bg-gradient-to-r from-[#E07B54] to-[#D4603C] text-white px-8 py-3.5 rounded-full text-base font-medium hover:shadow-lg hover:shadow-[#E07B54]/30 transition-all active:scale-95"
             >
-              Essayer maintenant
+              {t('tryNow')}
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -550,10 +415,10 @@ function PricingPage() {
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 bg-[#FFF0EB] text-[#D4603C] px-4 py-2 rounded-full text-sm font-medium mb-4">
               <Users className="w-4 h-4" />
-              Pour qui ?
+              {t('whoForBadge')}
             </div>
             <h2 className="text-2xl sm:text-3xl md:text-[36px] font-semibold text-[#2D2D2D]">
-              Un outil adapté à chaque besoin
+              {t('whoForTitle')}
             </h2>
           </div>
           <div className="grid sm:grid-cols-3 gap-6">
@@ -565,7 +430,7 @@ function PricingPage() {
                   {useCase.text}
                 </p>
                 <span className="text-xs bg-[#FFF0EB] text-[#D4603C] px-2 py-1 rounded-full">
-                  Pack {useCase.pack}
+                  {t('packLabel', { name: useCase.pack })}
                 </span>
               </div>
             ))}
@@ -579,10 +444,10 @@ function PricingPage() {
           <div className="text-center mb-10">
             <div className="inline-flex items-center gap-2 bg-[#FFF0EB] text-[#D4603C] px-4 py-2 rounded-full text-sm font-medium mb-4">
               <TrendingUp className="w-4 h-4" />
-              Comparez
+              {t('compareBadge')}
             </div>
             <h2 className="text-2xl sm:text-3xl font-semibold text-[#2D2D2D] mb-2">
-              InstaDeco vs un décorateur traditionnel
+              {t('compareTitle')}
             </h2>
           </div>
           <div className="rounded-2xl border border-[#F0E8E4] overflow-hidden">
@@ -591,18 +456,12 @@ function PricingPage() {
               <thead>
                 <tr className="bg-[#FFF8F5]">
                   <th className="text-left p-4 font-medium text-[#6B6B6B]"></th>
-                  <th className="p-4 font-semibold text-[#E07B54]">InstaDeco AI</th>
-                  <th className="p-4 font-medium text-[#6B6B6B]">Décorateur</th>
+                  <th className="p-4 font-semibold text-[#E07B54]">{t('compareColUs')}</th>
+                  <th className="p-4 font-medium text-[#6B6B6B]">{t('compareColThem')}</th>
                 </tr>
               </thead>
               <tbody>
-                {[
-                  { label: 'Prix par proposition', us: 'À partir de 0,70€', them: '200 - 500€' },
-                  { label: 'Délai', us: '10 secondes', them: '1 - 3 semaines' },
-                  { label: 'Nombre de styles', us: '12 styles illimités', them: '2 - 3 propositions' },
-                  { label: 'Disponibilité', us: '24h/24, 7j/7', them: 'Sur rendez-vous' },
-                  { label: 'Modifications', us: 'Instantanées', them: 'Allers-retours' },
-                ].map((row, idx) => (
+                {compareRows.map((row, idx) => (
                   <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-[#FFFBF9]'}>
                     <td className="p-4 text-[#2D2D2D]">{row.label}</td>
                     <td className="p-4 text-center font-medium text-[#2D2D2D]">
@@ -627,13 +486,13 @@ function PricingPage() {
           <div className="text-center mb-10">
             <div className="inline-flex items-center gap-2 bg-[#FFF0EB] text-[#D4603C] px-4 py-2 rounded-full text-sm font-medium mb-4">
               <Crown className="w-4 h-4" />
-              Crédits vs Abonnement
+              {t('creditsVsSubBadge')}
             </div>
             <h2 className="text-2xl sm:text-3xl font-semibold text-[#2D2D2D] mb-3">
-              Quelle formule choisir ?
+              {t('creditsVsSubTitle')}
             </h2>
             <p className="text-[#6B6B6B] max-w-xl mx-auto">
-              Comparez les options pour trouver celle qui correspond à votre usage
+              {t('creditsVsSubSubtitle')}
             </p>
           </div>
 
@@ -645,58 +504,51 @@ function PricingPage() {
                   <CreditCard className="w-5 h-5 text-[#E07B54]" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-[#2D2D2D]">Packs de crédits</h3>
-                  <p className="text-xs text-[#6B6B6B]">Achat ponctuel</p>
+                  <h3 className="font-semibold text-[#2D2D2D]">{t('creditPacksCardTitle')}</h3>
+                  <p className="text-xs text-[#6B6B6B]">{t('creditPacksCardSubtitle')}</p>
                 </div>
               </div>
               <ul className="space-y-2.5 text-sm">
-                <li className="flex items-center gap-2 text-[#2D2D2D]">
-                  <Check className="w-4 h-4 text-[#4CAF50]" /> Pas d&apos;engagement
-                </li>
-                <li className="flex items-center gap-2 text-[#2D2D2D]">
-                  <Check className="w-4 h-4 text-[#4CAF50]" /> Crédits valables à vie
-                </li>
-                <li className="flex items-center gap-2 text-[#2D2D2D]">
-                  <Check className="w-4 h-4 text-[#4CAF50]" /> Idéal projet ponctuel
-                </li>
+                {creditPacksBullets.map((line) => (
+                  <li key={line} className="flex items-center gap-2 text-[#2D2D2D]">
+                    <Check className="w-4 h-4 text-[#4CAF50]" /> {line}
+                  </li>
+                ))}
               </ul>
               <div className="mt-4 pt-4 border-t border-[#F0E8E4]">
-                <p className="text-sm text-[#6B6B6B]">À partir de</p>
-                <p className="text-lg font-bold text-[#2D2D2D]">0.70€ <span className="text-sm font-normal text-[#6B6B6B]">/ image</span></p>
+                <p className="text-sm text-[#6B6B6B]">{t('fromLabel')}</p>
+                <p className="text-lg font-bold text-[#2D2D2D]">
+                  0.70€ <span className="text-sm font-normal text-[#6B6B6B]">{t('perImage')}</span>
+                </p>
               </div>
             </div>
 
             {/* Subscription - highlighted */}
             <div className="rounded-2xl border-2 border-[#E07B54] bg-gradient-to-b from-white to-[#FFF8F5] p-6 relative">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#E07B54] text-white text-[11px] font-bold px-3 py-1 rounded-full">
-                Meilleure valeur
+                {t('bestValue')}
               </div>
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-xl bg-[#E07B54] flex items-center justify-center">
                   <Crown className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-[#2D2D2D]">Abonnement</h3>
-                  <p className="text-xs text-[#6B6B6B]">Mensuel ou annuel</p>
+                  <h3 className="font-semibold text-[#2D2D2D]">{t('subscriptionCardTitle')}</h3>
+                  <p className="text-xs text-[#6B6B6B]">{t('subscriptionCardSubtitle')}</p>
                 </div>
               </div>
               <ul className="space-y-2.5 text-sm">
-                <li className="flex items-center gap-2 text-[#2D2D2D]">
-                  <Check className="w-4 h-4 text-[#4CAF50]" /> <strong>Jusqu&apos;à 60% d&apos;économie</strong>
-                </li>
-                <li className="flex items-center gap-2 text-[#2D2D2D]">
-                  <Check className="w-4 h-4 text-[#4CAF50]" /> Crédits renouvelés chaque mois
-                </li>
-                <li className="flex items-center gap-2 text-[#2D2D2D]">
-                  <Check className="w-4 h-4 text-[#4CAF50]" /> HD+ inclus (plan Pro+)
-                </li>
-                <li className="flex items-center gap-2 text-[#2D2D2D]">
-                  <Check className="w-4 h-4 text-[#4CAF50]" /> Annulable à tout moment
-                </li>
+                {subscriptionBulletList.map((line) => (
+                  <li key={line} className="flex items-center gap-2 text-[#2D2D2D]">
+                    <Check className="w-4 h-4 text-[#4CAF50]" /> {line}
+                  </li>
+                ))}
               </ul>
               <div className="mt-4 pt-4 border-t border-[#F0E8E4]">
-                <p className="text-sm text-[#6B6B6B]">À partir de</p>
-                <p className="text-lg font-bold text-[#E07B54]">0.32€ <span className="text-sm font-normal text-[#6B6B6B]">/ image</span></p>
+                <p className="text-sm text-[#6B6B6B]">{t('fromLabel')}</p>
+                <p className="text-lg font-bold text-[#E07B54]">
+                  0.32€ <span className="text-sm font-normal text-[#6B6B6B]">{t('perImage')}</span>
+                </p>
               </div>
             </div>
           </div>
@@ -709,13 +561,13 @@ function PricingPage() {
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 bg-[#FFF0EB] text-[#D4603C] px-4 py-2 rounded-full text-sm font-medium mb-4">
               <HelpCircle className="w-4 h-4" />
-              Tout ce qu&apos;il faut savoir
+              {t('faqBadge')}
             </div>
             <h2 className="text-2xl sm:text-3xl md:text-[36px] font-semibold text-[#2D2D2D] mb-3">
-              Questions fréquentes
+              {t('faqTitle')}
             </h2>
             <p className="text-[#6B6B6B]">
-              On répond à toutes vos questions pour que vous puissiez créer en toute sérénité
+              {t('faqSubtitle')}
             </p>
           </div>
           
@@ -759,13 +611,13 @@ function PricingPage() {
 
           <div className="mt-10 text-center p-6 bg-gradient-to-r from-[#FFF8F5] to-[#FFF0EB] rounded-2xl border border-[#F5E6E0]">
             <p className="text-[#2D2D2D] mb-2">
-              Vous avez encore une question ?
+              {t('faqCtaTitle')}
             </p>
             <a 
               href="mailto:contact@instadeco.app" 
               className="inline-flex items-center gap-2 text-[#E07B54] font-medium hover:underline"
             >
-              Écrivez-nous, on répond sous 24h 💌
+              {t('faqCtaLink')}
             </a>
           </div>
         </div>
@@ -775,20 +627,20 @@ function PricingPage() {
       <div className="bg-gradient-to-r from-[#E07B54] to-[#D4603C] py-16 sm:py-20">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-white mb-4">
-            Prêt à transformer votre intérieur ?
+            {t('finalCtaTitle')}
           </h2>
           <p className="text-white/80 text-lg mb-8 max-w-xl mx-auto">
-            Rejoignez les milliers d&apos;utilisateurs qui ont déjà redesigné leur espace avec InstaDeco AI.
+            {t('finalCtaSubtitle')}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href="/essai"
               className="inline-flex items-center gap-2 bg-white text-[#D4603C] px-8 py-3.5 rounded-full text-base font-semibold hover:bg-white/90 transition-all active:scale-95 shadow-lg"
             >
-              Essayer gratuitement
+              {t('finalCtaButton')}
               <ArrowRight className="w-4 h-4" />
             </Link>
-            <span className="text-white/60 text-sm">3 crédits offerts à l&apos;inscription</span>
+            <span className="text-white/60 text-sm">{t('finalCtaNote')}</span>
           </div>
         </div>
       </div>
@@ -822,6 +674,10 @@ function PricingCard({
   onSelect: () => void;
   isLoading: boolean;
 }) {
+  const t = useTranslations('Pricing');
+  const packFeaturesTpl = t.raw('packFeatures') as string[];
+  const featureLines = packFeaturesTpl.map((tpl) => tpl.replace('{credits}', String(plan.credits)));
+
   return (
     <div
       className={`relative bg-white rounded-3xl p-6 md:p-8 transition-all hover:scale-[1.02] hover:shadow-xl ${
@@ -832,7 +688,7 @@ function PricingCard({
     >
       {plan.popular && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#E07B54] to-[#D4603C] text-white text-[12px] font-medium px-4 py-1.5 rounded-full shadow-lg">
-          ⭐ Le plus choisi
+          {t('popularBadge')}
         </div>
       )}
 
@@ -857,23 +713,20 @@ function PricingCard({
           </span>
         </div>
         <p className="text-[#6B6B6B] mt-1">
-          {plan.credits} crédits • <span className="text-[#E07B54] font-medium">{plan.pricePerCredit.toFixed(2)}€/image</span>
+          {t('creditsPerImage', {
+            credits: plan.credits,
+            price: plan.pricePerCredit.toFixed(2),
+          })}
         </p>
         {plan.savings && (
           <p className="text-xs text-[#4CAF50] font-medium mt-1">
-            Vous économisez {((plan.credits * 1.0) - plan.price).toFixed(2)}€ vs prix unitaire
+            {t('savingsVsUnit', { amount: ((plan.credits * 1.0) - plan.price).toFixed(2) })}
           </p>
         )}
       </div>
 
       <ul className="space-y-3 mb-8">
-        {[
-          `${plan.credits} transformations HD`,
-          'Les 12 styles de déco',
-          'Téléchargement illimité',
-          'Usage commercial inclus',
-          'Crédits valables à vie',
-        ].map((feature, i) => (
+        {featureLines.map((feature, i) => (
           <li key={i} className="flex items-center gap-3">
             <div className="w-5 h-5 rounded-full bg-[#E8F4E5] flex items-center justify-center flex-shrink-0">
               <Check className="w-3 h-3 text-[#4CAF50]" />
@@ -892,7 +745,7 @@ function PricingCard({
             : 'bg-[#2D2D2D] text-white hover:bg-[#3D3D3D] active:scale-95'
         }`}
       >
-        {isLoading ? 'Chargement...' : plan.cta}
+        {isLoading ? t('loading') : plan.cta}
       </button>
     </div>
   );
@@ -908,6 +761,7 @@ function MobileCarousel({
   onSelect: (id: CreditPackId) => void;
   isLoading: boolean;
 }) {
+  const t = useTranslations('Pricing');
   const [currentIndex, setCurrentIndex] = useState(1);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
@@ -969,7 +823,7 @@ function MobileCarousel({
       </div>
       
       <p className="text-center text-xs text-[#6B6B6B] mt-3">
-        ← Glissez pour voir les offres →
+        {t('swipeHint')}
       </p>
     </div>
   );
@@ -1002,6 +856,7 @@ function SubscriptionCard({
   onSelect: () => void;
   isLoading: boolean;
 }) {
+  const t = useTranslations('Pricing');
   const price = interval === 'annual' ? plan.annualPrice : plan.monthlyPrice;
   const pricePerCredit = plan.pricePerCredit[interval];
   // Calcul de l'économie vs pack crédit le moins cher (0.70€/image)
@@ -1018,13 +873,13 @@ function SubscriptionCard({
       {plan.popular && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#E07B54] to-[#D4603C] text-white text-[12px] font-medium px-4 py-1.5 rounded-full shadow-lg flex items-center gap-1">
           <Crown className="w-3 h-3" />
-          Recommandé
+          {t('subRecommended')}
         </div>
       )}
 
       {/* Savings badge vs credits */}
       <div className="absolute -top-2 -right-2 bg-[#4CAF50] text-white text-[11px] font-bold px-2.5 py-1 rounded-full shadow-md">
-        -{savingsVsCredits}% vs crédits
+        {t('subSavingsVsCredits', { pct: savingsVsCredits })}
       </div>
 
       <div className="text-center mb-6">
@@ -1036,14 +891,17 @@ function SubscriptionCard({
       <div className="text-center mb-6">
         <div className="flex items-baseline justify-center gap-1">
           <span className="text-4xl md:text-5xl font-bold text-[#2D2D2D]">{price}€</span>
-          <span className="text-[#6B6B6B]">/mois</span>
+          <span className="text-[#6B6B6B]">{t('perMonth')}</span>
         </div>
         <p className="text-[#6B6B6B] mt-1">
-          {plan.creditsPerMonth} crédits/mois • <span className="text-[#E07B54] font-medium">{pricePerCredit.toFixed(2)}€/image</span>
+          {t('creditsPerMonthShort', {
+            credits: plan.creditsPerMonth,
+            price: pricePerCredit.toFixed(2),
+          })}
         </p>
         {interval === 'annual' && (
           <p className="text-xs text-[#4CAF50] font-medium mt-1">
-            Facturé {plan.annualTotal}€/an (au lieu de {plan.monthlyPrice * 12}€)
+            {t('billedAnnually', { total: plan.annualTotal, full: plan.monthlyPrice * 12 })}
           </p>
         )}
       </div>
@@ -1068,11 +926,11 @@ function SubscriptionCard({
             : 'bg-[#2D2D2D] text-white hover:bg-[#3D3D3D] active:scale-95'
         }`}
       >
-        {isLoading ? 'Chargement...' : plan.cta}
+        {isLoading ? t('loading') : plan.cta}
       </button>
 
       <p className="text-center text-xs text-[#6B6B6B] mt-3">
-        Sans engagement • Annulable à tout moment
+        {t('subFooter')}
       </p>
     </div>
   );
@@ -1090,6 +948,7 @@ function MobileSubscriptionCarousel({
   onSelect: (id: SubscriptionPlanId) => void;
   isLoading: boolean;
 }) {
+  const t = useTranslations('Pricing');
   const [currentIndex, setCurrentIndex] = useState(1);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
@@ -1152,7 +1011,7 @@ function MobileSubscriptionCarousel({
       </div>
 
       <p className="text-center text-xs text-[#6B6B6B] mt-3">
-        ← Glissez pour voir les offres →
+        {t('swipeHint')}
       </p>
     </div>
   );

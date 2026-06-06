@@ -111,6 +111,7 @@ export class StripePaymentService implements IPaymentService {
       // On ne traite que checkout.session.completed
       if (event.type !== 'checkout.session.completed') {
         return success({
+          eventId: event.id,
           type: event.type,
           sessionId: '',
           customerId: '',
@@ -123,6 +124,7 @@ export class StripePaymentService implements IPaymentService {
       const session = event.data.object as Stripe.Checkout.Session;
 
       return success({
+        eventId: event.id,
         type: event.type,
         sessionId: session.id,
         customerId: (session.customer as string) || '',

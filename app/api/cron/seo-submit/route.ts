@@ -49,7 +49,7 @@ export async function GET(request: Request) {
       `${BASE_URL}/generate`,
       `${BASE_URL}/pricing`,
       `${BASE_URL}/exemples`,
-      `${BASE_URL}/blog`,
+      `${BASE_URL}/fr/blog`,
       `${BASE_URL}/architecte-interieur`,
       
       // Pages styles programmatiques
@@ -83,7 +83,7 @@ export async function GET(request: Request) {
 
       if (articles) {
         articles.forEach((article) => {
-          allUrls.push(`${BASE_URL}/blog/${article.slug}`);
+          allUrls.push(`${BASE_URL}/fr/blog/${article.slug}`);
         });
         results.push({ action: 'load_blog_articles', success: true, detail: `${articles.length} articles` });
       }

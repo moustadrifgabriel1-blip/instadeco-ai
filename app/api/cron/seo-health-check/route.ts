@@ -66,8 +66,8 @@ function verifyCronSecret(request: NextRequest): boolean {
   const cronSecret = process.env.CRON_SECRET;
   if (!cronSecret) return false;
   if (authHeader === `Bearer ${cronSecret}`) return true;
-  const vercelSignature = request.headers.get('x-vercel-signature');
-  return !!vercelSignature;
+  // Pas de confiance à x-vercel-signature seul (header spoofable → bypass).
+  return false;
 }
 
 // ============================================================
@@ -150,7 +150,7 @@ async function checkRss(): Promise<CheckResult> {
 async function checkKeyPages(): Promise<CheckResult[]> {
   const pages = [
     { path: '/', name: 'Home' },
-    { path: '/blog', name: 'Blog index' },
+    { path: '/fr/blog', name: 'Blog index' },
     { path: '/pricing', name: 'Pricing' },
     { path: '/generate', name: 'Generate' },
     { path: '/exemples', name: 'Exemples' },
@@ -241,7 +241,7 @@ async function checkTopArticles(): Promise<CheckResult> {
     const failedSlugs: string[] = [];
     // Vérif en parallèle limité
     const results = await Promise.allSettled(
-      data.map((a) => fetchWithTimeout(`${BASE_URL}/blog/${a.slug}`, 8000))
+      data.map((a) => fetchWithTimeout(`${BASE_URL}/fr/blog/${a.slug}`, 8000))
     );
     results.forEach((r, i) => {
       if (r.status === 'rejected' || (r.status === 'fulfilled' && r.value.status !== 200)) {
@@ -337,8 +337,8 @@ async function checkCoreWebVitals(): Promise<{
       .limit(1)
       .maybeSingle();
     if (data?.slug) {
-      articleMobile = await checkPageSpeed(`${BASE_URL}/blog/${data.slug}`, 'mobile');
-      articleDesktop = await checkPageSpeed(`${BASE_URL}/blog/${data.slug}`, 'desktop');
+      articleMobile = await checkPageSpeed(`${BASE_URL}/fr/blog/${data.slug}`, 'mobile');
+      articleDesktop = await checkPageSpeed(`${BASE_URL}/fr/blog/${data.slug}`, 'desktop');
     }
   } catch {}
 

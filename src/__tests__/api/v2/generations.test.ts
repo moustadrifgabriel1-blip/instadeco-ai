@@ -1,7 +1,15 @@
 /**
  * Tests d'intégration pour GET /api/v2/generations
+ *
+ * Auth : userId extrait de la session (supabase.auth.getUser), jamais de la query.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+// Mock de l'auth Supabase serveur
+const mockGetUser = vi.hoisted(() => vi.fn());
+vi.mock('@/lib/supabase/server', () => ({
+  createClient: vi.fn(async () => ({ auth: { getUser: mockGetUser } })),
+}));
 
 // Créer le mock avec vi.hoisted pour pouvoir l'utiliser dans vi.mock
 const mockListUserGenerations = vi.hoisted(() => vi.fn());
@@ -41,19 +49,23 @@ import { GET } from '@/app/api/v2/generations/route';
 describe('GET /api/v2/generations', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockGetUser.mockResolvedValue({
+      data: { user: { id: 'user123', email: 'test@example.com' } },
+      error: null,
+    });
   });
 
-  it('devrait retourner 400 si userId manquant', async () => {
+  it('devrait retourner 401 si non authentifié', async () => {
+    mockGetUser.mockResolvedValue({ data: { user: null }, error: { message: 'No session' } });
+
     const request = new Request('http://localhost/api/v2/generations');
-    
+
     const response = await GET(request);
-    const data = await response.json();
-    
-    expect(response.status).toBe(400);
-    expect(data.error).toBe('Paramètres invalides');
+
+    expect(response.status).toBe(401);
   });
 
-  it('devrait retourner les générations pour un userId valide', async () => {
+  it('devrait retourner les générations de l\'utilisateur authentifié', async () => {
     const mockGenerations = [
       {
         id: 'gen1',
@@ -84,11 +96,11 @@ describe('GET /api/v2/generations', () => {
       data: mockGenerations,
     });
 
-    const request = new Request('http://localhost/api/v2/generations?userId=user123');
-    
+    const request = new Request('http://localhost/api/v2/generations');
+
     const response = await GET(request);
     const data = await response.json();
-    
+
     expect(response.status).toBe(200);
     expect(data.generations).toHaveLength(2);
     expect(data.total).toBe(2);
@@ -106,10 +118,10 @@ describe('GET /api/v2/generations', () => {
       data: [],
     });
 
-    const request = new Request('http://localhost/api/v2/generations?userId=user123&limit=5');
-    
+    const request = new Request('http://localhost/api/v2/generations?limit=5');
+
     const response = await GET(request);
-    
+
     expect(response.status).toBe(200);
     expect(mockListUserGenerations).toHaveBeenCalledWith({
       userId: 'user123',
@@ -123,11 +135,11 @@ describe('GET /api/v2/generations', () => {
       data: [],
     });
 
-    const request = new Request('http://localhost/api/v2/generations?userId=user123&limit=500');
-    
+    const request = new Request('http://localhost/api/v2/generations?limit=500');
+
     const response = await GET(request);
     const data = await response.json();
-    
+
     // Zod devrait rejeter limit > 100
     expect(response.status).toBe(400);
     expect(data.error).toBe('Paramètres invalides');
@@ -139,11 +151,11 @@ describe('GET /api/v2/generations', () => {
       error: { message: 'Erreur base de données' },
     });
 
-    const request = new Request('http://localhost/api/v2/generations?userId=user123');
-    
+    const request = new Request('http://localhost/api/v2/generations');
+
     const response = await GET(request);
     const data = await response.json();
-    
+
     expect(response.status).toBe(500);
     expect(data.error).toBe('Erreur base de données');
   });
@@ -153,11 +165,11 @@ describe('GET /api/v2/generations', () => {
       new Error('Connection timeout')
     );
 
-    const request = new Request('http://localhost/api/v2/generations?userId=user123');
-    
+    const request = new Request('http://localhost/api/v2/generations');
+
     const response = await GET(request);
     const data = await response.json();
-    
+
     expect(response.status).toBe(500);
     expect(data.error).toBe('Erreur lors de la récupération des générations');
     expect(data.details).toBe('Connection timeout');

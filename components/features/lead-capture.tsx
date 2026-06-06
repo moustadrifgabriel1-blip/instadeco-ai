@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { X, Gift, ArrowRight, Sparkles } from 'lucide-react';
+import { Link } from '@/i18n/navigation';
 
 interface LeadCaptureProps {
   /** Délai avant affichage (ms). Par défaut 8s */
@@ -136,12 +137,12 @@ export function LeadCapture({ delay = 8000, variant = 'banner' }: LeadCapturePro
                   Vos 3 crédits gratuits vous attendent.
                   <br />Créez votre compte pour les utiliser.
                 </p>
-                <a
+                <Link
                   href="/signup"
                   className="inline-flex items-center gap-2 bg-[#E07B54] text-white px-6 py-3 rounded-full font-semibold mt-4 hover:bg-[#D4603C] transition-colors"
                 >
                   Créer mon compte <ArrowRight className="w-4 h-4" />
-                </a>
+                </Link>
               </div>
             ) : (
               <>
@@ -211,12 +212,12 @@ export function LeadCapture({ delay = 8000, variant = 'banner' }: LeadCapturePro
 
           {/* Formulaire */}
           {status === 'success' ? (
-            <a
+            <Link
               href="/signup"
               className="inline-flex items-center gap-2 bg-[#E07B54] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#D4603C] transition-colors whitespace-nowrap"
             >
               Créer mon compte <ArrowRight className="w-4 h-4" />
-            </a>
+            </Link>
           ) : (
             <form onSubmit={handleSubmit} className="flex items-center gap-2 w-full sm:w-auto">
               <input

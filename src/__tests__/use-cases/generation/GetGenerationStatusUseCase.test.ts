@@ -1,9 +1,10 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { GetGenerationStatusUseCase } from '@/src/application/use-cases/generation/GetGenerationStatusUseCase';
-import { 
-  createMockGenerationRepository, 
+import {
+  createMockGenerationRepository,
   createMockGeneration,
-  createMockLogger 
+  createMockCreditRepository,
+  createMockLogger
 } from '@/src/__tests__/mocks';
 import { success, failure } from '@/src/shared/types/Result';
 import { GenerationNotFoundError } from '@/src/domain/errors/GenerationNotFoundError';
@@ -29,16 +30,18 @@ const createMockStorageService = (): IStorageService => ({
 describe('GetGenerationStatusUseCase', () => {
   let useCase: GetGenerationStatusUseCase;
   let mockGenerationRepo: ReturnType<typeof createMockGenerationRepository>;
+  let mockCreditRepo: ReturnType<typeof createMockCreditRepository>;
   let mockImageGenerator: IImageGeneratorService;
   let mockStorage: IStorageService;
   let mockLogger: ReturnType<typeof createMockLogger>;
 
   beforeEach(() => {
     mockGenerationRepo = createMockGenerationRepository();
+    mockCreditRepo = createMockCreditRepository();
     mockImageGenerator = createMockImageGeneratorService();
     mockStorage = createMockStorageService();
     mockLogger = createMockLogger();
-    useCase = new GetGenerationStatusUseCase(mockGenerationRepo, mockImageGenerator, mockStorage, mockLogger);
+    useCase = new GetGenerationStatusUseCase(mockGenerationRepo, mockCreditRepo, mockImageGenerator, mockStorage, mockLogger);
   });
 
   describe('execute', () => {
@@ -120,6 +123,47 @@ describe('GetGenerationStatusUseCase', () => {
       // Assert
       expect(result.success).toBe(false);
       expect(mockLogger.error).toHaveBeenCalled();
+    });
+
+    it('should refund credit when a zombie generation transitions to failed', async () => {
+      // Arrange : génération bloquée en 'processing' depuis > 2 min
+      const stale = new Date(Date.now() - 3 * 60 * 1000);
+      const zombie = createMockGeneration({ status: 'processing', updatedAt: stale });
+      mockGenerationRepo.findById = vi.fn().mockResolvedValue(success(zombie));
+      mockGenerationRepo.markFailedIfPending = vi.fn().mockResolvedValue(
+        success({ transitioned: true, generation: { ...zombie, status: 'failed' } })
+      );
+
+      // Act
+      const result = await useCase.execute({ generationId: zombie.id });
+
+      // Assert
+      expect(result.success).toBe(true);
+      if (result.success) expect(result.data.status).toBe('failed');
+      expect(mockCreditRepo.addCredits).toHaveBeenCalledTimes(1);
+      expect(mockCreditRepo.addCredits).toHaveBeenCalledWith(
+        zombie.userId,
+        expect.any(Number),
+        expect.stringContaining('Remboursement'),
+      );
+    });
+
+    it('should NOT refund when the zombie transition was already done concurrently', async () => {
+      // Arrange : transition déjà effectuée par un poll concurrent
+      const stale = new Date(Date.now() - 3 * 60 * 1000);
+      const zombie = createMockGeneration({ status: 'processing', updatedAt: stale });
+      mockGenerationRepo.findById = vi.fn().mockResolvedValue(success(zombie));
+      mockGenerationRepo.markFailedIfPending = vi.fn().mockResolvedValue(
+        success({ transitioned: false, generation: { ...zombie, status: 'failed' } })
+      );
+
+      // Act
+      const result = await useCase.execute({ generationId: zombie.id });
+
+      // Assert : pas de double remboursement
+      expect(result.success).toBe(true);
+      if (result.success) expect(result.data.status).toBe('failed');
+      expect(mockCreditRepo.addCredits).not.toHaveBeenCalled();
     });
 
     it('should log debug message when getting status', async () => {

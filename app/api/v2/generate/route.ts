@@ -15,9 +15,11 @@ import { useCases } from '@/src/infrastructure/config/di-container';
 import { GenerationMapper } from '@/src/application/mappers/GenerationMapper';
 import { DomainError } from '@/src/domain/errors/DomainError';
 import { InsufficientCreditsError } from '@/src/domain/errors/InsufficientCreditsError';
-import { checkRateLimit, getClientIP, RATE_LIMIT_CONFIGS } from '@/lib/security/rate-limiter';
+import { checkRateLimitDistributed, getClientIP, RATE_LIMIT_CONFIGS } from '@/lib/security/rate-limiter';
 import { logRateLimitExceeded, logGenerationCreated, logAuditEvent } from '@/lib/security/audit-logger';
 import { createClient } from '@/lib/supabase/server';
+import { sendGenerationCompleteEmail } from '@/lib/notifications/marketing-emails';
+import { createClient as createSupabaseAdmin } from '@supabase/supabase-js';
 
 /**
  * Schéma de validation pour la génération
@@ -48,7 +50,7 @@ export async function POST(req: Request) {
   
   // Rate limiting
   const clientIP = getClientIP(req.headers);
-  const rateLimitResult = checkRateLimit(clientIP, RATE_LIMIT_CONFIGS.generate);
+  const rateLimitResult = await checkRateLimitDistributed(clientIP, RATE_LIMIT_CONFIGS.generate);
   
   if (!rateLimitResult.success) {
     console.warn(`[Generate V2] ⛔ Rate limit exceeded for IP: ${clientIP}`);
@@ -170,6 +172,20 @@ export async function POST(req: Request) {
     // Log audit de la génération réussie
     await logGenerationCreated(userId, generation.id, clientIP);
 
+    // Email post-génération — envoyé ICI, au moment exact du passage à 'completed'
+    // (flux synchrone). Une seule fois par génération : on ne dépend plus d'une
+    // fenêtre temporelle fragile côté polling (cf. statut route).
+    if (generation.status === 'completed' && generation.outputImageUrl) {
+      // Fire-and-forget : ne bloque pas la réponse.
+      sendPostGenerationEmail(
+        userId,
+        generation.styleSlug || 'modern',
+        generation.roomType || 'living_room',
+      ).catch((err) => {
+        console.error('[Generate V2] Post-generation email failed:', err);
+      });
+    }
+
     return NextResponse.json({
       success: true,
       generation: GenerationMapper.toDTO(generation),
@@ -195,6 +211,41 @@ export async function POST(req: Request) {
       { status: 500 }
     );
   }
+}
+
+/**
+ * Récupère le profil utilisateur et envoie l'email post-génération.
+ * Appelé une seule fois, au passage à 'completed' (flux synchrone).
+ */
+async function sendPostGenerationEmail(
+  userId: string,
+  style: string,
+  roomType: string,
+): Promise<void> {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return;
+  }
+
+  const supabaseAdmin = createSupabaseAdmin(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY,
+  );
+
+  const { data: profile } = await supabaseAdmin
+    .from('profiles')
+    .select('email, full_name, referral_code')
+    .eq('id', userId)
+    .single();
+
+  if (!profile?.email) return;
+
+  await sendGenerationCompleteEmail(
+    profile.email,
+    profile.full_name,
+    style,
+    roomType,
+    profile.referral_code || null,
+  );
 }
 
 /**

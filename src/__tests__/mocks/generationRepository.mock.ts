@@ -26,6 +26,9 @@ export function createMockGenerationRepository(overrides: Partial<IGenerationRep
     findById: vi.fn().mockResolvedValue(success(mockGeneration)),
     findByUserId: vi.fn().mockResolvedValue(success([mockGeneration])),
     update: vi.fn().mockResolvedValue(success({ ...mockGeneration, status: 'completed' })),
+    markFailedIfPending: vi.fn().mockResolvedValue(
+      success({ transitioned: true, generation: { ...mockGeneration, status: 'failed' } }),
+    ),
     delete: vi.fn().mockResolvedValue(success(undefined)),
     countByUserId: vi.fn().mockResolvedValue(success(1)),
     ...overrides,

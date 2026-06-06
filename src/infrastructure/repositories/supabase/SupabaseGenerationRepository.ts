@@ -133,6 +133,45 @@ export class SupabaseGenerationRepository implements IGenerationRepository {
     return success(this.toEntity(data as GenerationRow));
   }
 
+  async markFailedIfPending(
+    id: string,
+  ): Promise<Result<{ transitioned: boolean; generation: Generation }>> {
+    // UPDATE conditionnel atomique : ne transite que si le statut est encore
+    // 'pending'/'processing'. On utilise .select() SANS .single() pour que
+    // 0 ligne affectée ne lève pas d'erreur PGRST116 mais retourne [].
+    const { data, error } = await this.supabase
+      .from('generations')
+      .update({
+        status: 'failed',
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', id)
+      .in('status', ['pending', 'processing'])
+      .select();
+
+    if (error) {
+      return failure(new Error(`Failed to mark generation as failed: ${error.message}`));
+    }
+
+    // Au moins une ligne affectée → CET appel a réellement effectué la transition.
+    if (data && data.length > 0) {
+      return success({ transitioned: true, generation: this.toEntity(data[0] as GenerationRow) });
+    }
+
+    // Aucune ligne affectée : la génération n'était plus 'pending'/'processing'
+    // (déjà transité par un appel concurrent, ou déjà completed/failed).
+    // On recharge l'état courant pour le retourner sans déclencher de remboursement.
+    const current = await this.findById(id);
+    if (!current.success) {
+      return failure(current.error as Error);
+    }
+    if (!current.data) {
+      return failure(new Error(`Generation not found: ${id}`));
+    }
+
+    return success({ transitioned: false, generation: current.data });
+  }
+
   async delete(id: string): Promise<Result<void>> {
     const { error } = await this.supabase
       .from('generations')

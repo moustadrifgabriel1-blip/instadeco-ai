@@ -18,7 +18,7 @@
  */
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { checkRateLimit, getClientIP, isDevBypass } from '@/lib/security/rate-limiter';
+import { checkRateLimitDistributed, getClientIP, isDevBypass } from '@/lib/security/rate-limiter';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { isSupportedImageBase64 } from '@/src/shared/utils/image-size';
 import { useCases } from '@/src/infrastructure/config/di-container';
@@ -144,16 +144,17 @@ export async function POST(req: Request) {
     console.log(`[Trial] 🔓 Dev bypass actif — skip rate limits`);
   }
 
-  // Couche 1 : Rate limit mémoire (protection même si DB down)
+  // Couche 1 : Rate limit distribué (Supabase, partagé entre instances ;
+  // fallback mémoire automatique si la DB est indisponible)
   if (!devMode) {
-    const rateLimitResult = checkRateLimit(clientIP, {
+    const rateLimitResult = await checkRateLimitDistributed(clientIP, {
       maxRequests: 1,
       windowSeconds: 86400, // 24h
       prefix: 'trial',
     });
 
     if (!rateLimitResult.success) {
-      console.warn(`[Trial] ⛔ Memory rate limit exceeded for IP: ${clientIP}`);
+      console.warn(`[Trial] ⛔ Rate limit exceeded for IP: ${clientIP}`);
       return NextResponse.json(
         {
           error: 'Vous avez déjà utilisé votre essai gratuit. Créez un compte pour continuer !',

@@ -539,7 +539,7 @@ function GenerateContent() {
                   {user ? (
                     (credits ?? 0) < 1 ? (
                       <span className="text-[12px] text-[#ff3b30]">
-                        Plus de crédits — <a href="/credits" className="underline hover:text-[#d62d22]">Recharger</a>
+                        Plus de crédits — <Link href="/credits" className="underline hover:text-[#d62d22]">Recharger</Link>
                       </span>
                     ) : (
                       <span className="text-[12px] text-[#636366]">
