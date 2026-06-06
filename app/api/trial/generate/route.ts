@@ -27,6 +27,12 @@ import {
   GUIDANCE_BY_MODE,
   NAG_SCALE_BY_MODE,
 } from '@/src/infrastructure/services/fal/flux-presets';
+import { getFalImageSizeFromBase64, isSupportedImageBase64 } from '@/src/shared/utils/image-size';
+import {
+  getRoomFurniture,
+  getRoomLabel,
+  getStyleDescription,
+} from '@/src/shared/constants/interior-design';
 
 const MODEL_PATH = 'fal-ai/flux-general/image-to-image';
 
@@ -34,10 +40,14 @@ const MODEL_PATH = 'fal-ai/flux-general/image-to-image';
  * Schéma de validation pour l'essai gratuit
  */
 const trialRequestSchema = z.object({
-  imageBase64: z.string().min(100, 'Image requise').refine(
-    (val) => val.startsWith('data:image/'),
-    'Seuls les data URIs image sont acceptés'
-  ),
+  imageBase64: z
+    .string()
+    .min(100, 'Image requise')
+    // ~10 Mo de base64 ≈ 7.5 Mo binaire — borne anti-DoS / bombe de payload (route non authentifiée)
+    .max(10_000_000, 'Image trop volumineuse (max ~7,5 Mo)')
+    .refine((val) => val.startsWith('data:image/'), 'Seuls les data URIs image sont acceptés')
+    // Validation par MAGIC BYTES (le préfixe data:image/ est falsifiable)
+    .refine(isSupportedImageBase64, 'Format non supporté (JPEG, PNG ou WEBP uniquement)'),
   roomType: z.string().max(50).regex(/^[a-z0-9-]+$/).default('salon'),
   style: z.string().max(50).regex(/^[a-z0-9-]+$/).default('moderne'),
   fingerprint: z.string().max(64).optional(),
@@ -205,8 +215,10 @@ export async function POST(req: Request) {
     // Construire un prompt simple
     const prompt = buildTrialPrompt(style, roomType);
 
-    // Extraire les dimensions pour déterminer le format
-    const imageSize = guessImageSize(imageBase64);
+    // Déterminer le format Fal à partir des dimensions RÉELLES de la photo.
+    // Fix : auparavant `guessImageSize` retournait toujours 'landscape_4_3',
+    // ce qui déformait/recadrait les photos portrait (majorité des photos smartphone).
+    const imageSize = getFalImageSizeFromBase64(imageBase64);
 
     // Upload l'image sur le storage fal.ai (les data URIs base64 ne fonctionnent pas en queue)
     console.log(`[Trial] 📤 Uploading image to fal.ai storage...`);
@@ -290,50 +302,10 @@ export async function POST(req: Request) {
  * Prompt simplifié pour l'essai
  */
 function buildTrialPrompt(style: string, roomType: string): string {
-  const styleDescriptions: Record<string, string> = {
-    moderne: 'contemporary modern interior, clean architectural lines, matte white walls, warm neutral upholstery, light hardwood floors, sculptural low-profile furniture, recessed LED and geometric pendant lighting',
-    scandinave: 'Scandinavian hygge interior, warm white textured walls, light oak plank floors, bouclé upholstery, sheepskin throws draped over furniture, clustered white candles, woven wool area rug, pendant globe lights, soft cream palette',
-    boheme: 'bohemian interior, layered Persian and kilim rugs, macramé wall hangings, abundant trailing indoor plants, rattan and wicker furniture, terracotta and ochre palette, vintage brass lanterns, embroidered cushions',
-    japandi: 'Japandi interior, wabi-sabi handcrafted ceramics, light ash wood furniture, dried pampas grass, neutral linen textiles, paper lantern pendants, muted earth tones, organic natural textures',
-    industriel: 'industrial loft interior, exposed red brick accent wall, black steel frame elements, Edison filament bulb pendant cluster, raw concrete floor, aged brown leather Chesterfield sofa, matte black pipe shelving',
-    minimaliste: 'ultra-minimalist interior, pure white space with warm wood accents, essential furniture only, generous negative space, monochrome palette, Japanese-inspired serenity, soft diffused light',
-    haussmannien: 'classic Parisian Haussmannian interior, ornate plaster crown moldings, herringbone oak parquet, white marble fireplace, floor-to-ceiling French windows, crystal chandelier, navy velvet upholstery',
-    artdeco: 'Art Deco interior, bold geometric patterns and brass inlays, emerald green velvet tufted seating, black lacquered surfaces, sunburst mirrors, dramatic pendant lighting, jewel tones with gold',
-    midcentury: 'mid-century modern interior, Eames-inspired organic forms, warm teak and walnut wood, tapered legs, mustard and olive palette, Nelson bubble pendant, bold abstract art on walls',
-    coastal: 'coastal interior, ocean blue and sandy white palette, whitewashed shiplap paneling, woven seagrass pendants, natural linen slipcovers, weathered driftwood accents, sisal rug, sheer curtains',
-    luxe: 'luxury interior, book-matched Calacatta marble surfaces, polished brass fixtures, deep velvet upholstery, crystal chandelier, champagne gold accents, plush mohair throws, sculptural art objects',
-  };
-
-  const roomDescriptions: Record<string, string> = {
-    salon: 'living room',
-    chambre: 'bedroom',
-    cuisine: 'kitchen',
-    'salle-de-bain': 'bathroom',
-    bureau: 'home office',
-    'salle-a-manger': 'dining room',
-  };
-
-  const roomFurniture: Record<string, string> = {
-    salon: 'designer sofa, sculptural coffee table, accent armchair, bookshelf, floor lamp',
-    chambre: 'upholstered bed with layered bedding, nightstands with lamps, elegant wardrobe',
-    cuisine: 'premium cabinetry, stone countertops, integrated appliances, pendant-lit island',
-    'salle-de-bain': 'floating vanity, backlit mirror, rainfall shower, premium fixtures',
-    bureau: 'executive desk, ergonomic chair, open shelving, task and ambient lighting',
-    'salle-a-manger': 'dining table set for six, designer chairs, sideboard, overhead pendant',
-  };
-
-  const styleDesc = styleDescriptions[style] || 'modern minimalist interior, clean lines, neutral tones, contemporary furniture';
-  const roomDesc = roomDescriptions[roomType] || 'living room';
-  const furniture = roomFurniture[roomType] || 'beautiful designer furniture';
+  const styleDesc = getStyleDescription(style);
+  const roomDesc = getRoomLabel(roomType);
+  const furniture = getRoomFurniture(roomType);
 
   return `Stunning ${style} ${roomDesc}, award-winning complete interior redesign. ${styleDesc}. Fully furnished with ${furniture}. Cohesive ${style} design language on every surface — walls, flooring, textiles, and light fixtures. Warm inviting atmosphere with layered ambient and accent lighting. Beautifully styled with curated objects, fresh greenery, and designer textiles. Published in Architectural Digest.
 ${FLUX_QUALITY_SUFFIX}`;
-}
-
-/**
- * Deviner la taille d'image à partir du base64 (simplifié)
- */
-function guessImageSize(base64: string): string {
-  // Par défaut landscape_4_3 car la plupart des photos sont en paysage
-  return 'landscape_4_3';
 }
