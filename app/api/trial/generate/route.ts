@@ -10,7 +10,7 @@
  * de queue/polling — voir FalImageGeneratorService).
  *
  * Cette route ne garde que ses préoccupations TRANSPORT / ANTI-ABUS :
- *   1. Rate limit mémoire (1 essai/IP/24h)
+ *   1. Rate limit distribué (TRIAL_MAX_GENERATIONS essais/IP/24h — cf. constants/trial.ts)
  *   2. Supabase trial_usage (IP + fingerprint) — persistant
  *   3. localStorage côté client — UX immédiate (hors backend)
  *
@@ -22,6 +22,11 @@ import { checkRateLimitDistributed, getClientIP, isDevBypass } from '@/lib/secur
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { isSupportedImageBase64 } from '@/src/shared/utils/image-size';
 import { useCases } from '@/src/infrastructure/config/di-container';
+import {
+  TRIAL_MAX_GENERATIONS,
+  TRIAL_WINDOW_SECONDS,
+  TRIAL_PERSISTENT_WINDOW_HOURS,
+} from '@/src/shared/constants/trial';
 
 /**
  * Schéma de validation pour l'essai gratuit
@@ -44,52 +49,53 @@ export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
 /**
- * Vérifie si un essai a déjà été effectué via Supabase (persistant).
- * Regarde l'IP ET le fingerprint navigateur.
+ * Vérifie si le quota d'essais gratuits est épuisé via Supabase (persistant).
+ * Regarde l'IP ET le fingerprint navigateur. La protection anti-abus reste
+ * identique (IP + fingerprint) : seul le SEUIL passe de 1 à TRIAL_MAX_GENERATIONS.
+ *
+ * On COMPTE les essais déjà enregistrés et on bloque dès que le maximum est atteint.
  */
 async function hasTrialBeenUsed(ip: string, fingerprint?: string): Promise<boolean> {
   try {
-    // Vérifier par IP (dernières 48h)
-    const since = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
-    console.log(`[Trial] 🔍 Checking trial usage for IP: ${ip}, fingerprint: ${fingerprint?.substring(0, 8) || 'none'}`);
+    // Compter les essais par IP (dernières TRIAL_PERSISTENT_WINDOW_HOURS heures)
+    const since = new Date(Date.now() - TRIAL_PERSISTENT_WINDOW_HOURS * 60 * 60 * 1000).toISOString();
+    console.log(`[Trial] 🔍 Checking trial usage for IP: ${ip}, fingerprint: ${fingerprint?.substring(0, 8) || 'none'} (max=${TRIAL_MAX_GENERATIONS})`);
 
-    const { data: ipMatch, error: ipError } = await supabaseAdmin
+    const { count: ipCount, error: ipError } = await supabaseAdmin
       .from('trial_usage')
-      .select('id')
+      .select('id', { count: 'exact', head: true })
       .eq('ip_address', ip)
-      .gte('created_at', since)
-      .limit(1);
+      .gte('created_at', since);
 
     if (ipError) {
       console.warn(`[Trial] ⚠️ Supabase IP check error (table may not exist):`, ipError.message, ipError.code);
       return false; // Fallback: pas de blocage si table absente
     }
 
-    if (ipMatch && ipMatch.length > 0) {
-      console.log(`[Trial] ⛔ IP ${ip} already used trial`);
+    if ((ipCount ?? 0) >= TRIAL_MAX_GENERATIONS) {
+      console.log(`[Trial] ⛔ IP ${ip} reached trial quota (${ipCount}/${TRIAL_MAX_GENERATIONS})`);
       return true;
     }
 
-    // Vérifier par fingerprint (si fourni) — toutes dates confondues
+    // Compter par fingerprint (si fourni) — toutes dates confondues
     if (fingerprint) {
-      const { data: fpMatch, error: fpError } = await supabaseAdmin
+      const { count: fpCount, error: fpError } = await supabaseAdmin
         .from('trial_usage')
-        .select('id')
-        .eq('fingerprint', fingerprint)
-        .limit(1);
+        .select('id', { count: 'exact', head: true })
+        .eq('fingerprint', fingerprint);
 
       if (fpError) {
         console.warn(`[Trial] ⚠️ Supabase fingerprint check error:`, fpError.message);
         return false;
       }
 
-      if (fpMatch && fpMatch.length > 0) {
-        console.log(`[Trial] ⛔ Fingerprint ${fingerprint.substring(0, 8)} already used trial`);
+      if ((fpCount ?? 0) >= TRIAL_MAX_GENERATIONS) {
+        console.log(`[Trial] ⛔ Fingerprint ${fingerprint.substring(0, 8)} reached trial quota (${fpCount}/${TRIAL_MAX_GENERATIONS})`);
         return true;
       }
     }
 
-    console.log(`[Trial] ✅ No previous trial found`);
+    console.log(`[Trial] ✅ Trial quota available`);
     return false;
   } catch (error: any) {
     // En cas d'erreur DB (ex: table n'existe pas encore), on fallback sur le rate limiter mémoire
@@ -148,8 +154,8 @@ export async function POST(req: Request) {
   // fallback mémoire automatique si la DB est indisponible)
   if (!devMode) {
     const rateLimitResult = await checkRateLimitDistributed(clientIP, {
-      maxRequests: 1,
-      windowSeconds: 86400, // 24h
+      maxRequests: TRIAL_MAX_GENERATIONS,
+      windowSeconds: TRIAL_WINDOW_SECONDS, // 24h
       prefix: 'trial',
     });
 

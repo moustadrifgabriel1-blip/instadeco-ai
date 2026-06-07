@@ -5,12 +5,15 @@
  */
 
 import { IBlogArticleRepository, BlogArticleFilters, PaginationOptions } from '../../../domain/ports/repositories/IBlogArticleRepository';
+import { ArticleLanguage } from '../../../domain/entities/BlogArticle';
 import { PaginatedBlogArticlesDTO } from '../../dtos/BlogArticleDTO';
 import { BlogArticleMapper } from '../../mappers/BlogArticleMapper';
 
 export interface ListBlogArticlesInput {
   /** Filtrer par statut */
   status?: 'draft' | 'published' | 'archived';
+  /** Filtrer par langue (fr, en, de) */
+  language?: ArticleLanguage;
   /** Filtrer par tags */
   tags?: string[];
   /** Recherche dans le titre */
@@ -33,6 +36,7 @@ export class ListBlogArticlesUseCase {
   async execute(input: ListBlogArticlesInput = {}): Promise<PaginatedBlogArticlesDTO> {
     const {
       status = 'published',
+      language,
       tags,
       search,
       page = 1,
@@ -45,6 +49,10 @@ export class ListBlogArticlesUseCase {
     const filters: BlogArticleFilters = {
       status,
     };
+
+    if (language) {
+      filters.language = language;
+    }
 
     if (tags && tags.length > 0) {
       filters.tags = tags;

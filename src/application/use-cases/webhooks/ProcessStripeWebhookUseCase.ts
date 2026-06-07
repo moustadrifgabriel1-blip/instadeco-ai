@@ -4,6 +4,7 @@ import { IProcessedEventRepository } from '@/src/domain/ports/repositories/IProc
 import { IPaymentService, PaymentWebhookEvent } from '@/src/domain/ports/services/IPaymentService';
 import { IGenerationRepository } from '@/src/domain/ports/repositories/IGenerationRepository';
 import { ILoggerService } from '@/src/domain/ports/services/ILoggerService';
+import { IAuthService } from '@/src/domain/ports/services/IAuthService';
 import { DomainError } from '@/src/domain/errors/DomainError';
 import { PaymentError } from '@/src/domain/errors/PaymentError';
 
@@ -37,6 +38,8 @@ export class ProcessStripeWebhookUseCase {
     private readonly paymentService: IPaymentService,
     private readonly logger: ILoggerService,
     private readonly processedEventRepo: IProcessedEventRepository,
+    /** Optionnel : requis uniquement pour le guest checkout (création de compte). */
+    private readonly authService?: IAuthService,
   ) {}
 
   async execute(input: ProcessWebhookInput): Promise<Result<ProcessWebhookOutput, DomainError>> {
@@ -162,6 +165,57 @@ export class ProcessStripeWebhookUseCase {
         action: 'credits_added',
       });
 
+    }
+
+    if (type === 'guest_credits_purchase') {
+      // Achat SANS compte : on matérialise/lie un compte par email, puis on crédite.
+      if (!this.authService) {
+        this.logger.error('Guest checkout reçu mais authService non configuré', undefined as unknown as Error);
+        return failure(new PaymentError('Service d\'authentification indisponible'));
+      }
+
+      const credits = parseInt(metadata.credits, 10);
+      const email = (metadata.email || event.customerEmail || '').trim().toLowerCase();
+
+      if (!email || Number.isNaN(credits) || credits <= 0) {
+        this.logger.error('Guest checkout : email ou crédits invalides', undefined as unknown as Error);
+        return failure(new PaymentError('Données guest checkout invalides'));
+      }
+
+      // 1. Provisionner le compte (idempotent : réutilise un compte existant).
+      const provision = await this.authService.provisionGuestForPurchase(email, credits);
+      if (!provision.success) {
+        this.logger.error('Échec provisionnement compte guest', provision.error as Error);
+        return failure(new PaymentError('Échec de la création du compte'));
+      }
+
+      const { userId, created } = provision.data;
+
+      // 2. Créditer (l'idempotence event-level empêche tout double crédit).
+      const addResult = await this.creditRepo.addCredits(
+        userId,
+        credits,
+        `Achat invité de ${credits} crédits`,
+        event.sessionId,
+      );
+
+      if (!addResult.success) {
+        this.logger.error('Échec ajout crédits (guest)', addResult.error as Error);
+        return failure(new PaymentError('Échec de l\'ajout des crédits'));
+      }
+
+      this.logger.info('Crédits ajoutés (guest checkout)', {
+        userId,
+        credits,
+        accountCreated: created,
+        newBalance: addResult.data,
+      });
+
+      return success({
+        processed: true,
+        eventType: event.type,
+        action: created ? 'guest_account_created_credits_added' : 'guest_credits_added',
+      });
     }
 
     return success({

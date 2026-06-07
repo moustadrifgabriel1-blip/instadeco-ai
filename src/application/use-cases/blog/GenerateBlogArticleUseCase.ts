@@ -8,7 +8,7 @@
 import { IBlogArticleRepository } from '../../../domain/ports/repositories/IBlogArticleRepository';
 import { IAIContentService } from '../../../domain/ports/services/IAIContentService';
 import { ISEONotificationService } from '../../../domain/ports/services/ISEONotificationService';
-import { createBlogArticle, generateSlug, ArticleSessionType } from '../../../domain/entities/BlogArticle';
+import { createBlogArticle, generateSlug, ArticleSessionType, ArticleLanguage } from '../../../domain/entities/BlogArticle';
 import { ArticleGenerationError } from '../../../domain/errors/ArticleGenerationError';
 import { DuplicateArticleError } from '../../../domain/errors/DuplicateArticleError';
 import { BlogArticleDTO, GenerateArticleResponseDTO } from '../../dtos/BlogArticleDTO';
@@ -26,6 +26,8 @@ function generateUUID(): string {
 export interface GenerateBlogArticleInput {
   theme: string;
   sessionType: ArticleSessionType;
+  /** Langue de rédaction (fr par défaut) */
+  language?: ArticleLanguage;
 }
 
 export interface IAntiAIPostProcessor {
@@ -48,7 +50,7 @@ export class GenerateBlogArticleUseCase {
   ) {}
 
   async execute(input: GenerateBlogArticleInput): Promise<GenerateArticleResponseDTO> {
-    const { theme, sessionType } = input;
+    const { theme, sessionType, language = 'fr' } = input;
 
     try {
       // 1. Vérifier que le mot-clé/thème n'a pas été utilisé récemment
@@ -69,6 +71,7 @@ export class GenerateBlogArticleUseCase {
       // 3. Générer le contenu via IA
       const generatedContent = await this.aiContentService.generateArticle({
         theme,
+        targetLanguage: language,
         sessionType,
         minWords: 2000,
         temperature: 0.85,
@@ -89,7 +92,7 @@ export class GenerateBlogArticleUseCase {
 
       // 5. Générer et vérifier le slug
       const slug = generateSlug(generatedContent.title);
-      const slugExists = await this.articleRepository.slugExists(slug);
+      const slugExists = await this.articleRepository.slugExists(slug, language);
       if (slugExists) {
         throw DuplicateArticleError.slugExists(slug);
       }
@@ -119,6 +122,7 @@ export class GenerateBlogArticleUseCase {
         sessionType,
         source: `${sessionType}-automation`,
         antiAIScore: antiAIResult.score,
+        language,
       });
 
       // 9. Sauvegarder en base

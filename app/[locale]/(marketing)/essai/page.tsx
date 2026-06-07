@@ -11,6 +11,21 @@ import { SocialProofToast } from '@/components/features/social-proof-toast';
 import { LeadCaptureLazy } from '@/components/features/lead-capture-lazy';
 import { trackTrialStart, trackTrialComplete, trackLeadCaptured } from '@/lib/analytics/gtag';
 import { compressImageToDataUrl } from '@/lib/image/compress-client';
+import { TRIAL_MAX_GENERATIONS } from '@/src/shared/constants/trial';
+
+// Compteur d'essais consommés côté client (UX immédiate ; la vraie limite est serveur).
+const TRIAL_COUNT_KEY = 'instadeco_trial_count';
+function readTrialCount(): number {
+  try {
+    const raw = localStorage.getItem(TRIAL_COUNT_KEY);
+    const n = raw ? parseInt(raw, 10) : 0;
+    // Migration depuis l'ancien flag booléen (= 1 essai consommé).
+    if (!raw && localStorage.getItem('instadeco_trial_used')) return 1;
+    return Number.isFinite(n) ? n : 0;
+  } catch {
+    return 0;
+  }
+}
 
 // Styles populaires pour l'essai (6 max)
 const TRIAL_STYLES = [
@@ -42,7 +57,7 @@ const LOADING_MESSAGES = [
 ];
 
 export default function EssaiPage() {
-  const [step, setStep] = useState<'upload' | 'options' | 'generating' | 'email-gate' | 'result' | 'trial-used'>('upload');
+  const [step, setStep] = useState<'upload' | 'options' | 'generating' | 'result' | 'trial-used'>('upload');
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [selectedStyle, setSelectedStyle] = useState('moderne');
@@ -53,17 +68,22 @@ export default function EssaiPage() {
   const [trialEmail, setTrialEmail] = useState('');
   const [emailStatus, setEmailStatus] = useState<'idle' | 'loading' | 'error'>('idle');
   const [emailError, setEmailError] = useState('');
+  const [emailUnlocked, setEmailUnlocked] = useState(false);
+  const [trialsUsed, setTrialsUsed] = useState(0);
   const resultRef = useRef<HTMLDivElement>(null);
 
-  // Vérifier si l'essai a déjà été utilisé (bypass si cookie dev)
+  const remainingTrials = Math.max(0, TRIAL_MAX_GENERATIONS - trialsUsed);
+
+  // Vérifier le quota d'essais déjà consommés (bypass si cookie dev)
   useEffect(() => {
     const isDevMode = document.cookie.includes('instadeco_dev=');
     if (isDevMode) {
       console.log('🔓 Dev mode actif — trial illimité');
       return; // Ne pas bloquer
     }
-    const trialUsed = localStorage.getItem('instadeco_trial_used');
-    if (trialUsed) {
+    const used = readTrialCount();
+    setTrialsUsed(used);
+    if (used >= TRIAL_MAX_GENERATIONS) {
       setStep('trial-used');
     }
   }, []);
@@ -175,7 +195,8 @@ export default function EssaiPage() {
         if (!response.ok) {
           console.error(`[Trial] ❌ Generate API error: ${response.status}`, data);
           if (data.code === 'TRIAL_USED') {
-            localStorage.setItem('instadeco_trial_used', 'true');
+            localStorage.setItem(TRIAL_COUNT_KEY, String(TRIAL_MAX_GENERATIONS));
+            setTrialsUsed(TRIAL_MAX_GENERATIONS);
             clearInterval(progressInterval);
             setStep('trial-used');
             return;
@@ -195,11 +216,15 @@ export default function EssaiPage() {
         clearInterval(progressInterval);
         setProgress(100);
         setGeneratedImage(imageUrl);
-        localStorage.setItem('instadeco_trial_used', 'true');
+        // Incrémenter le compteur d'essais consommés (UX immédiate).
+        const newUsed = readTrialCount() + 1;
+        localStorage.setItem(TRIAL_COUNT_KEY, String(newUsed));
+        setTrialsUsed(newUsed);
         trackTrialComplete(selectedStyle, selectedRoom);
         setTimeout(() => {
-          setStep('email-gate');
-          // Auto-scroll vers le résultat après changement d'étape
+          // WOW MOMENT : on affiche le résultat EN CLAIR immédiatement (filigrane
+          // InstaDeco présent). L'email devient optionnel (HD / sans filigrane).
+          setStep('result');
           setTimeout(() => {
             resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }, 100);
@@ -378,7 +403,7 @@ export default function EssaiPage() {
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </button>
                 <span className="text-[12px] text-[#636366]">
-                  100% gratuit — 1 essai disponible
+                  100% gratuit — {remainingTrials} essai{remainingTrials > 1 ? 's' : ''} disponible{remainingTrials > 1 ? 's' : ''}
                 </span>
               </div>
             </div>
@@ -418,126 +443,17 @@ export default function EssaiPage() {
             </div>
           )}
 
-          {/* ── ÉTAPE 3.5 : EMAIL GATE (avant le résultat) ── */}
-          {step === 'email-gate' && generatedImage && (
-            <div ref={resultRef} className="flex flex-col items-center py-12 scroll-mt-4">
-              <div className="max-w-md w-full bg-white rounded-[28px] border border-black/5 shadow-xl overflow-hidden">
-                {/* Preview floutée */}
-                <div className="relative h-48 overflow-hidden">
-                  <Image
-                    src={generatedImage}
-                    alt="Aperçu du résultat (flouté)"
-                    width={600}
-                    height={300}
-                    className="w-full h-full object-cover blur-lg scale-110"
-                    sizes="(max-width: 768px) 100vw, 448px"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white/80" />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="bg-white/90 backdrop-blur-md rounded-2xl px-6 py-3 shadow-lg">
-                      <p className="text-[15px] font-bold text-[#1d1d1f] flex items-center gap-2">
-                        <Sparkles className="w-5 h-5 text-[#E07B54]" />
-                        Votre résultat est prêt !
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Formulaire email */}
-                <div className="p-6 sm:p-8">
-                  <h2 className="text-[22px] font-bold text-[#1d1d1f] text-center mb-2">
-                    Entrez votre email pour voir le résultat
-                  </h2>
-                  <p className="text-[14px] text-[#636366] text-center mb-6">
-                    Recevez aussi <span className="font-semibold text-[#E07B54]">3 crédits offerts</span> pour transformer d&apos;autres pièces.
-                  </p>
-
-                  <form
-                    onSubmit={async (e) => {
-                      e.preventDefault();
-                      if (!trialEmail || emailStatus === 'loading') return;
-                      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trialEmail)) {
-                        setEmailError('Email invalide');
-                        setEmailStatus('error');
-                        return;
-                      }
-                      setEmailStatus('loading');
-                      setEmailError('');
-                      try {
-                        await fetch('/api/v2/leads', {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({
-                            email: trialEmail,
-                            source: 'trial_email_gate',
-                            metadata: { style: selectedStyle, room: selectedRoom },
-                          }),
-                        });
-                        trackLeadCaptured('trial_email_gate');
-                        localStorage.setItem('trial_lead_email', trialEmail);
-                        setStep('result');
-                        setTimeout(() => {
-                          resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        }, 100);
-                      } catch {
-                        setEmailError('Erreur, réessayez');
-                        setEmailStatus('error');
-                      }
-                    }}
-                    className="space-y-3"
-                  >
-                    <input
-                      type="email"
-                      value={trialEmail}
-                      onChange={(e) => { setTrialEmail(e.target.value); setEmailStatus('idle'); }}
-                      placeholder="votre@email.com"
-                      className="w-full px-4 py-3.5 rounded-xl border border-[#d2d2d7] focus:border-[#E07B54] focus:ring-2 focus:ring-[#E07B54]/20 outline-none transition-all text-[#1d1d1f] text-[15px]"
-                      required
-                      autoFocus
-                    />
-                    {emailStatus === 'error' && (
-                      <p className="text-red-500 text-[12px]">{emailError}</p>
-                    )}
-                    <button
-                      type="submit"
-                      disabled={emailStatus === 'loading'}
-                      className="w-full group inline-flex items-center justify-center gap-2 bg-[#E07B54] text-white px-6 py-3.5 rounded-xl text-[16px] font-semibold hover:bg-[#d06a45] transition-all disabled:opacity-50 shadow-lg shadow-[#E07B54]/20"
-                    >
-                      {emailStatus === 'loading' ? (
-                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      ) : (
-                        <>
-                          <Mail className="w-5 h-5" />
-                          Voir mon résultat
-                          <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                        </>
-                      )}
-                    </button>
-                  </form>
-
-                  <button
-                    onClick={() => {
-                      setStep('result');
-                      setTimeout(() => {
-                        resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                      }, 100);
-                    }}
-                    className="w-full mt-3 text-[12px] text-[#636366] hover:text-[#1d1d1f] transition-colors py-2"
-                  >
-                    Passer →
-                  </button>
-
-                  <p className="text-[11px] text-[#aaa] text-center mt-3">
-                    Pas de spam. Désinscription en 1 clic.
-                  </p>
+          {/* ── ÉTAPE 4 : RÉSULTAT (affiché EN CLAIR immédiatement) ── */}
+          {step === 'result' && generatedImage && imagePreview && (
+            <div ref={resultRef} className="space-y-8 scroll-mt-4">
+              {/* Bandeau wow moment */}
+              <div className="text-center">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#FFF3ED] text-[#E07B54] rounded-full text-sm font-semibold">
+                  <Sparkles className="w-4 h-4" />
+                  Voici votre transformation !
                 </div>
               </div>
-            </div>
-          )}
 
-          {/* ── ÉTAPE 4 : RÉSULTAT ── */}
-          {step === 'result' && generatedImage && imagePreview && (
-            <div ref={step === 'result' ? resultRef : undefined} className="space-y-8 scroll-mt-4">
               {/* Avant / Après */}
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -566,6 +482,102 @@ export default function EssaiPage() {
                   </div>
                 </div>
               </div>
+
+              {/* Nouvel essai si quota restant (sans recharger la page) */}
+              {remainingTrials > 0 && (
+                <div className="text-center">
+                  <button
+                    onClick={() => {
+                      setGeneratedImage(null);
+                      setError(null);
+                      setStep('options');
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className="inline-flex items-center gap-2 bg-[#1d1d1f] text-white px-6 py-3 rounded-full text-[15px] font-semibold hover:bg-[#333] transition-all active:scale-95"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    Essayer un autre style — {remainingTrials} essai{remainingTrials > 1 ? 's' : ''} restant{remainingTrials > 1 ? 's' : ''}
+                  </button>
+                </div>
+              )}
+
+              {/* Email OPTIONNEL — débloque le HD sans filigrane (pas un gate) */}
+              {!emailUnlocked ? (
+                <div className="bg-white rounded-[20px] border border-black/5 p-5 sm:p-6 shadow-sm">
+                  <div className="flex items-center justify-center gap-2 mb-1.5">
+                    <Mail className="w-4 h-4 text-[#E07B54]" />
+                    <span className="text-[15px] font-semibold text-[#1d1d1f]">Recevez votre image en HD, sans filigrane</span>
+                  </div>
+                  <p className="text-[13px] text-[#636366] text-center mb-4">
+                    Entrez votre email pour télécharger la version haute définition (optionnel) — et recevez <span className="font-semibold text-[#E07B54]">3 crédits offerts</span>.
+                  </p>
+                  <form
+                    onSubmit={async (e) => {
+                      e.preventDefault();
+                      if (!trialEmail || emailStatus === 'loading') return;
+                      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trialEmail)) {
+                        setEmailError('Email invalide');
+                        setEmailStatus('error');
+                        return;
+                      }
+                      setEmailStatus('loading');
+                      setEmailError('');
+                      try {
+                        await fetch('/api/v2/leads', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            email: trialEmail,
+                            source: 'trial_hd_unlock',
+                            metadata: { style: selectedStyle, room: selectedRoom },
+                          }),
+                        });
+                        trackLeadCaptured('trial_hd_unlock');
+                        localStorage.setItem('trial_lead_email', trialEmail);
+                        setEmailUnlocked(true);
+                        setEmailStatus('idle');
+                      } catch {
+                        setEmailError('Erreur, réessayez');
+                        setEmailStatus('error');
+                      }
+                    }}
+                    className="flex flex-col sm:flex-row gap-2 max-w-md mx-auto"
+                  >
+                    <input
+                      type="email"
+                      value={trialEmail}
+                      onChange={(e) => { setTrialEmail(e.target.value); setEmailStatus('idle'); }}
+                      placeholder="votre@email.com"
+                      className="flex-1 px-4 py-3 rounded-xl border border-[#d2d2d7] focus:border-[#E07B54] focus:ring-2 focus:ring-[#E07B54]/20 outline-none transition-all text-[#1d1d1f] text-[15px]"
+                      required
+                    />
+                    <button
+                      type="submit"
+                      disabled={emailStatus === 'loading'}
+                      className="inline-flex items-center justify-center gap-2 bg-[#E07B54] text-white px-5 py-3 rounded-xl text-[15px] font-semibold hover:bg-[#d06a45] transition-all disabled:opacity-50"
+                    >
+                      {emailStatus === 'loading' ? (
+                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      ) : (
+                        <>Débloquer le HD</>
+                      )}
+                    </button>
+                  </form>
+                  {emailStatus === 'error' && (
+                    <p className="text-red-500 text-[12px] text-center mt-2">{emailError}</p>
+                  )}
+                  <p className="text-[11px] text-[#aaa] text-center mt-2">
+                    Pas de spam. Désinscription en 1 clic.
+                  </p>
+                </div>
+              ) : (
+                <div className="bg-[#F0FDF4] rounded-[20px] border border-green-200 p-4 text-center">
+                  <p className="text-[14px] font-semibold text-green-700 flex items-center justify-center gap-2">
+                    <Check className="w-4 h-4" />
+                    Version HD envoyée — vérifiez votre boîte mail.
+                  </p>
+                </div>
+              )}
 
               {/* Partage — Encourager la viralité */}
               <div className="bg-white rounded-[20px] border border-black/5 p-5 text-center shadow-sm">

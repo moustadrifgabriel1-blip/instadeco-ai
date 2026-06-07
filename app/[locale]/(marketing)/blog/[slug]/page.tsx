@@ -111,13 +111,19 @@ interface ArticleData {
 
 // Fonction pour récupérer un article — wrappée avec React.cache()
 // pour dédupliquer les appels entre generateMetadata et ArticlePage
-const getArticle = cache(async (slug: string): Promise<ArticleData | null> => {
+type BlogLocale = 'fr' | 'en' | 'de';
+function toBlogLocale(locale: string): BlogLocale {
+  return locale === 'en' || locale === 'de' ? locale : 'fr';
+}
+
+const getArticle = cache(async (slug: string, language: BlogLocale): Promise<ArticleData | null> => {
   try {
     const repository = new SupabaseBlogArticleRepository();
     const useCase = new GetBlogArticleBySlugUseCase(repository);
 
     const result = await useCase.execute({
       slug,
+      language,
       includeRelated: true,
       relatedLimit: 3
     });
@@ -161,7 +167,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
   const resolvedParams = await params;
   const { locale } = resolvedParams;
   const slug = decodeURIComponent(resolvedParams.slug);
-  const article = await getArticle(slug);
+  const article = await getArticle(slug, toBlogLocale(locale));
 
   if (!article) {
     return {
@@ -193,14 +199,13 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
       description: article.metaDescription,
       images: [imageUrl],
     },
+    // Blog multilingue : chaque langue est un article distinct au slug propre.
+    // Les traductions n'ont PAS forcément le même slug → on ne peut pas générer
+    // d'hreflang fiable vers les autres langues à partir du slug. On déclare donc
+    // uniquement le canonical auto-référent pour cette langue (évite des hreflang
+    // pointant vers des URLs 404).
     alternates: {
       canonical,
-      languages: {
-        'fr-FR': getLocalizedCanonicalUrl('fr', `/blog/${article.slug}`),
-        en: getLocalizedCanonicalUrl('en', `/blog/${article.slug}`),
-        de: getLocalizedCanonicalUrl('de', `/blog/${article.slug}`),
-        'x-default': getLocalizedCanonicalUrl('fr', `/blog/${article.slug}`),
-      },
     },
   };
 }
@@ -380,7 +385,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   const { locale } = resolvedParams;
   setRequestLocale(locale);
   const slug = decodeURIComponent(resolvedParams.slug);
-  const article = await getArticle(slug);
+  const article = await getArticle(slug, toBlogLocale(locale));
 
   if (!article) {
     notFound();

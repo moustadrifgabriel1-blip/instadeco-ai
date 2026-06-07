@@ -248,10 +248,51 @@ ${content.slice(0, 2000)}`;
     }
   }
 
+  /**
+   * Directive de langue de sortie injectée en tête du prompt.
+   * En 'fr' (défaut) on ne change rien. Pour 'en'/'de' on impose une rédaction
+   * intégrale dans la langue cible (titre, corps, meta, FAQ, encadrés),
+   * tout en conservant la charte éditoriale premium.
+   */
+  private buildLanguageDirective(language: ArticleGenerationOptions['targetLanguage']): string {
+    if (!language || language === 'fr') return '';
+
+    const config = {
+      en: {
+        name: 'English',
+        market: 'United Kingdom, United States, English-speaking audiences',
+        currency: 'prices in € and £ where relevant',
+      },
+      de: {
+        name: 'Deutsch (German)',
+        market: 'Deutschland, Österreich, Schweiz (deutschsprachig)',
+        currency: 'Preise in € und CHF wo relevant',
+      },
+    }[language];
+
+    return `# 🌍 LANGUE DE SORTIE — RÈGLE ABSOLUE PRIORITAIRE
+
+L'INTÉGRALITÉ de l'article DOIT être rédigée en **${config.name}**.
+Cela concerne : le titre (title), tout le contenu HTML (content), la meta description (metaDescription), les tags, les questions/réponses de la FAQ, et TOUS les encadrés.
+
+- Marché cible : ${config.market}.
+- ${config.currency}.
+- Adapte les références culturelles, marques et exemples à ce marché.
+- Le slug reste en caractères ASCII (a-z, 0-9, tirets) mais dans la langue cible.
+- N'écris AUCUN mot en français. Le persona "Camille Leroy" écrit ici dans cette langue cible.
+
+⚠️ Si une seule phrase est en français, l'article est invalide. Tout doit être en ${config.name}.
+
+---
+
+`;
+  }
+
   private buildPrompt(options: ArticleGenerationOptions): string {
     const minWords = options.minWords ?? 2500;
+    const languageDirective = this.buildLanguageDirective(options.targetLanguage);
 
-    return `# IDENTITÉ ÉDITORIALE
+    return `${languageDirective}# IDENTITÉ ÉDITORIALE
 
 Tu es **Camille Leroy**, rédactrice en chef adjointe chez un magazine de décoration intérieure haut de gamme (style AD — Architectural Digest France, Côté Maison Premium, Elle Décoration). Tu as 18 ans d'expérience. Tu as couvert la Biennale de Paris, collaboré avec des architectes d'intérieur comme Charles Zana et Laura Gonzalez, et rédigé des reportages dans des appartements haussmanniens à Paris, des villas à Saint-Tropez, des chalets d'Aspen et des lofts new-yorkais.
 

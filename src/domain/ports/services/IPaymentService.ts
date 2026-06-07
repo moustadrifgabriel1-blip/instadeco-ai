@@ -4,7 +4,8 @@ import { Result } from '@/src/shared/types/Result';
  * Options de création de session de paiement
  */
 export interface CreateCheckoutSessionOptions {
-  userId: string;
+  /** Optionnel : absent pour un achat invité (guest checkout). */
+  userId?: string;
   userEmail: string;
   priceId: string;
   successUrl: string;

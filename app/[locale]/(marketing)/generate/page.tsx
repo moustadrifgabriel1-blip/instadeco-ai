@@ -29,6 +29,7 @@ import {
 import { useAuth } from '@/hooks/use-auth';
 import { useGenerate } from '@/src/presentation/hooks/useGenerate';
 import { useGenerationStatus } from '@/src/presentation/hooks/useGenerationStatus';
+import { RatingStars } from '@/components/features/RatingStars';
 import { STYLE_CATEGORIES_WITH_STYLES, ROOM_TYPES } from '@/src/shared/constants';
 import { fbTrackUploadPhoto, fbTrackStartGeneration } from '@/lib/analytics/fb-pixel';
 import { trackCTAClick } from '@/lib/analytics/gtag';
@@ -777,6 +778,13 @@ function GenerateContent() {
                     Essayer un autre style
                   </button>
                 </div>
+
+                {/* Feedback qualité — mesure la satisfaction par génération */}
+                {generationId && (
+                  <div className="mt-8 pt-6 border-t border-[#e8e8ed] flex justify-center">
+                    <RatingStars generationId={generationId} className="items-center text-center" />
+                  </div>
+                )}
               </div>
             </div>
           )}

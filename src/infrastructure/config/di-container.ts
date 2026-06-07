@@ -11,10 +11,12 @@ import { SupabaseUserRepository } from '../repositories/supabase/SupabaseUserRep
 import { SupabaseCreditRepository } from '../repositories/supabase/SupabaseCreditRepository';
 import { SupabaseStyleRepository } from '../repositories/supabase/SupabaseStyleRepository';
 import { SupabaseProcessedEventRepository } from '../repositories/supabase/SupabaseProcessedEventRepository';
+import { SupabaseGenerationRatingRepository } from '../repositories/supabase/SupabaseGenerationRatingRepository';
 
 // Services
 import { createImageGeneratorService } from '../services/image-generator-factory';
 import { StripePaymentService } from '../services/stripe/StripePaymentService';
+import { SupabaseAuthService } from '../services/auth/SupabaseAuthService';
 import { SupabaseStorageService } from '../services/supabase/SupabaseStorageService';
 import { ConsoleLoggerService } from '../services/logger/ConsoleLoggerService';
 
@@ -23,11 +25,13 @@ import { GenerateDesignUseCase } from '@/src/application/use-cases/generation/Ge
 import { GetGenerationStatusUseCase } from '@/src/application/use-cases/generation/GetGenerationStatusUseCase';
 import { ListUserGenerationsUseCase } from '@/src/application/use-cases/generation/ListUserGenerationsUseCase';
 import { PurchaseCreditsUseCase } from '@/src/application/use-cases/credits/PurchaseCreditsUseCase';
+import { CreateGuestCheckoutUseCase } from '@/src/application/use-cases/payments/CreateGuestCheckoutUseCase';
 import { AddCreditsUseCase } from '@/src/application/use-cases/credits/AddCreditsUseCase';
 import { GetUserCreditsUseCase } from '@/src/application/use-cases/credits/GetUserCreditsUseCase';
 import { GetCreditHistoryUseCase } from '@/src/application/use-cases/credits/GetCreditHistoryUseCase';
 import { ProcessStripeWebhookUseCase } from '@/src/application/use-cases/webhooks/ProcessStripeWebhookUseCase';
 import { TrialGenerateUseCase } from '@/src/application/use-cases/trial/TrialGenerateUseCase';
+import { RateGenerationUseCase } from '@/src/application/use-cases/ratings/RateGenerationUseCase';
 
 // Types
 import { IGenerationRepository } from '@/src/domain/ports/repositories/IGenerationRepository';
@@ -35,8 +39,10 @@ import { IUserRepository } from '@/src/domain/ports/repositories/IUserRepository
 import { ICreditRepository } from '@/src/domain/ports/repositories/ICreditRepository';
 import { IStyleRepository } from '@/src/domain/ports/repositories/IStyleRepository';
 import { IProcessedEventRepository } from '@/src/domain/ports/repositories/IProcessedEventRepository';
+import { IGenerationRatingRepository } from '@/src/domain/ports/repositories/IGenerationRatingRepository';
 import { IImageGeneratorService } from '@/src/domain/ports/services/IImageGeneratorService';
 import { IPaymentService } from '@/src/domain/ports/services/IPaymentService';
+import { IAuthService } from '@/src/domain/ports/services/IAuthService';
 import { IStorageService } from '@/src/domain/ports/services/IStorageService';
 import { ILoggerService } from '@/src/domain/ports/services/ILoggerService';
 
@@ -50,10 +56,12 @@ class DIContainer {
   private _creditRepo: ICreditRepository | null = null;
   private _styleRepo: IStyleRepository | null = null;
   private _processedEventRepo: IProcessedEventRepository | null = null;
+  private _generationRatingRepo: IGenerationRatingRepository | null = null;
 
   // Instances singleton des services
   private _imageGenerator: IImageGeneratorService | null = null;
   private _paymentService: IPaymentService | null = null;
+  private _authService: IAuthService | null = null;
   private _storageService: IStorageService | null = null;
   private _logger: ILoggerService | null = null;
 
@@ -94,6 +102,13 @@ class DIContainer {
     return this._processedEventRepo;
   }
 
+  get generationRatingRepository(): IGenerationRatingRepository {
+    if (!this._generationRatingRepo) {
+      this._generationRatingRepo = new SupabaseGenerationRatingRepository();
+    }
+    return this._generationRatingRepo;
+  }
+
   // ============ SERVICES ============
 
   get imageGeneratorService(): IImageGeneratorService {
@@ -109,6 +124,13 @@ class DIContainer {
       this._paymentService = new StripePaymentService();
     }
     return this._paymentService;
+  }
+
+  get authService(): IAuthService {
+    if (!this._authService) {
+      this._authService = new SupabaseAuthService();
+    }
+    return this._authService;
   }
 
   get storageService(): IStorageService {
@@ -190,11 +212,27 @@ class DIContainer {
       this.paymentService,
       this.logger,
       this.processedEventRepository,
+      this.authService,
+    );
+  }
+
+  get createGuestCheckoutUseCase(): CreateGuestCheckoutUseCase {
+    return new CreateGuestCheckoutUseCase(
+      this.paymentService,
+      this.logger,
     );
   }
 
   get trialGenerateUseCase(): TrialGenerateUseCase {
     return new TrialGenerateUseCase(this.imageGeneratorService);
+  }
+
+  get rateGenerationUseCase(): RateGenerationUseCase {
+    return new RateGenerationUseCase(
+      this.generationRatingRepository,
+      this.generationRepository,
+      this.logger,
+    );
   }
 
   // ============ TESTING ============
@@ -208,8 +246,10 @@ class DIContainer {
     this._creditRepo = null;
     this._styleRepo = null;
     this._processedEventRepo = null;
+    this._generationRatingRepo = null;
     this._imageGenerator = null;
     this._paymentService = null;
+    this._authService = null;
     this._storageService = null;
     this._logger = null;
   }
@@ -235,6 +275,10 @@ class DIContainer {
 
   setProcessedEventRepository(repo: IProcessedEventRepository): void {
     this._processedEventRepo = repo;
+  }
+
+  setGenerationRatingRepository(repo: IGenerationRatingRepository): void {
+    this._generationRatingRepo = repo;
   }
 
   setImageGeneratorService(service: IImageGeneratorService): void {
@@ -267,9 +311,11 @@ export const useCases = {
   get getGenerationStatus() { return container.getGenerationStatusUseCase; },
   get listUserGenerations() { return container.listUserGenerationsUseCase; },
   get purchaseCredits() { return container.purchaseCreditsUseCase; },
+  get createGuestCheckout() { return container.createGuestCheckoutUseCase; },
   get addCredits() { return container.addCreditsUseCase; },
   get getUserCredits() { return container.getUserCreditsUseCase; },
   get getCreditHistory() { return container.getCreditHistoryUseCase; },
   get processStripeWebhook() { return container.processStripeWebhookUseCase; },
   get trialGenerate() { return container.trialGenerateUseCase; },
+  get rateGeneration() { return container.rateGenerationUseCase; },
 };

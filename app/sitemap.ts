@@ -112,18 +112,31 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     const { data: articles } = await supabase
       .from('blog_articles')
-      .select('slug, updated_at')
+      .select('slug, updated_at, language')
       .eq('status', 'published')
       .order('published_at', { ascending: false })
-      .limit(1000);
+      .limit(3000);
 
-    articlePages = (articles || []).flatMap((article) =>
-      withAlternatesForAllLocales(`/blog/${article.slug}`, {
+    // Blog multilingue : chaque article appartient à UNE langue (slug unique par langue).
+    // On émet donc une seule URL par article, sous la locale de sa langue, avec un
+    // hreflang auto-référent uniquement (les traductions ont des slugs différents, on
+    // ne peut pas les cross-linker de façon fiable). Évite tout duplicate-content
+    // et tout hreflang pointant vers une URL inexistante.
+    articlePages = (articles || []).map((article) => {
+      const lang = (article.language as string) || 'fr';
+      const hreflangKey = lang === 'fr' ? 'fr-FR' : lang;
+      return {
+        url: localizedUrl(lang, `/blog/${article.slug}`),
         lastModified: new Date(article.updated_at),
         changeFrequency: 'monthly' as const,
         priority: 0.7,
-      }),
-    );
+        alternates: {
+          languages: {
+            [hreflangKey]: localizedUrl(lang, `/blog/${article.slug}`),
+          },
+        },
+      };
+    });
   } catch (error) {
     console.error('Error fetching blog articles for sitemap:', error);
   }

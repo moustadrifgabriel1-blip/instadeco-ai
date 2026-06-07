@@ -64,8 +64,13 @@ interface BlogPageProps {
   }>;
 }
 
-// Fonction pour récupérer les articles
-async function getArticles(page: number, tag?: string, search?: string) {
+type BlogLocale = 'fr' | 'en' | 'de';
+function toBlogLocale(locale: string): BlogLocale {
+  return locale === 'en' || locale === 'de' ? locale : 'fr';
+}
+
+// Fonction pour récupérer les articles (filtrés par langue = locale courante)
+async function getArticles(locale: BlogLocale, page: number, tag?: string, search?: string) {
   try {
     const repository = new SupabaseBlogArticleRepository();
     const useCase = new ListBlogArticlesUseCase(repository);
@@ -74,6 +79,7 @@ async function getArticles(page: number, tag?: string, search?: string) {
       page,
       limit: 9,
       status: 'published',
+      language: locale,
       tags: tag ? [tag] : undefined,
       search,
     });
@@ -100,8 +106,8 @@ async function getArticles(page: number, tag?: string, search?: string) {
   }
 }
 
-// Fonction pour récupérer les données du sidebar
-async function getSidebarData() {
+// Fonction pour récupérer les données du sidebar (langue = locale courante)
+async function getSidebarData(locale: BlogLocale) {
   try {
     const repository = new SupabaseBlogArticleRepository();
     const useCase = new ListBlogArticlesUseCase(repository);
@@ -110,6 +116,7 @@ async function getSidebarData() {
     const result = await useCase.execute({
       limit: 5,
       status: 'published',
+      language: locale,
       sortBy: 'publishedAt',
       sortOrder: 'desc'
     });
@@ -191,15 +198,16 @@ function ArticleGridSkeleton() {
 export default async function BlogPage({ params, searchParams }: BlogPageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const blogLocale = toBlogLocale(locale);
   const sp = await searchParams;
   const currentPage = Number(sp.page) || 1;
   const tag = sp.tag;
   const search = sp.search;
 
-  // Récupérer les données en parallèle
+  // Récupérer les données en parallèle (filtrées par langue)
   const [articlesData, sidebarData] = await Promise.all([
-    getArticles(currentPage, tag, search),
-    getSidebarData(),
+    getArticles(blogLocale, currentPage, tag, search),
+    getSidebarData(blogLocale),
   ]);
 
   const articles = articlesData.data || [];

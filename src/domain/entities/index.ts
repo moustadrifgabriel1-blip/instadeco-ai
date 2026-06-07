@@ -4,3 +4,4 @@ export * from './User';
 export * from './Credit';
 export * from './Style';
 export * from './BlogArticle';
+export * from './GenerationRating';

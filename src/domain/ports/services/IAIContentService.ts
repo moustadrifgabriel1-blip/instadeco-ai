@@ -5,7 +5,7 @@
  * Permet de changer de fournisseur IA sans modifier le code métier.
  */
 
-import { ArticleSessionType } from '../../entities/BlogArticle';
+import { ArticleSessionType, ArticleLanguage } from '../../entities/BlogArticle';
 
 export interface GeneratedArticleContent {
   /** Titre généré (SEO optimisé) */
@@ -27,7 +27,13 @@ export interface GeneratedArticleContent {
 export interface ArticleGenerationOptions {
   /** Thème de l'article */
   theme: string;
-  
+
+  /**
+   * Langue dans laquelle l'article doit être rédigé (fr, en, de).
+   * Défaut: 'fr'. Le contenu (titre, corps, meta, FAQ) est généré dans cette langue.
+   */
+  targetLanguage?: ArticleLanguage;
+
   /** Type de session (affecte le style) */
   sessionType: ArticleSessionType;
   

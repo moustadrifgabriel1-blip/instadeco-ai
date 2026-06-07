@@ -52,7 +52,8 @@ export class StripePaymentService implements IPaymentService {
         cancel_url: options.cancelUrl,
         metadata: {
           ...options.metadata,
-          userId: options.userId,
+          // userId absent pour un achat invité : on n'écrit pas une clé vide.
+          ...(options.userId ? { userId: options.userId } : {}),
         },
       };
 

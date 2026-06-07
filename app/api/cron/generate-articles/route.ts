@@ -14,7 +14,7 @@ import { SEONotificationService } from '@/src/infrastructure/services/SEONotific
 import { AntiAIPostProcessor } from '@/src/infrastructure/services/AntiAIPostProcessor';
 import { InternalLinksService } from '@/src/infrastructure/services/InternalLinksService';
 import { selectRandomTheme, BLOG_THEMES, getSessionTypeFromTime } from '@/src/shared/constants/blog-themes';
-import { createBlogArticle, generateSlug } from '@/src/domain/entities/BlogArticle';
+import { createBlogArticle, generateSlug, ARTICLE_LANGUAGES, type ArticleLanguage } from '@/src/domain/entities/BlogArticle';
 
 export const runtime = 'nodejs';
 export const maxDuration = 300; // 300s max (Pro plan Vercel) — génération peut prendre 20-60s
@@ -176,103 +176,146 @@ export async function GET(request: NextRequest) {
 
     // 5.1 Construire la liste des titres récents à éviter pour le prompt
     const titlesToAvoid = recentTitles.slice(0, 20).map((t) => `- "${t}"`).join('\n');
+    const sessionType = getSessionTypeFromTime();
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://instadeco.app';
 
-    // 6. Générer le contenu via IA (2000+ mots pour un contenu substantiel)
-    const generatedContent = await aiService.generateArticle({
-      theme: selectedTheme.primaryKeyword,
-      sessionType: getSessionTypeFromTime(),
-      minWords: 2000,
-      temperature: 0.75,
-      additionalInstructions: `Mots-clés secondaires à intégrer: ${selectedTheme.secondaryKeywords.join(', ')}. Type de contenu: ${selectedTheme.themeType}. Cible: ${selectedTheme.targetCountry === 'ALL' ? 'Suisse, France, Belgique' : selectedTheme.targetCountry}. IMPORTANT: Inclure des prix réels de produits (IKEA, Maisons du Monde, La Redoute), des dimensions concrètes, et au moins 1 tableau comparatif HTML. Le titre doit être EVERGREEN (pas de date). Chaque conseil doit être ACTIONNABLE immédiatement.
+    // 6. BLOG MULTILINGUE — choix de(s) langue(s) à générer.
+    //    Chaque langue est un article distinct (slug unique par langue), ce qui élimine
+    //    le duplicate content sous /en et /de.
+    //
+    //    ⚠️ Contrainte budget : vercel.json plafonne cette function à maxDuration=60s
+    //    (règle coût ≤10.-/mois). Or 1 génération gemini-2.5-pro ≈ 60-120s. Générer les
+    //    3 langues en une invocation dépasserait largement 60s.
+    //    → Approche par défaut : ROTATION d'une langue par exécution. Le cron tourne 1×/j
+    //      (vercel.json : "0 6 * * *") : on alterne donc la langue d'un jour à l'autre via
+    //      le numéro de jour (J1→fr, J2→en, J3→de, J4→fr…). Sur 3 jours on couvre les 3
+    //      langues, sans jamais dépasser le budget temps de 60s.
+    //    → Override possible : ?languages=fr,en,de (ou ?languages=all) pour tout générer
+    //      en une fois (utile en test manuel avec un maxDuration relevé).
+    const { searchParams } = new URL(request.url);
+    const langParam = searchParams.get('languages');
+
+    let languagesToGenerate: ArticleLanguage[];
+    if (langParam === 'all') {
+      languagesToGenerate = [...ARTICLE_LANGUAGES];
+    } else if (langParam) {
+      languagesToGenerate = langParam
+        .split(',')
+        .map((l) => l.trim())
+        .filter((l): l is ArticleLanguage => (ARTICLE_LANGUAGES as string[]).includes(l));
+      if (languagesToGenerate.length === 0) languagesToGenerate = ['fr'];
+    } else {
+      // Rotation par jour : indexe ARTICLE_LANGUAGES via le numéro de jour (jour julien
+      // approximatif), pour alterner la langue à chaque exécution quotidienne du cron.
+      const now = new Date();
+      const dayNumber = Math.floor(now.getTime() / 86_400_000); // jours depuis epoch
+      const idx = dayNumber % ARTICLE_LANGUAGES.length;
+      languagesToGenerate = [ARTICLE_LANGUAGES[idx]];
+    }
+
+    console.log(`Cron: langues à générer = [${languagesToGenerate.join(', ')}]`);
+
+    const generateForLanguage = async (language: ArticleLanguage) => {
+      // 6.a Générer le contenu via IA dans la langue cible
+      const generatedContent = await aiService.generateArticle({
+        theme: selectedTheme!.primaryKeyword,
+        targetLanguage: language,
+        sessionType,
+        minWords: 2000,
+        temperature: 0.75,
+        additionalInstructions: `Mots-clés secondaires à intégrer: ${selectedTheme!.secondaryKeywords.join(', ')}. Type de contenu: ${selectedTheme!.themeType}. Cible: ${selectedTheme!.targetCountry === 'ALL' ? 'Suisse, France, Belgique' : selectedTheme!.targetCountry}. IMPORTANT: Inclure des prix réels de produits (IKEA, Maisons du Monde, La Redoute), des dimensions concrètes, et au moins 1 tableau comparatif HTML. Le titre doit être EVERGREEN (pas de date). Chaque conseil doit être ACTIONNABLE immédiatement.
 
 ⚠️ TITRES INTERDITS — Ces titres existent déjà sur notre blog. Ton titre doit être COMPLÈTEMENT DIFFÉRENT (angle différent, formulation différente, accroche différente). NE REPRENDS AUCUN de ces titres ni même une formulation proche :
 ${titlesToAvoid}
 
 Crée un titre avec un ANGLE UNIQUE : chiffre précis, question provocante, formule originale, erreur à éviter, secret de pro, etc.`,
-    });
+      });
 
-    // 7. Post-traitement anti-AI
-    const antiAIResult = await antiAIProcessor.process(generatedContent.content);
-    console.log(`Cron: Score anti-AI: ${antiAIResult.score}/100`);
+      // 6.b Post-traitement anti-AI
+      const antiAIResult = await antiAIProcessor.process(generatedContent.content);
 
-    // 8. Ajouter les liens internes
-    const linkResult = await linksService.addInternalLinks(
-      antiAIResult.content,
-      undefined,
-      selectedTheme.themeType,
-      5
-    );
-    console.log(`Cron: ${linkResult.linksAdded} liens internes ajoutés`);
+      // 6.c Ajouter les liens internes
+      const linkResult = await linksService.addInternalLinks(
+        antiAIResult.content,
+        undefined,
+        selectedTheme!.themeType,
+        5
+      );
 
-    // 9. Créer l'entité article
-    let slug = generateSlug(generatedContent.title);
-    let finalTitle = generatedContent.title;
-    
-    // 9.1 Vérifier que le titre n'est pas trop similaire à un titre existant
-    const titleIsSimilar = await repository.titleExistsSimilar(finalTitle, 90);
-    if (titleIsSimilar) {
-      console.warn(`Cron: Titre trop similaire détecté: "${finalTitle}"`);
-      // Ajouter un préfixe unique pour le différencier
-      const prefixes = ['Le Guide Pro :', 'Secrets de Déco :', 'Astuces Maison :', 'Nos Conseils :', 'Inspiration :', 'L\'Essentiel :'];
-      const randomPrefix = prefixes[Math.floor(Math.random() * prefixes.length)];
-      finalTitle = `${randomPrefix} ${finalTitle}`;
-      slug = generateSlug(finalTitle);
-      console.log(`Cron: Titre renommé en: "${finalTitle}"`);
-    }
-    
-    // 9.2 Vérifier que le slug n'existe pas déjà
-    const existingArticle = await repository.findBySlug(slug);
-    if (existingArticle) {
-      // Ajouter un suffixe unique pour éviter le conflit
-      const suffix = Date.now().toString(36);
-      slug = `${slug}-${suffix}`;
-      console.warn(`Cron: Slug en doublon détecté, renommé en "${slug}"`);
-    }
-    
-    const article = createBlogArticle({
-      id: crypto.randomUUID(),
-      title: finalTitle,
-      slug: slug,
-      content: linkResult.content,
-      metaDescription: generatedContent.metaDescription,
-      tags: generatedContent.tags,
-      sessionType: getSessionTypeFromTime(),
-      antiAIScore: Math.round(antiAIResult.score),
-      source: 'automation',
-    });
+      // 6.d Créer l'entité article (slug unique PAR langue)
+      let slug = generateSlug(generatedContent.title);
+      const finalTitle = generatedContent.title;
 
-    // 10. Sauvegarder dans la base
-    const savedArticle = await repository.save(article);
+      // Vérifier que le slug n'existe pas déjà DANS CETTE LANGUE
+      const slugTaken = await repository.slugExists(slug, language);
+      if (slugTaken) {
+        const suffix = Date.now().toString(36);
+        slug = `${slug}-${suffix}`;
+        console.warn(`Cron[${language}]: Slug en doublon détecté, renommé en "${slug}"`);
+      }
 
-    // 11. Notifier les moteurs de recherche
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://instadeco.app';
-    const articleUrl = `${siteUrl}/fr/blog/${savedArticle.slug}`;
-    
-    const seoResults = await seoService.notifyAll(articleUrl);
-    const successfulNotifications = seoResults.filter((r) => r.success).length;
-    console.log(`Cron: ${successfulNotifications}/${seoResults.length} notifications SEO réussies`);
+      const article = createBlogArticle({
+        id: crypto.randomUUID(),
+        title: finalTitle,
+        slug,
+        content: linkResult.content,
+        metaDescription: generatedContent.metaDescription,
+        tags: generatedContent.tags,
+        sessionType,
+        antiAIScore: Math.round(antiAIResult.score),
+        source: 'automation',
+        language,
+      });
 
-    const duration = Date.now() - startTime;
+      const savedArticle = await repository.save(article);
 
-    return NextResponse.json({
-      success: true,
-      article: {
+      // 6.e Notifier les moteurs de recherche (URL localisée)
+      const articleUrl = `${siteUrl}/${language}/blog/${savedArticle.slug}`;
+      const seoResults = await seoService.notifyAll(articleUrl);
+      const successfulNotifications = seoResults.filter((r) => r.success).length;
+
+      console.log(`Cron[${language}]: article "${savedArticle.title}" → ${successfulNotifications}/${seoResults.length} notifications SEO`);
+
+      return {
+        language,
         id: savedArticle.id,
         title: savedArticle.title,
         slug: savedArticle.slug,
         url: articleUrl,
         wordCount: savedArticle.wordCount,
-        antiAiScore: antiAIResult.score,
-      },
-      seo: {
-        notified: successfulNotifications,
-        total: seoResults.length,
-        results: seoResults,
-      },
-      processing: {
+        antiAiScore: Math.round(antiAIResult.score),
         linksAdded: linkResult.linksAdded,
-        modifications: antiAIResult.modifications.slice(0, 5),
-      },
+        seoNotified: successfulNotifications,
+        seoTotal: seoResults.length,
+      };
+    };
+
+    const articles: Array<Awaited<ReturnType<typeof generateForLanguage>>> = [];
+    const errors: Array<{ language: ArticleLanguage; error: string }> = [];
+
+    for (const language of languagesToGenerate) {
+      try {
+        articles.push(await generateForLanguage(language));
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'Erreur inconnue';
+        console.error(`[CRON][${language}] ❌ Échec génération:`, msg);
+        errors.push({ language, error: msg });
+      }
+    }
+
+    // Si AUCUNE langue n'a abouti, considérer l'exécution comme un échec.
+    if (articles.length === 0) {
+      throw new Error(`Aucun article généré (toutes langues en échec): ${errors.map((e) => `${e.language}=${e.error}`).join(' | ')}`);
+    }
+
+    const duration = Date.now() - startTime;
+
+    return NextResponse.json({
+      success: true,
+      theme: selectedTheme.primaryKeyword,
+      languagesGenerated: articles.map((a) => a.language),
+      articles,
+      errors,
       duration: `${duration}ms`,
     });
 
@@ -306,7 +349,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { theme } = body;
+    const { theme, language: rawLanguage } = body;
 
     if (!theme) {
       return NextResponse.json(
@@ -315,20 +358,29 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Langue cible optionnelle (fr par défaut). Valider contre la liste autorisée.
+    const language: ArticleLanguage = ARTICLE_LANGUAGES.includes(rawLanguage)
+      ? rawLanguage
+      : 'fr';
+
     // Initialiser les services
     const repository = new SupabaseBlogArticleRepository();
     const aiService = new GeminiAIContentService();
 
-    // Générer le contenu via IA
+    // Générer le contenu via IA dans la langue cible
     const generatedContent = await aiService.generateArticle({
       theme,
+      targetLanguage: language,
       sessionType: getSessionTypeFromTime(),
       minWords: 1200,
     });
 
-    // Créer l'entité article
-    const slug = generateSlug(generatedContent.title);
-    
+    // Créer l'entité article (slug unique par langue)
+    let slug = generateSlug(generatedContent.title);
+    if (await repository.slugExists(slug, language)) {
+      slug = `${slug}-${Date.now().toString(36)}`;
+    }
+
     const article = createBlogArticle({
       id: crypto.randomUUID(),
       title: generatedContent.title,
@@ -338,6 +390,7 @@ export async function POST(request: NextRequest) {
       tags: generatedContent.tags,
       sessionType: getSessionTypeFromTime(),
       source: 'manual',
+      language,
     });
 
     // Sauvegarder dans la base

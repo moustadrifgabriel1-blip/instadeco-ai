@@ -7,6 +7,10 @@
 
 export type ArticleSessionType = 'morning' | 'afternoon' | 'evening';
 export type ArticleStatusType = 'draft' | 'published' | 'archived';
+export type ArticleLanguage = 'fr' | 'en' | 'de';
+
+/** Langues supportées pour le blog multilingue */
+export const ARTICLE_LANGUAGES: ArticleLanguage[] = ['fr', 'en', 'de'];
 
 export interface BlogArticle {
   /** Identifiant unique (UUID) */
@@ -44,7 +48,10 @@ export interface BlogArticle {
   
   /** Source de l'article (ex: 'automation', 'manual') */
   source: string;
-  
+
+  /** Langue de rédaction de l'article (fr, en, de) */
+  language: ArticleLanguage;
+
   /** Date de publication */
   publishedAt: Date;
   
@@ -69,6 +76,7 @@ export function createBlogArticle(params: {
   sessionType: ArticleSessionType;
   source?: string;
   antiAIScore?: number;
+  language?: ArticleLanguage;
 }): BlogArticle {
   const wordCount = countWords(params.content);
   const readingTimeMinutes = Math.max(1, Math.ceil(wordCount / 250));
@@ -87,6 +95,7 @@ export function createBlogArticle(params: {
     antiAIScore: params.antiAIScore || 0,
     sessionType: params.sessionType,
     source: params.source || 'automation',
+    language: params.language || 'fr',
     publishedAt: now,
     createdAt: now,
     updatedAt: now,

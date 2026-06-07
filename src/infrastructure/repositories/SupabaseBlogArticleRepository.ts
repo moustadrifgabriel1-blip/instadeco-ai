@@ -11,7 +11,7 @@ import {
   PaginationOptions,
   PaginatedResult,
 } from '../../domain/ports/repositories/IBlogArticleRepository';
-import { BlogArticle } from '../../domain/entities/BlogArticle';
+import { BlogArticle, ArticleLanguage } from '../../domain/entities/BlogArticle';
 import { BlogArticleMapper } from '../../application/mappers/BlogArticleMapper';
 
 export class SupabaseBlogArticleRepository implements IBlogArticleRepository {
@@ -72,13 +72,23 @@ export class SupabaseBlogArticleRepository implements IBlogArticleRepository {
     return data ? BlogArticleMapper.fromSupabase(data) : null;
   }
 
-  async findBySlug(slug: string): Promise<BlogArticle | null> {
-    const { data, error } = await this.supabase
+  async findBySlug(slug: string, language?: ArticleLanguage): Promise<BlogArticle | null> {
+    let query = this.supabase
       .from('blog_articles')
       .select('*')
       .eq('slug', slug)
-      .eq('status', 'published')
-      .single();
+      .eq('status', 'published');
+
+    if (language) {
+      query = query.eq('language', language);
+    }
+
+    // maybeSingle: tolère 0 résultat sans erreur. Le slug est unique par langue ;
+    // sans langue précisée on prend le plus récent (rétro-compat des anciennes URLs).
+    const { data, error } = await query
+      .order('published_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
 
     if (error) {
       if (error.code === 'PGRST116') return null; // Not found
@@ -106,6 +116,10 @@ export class SupabaseBlogArticleRepository implements IBlogArticleRepository {
     // Appliquer les filtres
     if (filters?.status) {
       query = query.eq('status', filters.status);
+    }
+
+    if (filters?.language) {
+      query = query.eq('language', filters.language);
     }
 
     if (filters?.sessionType) {
@@ -186,11 +200,17 @@ export class SupabaseBlogArticleRepository implements IBlogArticleRepository {
     }
   }
 
-  async slugExists(slug: string): Promise<boolean> {
-    const { count, error } = await this.supabase
+  async slugExists(slug: string, language?: ArticleLanguage): Promise<boolean> {
+    let query = this.supabase
       .from('blog_articles')
       .select('*', { count: 'exact', head: true })
       .eq('slug', slug);
+
+    if (language) {
+      query = query.eq('language', language);
+    }
+
+    const { count, error } = await query;
 
     if (error) {
       throw new Error(`Erreur lors de la vérification du slug: ${error.message}`);
@@ -296,21 +316,32 @@ export class SupabaseBlogArticleRepository implements IBlogArticleRepository {
       return [];
     }
 
-    return this.findRelatedByTags(articleId, article.tags, limit);
+    return this.findRelatedByTags(articleId, article.tags, limit, article.language);
   }
 
-  async findRelatedByTags(articleId: string, tags: string[], limit: number = 3): Promise<BlogArticle[]> {
+  async findRelatedByTags(
+    articleId: string,
+    tags: string[],
+    limit: number = 3,
+    language?: ArticleLanguage,
+  ): Promise<BlogArticle[]> {
     if (tags.length === 0) {
       return [];
     }
 
-    // Chercher les articles avec des tags similaires
-    const { data, error } = await this.supabase
+    // Chercher les articles avec des tags similaires (même langue si précisée)
+    let query = this.supabase
       .from('blog_articles')
       .select('*')
       .eq('status', 'published')
       .neq('id', articleId)
-      .overlaps('tags', tags)
+      .overlaps('tags', tags);
+
+    if (language) {
+      query = query.eq('language', language);
+    }
+
+    const { data, error } = await query
       .order('published_at', { ascending: false })
       .limit(limit);
 

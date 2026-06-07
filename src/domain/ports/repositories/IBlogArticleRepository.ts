@@ -5,11 +5,13 @@
  * Fait partie de la couche Domain (aucune dépendance d'implémentation).
  */
 
-import { BlogArticle, ArticleSessionType, ArticleStatusType } from '../../entities/BlogArticle';
+import { BlogArticle, ArticleSessionType, ArticleStatusType, ArticleLanguage } from '../../entities/BlogArticle';
 
 export interface BlogArticleFilters {
   /** Filtrer par statut */
   status?: ArticleStatusType;
+  /** Filtrer par langue (fr, en, de) */
+  language?: ArticleLanguage;
   /** Filtrer par session */
   sessionType?: ArticleSessionType;
   /** Filtrer par tags (au moins un match) */
@@ -58,9 +60,12 @@ export interface IBlogArticleRepository {
   findById(id: string): Promise<BlogArticle | null>;
 
   /**
-   * Trouve un article par son slug
+   * Trouve un article par son slug.
+   * @param slug Le slug de l'article
+   * @param language Langue ciblée (le slug est unique par langue). Si omis, retourne
+   *   le premier article publié pour ce slug (rétro-compatibilité).
    */
-  findBySlug(slug: string): Promise<BlogArticle | null>;
+  findBySlug(slug: string, language?: ArticleLanguage): Promise<BlogArticle | null>;
 
   /**
    * Liste les articles avec filtres et pagination
@@ -81,9 +86,10 @@ export interface IBlogArticleRepository {
   delete(id: string): Promise<void>;
 
   /**
-   * Vérifie si un slug existe déjà
+   * Vérifie si un slug existe déjà (optionnellement restreint à une langue,
+   * le slug étant unique par langue).
    */
-  slugExists(slug: string): Promise<boolean>;
+  slugExists(slug: string, language?: ArticleLanguage): Promise<boolean>;
 
   /**
    * Vérifie si un titre similaire existe (pour déduplication)
@@ -110,7 +116,8 @@ export interface IBlogArticleRepository {
   findRelated(articleId: string, limit?: number): Promise<BlogArticle[]>;
 
   /**
-   * Récupère les articles liés par tags (évite un findById supplémentaire)
+   * Récupère les articles liés par tags (évite un findById supplémentaire).
+   * @param language Restreint les suggestions à la même langue que l'article source.
    */
-  findRelatedByTags(articleId: string, tags: string[], limit?: number): Promise<BlogArticle[]>;
+  findRelatedByTags(articleId: string, tags: string[], limit?: number, language?: ArticleLanguage): Promise<BlogArticle[]>;
 }

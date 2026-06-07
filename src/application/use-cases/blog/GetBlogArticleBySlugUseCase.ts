@@ -5,11 +5,14 @@
  */
 
 import { IBlogArticleRepository } from '../../../domain/ports/repositories/IBlogArticleRepository';
+import { ArticleLanguage } from '../../../domain/entities/BlogArticle';
 import { BlogArticleDTO, BlogArticleListDTO } from '../../dtos/BlogArticleDTO';
 import { BlogArticleMapper } from '../../mappers/BlogArticleMapper';
 
 export interface GetBlogArticleBySlugInput {
   slug: string;
+  /** Langue ciblée (le slug est unique par langue) */
+  language?: ArticleLanguage;
   /** Inclure les articles liés */
   includeRelated?: boolean;
   /** Nombre d'articles liés à récupérer */
@@ -27,10 +30,10 @@ export class GetBlogArticleBySlugUseCase {
   ) {}
 
   async execute(input: GetBlogArticleBySlugInput): Promise<GetBlogArticleBySlugOutput> {
-    const { slug, includeRelated = false, relatedLimit = 3 } = input;
+    const { slug, language, includeRelated = false, relatedLimit = 3 } = input;
 
-    // Récupérer l'article
-    const article = await this.articleRepository.findBySlug(slug);
+    // Récupérer l'article (dans la langue ciblée si fournie)
+    const article = await this.articleRepository.findBySlug(slug, language);
 
     if (!article) {
       return { article: null };
@@ -45,7 +48,7 @@ export class GetBlogArticleBySlugUseCase {
     if (includeRelated) {
       try {
         // Utiliser findRelatedByTags pour éviter une requête findById redondante
-        const related = await this.articleRepository.findRelatedByTags(article.id, article.tags, relatedLimit);
+        const related = await this.articleRepository.findRelatedByTags(article.id, article.tags, relatedLimit, article.language);
         relatedArticles = BlogArticleMapper.toListDTOArray(related);
       } catch (error) {
         console.warn(`[GetBlogArticleBySlugUseCase] Failed to fetch related articles for ${slug}:`, error);

@@ -18,6 +18,7 @@ export interface BlogArticleDTO {
   antiAIScore: number;
   sessionType: 'morning' | 'afternoon' | 'evening';
   source: string;
+  language: 'fr' | 'en' | 'de';
   publishedAt: string; // ISO string
   createdAt: string;   // ISO string
   updatedAt: string;   // ISO string
@@ -35,6 +36,7 @@ export interface BlogArticleListDTO {
   status: 'draft' | 'published' | 'archived';
   wordCount: number;
   readingTimeMinutes: number;
+  language: 'fr' | 'en' | 'de';
   publishedAt: string;
 }
 
