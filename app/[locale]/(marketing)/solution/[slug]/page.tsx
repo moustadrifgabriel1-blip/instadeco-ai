@@ -26,12 +26,12 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { generateFAQSchema, generateBreadcrumbList, generateWebPageSchema } from '@/lib/seo/schemas';
-import { getCanonicalUrl } from '@/lib/seo/config';
+import { getCanonicalUrl, getLocalizedCanonicalUrl, withLocalePath } from '@/lib/seo/config';
 import { INTENT_PAGES, getIntentPageBySlug } from '@/lib/seo/intent-pages-data';
 import { LeadCaptureLazy } from '@/components/features/lead-capture-lazy';
 
 interface PageProps {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }
 
 export function generateStaticParams() {
@@ -39,9 +39,11 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { slug } = await params;
+  const { locale, slug } = await params;
   const page = getIntentPageBySlug(slug);
   if (!page) return { title: 'Page non trouvée' };
+
+  const path = `/solution/${page.slug}`;
 
   return {
     title: page.metaTitle,
@@ -51,8 +53,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: page.metaTitle,
       description: page.metaDescription,
       type: 'website',
-      url: getCanonicalUrl(`/solution/${page.slug}`),
-      images: [getCanonicalUrl('/og-image.png')],
+      url: getLocalizedCanonicalUrl(locale, path),
+      images: [getCanonicalUrl('/api/og')],
     },
     twitter: {
       card: 'summary_large_image',
@@ -60,7 +62,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description: page.metaDescription,
     },
     alternates: {
-      canonical: getCanonicalUrl(`/solution/${page.slug}`),
+      canonical: getLocalizedCanonicalUrl(locale, path),
+      languages: {
+        'fr-FR': getLocalizedCanonicalUrl('fr', path),
+        en: getLocalizedCanonicalUrl('en', path),
+        de: getLocalizedCanonicalUrl('de', path),
+        'x-default': getLocalizedCanonicalUrl('fr', path),
+      },
     },
   };
 }
@@ -94,7 +102,7 @@ const iconMap: Record<string, React.ReactNode> = {
 };
 
 export default async function IntentPage({ params }: PageProps) {
-  const { slug } = await params;
+  const { locale, slug } = await params;
   const page = getIntentPageBySlug(slug);
   if (!page) notFound();
 
@@ -106,12 +114,13 @@ export default async function IntentPage({ params }: PageProps) {
         generateWebPageSchema({
           title: page.title,
           description: page.metaDescription,
-          url: getCanonicalUrl(`/solution/${page.slug}`),
+          url: getLocalizedCanonicalUrl(locale, `/solution/${page.slug}`),
         }),
         generateBreadcrumbList([
-          { label: 'Accueil', path: '/' },
-          { label: page.title, path: `/solution/${page.slug}` },
-        ]),
+          { label: page.title, path: withLocalePath(locale, `/solution/${page.slug}`) },
+        ], {
+          home: { name: 'Accueil', url: withLocalePath(locale, '/') },
+        }),
         generateFAQSchema(page.faq),
       ]} />
 

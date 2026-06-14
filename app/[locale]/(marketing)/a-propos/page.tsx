@@ -6,34 +6,48 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { generateBreadcrumbList } from '@/lib/seo/schemas';
-import { getCanonicalUrl } from '@/lib/seo/config';
+import { getCanonicalUrl, getLocalizedCanonicalUrl, withLocalePath } from '@/lib/seo/config';
 
-export const metadata: Metadata = {
-  title: 'À Propos d\'InstaDeco AI - Notre Histoire',
-  description: 'InstaDeco AI est né en Suisse de la rencontre entre une passionnée de décoration et un ingénieur tech. Découvrez comment nous rendons la décoration d\'intérieur accessible à tous grâce à l\'IA.',
-  openGraph: {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const path = '/a-propos';
+
+  return {
     title: 'À Propos d\'InstaDeco AI - Notre Histoire',
-    description: 'Un couple suisse, une passion pour la déco et la tech, et une mission : démocratiser la décoration d\'intérieur grâce à l\'IA.',
-    type: 'website',
-    url: getCanonicalUrl('/a-propos'),
-    images: [getCanonicalUrl('/og-image.png')],
-  },
-  alternates: {
-    canonical: getCanonicalUrl('/a-propos'),
-  },
-};
+    description: 'InstaDeco AI est né en Suisse de la rencontre entre une passionnée de décoration et un ingénieur tech. Découvrez comment nous rendons la décoration d\'intérieur accessible à tous grâce à l\'IA.',
+    openGraph: {
+      title: 'À Propos d\'InstaDeco AI - Notre Histoire',
+      description: 'Un couple suisse, une passion pour la déco et la tech, et une mission : démocratiser la décoration d\'intérieur grâce à l\'IA.',
+      type: 'website',
+      url: getLocalizedCanonicalUrl(locale, path),
+      images: [getCanonicalUrl('/api/og')],
+    },
+    alternates: {
+      canonical: getLocalizedCanonicalUrl(locale, path),
+      languages: {
+        'fr-FR': getLocalizedCanonicalUrl('fr', path),
+        en: getLocalizedCanonicalUrl('en', path),
+        de: getLocalizedCanonicalUrl('de', path),
+        'x-default': getLocalizedCanonicalUrl('fr', path),
+      },
+    },
+  };
+}
 
-export default function AboutPage() {
+export default async function AboutPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <JsonLd data={[
-        generateBreadcrumbList([{ label: 'À propos', path: '/a-propos' }]),
+        generateBreadcrumbList([{ label: 'À propos', path: withLocalePath(locale, '/a-propos') }], {
+          home: { name: 'Accueil', url: withLocalePath(locale, '/') },
+        }),
         {
           '@context': 'https://schema.org',
           '@type': 'AboutPage',
           name: 'À Propos d\'InstaDeco AI',
           description: 'L\'histoire d\'InstaDeco AI, fondée en Suisse par un couple passionné de déco et de technologie.',
-          url: getCanonicalUrl('/a-propos'),
+          url: getLocalizedCanonicalUrl(locale, '/a-propos'),
         },
       ]} />
 

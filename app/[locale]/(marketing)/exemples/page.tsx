@@ -3,28 +3,39 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, Sparkles, Home, Building2, Palette, Sofa, BedDouble, UtensilsCrossed } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { getCanonicalUrl } from '@/lib/seo/config';
+import { getCanonicalUrl, getLocalizedCanonicalUrl } from '@/lib/seo/config';
 
-export const metadata: Metadata = {
-  title: 'Exemples & Cas d\'Usage - Transformations Décoration IA | InstaDeco',
-  description: 'Découvrez des exemples concrets de transformations de décoration d\'intérieur réalisées par InstaDeco AI. Salon, chambre, cuisine, bureau : avant/après spectaculaires.',
-  keywords: ['exemples décoration IA', 'avant après déco', 'transformation intérieur', 'use cases home staging', 'galerie décoration', 'réalisations IA déco'],
-  openGraph: {
-    title: 'Exemples de Transformations Déco par IA | InstaDeco',
-    description: 'Avant/après spectaculaires de salons, chambres, cuisines et bureaux transformés par l\'IA.',
-    type: 'website',
-    url: getCanonicalUrl('/exemples'),
-    images: [getCanonicalUrl('/og-image.png')],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Transformations Déco par IA - Exemples | InstaDeco',
-    description: 'Avant/après bluffants de décoration intérieure par IA.',
-  },
-  alternates: {
-    canonical: getCanonicalUrl('/exemples'),
-  },
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const path = '/exemples';
+
+  return {
+    title: 'Exemples & Cas d\'Usage - Transformations Décoration IA | InstaDeco',
+    description: 'Découvrez des exemples concrets de transformations de décoration d\'intérieur réalisées par InstaDeco AI. Salon, chambre, cuisine, bureau : avant/après spectaculaires.',
+    keywords: ['exemples décoration IA', 'avant après déco', 'transformation intérieur', 'use cases home staging', 'galerie décoration', 'réalisations IA déco'],
+    openGraph: {
+      title: 'Exemples de Transformations Déco par IA | InstaDeco',
+      description: 'Avant/après spectaculaires de salons, chambres, cuisines et bureaux transformés par l\'IA.',
+      type: 'website',
+      url: getLocalizedCanonicalUrl(locale, path),
+      images: [getCanonicalUrl('/api/og')],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: 'Transformations Déco par IA - Exemples | InstaDeco',
+      description: 'Avant/après bluffants de décoration intérieure par IA.',
+    },
+    alternates: {
+      canonical: getLocalizedCanonicalUrl(locale, path),
+      languages: {
+        'fr-FR': getLocalizedCanonicalUrl('fr', path),
+        en: getLocalizedCanonicalUrl('en', path),
+        de: getLocalizedCanonicalUrl('de', path),
+        'x-default': getLocalizedCanonicalUrl('fr', path),
+      },
+    },
+  };
+}
 
 // Types de pièces avec exemples
 const useCases = [

@@ -549,7 +549,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             '@type': 'BlogPosting',
             headline: formatBlogTitle(article.title),
             description: article.metaDescription,
-            url: ``,
+            url: getLocalizedCanonicalUrl(locale, `/blog/${article.slug}`),
             datePublished: article.publishedAt,
             dateModified: article.publishedAt,
             inLanguage: locale,
@@ -570,7 +570,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             image: heroImageUrl,
             mainEntityOfPage: {
               '@type': 'WebPage',
-              '@id': ``,
+              '@id': getLocalizedCanonicalUrl(locale, `/blog/${article.slug}`),
             },
             keywords: article.tags.join(', '),
             wordCount: article.wordCount,

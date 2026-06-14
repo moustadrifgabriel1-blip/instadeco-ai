@@ -6,31 +6,43 @@ import { Button } from '@/components/ui/button';
 import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { generateBreadcrumbList } from '@/lib/seo/schemas';
-import { getCanonicalUrl } from '@/lib/seo/config';
+import { getCanonicalUrl, getLocalizedCanonicalUrl, withLocalePath } from '@/lib/seo/config';
 
-export const metadata: Metadata = {
-  title: 'Solutions Décoration IA - Home Staging, Simulateur, Avant/Après | InstaDeco',
-  description: 'Découvrez toutes les solutions de décoration par intelligence artificielle : home staging virtuel, simulateur déco, avant/après, idées d\'aménagement, et plus. Résultat en 30 secondes.',
-  keywords: [
-    'home staging virtuel',
-    'simulateur décoration intérieur',
-    'avant après décoration',
-    'logiciel home staging',
-    'idée aménagement studio',
-    'simulateur peinture',
-    'décoration salon IA',
-    'décoration chambre IA',
-  ],
-  openGraph: {
-    title: 'Solutions Décoration par IA | InstaDeco',
-    description: 'Home staging virtuel, simulateur déco, avant/après : toutes nos solutions IA pour votre intérieur.',
-    type: 'website',
-    url: getCanonicalUrl('/solutions'),
-  },
-  alternates: {
-    canonical: getCanonicalUrl('/solutions'),
-  },
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const path = '/solutions';
+
+  return {
+    title: 'Solutions Décoration IA - Home Staging, Simulateur, Avant/Après | InstaDeco',
+    description: 'Découvrez toutes les solutions de décoration par intelligence artificielle : home staging virtuel, simulateur déco, avant/après, idées d\'aménagement, et plus. Résultat en 30 secondes.',
+    keywords: [
+      'home staging virtuel',
+      'simulateur décoration intérieur',
+      'avant après décoration',
+      'logiciel home staging',
+      'idée aménagement studio',
+      'simulateur peinture',
+      'décoration salon IA',
+      'décoration chambre IA',
+    ],
+    openGraph: {
+      title: 'Solutions Décoration par IA | InstaDeco',
+      description: 'Home staging virtuel, simulateur déco, avant/après : toutes nos solutions IA pour votre intérieur.',
+      type: 'website',
+      url: getLocalizedCanonicalUrl(locale, path),
+      images: [getCanonicalUrl('/api/og')],
+    },
+    alternates: {
+      canonical: getLocalizedCanonicalUrl(locale, path),
+      languages: {
+        'fr-FR': getLocalizedCanonicalUrl('fr', path),
+        en: getLocalizedCanonicalUrl('en', path),
+        de: getLocalizedCanonicalUrl('de', path),
+        'x-default': getLocalizedCanonicalUrl('fr', path),
+      },
+    },
+  };
+}
 
 const SOLUTIONS = [
   {
@@ -99,11 +111,14 @@ const SOLUTIONS = [
   },
 ];
 
-export default function SolutionsIndexPage() {
+export default async function SolutionsIndexPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <JsonLd data={[
-        generateBreadcrumbList([{ label: 'Solutions', path: '/solutions' }]),
+        generateBreadcrumbList([{ label: 'Solutions', path: withLocalePath(locale, '/solutions') }], {
+          home: { name: 'Accueil', url: withLocalePath(locale, '/') },
+        }),
       ]} />
 
       <Breadcrumbs items={[{ label: 'Solutions décoration IA', href: '/solutions' }]} />

@@ -5,7 +5,7 @@
 import { Metadata } from 'next';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { generateProductSchema, generateFAQSchema, generateBreadcrumbList } from '@/lib/seo/schemas';
-import { getLocalizedCanonicalUrl, withLocalePath } from '@/lib/seo/config';
+import { getCanonicalUrl, getLocalizedCanonicalUrl, withLocalePath } from '@/lib/seo/config';
 import { getMessages, getTranslations } from 'next-intl/server';
 
 export async function generateMetadata({
@@ -33,7 +33,7 @@ export async function generateMetadata({
       description: t('ogDescription'),
       type: 'website',
       url: getLocalizedCanonicalUrl(locale, '/pricing'),
-      images: [getLocalizedCanonicalUrl(locale, '/og-image.png')],
+      images: [getCanonicalUrl('/api/og')],
     },
     twitter: {
       card: 'summary_large_image',

@@ -8,11 +8,11 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { LeadCaptureLazy } from '@/components/features/lead-capture-lazy';
 import { STYLE_SEO_DATA, ROOM_SEO_DATA, getStyleSEOBySlug, getRoomSEOBySlug } from '@/lib/seo/programmatic-data';
-import { getCanonicalUrl } from '@/lib/seo/config';
+import { getLocalizedCanonicalUrl } from '@/lib/seo/config';
 import { sanitizeJsonLd } from '@/lib/security/sanitize';
 
 interface PageProps {
-  params: Promise<{ style: string; piece: string }>;
+  params: Promise<{ locale: string; style: string; piece: string }>;
 }
 
 // ============================================
@@ -51,7 +51,7 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { style: styleSlug, piece: pieceSlug } = await params;
+  const { locale, style: styleSlug, piece: pieceSlug } = await params;
   const style = getStyleSEOBySlug(styleSlug);
   const room = getRoomSEOBySlug(pieceSlug);
 
@@ -63,18 +63,26 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const title = `${room.name} ${style.name} : Idées Déco, Couleurs & Conseils | InstaDeco`;
   const description = `Guide complet : comment créer ${room.name === 'Entrée' || room.name === 'Terrasse' || room.name === 'Chambre' ? 'une' : 'un'} ${room.name.toLowerCase()} en style ${style.name}. Palette ${style.colors.slice(0, 2).join('/')}, matériaux ${style.materials[0]}, budget ${style.priceRange}. Visualisez le résultat sur votre photo.`;
 
+  const path = `/deco/${styleSlug}/${pieceSlug}`;
+
   return {
     title,
     description,
     openGraph: {
       title,
       description,
-      url: getCanonicalUrl(`/deco/${styleSlug}/${pieceSlug}`),
+      url: getLocalizedCanonicalUrl(locale, path),
       type: 'article',
       siteName: 'InstaDeco AI',
     },
     alternates: {
-      canonical: getCanonicalUrl(`/deco/${styleSlug}/${pieceSlug}`),
+      canonical: getLocalizedCanonicalUrl(locale, path),
+      languages: {
+        'fr-FR': getLocalizedCanonicalUrl('fr', path),
+        en: getLocalizedCanonicalUrl('en', path),
+        de: getLocalizedCanonicalUrl('de', path),
+        'x-default': getLocalizedCanonicalUrl('fr', path),
+      },
     },
     // Pages non-prioritaires = noindex (maillage interne uniquement)
     ...(!indexable && {
@@ -392,7 +400,7 @@ function getFaq(style: typeof STYLE_SEO_DATA[0], room: typeof ROOM_SEO_DATA[0]) 
 }
 
 export default async function DecoStylePiecePage({ params }: PageProps) {
-  const { style: styleSlug, piece: pieceSlug } = await params;
+  const { locale, style: styleSlug, piece: pieceSlug } = await params;
   const style = getStyleSEOBySlug(styleSlug);
   const room = getRoomSEOBySlug(pieceSlug);
 
@@ -667,7 +675,7 @@ export default async function DecoStylePiecePage({ params }: PageProps) {
             '@type': 'WebPage',
             name: `${room.name} style ${style.name} : Guide Complet de Décoration`,
             description: `Comment décorer ${room.name === 'Entrée' || room.name === 'Terrasse' || room.name === 'Chambre' ? 'une' : 'un'} ${room.name.toLowerCase()} en style ${style.name}. Couleurs, matériaux, conseils.`,
-            url: getCanonicalUrl(`/deco/${style.slug}/${room.slug}`),
+            url: getLocalizedCanonicalUrl(locale, `/deco/${style.slug}/${room.slug}`),
             isPartOf: {
               '@id': 'https://instadeco.app/#website',
             },
@@ -699,10 +707,10 @@ export default async function DecoStylePiecePage({ params }: PageProps) {
             '@context': 'https://schema.org',
             '@type': 'BreadcrumbList',
             itemListElement: [
-              { '@type': 'ListItem', position: 1, name: 'Accueil', item: 'https://instadeco.app' },
-              { '@type': 'ListItem', position: 2, name: `Style ${style.name}`, item: getCanonicalUrl(`/style/${style.slug}`) },
-              { '@type': 'ListItem', position: 3, name: room.name, item: getCanonicalUrl(`/piece/${room.slug}`) },
-              { '@type': 'ListItem', position: 4, name: `${room.name} ${style.name}`, item: getCanonicalUrl(`/deco/${style.slug}/${room.slug}`) },
+              { '@type': 'ListItem', position: 1, name: 'Accueil', item: getLocalizedCanonicalUrl(locale, '/') },
+              { '@type': 'ListItem', position: 2, name: `Style ${style.name}`, item: getLocalizedCanonicalUrl(locale, `/style/${style.slug}`) },
+              { '@type': 'ListItem', position: 3, name: room.name, item: getLocalizedCanonicalUrl(locale, `/piece/${room.slug}`) },
+              { '@type': 'ListItem', position: 4, name: `${room.name} ${style.name}`, item: getLocalizedCanonicalUrl(locale, `/deco/${style.slug}/${room.slug}`) },
             ],
           }),
         }}

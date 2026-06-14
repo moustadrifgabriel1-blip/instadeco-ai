@@ -17,12 +17,12 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { generateFAQSchema, generateBreadcrumbList, generateWebPageSchema } from '@/lib/seo/schemas';
-import { getCanonicalUrl } from '@/lib/seo/config';
+import { getCanonicalUrl, getLocalizedCanonicalUrl, withLocalePath } from '@/lib/seo/config';
 import { STYLE_SEO_DATA, getStyleSEOBySlug } from '@/lib/seo/programmatic-data';
 import { CITIES } from '@/src/shared/constants/cities';
 
 interface PageProps {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }
 
 // Pre-render toutes les pages de style au build
@@ -33,9 +33,11 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { slug } = await params;
+  const { locale, slug } = await params;
   const style = getStyleSEOBySlug(slug);
   if (!style) return { title: 'Style non trouvé' };
+
+  const path = `/style/${style.slug}`;
 
   return {
     title: style.metaTitle,
@@ -45,8 +47,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: style.metaTitle,
       description: style.metaDescription,
       type: 'article',
-      url: getCanonicalUrl(`/style/${style.slug}`),
-      images: [getCanonicalUrl('/og-image.png')],
+      url: getLocalizedCanonicalUrl(locale, path),
+      images: [getCanonicalUrl('/api/og')],
     },
     twitter: {
       card: 'summary_large_image',
@@ -54,13 +56,19 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description: style.metaDescription,
     },
     alternates: {
-      canonical: getCanonicalUrl(`/style/${style.slug}`),
+      canonical: getLocalizedCanonicalUrl(locale, path),
+      languages: {
+        'fr-FR': getLocalizedCanonicalUrl('fr', path),
+        en: getLocalizedCanonicalUrl('en', path),
+        de: getLocalizedCanonicalUrl('de', path),
+        'x-default': getLocalizedCanonicalUrl('fr', path),
+      },
     },
   };
 }
 
 export default async function StylePage({ params }: PageProps) {
-  const { slug } = await params;
+  const { locale, slug } = await params;
   const style = getStyleSEOBySlug(slug);
   if (!style) notFound();
 
@@ -80,12 +88,14 @@ export default async function StylePage({ params }: PageProps) {
         generateWebPageSchema({
           title: style.title,
           description: style.metaDescription,
-          url: getCanonicalUrl(`/style/${style.slug}`),
+          url: getLocalizedCanonicalUrl(locale, `/style/${style.slug}`),
         }),
         generateBreadcrumbList([
-          { label: 'Styles', path: '/exemples' },
-          { label: style.name, path: `/style/${style.slug}` },
-        ]),
+          { label: 'Styles', path: withLocalePath(locale, '/exemples') },
+          { label: style.name, path: withLocalePath(locale, `/style/${style.slug}`) },
+        ], {
+          home: { name: 'Accueil', url: withLocalePath(locale, '/') },
+        }),
         generateFAQSchema(style.faq),
       ]} />
 

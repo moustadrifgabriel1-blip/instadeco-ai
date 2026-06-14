@@ -6,30 +6,42 @@ import { Button } from '@/components/ui/button';
 import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { generateBreadcrumbList, generateFAQSchema } from '@/lib/seo/schemas';
-import { getCanonicalUrl } from '@/lib/seo/config';
+import { getCanonicalUrl, getLocalizedCanonicalUrl, withLocalePath } from '@/lib/seo/config';
 
-export const metadata: Metadata = {
-  title: 'Décoration par Pièce - Salon, Chambre, Cuisine, Bureau | InstaDeco AI',
-  description: 'Trouvez l\'inspiration déco pour chaque pièce de votre maison. Salon, chambre, cuisine, salle de bain, bureau, entrée : visualisez la transformation par IA en 30 secondes.',
-  keywords: [
-    'décoration salon',
-    'décoration chambre',
-    'décoration cuisine',
-    'décoration salle de bain',
-    'décoration bureau',
-    'idée déco par pièce',
-    'aménagement intérieur',
-  ],
-  openGraph: {
-    title: 'Décoration par Pièce - Tous les Types | InstaDeco AI',
-    description: 'Inspiration déco pour salon, chambre, cuisine, bureau et plus. Visualisez avec l\'IA.',
-    type: 'website',
-    url: getCanonicalUrl('/pieces'),
-  },
-  alternates: {
-    canonical: getCanonicalUrl('/pieces'),
-  },
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const path = '/pieces';
+
+  return {
+    title: 'Décoration par Pièce - Salon, Chambre, Cuisine, Bureau | InstaDeco AI',
+    description: 'Trouvez l\'inspiration déco pour chaque pièce de votre maison. Salon, chambre, cuisine, salle de bain, bureau, entrée : visualisez la transformation par IA en 30 secondes.',
+    keywords: [
+      'décoration salon',
+      'décoration chambre',
+      'décoration cuisine',
+      'décoration salle de bain',
+      'décoration bureau',
+      'idée déco par pièce',
+      'aménagement intérieur',
+    ],
+    openGraph: {
+      title: 'Décoration par Pièce - Tous les Types | InstaDeco AI',
+      description: 'Inspiration déco pour salon, chambre, cuisine, bureau et plus. Visualisez avec l\'IA.',
+      type: 'website',
+      url: getLocalizedCanonicalUrl(locale, path),
+      images: [getCanonicalUrl('/api/og')],
+    },
+    alternates: {
+      canonical: getLocalizedCanonicalUrl(locale, path),
+      languages: {
+        'fr-FR': getLocalizedCanonicalUrl('fr', path),
+        en: getLocalizedCanonicalUrl('en', path),
+        de: getLocalizedCanonicalUrl('de', path),
+        'x-default': getLocalizedCanonicalUrl('fr', path),
+      },
+    },
+  };
+}
 
 const ROOMS = [
   {
@@ -113,11 +125,14 @@ const FAQ = [
   },
 ];
 
-export default function PiecesIndexPage() {
+export default async function PiecesIndexPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <JsonLd data={[
-        generateBreadcrumbList([{ label: 'Pièces', path: '/pieces' }]),
+        generateBreadcrumbList([{ label: 'Pièces', path: withLocalePath(locale, '/pieces') }], {
+          home: { name: 'Accueil', url: withLocalePath(locale, '/') },
+        }),
         generateFAQSchema(FAQ),
       ]} />
 

@@ -1,0 +1,114 @@
+# seo-engine — Moteur SEO autonome InstaDeco (GitHub Actions, pas de VPS).
+#
+# Budget : runners ubuntu-latest GRATUITS. Seul poste payant = citation_batch
+# (capé à 1.50 CHF/mois côté script). Voir .claude/seo-engine/README.md.
+#
+# MODE DORMANT : seul le déclencheur manuel (workflow_dispatch) est actif.
+# Le bloc `schedule:` (crons) est PRÉSENT mais COMMENTÉ ci-dessous.
+#
+# POUR ACTIVER :
+#   1. Configurer les secrets GitHub (Settings -> Secrets and variables ->
+#      Actions) : GOOGLE_APPLICATION_CREDENTIALS_JSON, GSC_SITE_URL,
+#      GA4_PROPERTY_ID, PAGESPEED_API_KEY, OPENAI_API_KEY, PERPLEXITY_API_KEY,
+#      USD_CHF_RATE. (CITATION_BUDGET_CHF a un défaut de 1.50 dans le script.)
+#   2. Décommenter le bloc `schedule:` ci-dessous.
+#   3. (Optionnel) lancer un run manuel depuis l'onglet Actions pour valider.
+#
+# Tant que les secrets ne sont pas configurés, les jobs ÉCHOUENT proprement
+# (code non-zéro + message clair). C'est VOULU : aucune exécution silencieuse
+# sans vraies credentials, aucune donnée inventée.
+
+name: seo-engine
+
+on:
+  # Déclencheur manuel ACTIF : permet de choisir quel job lancer.
+  workflow_dispatch:
+    inputs:
+      job:
+        description: "Quel script lancer"
+        required: true
+        default: "gsc_daily"
+        type: choice
+        options:
+          - gsc_daily
+          - drift_check
+          - rank_tracker
+          - competitor_diff
+          - citation_batch
+
+  # --- CRONS (DORMANT) — décommenter pour activer la planification ---
+  # Tous les horaires sont en UTC.
+  # schedule:
+  #   - cron: "0 6 * * *"   # gsc_daily      — quotidien  06h UTC
+  #   - cron: "0 6 * * *"   # drift_check    — quotidien  06h UTC
+  #   - cron: "0 7 * * 1"   # rank_tracker   — hebdo lundi 07h UTC
+  #   - cron: "0 7 * * 0"   # competitor_diff— hebdo dimanche 07h UTC
+  #   - cron: "0 8 1 * *"   # citation_batch — mensuel le 1er 08h UTC
+
+# Pas de permissions d'écriture nécessaires par défaut (les rapports restent
+# sur le runner). Pour committer les rapports dans le repo, ajouter ici
+# `permissions: contents: write` + une étape de commit.
+permissions:
+  contents: read
+
+jobs:
+  seo-engine:
+    runs-on: ubuntu-latest   # runner gratuit
+    env:
+      # Variables non-secrètes : fournies en repo variables ou en dur.
+      GSC_SITE_URL: ${{ vars.GSC_SITE_URL || 'https://instadeco.app' }}
+      GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
+      PAGESPEED_API_KEY: ${{ secrets.PAGESPEED_API_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
+      USD_CHF_RATE: ${{ secrets.USD_CHF_RATE }}
+      # Chemin où l'on écrit le JSON du compte de service Google (cf. étape ci-dessous).
+      GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/.gcp-sa.json
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install deps
+        run: pip install -r .claude/seo-engine/requirements.txt
+
+      - name: Écrire les credentials Google (depuis le secret)
+        # Le secret contient le CONTENU JSON du compte de service.
+        # Si le secret est absent, le fichier reste vide et les scripts Google
+        # échoueront proprement (comportement voulu tant que non configuré).
+        run: |
+          printf '%s' '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}' > "$GOOGLE_APPLICATION_CREDENTIALS"
+        shell: bash
+
+      # --- Exécution ---
+      # En run manuel : lance le job choisi.
+      # En run planifié : adapter (un workflow par cron, ou router via
+      # github.event.schedule). Ici on exécute le job demandé manuellement ;
+      # par défaut (cron) on lance gsc_daily.
+      - name: Run script
+        run: |
+          JOB="${{ github.event.inputs.job }}"
+          JOB="${JOB:-gsc_daily}"
+          case "$JOB" in
+            gsc_daily)       python .claude/seo-engine/monitors/gsc_daily.py ;;
+            drift_check)     python .claude/seo-engine/monitors/drift_check.py ;;
+            rank_tracker)    python .claude/seo-engine/monitors/rank_tracker.py ;;
+            competitor_diff) python .claude/seo-engine/scrapers/competitor_diff.py ;;
+            citation_batch)  python .claude/seo-engine/monitors/citation_batch.py ;;
+            *) echo "Job inconnu: $JOB" && exit 1 ;;
+          esac
+        shell: bash
+
+      - name: Upload des rapports (artefact)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: seo-engine-reports
+          path: .claude/seo-engine/reports/
+          if-no-files-found: ignore

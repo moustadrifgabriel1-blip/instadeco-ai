@@ -11,11 +11,11 @@ import {
 } from 'lucide-react';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { generateServiceSchema, generateBreadcrumbList, generateFAQSchema } from '@/lib/seo/schemas';
-import { getCanonicalUrl } from '@/lib/seo/config';
+import { getCanonicalUrl, getLocalizedCanonicalUrl, withLocalePath } from '@/lib/seo/config';
 import { LeadCaptureLazy } from '@/components/features/lead-capture-lazy';
 
 interface PageProps {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }
 
 // Génération des routes statiques
@@ -104,12 +104,14 @@ const getArchitectureContent = (city: City) => {
 
 // Métadonnées SEO
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { slug } = await params;
+  const { locale, slug } = await params;
   const city = CITIES.find((c) => c.slug === slug);
   if (!city) return { title: 'Page non trouvée' };
 
   const title = `Architecte d'intérieur IA à ${city.name} (${city.zip}) - Rénovation & Déco`;
   const description = `Habitant de ${city.name} ? Redécorez votre intérieur en 10s avec l'IA. Home Staging virtuel et simulation travaux pour ${city.zip}. Essai gratuit.`;
+
+  const path = `/architecte-interieur/${city.slug}`;
 
   return {
     title,
@@ -127,8 +129,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description,
       type: 'website',
       locale: 'fr_FR',
-      url: getCanonicalUrl(`/architecte-interieur/${city.slug}`),
-      images: [getCanonicalUrl('/og-image.png')],
+      url: getLocalizedCanonicalUrl(locale, path),
+      images: [getCanonicalUrl('/api/og')],
     },
     twitter: {
       card: 'summary_large_image',
@@ -136,13 +138,19 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description,
     },
     alternates: {
-      canonical: getCanonicalUrl(`/architecte-interieur/${city.slug}`),
+      canonical: getLocalizedCanonicalUrl(locale, path),
+      languages: {
+        'fr-FR': getLocalizedCanonicalUrl('fr', path),
+        en: getLocalizedCanonicalUrl('en', path),
+        de: getLocalizedCanonicalUrl('de', path),
+        'x-default': getLocalizedCanonicalUrl('fr', path),
+      },
     },
   };
 }
 
 export default async function CityPage({ params }: PageProps) {
-  const { slug } = await params;
+  const { locale, slug } = await params;
   const city = CITIES.find((c) => c.slug === slug);
   if (!city) notFound();
 
@@ -172,9 +180,11 @@ export default async function CityPage({ params }: PageProps) {
           currency: terms.currency,
         }),
         generateBreadcrumbList([
-          { label: 'Architecte intérieur', path: '/architecte-interieur' },
-          { label: city.name, path: `/architecte-interieur/${city.slug}` },
-        ]),
+          { label: 'Architecte intérieur', path: withLocalePath(locale, '/architecte-interieur') },
+          { label: city.name, path: withLocalePath(locale, `/architecte-interieur/${city.slug}`) },
+        ], {
+          home: { name: 'Accueil', url: withLocalePath(locale, '/') },
+        }),
         generateFAQSchema(faqItems),
       ]} />
 

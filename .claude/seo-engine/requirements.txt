@@ -1,0 +1,10 @@
+# Dépendances Python du moteur seo-engine (minimal).
+# Installé sur le runner GitHub Actions et en local.
+
+requests
+beautifulsoup4
+lxml
+google-api-python-client
+google-auth
+google-auth-oauthlib
+python-dotenv

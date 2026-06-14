@@ -6,14 +6,17 @@
  */
 
 export const SEO_CONFIG = {
-  // Domaine principal - UNIQUE source de vérité
-  siteUrl: process.env.NEXT_PUBLIC_APP_URL || 'https://instadeco.app',
+  // Domaine principal - UNIQUE source de vérité.
+  // .trim() + suppression du/des slash(es) final(aux) : durcissement contre une variable
+  // d'env Vercel polluée par un retour-ligne final (sinon `${siteUrl}/${locale}` produit
+  // "https://instadeco.app\n/fr" → toutes les <loc> du sitemap et les hreflang invalides).
+  siteUrl: (process.env.NEXT_PUBLIC_APP_URL || 'https://instadeco.app').trim().replace(/\/+$/, ''),
   siteName: 'InstaDeco AI',
   siteDescription: 'Transformez vos pièces en rendus décorés professionnels en quelques secondes grâce à l\'IA. Home staging virtuel, inspiration déco, visualisation avant travaux.',
   
   // Branding
   logo: '/images/logo-v3-house-sparkle.svg',
-  ogImage: '/og-image.png',
+  ogImage: '/api/og', // OG généré dynamiquement (app/api/og/route.tsx) — l'ancien /og-image.png renvoyait 404
   themeColor: '#E07B54',
   
   // Contact

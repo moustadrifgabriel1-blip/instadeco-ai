@@ -92,6 +92,7 @@ export function generateSoftwareAppSchema() {
 
   return {
     '@type': 'SoftwareApplication',
+    '@id': `${SEO_CONFIG.siteUrl}/#software`, // @id stable → Google fusionne les instances (dédup)
     name: SEO_CONFIG.siteName,
     applicationCategory: 'DesignApplication',
     operatingSystem: 'Web',

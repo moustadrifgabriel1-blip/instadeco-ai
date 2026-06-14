@@ -6,31 +6,43 @@ import { Button } from '@/components/ui/button';
 import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { generateBreadcrumbList, generateFAQSchema } from '@/lib/seo/schemas';
-import { getCanonicalUrl } from '@/lib/seo/config';
+import { getCanonicalUrl, getLocalizedCanonicalUrl, withLocalePath } from '@/lib/seo/config';
 
-export const metadata: Metadata = {
-  title: '12 Styles de Décoration Intérieure par IA - Moderne, Scandinave, Japandi...',
-  description: 'Découvrez 12 styles de décoration intérieure et appliquez-les à votre pièce grâce à l\'IA. Moderne, Scandinave, Industriel, Bohème, Japandi, Minimaliste et plus. Guide complet avec exemples.',
-  keywords: [
-    'styles décoration intérieure',
-    'décoration moderne',
-    'décoration scandinave',
-    'décoration industrielle',
-    'style japandi',
-    'style bohème',
-    'idée décoration maison',
-    'tendance déco 2025',
-  ],
-  openGraph: {
-    title: '12 Styles de Décoration par IA | InstaDeco',
-    description: 'Explorez tous les styles déco et appliquez-les à votre intérieur en 30 secondes.',
-    type: 'website',
-    url: getCanonicalUrl('/styles'),
-  },
-  alternates: {
-    canonical: getCanonicalUrl('/styles'),
-  },
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const path = '/styles';
+
+  return {
+    title: '12 Styles de Décoration Intérieure par IA - Moderne, Scandinave, Japandi...',
+    description: 'Découvrez 12 styles de décoration intérieure et appliquez-les à votre pièce grâce à l\'IA. Moderne, Scandinave, Industriel, Bohème, Japandi, Minimaliste et plus. Guide complet avec exemples.',
+    keywords: [
+      'styles décoration intérieure',
+      'décoration moderne',
+      'décoration scandinave',
+      'décoration industrielle',
+      'style japandi',
+      'style bohème',
+      'idée décoration maison',
+      'tendance déco 2025',
+    ],
+    openGraph: {
+      title: '12 Styles de Décoration par IA | InstaDeco',
+      description: 'Explorez tous les styles déco et appliquez-les à votre intérieur en 30 secondes.',
+      type: 'website',
+      url: getLocalizedCanonicalUrl(locale, path),
+      images: [getCanonicalUrl('/api/og')],
+    },
+    alternates: {
+      canonical: getLocalizedCanonicalUrl(locale, path),
+      languages: {
+        'fr-FR': getLocalizedCanonicalUrl('fr', path),
+        en: getLocalizedCanonicalUrl('en', path),
+        de: getLocalizedCanonicalUrl('de', path),
+        'x-default': getLocalizedCanonicalUrl('fr', path),
+      },
+    },
+  };
+}
 
 const STYLES = [
   {
@@ -146,11 +158,14 @@ const FAQ = [
   },
 ];
 
-export default function StylesIndexPage() {
+export default async function StylesIndexPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <JsonLd data={[
-        generateBreadcrumbList([{ label: 'Styles', path: '/styles' }]),
+        generateBreadcrumbList([{ label: 'Styles', path: withLocalePath(locale, '/styles') }], {
+          home: { name: 'Accueil', url: withLocalePath(locale, '/') },
+        }),
         generateFAQSchema(FAQ),
       ]} />
 

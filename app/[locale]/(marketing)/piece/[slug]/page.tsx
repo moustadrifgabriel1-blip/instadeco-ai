@@ -16,13 +16,13 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { generateFAQSchema, generateBreadcrumbList, generateWebPageSchema } from '@/lib/seo/schemas';
-import { getCanonicalUrl } from '@/lib/seo/config';
+import { getCanonicalUrl, getLocalizedCanonicalUrl, withLocalePath } from '@/lib/seo/config';
 import { ROOM_SEO_DATA, STYLE_SEO_DATA, getRoomSEOBySlug } from '@/lib/seo/programmatic-data';
 import { LeadCaptureLazy } from '@/components/features/lead-capture-lazy';
 import { CITIES } from '@/src/shared/constants/cities';
 
 interface PageProps {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }
 
 // Pre-render toutes les pages de pièce au build
@@ -33,9 +33,11 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { slug } = await params;
+  const { locale, slug } = await params;
   const room = getRoomSEOBySlug(slug);
   if (!room) return { title: 'Pièce non trouvée' };
+
+  const path = `/piece/${room.slug}`;
 
   return {
     title: room.metaTitle,
@@ -45,8 +47,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: room.metaTitle,
       description: room.metaDescription,
       type: 'article',
-      url: getCanonicalUrl(`/piece/${room.slug}`),
-      images: [getCanonicalUrl('/og-image.png')],
+      url: getLocalizedCanonicalUrl(locale, path),
+      images: [getCanonicalUrl('/api/og')],
     },
     twitter: {
       card: 'summary_large_image',
@@ -54,13 +56,19 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description: room.metaDescription,
     },
     alternates: {
-      canonical: getCanonicalUrl(`/piece/${room.slug}`),
+      canonical: getLocalizedCanonicalUrl(locale, path),
+      languages: {
+        'fr-FR': getLocalizedCanonicalUrl('fr', path),
+        en: getLocalizedCanonicalUrl('en', path),
+        de: getLocalizedCanonicalUrl('de', path),
+        'x-default': getLocalizedCanonicalUrl('fr', path),
+      },
     },
   };
 }
 
 export default async function RoomPage({ params }: PageProps) {
-  const { slug } = await params;
+  const { locale, slug } = await params;
   const room = getRoomSEOBySlug(slug);
   if (!room) notFound();
 
@@ -83,12 +91,14 @@ export default async function RoomPage({ params }: PageProps) {
         generateWebPageSchema({
           title: `Décoration ${room.name}`,
           description: room.metaDescription,
-          url: getCanonicalUrl(`/piece/${room.slug}`),
+          url: getLocalizedCanonicalUrl(locale, `/piece/${room.slug}`),
         }),
         generateBreadcrumbList([
-          { label: 'Pièces', path: '/exemples' },
-          { label: room.name, path: `/piece/${room.slug}` },
-        ]),
+          { label: 'Pièces', path: withLocalePath(locale, '/exemples') },
+          { label: room.name, path: withLocalePath(locale, `/piece/${room.slug}`) },
+        ], {
+          home: { name: 'Accueil', url: withLocalePath(locale, '/') },
+        }),
         generateFAQSchema(room.faq),
       ]} />
 

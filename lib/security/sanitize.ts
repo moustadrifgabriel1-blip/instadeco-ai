@@ -29,6 +29,9 @@ const ALLOWED_ATTR = new Set([
   'src', 'alt', 'width', 'height', 'loading',
   'srcset', 'sizes', 'decoding', 'fetchpriority',
   'class',
+  // Microdonnées schema.org (FAQPage des articles de blog) — attributs inertes, sans JS.
+  // Sans eux, le sanitizer strippait le balisage FAQ → 0 rich result FAQ sur les articles.
+  'itemscope', 'itemprop', 'itemtype',
 ]);
 
 // Attributs événementiels interdits (pattern)
