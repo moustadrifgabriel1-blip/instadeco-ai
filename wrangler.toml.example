@@ -1,0 +1,38 @@
+# Template Cloudflare Workers (via @opennextjs/cloudflare) — POC, NON déployé.
+# Copier en `wrangler.toml` (gitignoré : contient des IDs de compte) puis remplir.
+# Voir docs/CLOUDFLARE_MIGRATION.md.
+
+name = "instadeco"
+main = ".open-next/worker.js"
+compatibility_date = "2026-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
+
+# --- Cron Triggers (gratuits, illimités) : remplacent les 10 crons Vercel ---
+# Un seul Worker dispatcher peut router selon le jour/heure (cf. rotation generate-articles).
+[triggers]
+crons = [
+  "0 6 * * *",   # quotidien : génération article + réconciliation générations zombies
+  "0 4 * * 0",   # hebdo : storage-cleanup
+]
+
+# --- R2 (storage images — egress gratuit). Décommenter si bascule storage. ---
+# [[r2_buckets]]
+# binding = "OUTPUT_IMAGES"
+# bucket_name = "instadeco-output-images"
+
+# --- Variables publiques (les secrets via `wrangler secret put`) ---
+[vars]
+NEXT_PUBLIC_APP_URL = "https://instadeco.app"
+
+# Secrets à définir hors-fichier (NE PAS committer) :
+#   wrangler secret put CRON_SECRET
+#   wrangler secret put SUPABASE_SERVICE_ROLE_KEY
+#   wrangler secret put STRIPE_SECRET_KEY
+#   wrangler secret put STRIPE_WEBHOOK_SECRET
+#   wrangler secret put FAL_KEY
+#   wrangler secret put GEMINI_API_KEY
+#   wrangler secret put RESEND_API_KEY
