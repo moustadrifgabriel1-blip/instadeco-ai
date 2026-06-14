@@ -54,8 +54,20 @@ Avant tout commit : `npm run type-check && npm run lint && npm run test:run` doi
 - Liens internes : utiliser `Link` de `@/i18n/navigation` (ou `next/link`), **jamais `<a href>` vers une page interne** (casse le build via ESLint + le routing i18n).
 - `app/api/trial/generate/route.ts` : route critique (essai gratuit anti-abus). Préserver la logique `fal.run` synchrone.
 - Le blog est sous `app/[locale]/(marketing)/blog/` (migré, localisé).
-- Migrations Supabase dans `supabase/migrations/` : **les écrire mais demander à l'utilisateur de les appliquer** (pas d'accès DB en agent).
+- Migrations Supabase dans `supabase/migrations/` : **l'agent PEUT les appliquer directement via le MCP Supabase** (`apply_migration`) sur le projet prod `tocgrsdlegabfkykhdrz`. Toujours écrire le fichier `.sql` dans `supabase/migrations/` d'abord (source de vérité versionnée), puis appliquer. Écrire des migrations **idempotentes** (`IF NOT EXISTS` / `CREATE OR REPLACE`). Pour un DDL **destructif** sur une table live (DROP de colonne/table/contrainte, ALTER de type), prévenir l'utilisateur dans la réponse avant d'appliquer.
+
+## Système SEO/GEO multi-agents (`.claude/`)
+- Installé le 14/06/2026. **Point d'entrée UNIQUE** : agent `seo-chief` (`.claude/agents/seo-chief.md`). Il route vers 17 sous-agents (escouades Diagnostic / Sémantique / Exécution / Présence / Médias), parallélise le diagnostic (lecture seule), synthétise `.claude/seo-memory/seo-scoreboard.md` et **PROPOSE** des patchs (validation humaine avant toute écriture sur le site live). Ne JAMAIS lancer un agent d'escouade en direct.
+- Usage : demander « lance seo-chief pour un audit complet » (ou ciblé). NB : les fichiers `.claude/agents/` ne deviennent des *types* d'agent qu'au (re)démarrage de session — en cours de session, faire exécuter un agent en lui faisant lire sa définition.
+- Mémoire partagée : `.claude/seo-memory/*.md` (scoreboard, entity-graph, topical-coverage, serp-targets, brand-presence-map, citation-log, schema-proposals).
+- Moteur cron : `.claude/seo-engine/` (scripts Python) + `.github/workflows/seo-engine.yml` — **DORMANT** (workflow_dispatch only, `schedule` commenté). Pas de VPS → GitHub Actions. Requiert des secrets absents par défaut (GSC service account, GA4, clés LLM) ; sinon les jobs échouent proprement. **Aucun connecteur GSC dispo** → fournir un compte de service Google.
+- **Budget STRICT ≤ 2 CHF/mois** : tout à 0 € (agents via Claude Code, APIs Google + GitHub Actions gratuits) sauf `seo-geo-citation` (monitoring LLM, cap ≤ 1.50 CHF, hard-stop codé). Désactivés (web-only) : `seo-aso`, `seo-video`, `seo-crawl-budget`.
+- Règles : croissance **Google-safe** (pas d'écriture massive, rate-limiting scrape), **données réelles uniquement** (jamais d'invention), pas de schema fake (`AggregateRating` seulement avec `generation_ratings`).
 
 ## Migrations / actions en attente
-- Appliquer `supabase/migrations/20260606_rate_limits.sql` (sinon fallback mémoire automatique).
-- Roter les secrets historiquement exposés (CRON_SECRET, GEMINI_API_KEY) si pas déjà fait.
+- ✅ Appliqué (07/06/2026) : `20260606_rate_limits.sql`, `20260607_generation_ratings.sql`.
+- ✅ Appliqué (07/06/2026) : `20260607_blog_language.sql` (colonne `language` + unicité slug par langue). ⚠️ Le schéma est prêt mais le blog ne contient encore que du `fr` (38 articles) → `/en/blog` et `/de/blog` sont VIDES tant qu'on n'a pas backfillé. Script prêt : `scripts/backfill-blog.ts` (nécessite une `GEMINI_API_KEY` valide + `SUPABASE_SERVICE_ROLE_KEY` en local).
+- ✅ Appliqué (14/06/2026) : `20260614_harden_cleanup_rate_limits_grants.sql` (REVOKE EXECUTE anon/authenticated sur `cleanup_rate_limits` — était ouvert à tous malgré le REVOKE FROM PUBLIC initial).
+- 🔴 `GEMINI_API_KEY` **révoquée par Google** (« reported as leaked ») et toujours en clair dans `.env.local` → créer une nouvelle clé, supprimer l'ancienne, mettre à jour `.env.local` + Vercel. Bloque toute génération de blog.
+- ⏳ Roter `CRON_SECRET` (historiquement exposé) si pas déjà fait. Activer la « leaked password protection » dans le dashboard Supabase (Auth → Password security).
+- ℹ️ Advisors sécurité restants (intentionnels, ne pas « corriger ») : `get_own_credits`/`get_own_role`/`is_admin` exposés à anon/authenticated = REQUIS par les policies RLS (profiles, blog_articles), sans fuite (ne renvoient que les données de l'appelant). `rate_limits`/`trial_usage` RLS sans policy = tables service-role-only (deny par défaut = posture sûre).
