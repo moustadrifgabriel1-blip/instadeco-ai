@@ -266,6 +266,8 @@ export class GenerateDesignUseCase {
         input.userId,
         requiredCredits,
         `Remboursement — échec génération #${generation.id.slice(0, 8)}`,
+        undefined,
+        'refund',
       );
       if (refundResult.success) {
         this.logger.info('Credits refunded after AI failure', {
@@ -325,6 +327,8 @@ export class GenerateDesignUseCase {
         input.userId,
         requiredCredits,
         `Remboursement — échec mise à jour #${generation.id.slice(0, 8)}`,
+        undefined,
+        'refund',
       );
       if (refundResult.success) {
         this.logger.info('Credits refunded after DB update failure', {

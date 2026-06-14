@@ -24,7 +24,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { SEO_CONFIG } from '@/lib/seo/config';
 
 export const runtime = 'nodejs';
-export const maxDuration = 300; // PageSpeed peut être lent
+export const maxDuration = 60; // aligné sur le plafond réel de vercel.json (60s) — PageSpeed peut être lent
 export const dynamic = 'force-dynamic';
 
 // ============================================================

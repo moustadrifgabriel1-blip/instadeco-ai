@@ -112,7 +112,7 @@ describe('GenerateDesignUseCase', () => {
     expect(generationRepo.update).toHaveBeenCalledWith(GENERATION_ID, { status: 'failed' });
     // Le crédit déduit est remboursé (montant exact 1)
     expect(creditRepo.addCredits).toHaveBeenCalledWith(
-      USER_ID, 1, expect.stringContaining('Remboursement'),
+      USER_ID, 1, expect.stringContaining('Remboursement'), undefined, 'refund',
     );
   });
 
@@ -132,7 +132,7 @@ describe('GenerateDesignUseCase', () => {
 
     expect(result.success).toBe(false);
     expect(creditRepo.addCredits).toHaveBeenCalledWith(
-      USER_ID, 1, expect.stringContaining('Remboursement'),
+      USER_ID, 1, expect.stringContaining('Remboursement'), undefined, 'refund',
     );
   });
 

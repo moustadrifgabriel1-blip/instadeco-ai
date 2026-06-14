@@ -1,3 +1,4 @@
+export * from './authService.mock';
 export * from './creditRepository.mock';
 export * from './generationRepository.mock';
 export * from './logger.mock';

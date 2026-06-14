@@ -145,6 +145,8 @@ describe('GetGenerationStatusUseCase', () => {
         zombie.userId,
         expect.any(Number),
         expect.stringContaining('Remboursement'),
+        undefined,
+        'refund',
       );
     });
 

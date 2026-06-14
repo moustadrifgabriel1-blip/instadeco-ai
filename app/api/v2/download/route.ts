@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { safeFetchImage } from '@/src/shared/utils/safe-url';
 
 export const dynamic = 'force-dynamic';
 
@@ -39,10 +40,17 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: 'Image non disponible' }, { status: 404 });
     }
 
-    // Retourner l'image originale
-    const imageResponse = await fetch(generation.output_image_url);
+    // Retourner l'image originale.
+    // output_image_url est d'origine externe (output Fal/Gemini / storage) :
+    // garde anti-SSRF + timeout d'abandon (10s) via safeFetchImage (CLAUDE.md).
+    const imageResponse = await safeFetchImage(generation.output_image_url, undefined, 10_000);
+
+    if (!imageResponse.ok) {
+      return NextResponse.json({ error: 'Image non disponible' }, { status: 404 });
+    }
+
     const imageBuffer = await imageResponse.arrayBuffer();
-    
+
     return new NextResponse(new Uint8Array(imageBuffer), {
       headers: {
         'Content-Type': 'image/jpeg',

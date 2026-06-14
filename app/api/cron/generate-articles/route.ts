@@ -17,7 +17,7 @@ import { selectRandomTheme, BLOG_THEMES, getSessionTypeFromTime } from '@/src/sh
 import { createBlogArticle, generateSlug, ARTICLE_LANGUAGES, type ArticleLanguage } from '@/src/domain/entities/BlogArticle';
 
 export const runtime = 'nodejs';
-export const maxDuration = 300; // 300s max (Pro plan Vercel) — génération peut prendre 20-60s
+export const maxDuration = 60; // aligné sur le plafond réel de vercel.json (60s) — génération peut prendre 20-60s
 
 /**
  * Vérifie le secret CRON (Vercel ou manuel)

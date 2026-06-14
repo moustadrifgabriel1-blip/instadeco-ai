@@ -92,7 +92,7 @@ export default async function RoomPage({ params }: PageProps) {
           title: `Décoration ${room.name}`,
           description: room.metaDescription,
           url: getLocalizedCanonicalUrl(locale, `/piece/${room.slug}`),
-        }),
+        }, locale),
         generateBreadcrumbList([
           { label: 'Pièces', path: withLocalePath(locale, '/exemples') },
           { label: room.name, path: withLocalePath(locale, `/piece/${room.slug}`) },

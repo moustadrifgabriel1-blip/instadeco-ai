@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { useCases } from '@/src/infrastructure/config/di-container';
 import { GenerationMapper } from '@/src/application/mappers/GenerationMapper';
-import { createClient } from '@/lib/supabase/server';
+import { requireAuth } from '@/lib/security/api-auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,18 +19,11 @@ const querySchema = z.object({
  * Récupère les générations de l'utilisateur via ListUserGenerationsUseCase
  */
 export async function GET(req: Request) {
-  try {
-    // 🔒 Authentification serveur
-    const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Authentification requise' },
-        { status: 401 }
-      );
-    }
+  // ✅ Authentification obligatoire
+  const auth = await requireAuth();
+  if (auth.error) return auth.error;
 
+  try {
     const url = new URL(req.url);
     
     const validation = querySchema.safeParse({
@@ -48,7 +41,7 @@ export async function GET(req: Request) {
     }
 
     const { limit } = validation.data;
-    const userId = user.id;
+    const userId = auth.user.id;
 
     // Exécuter le Use Case
     const result = await useCases.listUserGenerations.execute({

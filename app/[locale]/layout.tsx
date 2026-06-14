@@ -169,7 +169,7 @@ export default async function LocaleLayout({
         <JsonLd
           data={[
             generateOrganizationSchema(),
-            generateWebSiteSchema(),
+            generateWebSiteSchema(locale),
             generateSoftwareAppSchema(),
           ]}
         />

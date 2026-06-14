@@ -12,7 +12,12 @@ const nextConfig = {
   reactStrictMode: true,
   
   serverExternalPackages: ['undici', 'jsdom'],
-  
+
+  // Tree-shaking ciblé : lucide-react est importé dans ~60 fichiers
+  experimental: {
+    optimizePackageImports: ['lucide-react'],
+  },
+
   // Headers de sécurité
   async headers() {
     return [

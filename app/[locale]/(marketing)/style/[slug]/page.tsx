@@ -89,7 +89,7 @@ export default async function StylePage({ params }: PageProps) {
           title: style.title,
           description: style.metaDescription,
           url: getLocalizedCanonicalUrl(locale, `/style/${style.slug}`),
-        }),
+        }, locale),
         generateBreadcrumbList([
           { label: 'Styles', path: withLocalePath(locale, '/exemples') },
           { label: style.name, path: withLocalePath(locale, `/style/${style.slug}`) },

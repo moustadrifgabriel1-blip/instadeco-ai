@@ -1,5 +1,5 @@
 import { Result, success, failure } from '@/src/shared/types/Result';
-import { CreditTransaction, CreateCreditTransactionInput } from '@/src/domain/entities/Credit';
+import { CreditTransaction, CreateCreditTransactionInput, CreditTransactionType } from '@/src/domain/entities/Credit';
 import { ICreditRepository } from '@/src/domain/ports/repositories/ICreditRepository';
 import { getSupabaseAdmin, CreditTransactionRow } from './supabaseClient';
 
@@ -46,7 +46,8 @@ export class SupabaseCreditRepository implements ICreditRepository {
     userId: string,
     amount: number,
     description: string,
-    stripeSessionId?: string
+    stripeSessionId?: string,
+    type: CreditTransactionType = 'purchase'
   ): Promise<Result<number>> {
     // Opération atomique : incrémenter les crédits avec RPC ou update SQL
     const { data, error: updateError } = await this.supabase
@@ -71,7 +72,7 @@ export class SupabaseCreditRepository implements ICreditRepository {
       }
       
       // Créer la transaction
-      await this.createTransaction({ userId, amount, type: 'purchase', description, stripeSessionId });
+      await this.createTransaction({ userId, amount, type, description, stripeSessionId });
       return success(newBalance);
     }
 
@@ -81,7 +82,7 @@ export class SupabaseCreditRepository implements ICreditRepository {
     await this.createTransaction({
       userId,
       amount,
-      type: 'purchase',
+      type,
       description,
       stripeSessionId,
     });

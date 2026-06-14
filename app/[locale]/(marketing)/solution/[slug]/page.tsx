@@ -115,7 +115,7 @@ export default async function IntentPage({ params }: PageProps) {
           title: page.title,
           description: page.metaDescription,
           url: getLocalizedCanonicalUrl(locale, `/solution/${page.slug}`),
-        }),
+        }, locale),
         generateBreadcrumbList([
           { label: page.title, path: withLocalePath(locale, `/solution/${page.slug}`) },
         ], {

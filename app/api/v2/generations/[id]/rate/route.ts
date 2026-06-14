@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { useCases } from '@/src/infrastructure/config/di-container';
-import { createClient } from '@/lib/supabase/server';
+import { requireAuth } from '@/lib/security/api-auth';
 import type { RatingValue } from '@/src/domain/entities/GenerationRating';
 
 export const dynamic = 'force-dynamic';
@@ -25,18 +25,11 @@ export async function POST(
   req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  // ✅ Authentification obligatoire
+  const auth = await requireAuth();
+  if (auth.error) return auth.error;
+
   try {
-    // 🔒 Authentification serveur
-    const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Authentification requise' },
-        { status: 401 },
-      );
-    }
-
     const { id: generationId } = await params;
 
     let json: unknown;
@@ -61,7 +54,7 @@ export async function POST(
 
     const result = await useCases.rateGeneration.execute({
       generationId,
-      userId: user.id, // ✅ toujours depuis la session
+      userId: auth.user.id, // ✅ toujours depuis la session
       rating: rating as RatingValue,
       feedbackText: feedbackText ?? null,
     });

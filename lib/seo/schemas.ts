@@ -53,7 +53,7 @@ export function generateOrganizationSchema() {
  * Schema WebSite - metadata du site avec SearchAction
  * Permet la sitelinks searchbox dans Google
  */
-export function generateWebSiteSchema() {
+export function generateWebSiteSchema(locale: string = SEO_CONFIG.language) {
   return {
     '@type': 'WebSite',
     '@id': `${SEO_CONFIG.siteUrl}/#website`,
@@ -63,7 +63,7 @@ export function generateWebSiteSchema() {
     publisher: {
       '@id': `${SEO_CONFIG.siteUrl}/#organization`,
     },
-    inLanguage: SEO_CONFIG.language,
+    inLanguage: locale,
     potentialAction: {
       '@type': 'SearchAction',
       target: {
@@ -285,7 +285,7 @@ export function generateArticleSchema(article: {
   url: string;
   publishedAt?: string;
   image?: string;
-}) {
+}, locale: string = SEO_CONFIG.language) {
   return {
     '@type': 'Article',
     headline: article.title,
@@ -301,7 +301,7 @@ export function generateArticleSchema(article: {
       '@type': 'Organization',
       '@id': `${SEO_CONFIG.siteUrl}/#organization`,
     },
-    inLanguage: SEO_CONFIG.language,
+    inLanguage: locale,
   };
 }
 
@@ -403,7 +403,7 @@ export function generateWebPageSchema(page: {
   title: string;
   description: string;
   url: string;
-}) {
+}, locale: string = SEO_CONFIG.language) {
   return {
     '@type': 'WebPage',
     name: page.title,
@@ -415,6 +415,6 @@ export function generateWebPageSchema(page: {
     publisher: {
       '@id': `${SEO_CONFIG.siteUrl}/#organization`,
     },
-    inLanguage: SEO_CONFIG.language,
+    inLanguage: locale,
   };
 }

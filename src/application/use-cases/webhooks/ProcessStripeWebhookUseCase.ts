@@ -7,6 +7,7 @@ import { ILoggerService } from '@/src/domain/ports/services/ILoggerService';
 import { IAuthService } from '@/src/domain/ports/services/IAuthService';
 import { DomainError } from '@/src/domain/errors/DomainError';
 import { PaymentError } from '@/src/domain/errors/PaymentError';
+import { WebhookSignatureError } from '@/src/domain/errors/WebhookSignatureError';
 
 /**
  * Input pour le traitement du webhook
@@ -51,7 +52,8 @@ export class ProcessStripeWebhookUseCase {
 
     if (!verifyResult.success) {
       this.logger.error('Webhook verification failed', verifyResult.error as Error);
-      return failure(new PaymentError('Signature webhook invalide'));
+      // Signature invalide → HTTP 400 (code dédié consommé par la route), pas 200.
+      return failure(new WebhookSignatureError());
     }
 
     const event = verifyResult.data;

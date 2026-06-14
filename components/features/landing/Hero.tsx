@@ -53,7 +53,8 @@ export function Hero() {
               <span>{t('badge')}</span>
             </motion.div>
 
-            <motion.div variants={staggerItem} className="space-y-2">
+            {/* LCP : peint immédiatement (pas d'enter fade-in) pour ne pas retarder le Largest Contentful Paint. */}
+            <div className="space-y-2">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold tracking-tight text-[#2D2D2D] leading-[1.1]">
                 <span className="block">{t('titleLine1')}</span>
                 <span className="block mt-2 text-[#C95D3A] italic inline-grid overflow-visible px-2 min-h-[1.15em]">
@@ -69,7 +70,7 @@ export function Hero() {
                   ))}
                 </span>
               </h1>
-            </motion.div>
+            </div>
 
             <motion.p
               variants={staggerItem}

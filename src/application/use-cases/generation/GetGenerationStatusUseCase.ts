@@ -121,6 +121,8 @@ export class GetGenerationStatusUseCase {
             updatedGen.userId,
             CREDIT_COSTS.GENERATION,
             `Remboursement — génération zombie #${updatedGen.id.slice(0, 8)}`,
+            undefined,
+            'refund',
           );
 
           if (refundResult.success) {

@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -14,7 +15,9 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-async function getGeneration(id: string) {
+// Wrappée avec React.cache() : appelée 2× par requête (generateMetadata + page),
+// la déduplication évite une seconde requête Supabase identique.
+const getGeneration = cache(async (id: string) => {
   const { data, error } = await supabaseAdmin
     .from('generations')
     .select('id, style_slug, room_type_slug, output_image_url, created_at, status')
@@ -25,7 +28,7 @@ async function getGeneration(id: string) {
 
   if (error || !data) return null;
   return data;
-}
+});
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;

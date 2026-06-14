@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { useCases } from '@/src/infrastructure/config/di-container';
-import { checkRateLimit, getClientIP, RATE_LIMIT_CONFIGS } from '@/lib/security/rate-limiter';
+import { checkRateLimitDistributed, getClientIP, RATE_LIMIT_CONFIGS } from '@/lib/security/rate-limiter';
 import { requireAuth } from '@/lib/security/api-auth';
 
 /**
@@ -61,9 +61,9 @@ export async function POST(req: Request) {
   const userId = auth.user.id;
   const email = auth.user.email!;
 
-  // Rate limiting pour éviter les abus
+  // Rate limiting pour éviter les abus (store Supabase partagé, serverless-safe)
   const clientIP = getClientIP(req.headers);
-  const rateLimitResult = checkRateLimit(clientIP, RATE_LIMIT_CONFIGS.checkout);
+  const rateLimitResult = await checkRateLimitDistributed(clientIP, RATE_LIMIT_CONFIGS.checkout);
   
   if (!rateLimitResult.success) {
     return NextResponse.json(

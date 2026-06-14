@@ -4,6 +4,7 @@ import {
   UploadImageOptions 
 } from '@/src/domain/ports/services/IStorageService';
 import { getSupabaseAdmin } from '../../repositories/supabase/supabaseClient';
+import { safeFetchImage } from '@/src/shared/utils/safe-url';
 
 /**
  * Adapter: Supabase Storage Service
@@ -51,9 +52,12 @@ export class SupabaseStorageService implements IStorageService {
     options: UploadImageOptions
   ): Promise<Result<{ url: string; path: string }>> {
     try {
-      // Télécharger l'image depuis l'URL source
-      const response = await fetch(sourceUrl);
-      
+      // Télécharger l'image depuis l'URL source.
+      // Garde anti-SSRF (CLAUDE.md) : sourceUrl est dérivée de l'output Fal/Gemini
+      // (origine externe). safeFetchImage valide l'URL (https + IP non interne /
+      // metadata, anti DNS-rebinding) et applique un timeout d'abandon.
+      const response = await safeFetchImage(sourceUrl);
+
       if (!response.ok) {
         return failure(new Error(`Failed to fetch image from URL: ${response.status}`));
       }

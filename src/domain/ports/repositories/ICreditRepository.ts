@@ -1,4 +1,4 @@
-import { CreditTransaction, CreateCreditTransactionInput } from '../../entities/Credit';
+import { CreditTransaction, CreateCreditTransactionInput, CreditTransactionType } from '../../entities/Credit';
 import { Result } from '@/src/shared/types/Result';
 
 /**
@@ -12,9 +12,10 @@ export interface ICreditRepository {
   getBalance(userId: string): Promise<Result<number>>;
 
   /**
-   * Ajoute des crédits à un utilisateur
+   * Ajoute des crédits à un utilisateur.
+   * @param type type de transaction enregistré au grand livre (défaut 'purchase' ; passer 'refund' pour un remboursement).
    */
-  addCredits(userId: string, amount: number, description: string, stripeSessionId?: string): Promise<Result<number>>;
+  addCredits(userId: string, amount: number, description: string, stripeSessionId?: string, type?: CreditTransactionType): Promise<Result<number>>;
 
   /**
    * Déduit des crédits d'un utilisateur

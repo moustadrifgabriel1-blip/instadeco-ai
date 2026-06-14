@@ -32,15 +32,20 @@ export function useAuth() {
 
     const getInitialSession = async () => {
       try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
+        // getUser() et getSession() sont indépendants → parallélisés.
+        const [
+          {
+            data: { user },
+          },
+          {
+            data: { session },
+          },
+        ] = await Promise.all([
+          supabase.auth.getUser(),
+          supabase.auth.getSession(),
+        ]);
         if (cancelled) return;
         setUser(user);
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-        if (cancelled) return;
         setSession(session);
       } catch (error) {
         console.error('Error getting user:', error);
