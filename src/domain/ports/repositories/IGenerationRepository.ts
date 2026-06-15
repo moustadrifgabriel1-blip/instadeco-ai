@@ -1,4 +1,4 @@
-import { Generation, CreateGenerationInput, UpdateGenerationInput } from '../../entities/Generation';
+import { Generation, CreateGenerationInput, UpdateGenerationInput, PublicGalleryItem, PublicGalleryQuery } from '../../entities/Generation';
 import { Result } from '@/src/shared/types/Result';
 
 /**
@@ -47,6 +47,12 @@ export interface IGenerationRepository {
    * serveur + remboursement). `limit` borne le travail d'un run cron.
    */
   findStuck(olderThanMs: number, limit?: number): Promise<Result<Generation[]>>;
+
+  /**
+   * Galerie publique : générations 'completed' ANONYMISÉES (jamais userId/inputImageUrl),
+   * récentes d'abord, paginées, avec total (filtres style/pièce respectés).
+   */
+  findPublicGallery(query: PublicGalleryQuery): Promise<Result<{ items: PublicGalleryItem[]; total: number }>>;
 
   /**
    * Supprime une génération

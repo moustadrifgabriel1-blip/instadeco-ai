@@ -6,8 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { SupabaseBlogArticleRepository } from '@/src/infrastructure/repositories/SupabaseBlogArticleRepository';
-import { GetBlogArticleBySlugUseCase } from '@/src/application/use-cases/blog/GetBlogArticleBySlugUseCase';
+import { useCases } from '@/src/infrastructure/config/di-container';
 
 export const runtime = 'nodejs';
 
@@ -29,12 +28,8 @@ export async function GET(
       );
     }
 
-    // Initialiser le repository et use case
-    const repository = new SupabaseBlogArticleRepository();
-    const useCase = new GetBlogArticleBySlugUseCase(repository);
-
-    // Récupérer l'article avec les articles liés
-    const result = await useCase.execute({
+    // Récupérer l'article via le use case (DI container)
+    const result = await useCases.getBlogArticleBySlug.execute({
       slug,
       includeRelated: true,
       relatedLimit: 3,

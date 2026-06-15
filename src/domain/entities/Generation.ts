@@ -17,7 +17,23 @@ export interface Generation {
   readonly updatedAt: Date;
 }
 
-export type GenerationStatus = 
+/** Item de galerie publique — anonymisé (jamais de userId ni d'inputImageUrl). */
+export interface PublicGalleryItem {
+  readonly id: string;
+  readonly styleSlug: string;
+  readonly roomType: string;
+  readonly outputImageUrl: string;
+  readonly createdAt: Date;
+}
+
+export interface PublicGalleryQuery {
+  limit?: number;
+  offset?: number;
+  styleSlug?: string;
+  roomType?: string;
+}
+
+export type GenerationStatus =
   | 'pending'
   | 'processing'
   | 'completed'

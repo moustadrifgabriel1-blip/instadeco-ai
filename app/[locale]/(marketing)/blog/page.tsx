@@ -10,8 +10,7 @@ import { Link } from '@/i18n/navigation';
 import { setRequestLocale } from 'next-intl/server';
 import { Newspaper } from 'lucide-react';
 import { ArticleCard, ArticleCardSkeleton, BlogSidebar, Pagination } from '@/components/features/blog';
-import { SupabaseBlogArticleRepository } from '@/src/infrastructure/repositories/SupabaseBlogArticleRepository';
-import { ListBlogArticlesUseCase } from '@/src/application/use-cases/blog/ListBlogArticlesUseCase';
+import { useCases } from '@/src/infrastructure/config/di-container';
 import { BlogArticleMapper } from '@/src/application/mappers/BlogArticleMapper';
 import { getLocalizedCanonicalUrl } from '@/lib/seo/config';
 
@@ -72,10 +71,7 @@ function toBlogLocale(locale: string): BlogLocale {
 // Fonction pour récupérer les articles (filtrés par langue = locale courante)
 async function getArticles(locale: BlogLocale, page: number, tag?: string, search?: string) {
   try {
-    const repository = new SupabaseBlogArticleRepository();
-    const useCase = new ListBlogArticlesUseCase(repository);
-
-    const result = await useCase.execute({
+    const result = await useCases.listBlogArticles.execute({
       page,
       limit: 9,
       status: 'published',
@@ -109,11 +105,8 @@ async function getArticles(locale: BlogLocale, page: number, tag?: string, searc
 // Fonction pour récupérer les données du sidebar (langue = locale courante)
 async function getSidebarData(locale: BlogLocale) {
   try {
-    const repository = new SupabaseBlogArticleRepository();
-    const useCase = new ListBlogArticlesUseCase(repository);
-
     // Récupérer les 5 derniers articles pour la sidebar
-    const result = await useCase.execute({
+    const result = await useCases.listBlogArticles.execute({
       limit: 5,
       status: 'published',
       language: locale,

@@ -1,5 +1,5 @@
 import { Result, success, failure } from '@/src/shared/types/Result';
-import { Generation, CreateGenerationInput, UpdateGenerationInput } from '@/src/domain/entities/Generation';
+import { Generation, CreateGenerationInput, UpdateGenerationInput, PublicGalleryItem, PublicGalleryQuery } from '@/src/domain/entities/Generation';
 import { IGenerationRepository } from '@/src/domain/ports/repositories/IGenerationRepository';
 import { getSupabaseAdmin, GenerationRow } from './supabaseClient';
 
@@ -188,6 +188,62 @@ export class SupabaseGenerationRepository implements IGenerationRepository {
 
     const generations = (data as GenerationRow[]).map((row) => this.toEntity(row));
     return success(generations);
+  }
+
+  async findPublicGallery(
+    query: PublicGalleryQuery,
+  ): Promise<Result<{ items: PublicGalleryItem[]; total: number }>> {
+    const limit = Math.max(1, Math.min(query.limit ?? 24, 50));
+    const offset = Math.max(0, query.offset ?? 0);
+
+    // ANONYMISATION au niveau data : on ne SELECT JAMAIS user_id ni input_image_url.
+    let dataQuery = this.supabase
+      .from('generations')
+      .select('id, style_slug, room_type_slug, output_image_url, created_at')
+      .eq('status', 'completed')
+      .not('output_image_url', 'is', null)
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1);
+
+    let countQuery = this.supabase
+      .from('generations')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'completed')
+      .not('output_image_url', 'is', null);
+
+    if (query.styleSlug) {
+      dataQuery = dataQuery.eq('style_slug', query.styleSlug);
+      countQuery = countQuery.eq('style_slug', query.styleSlug);
+    }
+    if (query.roomType) {
+      dataQuery = dataQuery.eq('room_type_slug', query.roomType);
+      countQuery = countQuery.eq('room_type_slug', query.roomType);
+    }
+
+    const { data, error } = await dataQuery;
+    if (error) {
+      return failure(new Error(`Failed to load public gallery: ${error.message}`));
+    }
+
+    const { count } = await countQuery;
+
+    const rows = (data ?? []) as Array<{
+      id: string;
+      style_slug: string;
+      room_type_slug: string;
+      output_image_url: string;
+      created_at: string;
+    }>;
+
+    const items: PublicGalleryItem[] = rows.map((row) => ({
+      id: row.id,
+      styleSlug: row.style_slug,
+      roomType: row.room_type_slug,
+      outputImageUrl: row.output_image_url,
+      createdAt: new Date(row.created_at),
+    }));
+
+    return success({ items, total: count ?? 0 });
   }
 
   async delete(id: string): Promise<Result<void>> {

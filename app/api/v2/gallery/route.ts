@@ -1,53 +1,40 @@
 import { NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/server';
+import { useCases } from '@/src/infrastructure/config/di-container';
 
 export const dynamic = 'force-dynamic';
 
 /**
- * GET /api/v2/gallery — Récupérer les générations publiques pour la galerie
- * Retourne les meilleures générations complétées (anonymisées, sans input_image_url)
+ * GET /api/v2/gallery — Générations publiques pour la galerie.
+ * Passe par ListPublicGalleryUseCase (DI) : anonymisé (sans input_image_url),
+ * cap limit à 50, total filtré. Le contrat JSON (snake_case) est préservé.
  */
 export async function GET(req: Request) {
   try {
-    const supabaseAdmin = await createAdminClient();
     const url = new URL(req.url);
-    const style = url.searchParams.get('style');
-    const room = url.searchParams.get('room');
-    // ✅ Limit capé à 50 maximum pour éviter les abus
-    const rawLimit = parseInt(url.searchParams.get('limit') || '24');
-    const limit = Math.max(1, Math.min(rawLimit, 50));
-    const rawOffset = parseInt(url.searchParams.get('offset') || '0');
-    const offset = Math.max(0, rawOffset);
+    const limitParam = url.searchParams.get('limit');
+    const offsetParam = url.searchParams.get('offset');
 
-    // ✅ input_image_url retiré : les photos des intérieurs des utilisateurs sont privées
-    let query = supabaseAdmin
-      .from('generations')
-      .select('id, style_slug, room_type_slug, output_image_url, created_at')
-      .eq('status', 'completed')
-      .not('output_image_url', 'is', null)
-      .order('created_at', { ascending: false })
-      .range(offset, offset + limit - 1);
+    const result = await useCases.listPublicGallery.execute({
+      styleSlug: url.searchParams.get('style') ?? undefined,
+      roomType: url.searchParams.get('room') ?? undefined,
+      limit: limitParam ? parseInt(limitParam, 10) : undefined,
+      offset: offsetParam ? parseInt(offsetParam, 10) : undefined,
+    });
 
-    if (style) query = query.eq('style_slug', style);
-    if (room) query = query.eq('room_type_slug', room);
-
-    const { data, error } = await query;
-
-    if (error) {
-      console.error('[Gallery] Query error:', error);
+    if (!result.success) {
+      console.error('[Gallery] error:', result.error.message);
       return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
     }
 
-    // Compteur total
-    const { count } = await supabaseAdmin
-      .from('generations')
-      .select('id', { count: 'exact', head: true })
-      .eq('status', 'completed')
-      .not('output_image_url', 'is', null);
-
     return NextResponse.json({
-      generations: data || [],
-      total: count || 0,
+      generations: result.data.items.map((g) => ({
+        id: g.id,
+        style_slug: g.styleSlug,
+        room_type_slug: g.roomType,
+        output_image_url: g.outputImageUrl,
+        created_at: g.createdAt.toISOString(),
+      })),
+      total: result.data.total,
     });
   } catch (error) {
     console.error('[Gallery] Error:', error);

@@ -30,6 +30,7 @@ export function createMockGenerationRepository(overrides: Partial<IGenerationRep
       success({ transitioned: true, generation: { ...mockGeneration, status: 'failed' } }),
     ),
     findStuck: vi.fn().mockResolvedValue(success([])),
+    findPublicGallery: vi.fn().mockResolvedValue(success({ items: [], total: 0 })),
     delete: vi.fn().mockResolvedValue(success(undefined)),
     countByUserId: vi.fn().mockResolvedValue(success(1)),
     ...overrides,

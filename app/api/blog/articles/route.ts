@@ -6,8 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { SupabaseBlogArticleRepository } from '@/src/infrastructure/repositories/SupabaseBlogArticleRepository';
-import { ListBlogArticlesUseCase } from '@/src/application/use-cases/blog/ListBlogArticlesUseCase';
+import { useCases } from '@/src/infrastructure/config/di-container';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic'; // Force dynamic rendering
@@ -24,12 +23,8 @@ export async function GET(request: NextRequest) {
     const tag = searchParams.get('tag');
     const search = searchParams.get('search');
 
-    // Initialiser le repository et use case
-    const repository = new SupabaseBlogArticleRepository();
-    const useCase = new ListBlogArticlesUseCase(repository);
-
-    // Exécuter la requête
-    const result = await useCase.execute({
+    // Exécuter la requête via le use case (DI container)
+    const result = await useCases.listBlogArticles.execute({
       page,
       limit,
       tags: tag ? [tag] : undefined,

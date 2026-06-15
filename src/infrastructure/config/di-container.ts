@@ -24,7 +24,12 @@ import { ConsoleLoggerService } from '../services/logger/ConsoleLoggerService';
 import { GenerateDesignUseCase } from '@/src/application/use-cases/generation/GenerateDesignUseCase';
 import { GetGenerationStatusUseCase } from '@/src/application/use-cases/generation/GetGenerationStatusUseCase';
 import { ReconcileStuckGenerationsUseCase } from '@/src/application/use-cases/generation/ReconcileStuckGenerationsUseCase';
+import { ListPublicGalleryUseCase } from '@/src/application/use-cases/generation/ListPublicGalleryUseCase';
 import { ListUserGenerationsUseCase } from '@/src/application/use-cases/generation/ListUserGenerationsUseCase';
+import { SupabaseBlogArticleRepository } from '../repositories/SupabaseBlogArticleRepository';
+import { IBlogArticleRepository } from '@/src/domain/ports/repositories/IBlogArticleRepository';
+import { ListBlogArticlesUseCase } from '@/src/application/use-cases/blog/ListBlogArticlesUseCase';
+import { GetBlogArticleBySlugUseCase } from '@/src/application/use-cases/blog/GetBlogArticleBySlugUseCase';
 import { PurchaseCreditsUseCase } from '@/src/application/use-cases/credits/PurchaseCreditsUseCase';
 import { CreateGuestCheckoutUseCase } from '@/src/application/use-cases/payments/CreateGuestCheckoutUseCase';
 import { AddCreditsUseCase } from '@/src/application/use-cases/credits/AddCreditsUseCase';
@@ -58,6 +63,7 @@ class DIContainer {
   private _styleRepo: IStyleRepository | null = null;
   private _processedEventRepo: IProcessedEventRepository | null = null;
   private _generationRatingRepo: IGenerationRatingRepository | null = null;
+  private _blogArticleRepo: IBlogArticleRepository | null = null;
 
   // Instances singleton des services
   private _imageGenerator: IImageGeneratorService | null = null;
@@ -87,6 +93,13 @@ class DIContainer {
       this._creditRepo = new SupabaseCreditRepository();
     }
     return this._creditRepo;
+  }
+
+  get blogArticleRepository(): IBlogArticleRepository {
+    if (!this._blogArticleRepo) {
+      this._blogArticleRepo = new SupabaseBlogArticleRepository();
+    }
+    return this._blogArticleRepo;
   }
 
   get styleRepository(): IStyleRepository {
@@ -183,6 +196,18 @@ class DIContainer {
       this.creditRepository,
       this.logger,
     );
+  }
+
+  get listPublicGalleryUseCase(): ListPublicGalleryUseCase {
+    return new ListPublicGalleryUseCase(this.generationRepository);
+  }
+
+  get listBlogArticlesUseCase(): ListBlogArticlesUseCase {
+    return new ListBlogArticlesUseCase(this.blogArticleRepository);
+  }
+
+  get getBlogArticleBySlugUseCase(): GetBlogArticleBySlugUseCase {
+    return new GetBlogArticleBySlugUseCase(this.blogArticleRepository);
   }
 
   get purchaseCreditsUseCase(): PurchaseCreditsUseCase {
@@ -320,6 +345,9 @@ export const useCases = {
   get getGenerationStatus() { return container.getGenerationStatusUseCase; },
   get listUserGenerations() { return container.listUserGenerationsUseCase; },
   get reconcileStuckGenerations() { return container.reconcileStuckGenerationsUseCase; },
+  get listPublicGallery() { return container.listPublicGalleryUseCase; },
+  get listBlogArticles() { return container.listBlogArticlesUseCase; },
+  get getBlogArticleBySlug() { return container.getBlogArticleBySlugUseCase; },
   get purchaseCredits() { return container.purchaseCreditsUseCase; },
   get createGuestCheckout() { return container.createGuestCheckoutUseCase; },
   get addCredits() { return container.addCreditsUseCase; },

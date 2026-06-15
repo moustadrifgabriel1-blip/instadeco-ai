@@ -22,8 +22,7 @@ import { BlogCtaBanner } from '@/components/features/blog-cta-banner';
 import { formatBlogTitle, cn } from '@/lib/utils';
 import { sanitizeHtml, sanitizeJsonLd } from '@/lib/security/sanitize';
 
-import { SupabaseBlogArticleRepository } from '@/src/infrastructure/repositories/SupabaseBlogArticleRepository';
-import { GetBlogArticleBySlugUseCase } from '@/src/application/use-cases/blog/GetBlogArticleBySlugUseCase';
+import { useCases } from '@/src/infrastructure/config/di-container';
 import { BlogArticleMapper } from '@/src/application/mappers/BlogArticleMapper';
 import { SEO_CONFIG, getCanonicalUrl, getLocalizedCanonicalUrl } from '@/lib/seo/config';
 
@@ -118,10 +117,7 @@ function toBlogLocale(locale: string): BlogLocale {
 
 const getArticle = cache(async (slug: string, language: BlogLocale): Promise<ArticleData | null> => {
   try {
-    const repository = new SupabaseBlogArticleRepository();
-    const useCase = new GetBlogArticleBySlugUseCase(repository);
-
-    const result = await useCase.execute({
+    const result = await useCases.getBlogArticleBySlug.execute({
       slug,
       language,
       includeRelated: true,
