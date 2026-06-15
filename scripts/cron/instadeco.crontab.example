@@ -1,0 +1,15 @@
+# InstaDeco — crontab VPS Hetzner (remplace les `crons` de vercel.json).
+# Installe : voir docs/CRON_VPS_HETZNER.md.  Heures en UTC (régler le fuseau du VPS si besoin).
+# Une ligne de log par run → fichier MAILTO/redirigé. m h dom mon dow  commande
+#
+0 3   * * *     /opt/instadeco/run-cron.sh seo-submit
+0 4   * * 0     /opt/instadeco/run-cron.sh storage-cleanup
+0 5   * * *     /opt/instadeco/run-cron.sh reconcile-generations
+0 6   * * *     /opt/instadeco/run-cron.sh generate-articles
+0 7   1,15 * *  /opt/instadeco/run-cron.sh seo-health-check
+0 8   * * *     /opt/instadeco/run-cron.sh maintenance-reminder
+0 8   * * 1     /opt/instadeco/run-cron.sh backlink-outreach
+0 9   * * *     /opt/instadeco/run-cron.sh check-milestones
+0 9   * * *     /opt/instadeco/run-cron.sh blog-monitor
+0 10  * * *     /opt/instadeco/run-cron.sh email-nurturing
+0 14  * * 1,3,5 /opt/instadeco/run-cron.sh pinterest-post

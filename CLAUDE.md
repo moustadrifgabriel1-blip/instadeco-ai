@@ -48,7 +48,8 @@ Avant tout commit : `npm run type-check && npm run lint && npm run test:run` doi
 
 ## Contrainte coût (≤ 10.-/mois fixe visé)
 - Unit economics excellentes (~96% marge ; COGS génération ~0,025€/image). Le poste qui casse le budget = **Vercel Pro 20$** (forcé par crons + maxDuration élevés).
-- Garder `maxDuration ≤ 60`, peu de crons. ⚠️ **Vercel Hobby interdit l'usage commercial** (ToS) → la voie strictement <10.-/mois conforme = **Cloudflare (Pages/Workers + R2)** (migration future).
+- Garder `maxDuration ≤ 60`, peu de crons. ⚠️ **Vercel Hobby interdit l'usage commercial** (ToS).
+- **Stratégie crons retenue (15/06/2026) : VPS Hetzner** (déjà payé ~12 CHF, mutualisable pour les 3 projets) fait tourner tous les crons en appelant `/api/cron/*` (Bearer `CRON_SECRET`). Outillage : `scripts/cron/` + `docs/CRON_VPS_HETZNER.md`. → retire la pression « Pro forcé par crons » **sans migration Cloudflare**. Après validation VPS, vider `crons` de `vercel.json`. Le POC Cloudflare (`docs/CLOUDFLARE_MIGRATION.md`) reste un plan B, non prioritaire.
 
 ## Pièges / fichiers sensibles
 - Liens internes : utiliser `Link` de `@/i18n/navigation` (ou `next/link`), **jamais `<a href>` vers une page interne** (casse le build via ESLint + le routing i18n).
