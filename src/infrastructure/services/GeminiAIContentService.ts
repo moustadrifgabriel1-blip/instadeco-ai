@@ -20,11 +20,12 @@ interface GeminiResponse {
   }>;
 }
 
-// Modèles disponibles par ordre de préférence (qualité éditoriale premium)
+// Modèles par ordre de préférence (qualité éditoriale premium).
+// ⚠️ Utiliser les ALIAS STABLES, pas les ID datés `-preview-MM-DD` : Google les
+// supprime à terme (gemini-2.5-pro-preview-05-06 renvoyait 404 → cron blog cassé).
 const GEMINI_MODELS = [
-  'gemini-2.5-pro-preview-05-06',  // Top qualité — modèle principal (rédaction luxe)
-  'gemini-2.5-pro-preview',        // Alias stable gemini-2.5-pro
-  'gemini-2.0-flash',              // Fallback rapide si pro indisponible
+  'gemini-2.5-pro',    // Top qualité — alias stable (rédaction premium)
+  'gemini-2.5-flash',  // Fallback rapide si pro indisponible
 ];
 
 const GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
@@ -83,6 +84,11 @@ export class GeminiAIContentService implements IAIContentService {
               // Avant: 8192 tokens (trop court pour gemini-2.5-pro)
               maxOutputTokens: 16384,
               topP: 0.95,
+              // ⚠️ gemini-2.5-* sont des modèles à "thinking" : sans borne, les tokens
+              // de réflexion consomment maxOutputTokens et TRONQUENT le JSON de l'article
+              // ("Unterminated string" → GEMINI_PARSE_ERROR). On borne le thinking pour
+              // garantir une réponse complète. 1024 est valide pour pro (min 128) ET flash.
+              thinkingConfig: { thinkingBudget: 1024 },
             },
           }),
         });
