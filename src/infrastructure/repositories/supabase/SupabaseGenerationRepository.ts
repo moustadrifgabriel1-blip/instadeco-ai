@@ -172,6 +172,24 @@ export class SupabaseGenerationRepository implements IGenerationRepository {
     return success({ transitioned: false, generation: current.data });
   }
 
+  async findStuck(olderThanMs: number, limit = 100): Promise<Result<Generation[]>> {
+    const threshold = new Date(Date.now() - olderThanMs).toISOString();
+    const { data, error } = await this.supabase
+      .from('generations')
+      .select('*')
+      .in('status', ['pending', 'processing'])
+      .lt('updated_at', threshold)
+      .order('updated_at', { ascending: true })
+      .limit(limit);
+
+    if (error) {
+      return failure(new Error(`Failed to find stuck generations: ${error.message}`));
+    }
+
+    const generations = (data as GenerationRow[]).map((row) => this.toEntity(row));
+    return success(generations);
+  }
+
   async delete(id: string): Promise<Result<void>> {
     const { error } = await this.supabase
       .from('generations')

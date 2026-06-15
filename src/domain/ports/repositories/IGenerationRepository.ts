@@ -42,6 +42,13 @@ export interface IGenerationRepository {
   markFailedIfPending(id: string): Promise<Result<{ transitioned: boolean; generation: Generation }>>;
 
   /**
+   * Récupère les générations bloquées en 'pending'/'processing' dont la dernière
+   * mise à jour remonte à plus de `olderThanMs` ms (candidates à la réconciliation
+   * serveur + remboursement). `limit` borne le travail d'un run cron.
+   */
+  findStuck(olderThanMs: number, limit?: number): Promise<Result<Generation[]>>;
+
+  /**
    * Supprime une génération
    */
   delete(id: string): Promise<Result<void>>;

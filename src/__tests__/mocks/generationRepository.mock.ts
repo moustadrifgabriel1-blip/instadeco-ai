@@ -29,6 +29,7 @@ export function createMockGenerationRepository(overrides: Partial<IGenerationRep
     markFailedIfPending: vi.fn().mockResolvedValue(
       success({ transitioned: true, generation: { ...mockGeneration, status: 'failed' } }),
     ),
+    findStuck: vi.fn().mockResolvedValue(success([])),
     delete: vi.fn().mockResolvedValue(success(undefined)),
     countByUserId: vi.fn().mockResolvedValue(success(1)),
     ...overrides,

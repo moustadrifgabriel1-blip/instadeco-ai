@@ -23,6 +23,7 @@ import { ConsoleLoggerService } from '../services/logger/ConsoleLoggerService';
 // Use Cases
 import { GenerateDesignUseCase } from '@/src/application/use-cases/generation/GenerateDesignUseCase';
 import { GetGenerationStatusUseCase } from '@/src/application/use-cases/generation/GetGenerationStatusUseCase';
+import { ReconcileStuckGenerationsUseCase } from '@/src/application/use-cases/generation/ReconcileStuckGenerationsUseCase';
 import { ListUserGenerationsUseCase } from '@/src/application/use-cases/generation/ListUserGenerationsUseCase';
 import { PurchaseCreditsUseCase } from '@/src/application/use-cases/credits/PurchaseCreditsUseCase';
 import { CreateGuestCheckoutUseCase } from '@/src/application/use-cases/payments/CreateGuestCheckoutUseCase';
@@ -176,6 +177,14 @@ class DIContainer {
     );
   }
 
+  get reconcileStuckGenerationsUseCase(): ReconcileStuckGenerationsUseCase {
+    return new ReconcileStuckGenerationsUseCase(
+      this.generationRepository,
+      this.creditRepository,
+      this.logger,
+    );
+  }
+
   get purchaseCreditsUseCase(): PurchaseCreditsUseCase {
     return new PurchaseCreditsUseCase(
       this.creditRepository,
@@ -310,6 +319,7 @@ export const useCases = {
   get generateDesign() { return container.generateDesignUseCase; },
   get getGenerationStatus() { return container.getGenerationStatusUseCase; },
   get listUserGenerations() { return container.listUserGenerationsUseCase; },
+  get reconcileStuckGenerations() { return container.reconcileStuckGenerationsUseCase; },
   get purchaseCredits() { return container.purchaseCreditsUseCase; },
   get createGuestCheckout() { return container.createGuestCheckoutUseCase; },
   get addCredits() { return container.addCreditsUseCase; },
