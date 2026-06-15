@@ -22,7 +22,7 @@ export class SupabaseCreditRepository implements ICreditRepository {
       amount: row.amount,
       type: row.type as CreditTransaction['type'],
       description: row.description,
-      stripeSessionId: row.stripe_session_id,
+      stripeSessionId: row.stripe_payment_intent,
       generationId: row.generation_id,
       createdAt: new Date(row.created_at),
     };
@@ -49,45 +49,21 @@ export class SupabaseCreditRepository implements ICreditRepository {
     stripeSessionId?: string,
     type: CreditTransactionType = 'purchase'
   ): Promise<Result<number>> {
-    // Opération atomique : incrémenter les crédits avec RPC ou update SQL
-    const { data, error: updateError } = await this.supabase
-      .rpc('increment_credits', { user_id_input: userId, amount_input: amount });
-
-    if (updateError) {
-      // Fallback si la function RPC n'existe pas encore
-      console.warn('[Credits] RPC increment_credits failed, using fallback:', updateError.message);
-      
-      // Fallback : utiliser update avec subquery (moins atomique mais fonctionnel)
-      const balanceResult = await this.getBalance(userId);
-      if (!balanceResult.success) return balanceResult;
-      
-      const newBalance = balanceResult.data + amount;
-      const { error: fallbackError } = await this.supabase
-        .from('profiles')
-        .update({ credits: newBalance, updated_at: new Date().toISOString() })
-        .eq('id', userId);
-      
-      if (fallbackError) {
-        return failure(new Error(`Failed to add credits: ${fallbackError.message}`));
-      }
-      
-      // Créer la transaction
-      await this.createTransaction({ userId, amount, type, description, stripeSessionId });
-      return success(newBalance);
-    }
-
-    const newBalance = data as number;
-
-    // Créer la transaction
-    await this.createTransaction({
-      userId,
-      amount,
-      type,
-      description,
-      stripeSessionId,
+    // Atomique : solde + ligne de grand livre (credit_transactions) dans UNE transaction.
+    const { data, error } = await this.supabase.rpc('add_credits_with_ledger', {
+      user_id_input: userId,
+      amount_input: amount,
+      type_input: type,
+      description_input: description,
+      stripe_ref_input: stripeSessionId ?? null,
+      generation_id_input: null,
     });
 
-    return success(newBalance);
+    if (error) {
+      return failure(new Error(`Failed to add credits: ${error.message}`));
+    }
+
+    return success(data as number);
   }
 
   async deductCredits(
@@ -96,53 +72,24 @@ export class SupabaseCreditRepository implements ICreditRepository {
     description: string,
     generationId?: string
   ): Promise<Result<number>> {
-    // Opération atomique : décrémenter les crédits avec RPC
-    const { data, error: rpcError } = await this.supabase
-      .rpc('deduct_credits', { user_id_input: userId, amount_input: amount });
+    // Atomique : solde + grand livre dans UNE transaction. -1 = crédits insuffisants.
+    const { data, error } = await this.supabase.rpc('deduct_credits_with_ledger', {
+      user_id_input: userId,
+      amount_input: amount,
+      type_input: 'generation',
+      description_input: description,
+      generation_id_input: generationId ?? null,
+    });
 
-    if (rpcError) {
-      // Fallback si la function RPC n'existe pas encore
-      console.warn('[Credits] RPC deduct_credits failed, using fallback:', rpcError.message);
-      
-      const balanceResult = await this.getBalance(userId);
-      if (!balanceResult.success) return balanceResult;
-      
-      const currentBalance = balanceResult.data;
-      if (currentBalance < amount) {
-        return failure(new Error('Insufficient credits'));
-      }
-      
-      const newBalance = currentBalance - amount;
-      const { error: fallbackError } = await this.supabase
-        .from('profiles')
-        .update({ credits: newBalance, updated_at: new Date().toISOString() })
-        .eq('id', userId);
-      
-      if (fallbackError) {
-        return failure(new Error(`Failed to deduct credits: ${fallbackError.message}`));
-      }
-      
-      await this.createTransaction({ userId, amount: -amount, type: 'generation', description, generationId });
-      return success(newBalance);
+    if (error) {
+      return failure(new Error(`Failed to deduct credits: ${error.message}`));
     }
 
-    // Si data est -1, c'est que les crédits sont insuffisants (convention de la RPC)
     if (data === -1) {
       return failure(new Error('Insufficient credits'));
     }
 
-    const newBalance = data as number;
-
-    // Créer la transaction
-    await this.createTransaction({
-      userId,
-      amount: -amount,
-      type: 'generation',
-      description,
-      generationId,
-    });
-
-    return success(newBalance);
+    return success(data as number);
   }
 
   async createTransaction(input: CreateCreditTransactionInput): Promise<Result<CreditTransaction>> {
@@ -153,7 +100,7 @@ export class SupabaseCreditRepository implements ICreditRepository {
         amount: input.amount,
         type: input.type,
         description: input.description,
-        stripe_session_id: input.stripeSessionId || null,
+        stripe_payment_intent: input.stripeSessionId || null,
         generation_id: input.generationId || null,
       })
       .select()

@@ -112,7 +112,7 @@ export interface CreditTransactionRow {
   amount: number;
   type: string;
   description: string;
-  stripe_session_id: string | null;
+  stripe_payment_intent: string | null;
   generation_id: string | null;
   created_at: string;
 }
