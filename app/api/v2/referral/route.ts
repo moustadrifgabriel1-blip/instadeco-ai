@@ -1,8 +1,19 @@
 import { NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/server';
 import { useCases } from '@/src/infrastructure/config/di-container';
 import { requireAuth } from '@/lib/security/api-auth';
 import { sendReferralNotificationEmail } from '@/lib/notifications/marketing-emails';
+import { ApplyReferralFailureReason } from '@/src/application/use-cases/referral/ApplyReferralCodeUseCase';
+
+/**
+ * Mapping raison métier → code HTTP (préserve les codes de l'ancienne route).
+ */
+const REASON_STATUS: Record<ApplyReferralFailureReason, number> = {
+  MISSING_CODE: 400,
+  INVALID_CODE: 404,
+  ALREADY_REFERRED: 409,
+  SELF_REFERRAL: 400,
+  INSERT_FAILED: 500,
+};
 
 /**
  * GET /api/v2/referral — Récupérer les infos de parrainage de l'utilisateur authentifié
@@ -13,50 +24,19 @@ export async function GET(req: Request) {
   if (auth.error) return auth.error;
   const userId = auth.user.id;
 
-  const supabaseAdmin = await createAdminClient();
-
   try {
+    const result = await useCases.getReferralInfo.execute({ userId });
 
-    // Récupérer le code de parrainage
-    const { data: profile, error: profileError } = await supabaseAdmin
-      .from('profiles')
-      .select('referral_code')
-      .eq('id', userId)
-      .single();
-
-    if (profileError) {
-      // Si la colonne n'existe pas encore, retourner un code par défaut
-      return NextResponse.json({
-        referralCode: null,
-        referrals: [],
-        totalReferred: 0,
-        totalCreditsEarned: 0,
-      });
+    if (!result.success) {
+      console.error('[Referral GET] Error:', result.error);
+      return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
     }
 
-    // Récupérer les parrainages
-    const { data: referrals, error: refError } = await supabaseAdmin
-      .from('referrals')
-      .select(`
-        id,
-        referred_id,
-        referrer_credits_awarded,
-        status,
-        created_at
-      `)
-      .eq('referrer_id', userId)
-      .order('created_at', { ascending: false });
-
-    const referralList = referrals || [];
-    const totalCreditsEarned = referralList.reduce(
-      (sum: number, r: any) => sum + (r.referrer_credits_awarded || 0), 0
-    );
-
     return NextResponse.json({
-      referralCode: profile?.referral_code || null,
-      referrals: referralList,
-      totalReferred: referralList.length,
-      totalCreditsEarned,
+      referralCode: result.data.referralCode,
+      referrals: result.data.referrals,
+      totalReferred: result.data.totalReferred,
+      totalCreditsEarned: result.data.totalCreditsEarned,
     });
   } catch (error) {
     console.error('[Referral GET] Error:', error);
@@ -74,100 +54,52 @@ export async function POST(req: Request) {
   if (auth.error) return auth.error;
   const newUserId = auth.user.id;
 
-  const supabaseAdmin = await createAdminClient();
-
   try {
     const { referralCode } = await req.json();
 
-    if (!referralCode) {
-      return NextResponse.json(
-        { error: 'referralCode requis' },
-        { status: 400 }
-      );
+    // Validation + création du parrainage via le use-case (data access).
+    const result = await useCases.applyReferralCode.execute({
+      newUserId,
+      referralCode,
+    });
+
+    if (!result.success) {
+      const status = REASON_STATUS[result.error.reason] ?? 500;
+      if (result.error.reason === 'INSERT_FAILED') {
+        console.error('[Referral] Insert error:', result.error);
+      }
+      return NextResponse.json({ error: result.error.message }, { status });
     }
 
-    // 1. Trouver le parrain via le code
-    const { data: referrer, error: refError } = await supabaseAdmin
-      .from('profiles')
-      .select('id, email, full_name')
-      .eq('referral_code', referralCode.toUpperCase().trim())
-      .single();
+    const {
+      referrerId,
+      referrerEmail,
+      referrerFullName,
+      referrerBonus,
+      referredBonus,
+    } = result.data;
 
-    if (refError || !referrer) {
-      return NextResponse.json(
-        { error: 'Code de parrainage invalide' },
-        { status: 404 }
-      );
-    }
-
-    // 2. Vérifier que le filleul n'a pas déjà été parrainé
-    const { data: existing } = await supabaseAdmin
-      .from('referrals')
-      .select('id')
-      .eq('referred_id', newUserId)
-      .single();
-
-    if (existing) {
-      return NextResponse.json(
-        { error: 'Ce compte a déjà utilisé un code de parrainage' },
-        { status: 409 }
-      );
-    }
-
-    // 3. Vérifier que le parrain ne se parraine pas lui-même
-    if (referrer.id === newUserId) {
-      return NextResponse.json(
-        { error: 'Vous ne pouvez pas utiliser votre propre code' },
-        { status: 400 }
-      );
-    }
-
-    // 4. Créer le parrainage
-    const REFERRER_BONUS = 5;
-    const REFERRED_BONUS = 5;
-
-    const { error: insertError } = await supabaseAdmin
-      .from('referrals')
-      .insert({
-        referrer_id: referrer.id,
-        referred_id: newUserId,
-        referrer_credits_awarded: REFERRER_BONUS,
-        referred_credits_awarded: REFERRED_BONUS,
-        status: 'completed',
-      });
-
-    if (insertError) {
-      console.error('[Referral] Insert error:', insertError);
-      return NextResponse.json({ error: 'Erreur création parrainage' }, { status: 500 });
-    }
-
-    // 5. Ajouter les crédits au parrain (RPC atomique via le repository)
+    // Ajouter les crédits au parrain (RPC atomique via le repository).
     await useCases.addCredits.execute({
-      userId: referrer.id,
-      amount: REFERRER_BONUS,
+      userId: referrerId,
+      amount: referrerBonus,
       description: 'Bonus parrainage',
     });
 
-    // 6. Ajouter les crédits au filleul (RPC atomique via le repository)
+    // Ajouter les crédits au filleul (RPC atomique via le repository).
     await useCases.addCredits.execute({
       userId: newUserId,
-      amount: REFERRED_BONUS,
+      amount: referredBonus,
       description: 'Bonus de bienvenue (parrainage)',
     });
 
-    // 7. Mettre à jour referred_by sur le profil du filleul
-    await supabaseAdmin
-      .from('profiles')
-      .update({ referred_by: referrer.id })
-      .eq('id', newUserId);
+    console.log(`[Referral] ✅ ${referrerEmail} → new user ${newUserId} (${referrerBonus}+${referredBonus} crédits)`);
 
-    console.log(`[Referral] ✅ ${referrer.email} → new user ${newUserId} (${REFERRER_BONUS}+${REFERRED_BONUS} crédits)`);
-
-    // 8. Notifier le parrain par email (en arrière-plan)
+    // Notifier le parrain par email (en arrière-plan).
     sendReferralNotificationEmail(
-      referrer.email,
-      referrer.full_name || null,
-      REFERRER_BONUS,
+      referrerEmail,
+      referrerFullName || null,
+      referrerBonus,
     ).catch((err) => {
       console.error('[Referral] Email notification failed:', err);
     });
@@ -175,8 +107,8 @@ export async function POST(req: Request) {
     return NextResponse.json({
       success: true,
       creditsAwarded: {
-        referrer: REFERRER_BONUS,
-        referred: REFERRED_BONUS,
+        referrer: referrerBonus,
+        referred: referredBonus,
       },
     });
   } catch (error) {

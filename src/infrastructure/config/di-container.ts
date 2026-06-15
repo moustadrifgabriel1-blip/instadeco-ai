@@ -34,6 +34,17 @@ import { SupabaseLeadRepository } from '../repositories/supabase/SupabaseLeadRep
 import { ILeadRepository } from '@/src/domain/ports/repositories/ILeadRepository';
 import { CaptureLeadUseCase } from '@/src/application/use-cases/leads/CaptureLeadUseCase';
 import { UnsubscribeUseCase } from '@/src/application/use-cases/leads/UnsubscribeUseCase';
+import { SupabaseReferralRepository } from '../repositories/supabase/SupabaseReferralRepository';
+import { IReferralRepository } from '@/src/domain/ports/repositories/IReferralRepository';
+import { GetReferralInfoUseCase } from '@/src/application/use-cases/referral/GetReferralInfoUseCase';
+import { ApplyReferralCodeUseCase } from '@/src/application/use-cases/referral/ApplyReferralCodeUseCase';
+import { GetGenerationDownloadUseCase } from '@/src/application/use-cases/generation/GetGenerationDownloadUseCase';
+import { SupabaseUserDataExportRepository } from '../repositories/supabase/SupabaseUserDataExportRepository';
+import { IUserDataExportRepository } from '@/src/domain/ports/repositories/IUserDataExportRepository';
+import { ExportUserDataUseCase } from '@/src/application/use-cases/user/ExportUserDataUseCase';
+import { SupabaseUserDeletionRepository } from '../repositories/supabase/SupabaseUserDeletionRepository';
+import { IUserDeletionRepository } from '@/src/domain/ports/repositories/IUserDeletionRepository';
+import { DeleteAccountUseCase } from '@/src/application/use-cases/user/DeleteAccountUseCase';
 import { PurchaseCreditsUseCase } from '@/src/application/use-cases/credits/PurchaseCreditsUseCase';
 import { CreateGuestCheckoutUseCase } from '@/src/application/use-cases/payments/CreateGuestCheckoutUseCase';
 import { AddCreditsUseCase } from '@/src/application/use-cases/credits/AddCreditsUseCase';
@@ -69,6 +80,9 @@ class DIContainer {
   private _generationRatingRepo: IGenerationRatingRepository | null = null;
   private _blogArticleRepo: IBlogArticleRepository | null = null;
   private _leadRepo: ILeadRepository | null = null;
+  private _referralRepo: IReferralRepository | null = null;
+  private _userDataExportRepo: IUserDataExportRepository | null = null;
+  private _userDeletionRepo: IUserDeletionRepository | null = null;
 
   // Instances singleton des services
   private _imageGenerator: IImageGeneratorService | null = null;
@@ -230,6 +244,47 @@ class DIContainer {
     return new UnsubscribeUseCase(this.userRepository, this.leadRepository, this.logger);
   }
 
+  get referralRepository(): IReferralRepository {
+    if (!this._referralRepo) {
+      this._referralRepo = new SupabaseReferralRepository();
+    }
+    return this._referralRepo;
+  }
+
+  get getReferralInfoUseCase(): GetReferralInfoUseCase {
+    return new GetReferralInfoUseCase(this.referralRepository, this.logger);
+  }
+
+  get applyReferralCodeUseCase(): ApplyReferralCodeUseCase {
+    return new ApplyReferralCodeUseCase(this.referralRepository, this.logger);
+  }
+
+  get getGenerationDownloadUseCase(): GetGenerationDownloadUseCase {
+    return new GetGenerationDownloadUseCase(this.generationRepository, this.logger);
+  }
+
+  get userDataExportRepository(): IUserDataExportRepository {
+    if (!this._userDataExportRepo) {
+      this._userDataExportRepo = new SupabaseUserDataExportRepository();
+    }
+    return this._userDataExportRepo;
+  }
+
+  get exportUserDataUseCase(): ExportUserDataUseCase {
+    return new ExportUserDataUseCase(this.userDataExportRepository, this.logger);
+  }
+
+  get userDeletionRepository(): IUserDeletionRepository {
+    if (!this._userDeletionRepo) {
+      this._userDeletionRepo = new SupabaseUserDeletionRepository();
+    }
+    return this._userDeletionRepo;
+  }
+
+  get deleteAccountUseCase(): DeleteAccountUseCase {
+    return new DeleteAccountUseCase(this.userDeletionRepository, this.logger);
+  }
+
   get purchaseCreditsUseCase(): PurchaseCreditsUseCase {
     return new PurchaseCreditsUseCase(
       this.creditRepository,
@@ -370,6 +425,11 @@ export const useCases = {
   get getBlogArticleBySlug() { return container.getBlogArticleBySlugUseCase; },
   get captureLead() { return container.captureLeadUseCase; },
   get unsubscribe() { return container.unsubscribeUseCase; },
+  get getReferralInfo() { return container.getReferralInfoUseCase; },
+  get applyReferralCode() { return container.applyReferralCodeUseCase; },
+  get getGenerationDownload() { return container.getGenerationDownloadUseCase; },
+  get exportUserData() { return container.exportUserDataUseCase; },
+  get deleteAccount() { return container.deleteAccountUseCase; },
   get purchaseCredits() { return container.purchaseCreditsUseCase; },
   get createGuestCheckout() { return container.createGuestCheckoutUseCase; },
   get addCredits() { return container.addCreditsUseCase; },

@@ -1,29 +1,32 @@
 /**
  * API Route: /api/v2/user/delete
- * 
+ *
  * Suppression de compte utilisateur (RGPD Art. 17 - Droit à l'effacement).
  * Supprime toutes les données associées à l'utilisateur.
- * 
+ *
  * La cascade SQL (ON DELETE CASCADE) supprime automatiquement :
  * - profiles
  * - generations
  * - credit_transactions
  * - projects
  * - referrals
+ *
+ * Transport (parsing body, confirmation, codes HTTP) géré ici ;
+ * la cascade (storage / leads / auth user) passe par DeleteAccountUseCase via le DI.
  */
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createClient as createSupabaseAdmin } from '@supabase/supabase-js';
+import { useCases } from '@/src/infrastructure/config/di-container';
 
 export const dynamic = 'force-dynamic';
 
 export async function DELETE(req: Request) {
   try {
-    // 1. Vérifier l'authentification
+    // 1. Vérifier l'authentification (le userId provient TOUJOURS de la session)
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
+
     if (authError || !user) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
     }
@@ -37,73 +40,19 @@ export async function DELETE(req: Request) {
       );
     }
 
-    // 3. Utiliser le service_role pour supprimer les données et le compte auth
-    const supabaseAdmin = createSupabaseAdmin(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
+    // 3. Exécuter la suppression en cascade (storage → leads → auth user) via le Use Case.
+    //    L'utilisateur ne peut supprimer que SON propre compte : l'id vient de la session.
+    const result = await useCases.deleteAccount.execute({
+      userId: user.id,
+      email: user.email,
+    });
 
-    // 4. Supprimer les images du storage
-    try {
-      const { data: generations } = await supabaseAdmin
-        .from('generations')
-        .select('input_image_url, output_image_url')
-        .eq('user_id', user.id);
-
-      if (generations && generations.length > 0) {
-        const storagePaths: string[] = [];
-        for (const gen of generations) {
-          // Extraire les chemins storage des URLs Supabase
-          if (gen.input_image_url?.includes('storage/v1/object/')) {
-            const match = gen.input_image_url.match(/\/storage\/v1\/object\/(?:public|sign)\/([^?]+)/);
-            if (match) storagePaths.push(match[1]);
-          }
-          if (gen.output_image_url?.includes('storage/v1/object/')) {
-            const match = gen.output_image_url.match(/\/storage\/v1\/object\/(?:public|sign)\/([^?]+)/);
-            if (match) storagePaths.push(match[1]);
-          }
-        }
-
-        if (storagePaths.length > 0) {
-          // Les paths sont au format "bucket/path", on doit séparer
-          const byBucket: Record<string, string[]> = {};
-          for (const p of storagePaths) {
-            const [bucket, ...rest] = p.split('/');
-            if (!byBucket[bucket]) byBucket[bucket] = [];
-            byBucket[bucket].push(rest.join('/'));
-          }
-          for (const [bucket, paths] of Object.entries(byBucket)) {
-            await supabaseAdmin.storage.from(bucket).remove(paths);
-          }
-        }
-      }
-    } catch (storageErr) {
-      // Ne pas bloquer la suppression si le storage échoue
-      console.error('[Delete Account] Storage cleanup error:', storageErr);
-    }
-
-    // 5. Supprimer les leads associés à cet email (table optionnelle)
-    try {
-      await supabaseAdmin
-        .from('leads')
-        .delete()
-        .eq('email', user.email);
-    } catch {
-      // Table leads peut ne pas exister
-    }
-
-    // 6. Supprimer le compte auth (cascade automatique sur profiles, generations, etc.)
-    const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(user.id);
-
-    if (deleteError) {
-      console.error('[Delete Account] Error:', deleteError);
+    if (!result.success) {
       return NextResponse.json(
         { error: 'Erreur lors de la suppression du compte' },
         { status: 500 }
       );
     }
-
-    console.log(`[Delete Account] ✅ User ${user.id} deleted successfully`);
 
     return NextResponse.json({
       success: true,
