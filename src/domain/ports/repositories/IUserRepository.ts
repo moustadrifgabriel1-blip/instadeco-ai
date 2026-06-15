@@ -35,4 +35,10 @@ export interface IUserRepository {
    * Vérifie si un utilisateur existe
    */
   exists(id: string): Promise<Result<boolean>>;
+
+  /**
+   * Définit le consentement marketing d'un profil par email.
+   * Idempotent : 0 ligne affectée (email non inscrit) = no-op sans erreur.
+   */
+  setMarketingConsentByEmail(email: string, consent: boolean): Promise<Result<void>>;
 }

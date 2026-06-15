@@ -30,6 +30,10 @@ import { SupabaseBlogArticleRepository } from '../repositories/SupabaseBlogArtic
 import { IBlogArticleRepository } from '@/src/domain/ports/repositories/IBlogArticleRepository';
 import { ListBlogArticlesUseCase } from '@/src/application/use-cases/blog/ListBlogArticlesUseCase';
 import { GetBlogArticleBySlugUseCase } from '@/src/application/use-cases/blog/GetBlogArticleBySlugUseCase';
+import { SupabaseLeadRepository } from '../repositories/supabase/SupabaseLeadRepository';
+import { ILeadRepository } from '@/src/domain/ports/repositories/ILeadRepository';
+import { CaptureLeadUseCase } from '@/src/application/use-cases/leads/CaptureLeadUseCase';
+import { UnsubscribeUseCase } from '@/src/application/use-cases/leads/UnsubscribeUseCase';
 import { PurchaseCreditsUseCase } from '@/src/application/use-cases/credits/PurchaseCreditsUseCase';
 import { CreateGuestCheckoutUseCase } from '@/src/application/use-cases/payments/CreateGuestCheckoutUseCase';
 import { AddCreditsUseCase } from '@/src/application/use-cases/credits/AddCreditsUseCase';
@@ -64,6 +68,7 @@ class DIContainer {
   private _processedEventRepo: IProcessedEventRepository | null = null;
   private _generationRatingRepo: IGenerationRatingRepository | null = null;
   private _blogArticleRepo: IBlogArticleRepository | null = null;
+  private _leadRepo: ILeadRepository | null = null;
 
   // Instances singleton des services
   private _imageGenerator: IImageGeneratorService | null = null;
@@ -100,6 +105,13 @@ class DIContainer {
       this._blogArticleRepo = new SupabaseBlogArticleRepository();
     }
     return this._blogArticleRepo;
+  }
+
+  get leadRepository(): ILeadRepository {
+    if (!this._leadRepo) {
+      this._leadRepo = new SupabaseLeadRepository();
+    }
+    return this._leadRepo;
   }
 
   get styleRepository(): IStyleRepository {
@@ -208,6 +220,14 @@ class DIContainer {
 
   get getBlogArticleBySlugUseCase(): GetBlogArticleBySlugUseCase {
     return new GetBlogArticleBySlugUseCase(this.blogArticleRepository);
+  }
+
+  get captureLeadUseCase(): CaptureLeadUseCase {
+    return new CaptureLeadUseCase(this.leadRepository, this.logger);
+  }
+
+  get unsubscribeUseCase(): UnsubscribeUseCase {
+    return new UnsubscribeUseCase(this.userRepository, this.leadRepository, this.logger);
   }
 
   get purchaseCreditsUseCase(): PurchaseCreditsUseCase {
@@ -348,6 +368,8 @@ export const useCases = {
   get listPublicGallery() { return container.listPublicGalleryUseCase; },
   get listBlogArticles() { return container.listBlogArticlesUseCase; },
   get getBlogArticleBySlug() { return container.getBlogArticleBySlugUseCase; },
+  get captureLead() { return container.captureLeadUseCase; },
+  get unsubscribe() { return container.unsubscribeUseCase; },
   get purchaseCredits() { return container.purchaseCreditsUseCase; },
   get createGuestCheckout() { return container.createGuestCheckoutUseCase; },
   get addCredits() { return container.addCreditsUseCase; },

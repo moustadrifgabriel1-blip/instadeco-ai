@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase/admin';
 import { checkRateLimitDistributed, getClientIP } from '@/lib/security/rate-limiter';
 import { z } from 'zod';
+import { useCases } from '@/src/infrastructure/config/di-container';
 
 const leadSchema = z.object({
   email: z.string().email('Email invalide'),
@@ -12,12 +12,11 @@ const leadSchema = z.object({
 
 /**
  * POST /api/v2/leads
- * Capture un lead (email) et l'enregistre dans Supabase.
- * Rate limited : 3 requêtes / 5 minutes par IP.
+ * Capture un lead (email) via CaptureLeadUseCase (DI). Rate limited : 3 req / 5 min par IP.
  */
 export async function POST(req: Request) {
   try {
-    // Rate limiting
+    // Rate limiting distribué
     const ip = getClientIP(req.headers);
     const rateLimit = await checkRateLimitDistributed(ip, {
       maxRequests: 3,
@@ -44,43 +43,17 @@ export async function POST(req: Request) {
 
     const { email, source, name, metadata } = parsed.data;
 
-    // Vérifier si le lead existe déjà
-    const { data: existing } = await supabaseAdmin
-      .from('leads')
-      .select('id')
-      .eq('email', email.toLowerCase())
-      .single();
+    const result = await useCases.captureLead.execute({ email, source, name, metadata });
 
-    if (existing) {
-      // Pas d'erreur - on ne révèle pas si l'email est déjà enregistré
-      return NextResponse.json({ success: true, message: 'Merci !' });
+    if (!result.success) {
+      console.error('[Leads] error:', result.error.message);
+      return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
     }
 
-    // Insérer le nouveau lead
-    const { error } = await supabaseAdmin
-      .from('leads')
-      .insert({
-        email: email.toLowerCase(),
-        source,
-        ...(name && { name }),
-        ...(metadata && { metadata }),
-        created_at: new Date().toISOString(),
-      });
-
-    if (error) {
-      console.error('[Leads] Insert error:', error);
-      return NextResponse.json(
-        { error: 'Erreur serveur' },
-        { status: 500 }
-      );
-    }
-
+    // Ne révèle pas si l'email était déjà enregistré (dédup silencieuse).
     return NextResponse.json({ success: true, message: 'Merci !' });
   } catch (error) {
     console.error('[Leads] Error:', error);
-    return NextResponse.json(
-      { error: 'Erreur serveur' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }

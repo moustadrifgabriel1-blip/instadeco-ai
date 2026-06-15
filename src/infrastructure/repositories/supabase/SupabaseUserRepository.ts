@@ -119,6 +119,18 @@ export class SupabaseUserRepository implements IUserRepository {
     return success(undefined);
   }
 
+  async setMarketingConsentByEmail(email: string, consent: boolean): Promise<Result<void>> {
+    const { error } = await this.supabase
+      .from('profiles')
+      .update({ consent_marketing: consent, updated_at: new Date().toISOString() })
+      .eq('email', email.toLowerCase());
+
+    if (error) {
+      return failure(new Error(`Failed to set marketing consent: ${error.message}`));
+    }
+    return success(undefined);
+  }
+
   async exists(id: string): Promise<Result<boolean>> {
     const { count, error } = await this.supabase
       .from('profiles')

@@ -7,8 +7,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient as createSupabaseAdmin } from '@supabase/supabase-js';
 import crypto from 'crypto';
+import { useCases } from '@/src/infrastructure/config/di-container';
 
 export const dynamic = 'force-dynamic';
 
@@ -46,34 +46,13 @@ export async function GET(req: NextRequest) {
     });
   }
 
-  // Appliquer la désinscription
-  const supabaseAdmin = createSupabaseAdmin(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-
-  // Mettre à jour le profil
-  const { data: profile } = await supabaseAdmin
-    .from('profiles')
-    .select('id')
-    .eq('email', email)
-    .single();
-
-  if (profile) {
-    await supabaseAdmin
-      .from('profiles')
-      .update({ consent_marketing: false })
-      .eq('id', profile.id);
-  }
-
-  // Mettre à jour les leads aussi (table optionnelle)
-  try {
-    await supabaseAdmin
-      .from('leads')
-      .update({ unsubscribed: true })
-      .eq('email', email);
-  } catch {
-    // Table leads peut ne pas exister
+  // Appliquer la désinscription via le use case (DI container)
+  const result = await useCases.unsubscribe.execute(email);
+  if (!result.success) {
+    return new NextResponse(
+      renderPage('Erreur', 'Une erreur est survenue lors de la désinscription. Réessayez plus tard.', false),
+      { status: 500, headers: { 'Content-Type': 'text/html; charset=utf-8' } },
+    );
   }
 
   return new NextResponse(
