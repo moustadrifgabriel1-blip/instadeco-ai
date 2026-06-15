@@ -1,10 +1,11 @@
 import Stripe from 'stripe';
 import { Result, success, failure } from '@/src/shared/types/Result';
-import { 
-  IPaymentService, 
-  CreateCheckoutSessionOptions, 
+import {
+  IPaymentService,
+  CreateCheckoutSessionOptions,
+  CreateSubscriptionSessionOptions,
   CheckoutSessionResult,
-  PaymentWebhookEvent 
+  PaymentWebhookEvent
 } from '@/src/domain/ports/services/IPaymentService';
 
 /**
@@ -76,6 +77,30 @@ export class StripePaymentService implements IPaymentService {
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown error';
       return failure(new Error(`Failed to create checkout session: ${message}`));
+    }
+  }
+
+  async createSubscriptionSession(options: CreateSubscriptionSessionOptions): Promise<Result<CheckoutSessionResult>> {
+    try {
+      const session = await this.stripe.checkout.sessions.create({
+        mode: 'subscription',
+        payment_method_types: ['card'],
+        customer_email: options.userEmail,
+        line_items: [{ price: options.priceId, quantity: 1 }],
+        success_url: options.successUrl,
+        cancel_url: options.cancelUrl,
+        metadata: options.metadata,
+        subscription_data: { metadata: options.subscriptionMetadata },
+      });
+
+      if (!session.url) {
+        return failure(new Error('Subscription session URL not generated'));
+      }
+
+      return success({ sessionId: session.id, url: session.url });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      return failure(new Error(`Failed to create subscription session: ${message}`));
     }
   }
 

@@ -24,6 +24,21 @@ export interface CheckoutSessionResult {
 }
 
 /**
+ * Options de création de session d'ABONNEMENT (Stripe mode 'subscription').
+ */
+export interface CreateSubscriptionSessionOptions {
+  userId: string;
+  userEmail: string;
+  priceId: string;
+  successUrl: string;
+  cancelUrl: string;
+  /** metadata de la session checkout (inclut type:'subscription'). */
+  metadata: Record<string, string>;
+  /** metadata propagée sur l'abonnement (subscription_data.metadata). */
+  subscriptionMetadata: Record<string, string>;
+}
+
+/**
  * Événement de webhook Stripe
  */
 export interface PaymentWebhookEvent {
@@ -46,6 +61,11 @@ export interface IPaymentService {
    * Crée une session de paiement
    */
   createCheckoutSession(options: CreateCheckoutSessionOptions): Promise<Result<CheckoutSessionResult>>;
+
+  /**
+   * Crée une session de paiement en mode ABONNEMENT (subscription).
+   */
+  createSubscriptionSession(options: CreateSubscriptionSessionOptions): Promise<Result<CheckoutSessionResult>>;
 
   /**
    * Récupère une session de paiement

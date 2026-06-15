@@ -15,6 +15,10 @@ export function createMockPaymentService(overrides: Partial<IPaymentService> = {
       sessionId: 'cs_test_123',
       url: 'https://checkout.stripe.com/test',
     } as CheckoutSessionResult)),
+    createSubscriptionSession: vi.fn().mockResolvedValue(success({
+      sessionId: 'cs_sub_123',
+      url: 'https://checkout.stripe.com/sub-test',
+    } as CheckoutSessionResult)),
     retrieveSession: vi.fn().mockResolvedValue(success({
       id: 'cs_test_123',
       paymentStatus: 'paid',
