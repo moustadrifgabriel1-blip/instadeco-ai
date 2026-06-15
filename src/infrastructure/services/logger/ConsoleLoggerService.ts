@@ -54,13 +54,23 @@ export class ConsoleLoggerService implements ILoggerService {
   }
 
   error(message: string, error?: Error, context?: LogContext): void {
-    const errorContext = error 
+    const errorContext = error
       ? { ...context, errorMessage: error.message, errorStack: error.stack }
       : context;
 
     console.error(
       `${this.getEmoji('error')} ${this.formatMessage('error', message, errorContext)}`
     );
+
+    // Observabilité low-cost : tout log CRITICAL (échec remboursement/webhook = argent
+    // perdu) alerte l'admin par email. Fire-and-forget, import dynamique (pas de coût
+    // si jamais déclenché, pas de bundling Resend dans les contextes qui ne loggent pas
+    // de CRITICAL). L'alerte est elle-même no-op hors prod / sans RESEND_API_KEY.
+    if (message.startsWith('CRITICAL')) {
+      void import('@/lib/notifications/critical-alert')
+        .then((m) => m.notifyAdminCritical(message, { ...this.context, ...errorContext }))
+        .catch(() => {});
+    }
   }
 
   child(context: LogContext): ILoggerService {
