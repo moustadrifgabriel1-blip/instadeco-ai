@@ -8,7 +8,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { SupabaseBlogArticleRepository } from '@/src/infrastructure/repositories/SupabaseBlogArticleRepository';
+import { SupabaseBlogArticleRepository } from '@/src/infrastructure/repositories/supabase/SupabaseBlogArticleRepository';
 import { GeminiAIContentService } from '@/src/infrastructure/services/GeminiAIContentService';
 import { SEONotificationService } from '@/src/infrastructure/services/SEONotificationService';
 import { AntiAIPostProcessor } from '@/src/infrastructure/services/AntiAIPostProcessor';

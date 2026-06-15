@@ -25,7 +25,7 @@ import * as path from 'path';
 import { randomUUID } from 'node:crypto';
 dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
 
-import { SupabaseBlogArticleRepository } from '@/src/infrastructure/repositories/SupabaseBlogArticleRepository';
+import { SupabaseBlogArticleRepository } from '@/src/infrastructure/repositories/supabase/SupabaseBlogArticleRepository';
 import { GeminiAIContentService } from '@/src/infrastructure/services/GeminiAIContentService';
 import { AntiAIPostProcessor } from '@/src/infrastructure/services/AntiAIPostProcessor';
 import { InternalLinksService } from '@/src/infrastructure/services/InternalLinksService';

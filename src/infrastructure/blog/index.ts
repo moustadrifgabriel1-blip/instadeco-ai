@@ -5,7 +5,7 @@
  */
 
 // Repositories
-export { SupabaseBlogArticleRepository } from '../repositories/SupabaseBlogArticleRepository';
+export { SupabaseBlogArticleRepository } from '../repositories/supabase/SupabaseBlogArticleRepository';
 
 // Services
 export { GeminiAIContentService } from '../services/GeminiAIContentService';

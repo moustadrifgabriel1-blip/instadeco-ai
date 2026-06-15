@@ -10,9 +10,9 @@ import {
   BlogArticleFilters,
   PaginationOptions,
   PaginatedResult,
-} from '../../domain/ports/repositories/IBlogArticleRepository';
-import { BlogArticle, ArticleLanguage } from '../../domain/entities/BlogArticle';
-import { BlogArticleMapper } from '../../application/mappers/BlogArticleMapper';
+} from '../../../domain/ports/repositories/IBlogArticleRepository';
+import { BlogArticle, ArticleLanguage } from '../../../domain/entities/BlogArticle';
+import { BlogArticleMapper } from '../../../application/mappers/BlogArticleMapper';
 
 export class SupabaseBlogArticleRepository implements IBlogArticleRepository {
   private supabase: SupabaseClient;

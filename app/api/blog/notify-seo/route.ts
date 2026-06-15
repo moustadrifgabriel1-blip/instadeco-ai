@@ -8,7 +8,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { SupabaseBlogArticleRepository } from '@/src/infrastructure/repositories/SupabaseBlogArticleRepository';
+import { SupabaseBlogArticleRepository } from '@/src/infrastructure/repositories/supabase/SupabaseBlogArticleRepository';
 import { SEONotificationService } from '@/src/infrastructure/services/SEONotificationService';
 import { verifyCronAuth, unauthorizedResponse } from '@/src/infrastructure/middleware/cronAuth';
 

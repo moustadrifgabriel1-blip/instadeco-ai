@@ -26,7 +26,7 @@ import { GetGenerationStatusUseCase } from '@/src/application/use-cases/generati
 import { ReconcileStuckGenerationsUseCase } from '@/src/application/use-cases/generation/ReconcileStuckGenerationsUseCase';
 import { ListPublicGalleryUseCase } from '@/src/application/use-cases/generation/ListPublicGalleryUseCase';
 import { ListUserGenerationsUseCase } from '@/src/application/use-cases/generation/ListUserGenerationsUseCase';
-import { SupabaseBlogArticleRepository } from '../repositories/SupabaseBlogArticleRepository';
+import { SupabaseBlogArticleRepository } from '../repositories/supabase/SupabaseBlogArticleRepository';
 import { IBlogArticleRepository } from '@/src/domain/ports/repositories/IBlogArticleRepository';
 import { ListBlogArticlesUseCase } from '@/src/application/use-cases/blog/ListBlogArticlesUseCase';
 import { GetBlogArticleBySlugUseCase } from '@/src/application/use-cases/blog/GetBlogArticleBySlugUseCase';
