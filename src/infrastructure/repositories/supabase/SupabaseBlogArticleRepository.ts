@@ -14,6 +14,16 @@ import {
 import { BlogArticle, ArticleLanguage } from '../../../domain/entities/BlogArticle';
 import { BlogArticleMapper } from '../../../application/mappers/BlogArticleMapper';
 
+/**
+ * Colonnes des LISTES (sans `content`). La colonne content pèse ~20 Ko/article :
+ * la tirer pour une liste de 9 = ~180 Ko inutiles (le rendu de liste n'affiche jamais
+ * le contenu). word_count / reading_time_minutes sont des colonnes stockées, donc
+ * conservées telles quelles. Les vues d'un seul article (findById/findBySlug) gardent
+ * select('*') car elles affichent le contenu.
+ */
+const LIST_COLUMNS =
+  'id, title, slug, meta_description, tags, status, word_count, reading_time_minutes, anti_ai_score, session_type, source, language, published_at, created_at, updated_at';
+
 export class SupabaseBlogArticleRepository implements IBlogArticleRepository {
   private supabase: SupabaseClient;
 
@@ -108,10 +118,10 @@ export class SupabaseBlogArticleRepository implements IBlogArticleRepository {
     const sortBy = pagination?.sortBy || 'published_at';
     const sortOrder = pagination?.sortOrder === 'asc';
 
-    // Construire la requête
+    // Construire la requête (projection sans `content` — liste allégée)
     let query = this.supabase
       .from('blog_articles')
-      .select('*', { count: 'exact' });
+      .select(LIST_COLUMNS, { count: 'exact' });
 
     // Appliquer les filtres
     if (filters?.status) {
@@ -297,7 +307,7 @@ export class SupabaseBlogArticleRepository implements IBlogArticleRepository {
   async findLatest(limit: number = 5): Promise<BlogArticle[]> {
     const { data, error } = await this.supabase
       .from('blog_articles')
-      .select('*')
+      .select(LIST_COLUMNS)
       .eq('status', 'published')
       .order('published_at', { ascending: false })
       .limit(limit);
@@ -329,10 +339,11 @@ export class SupabaseBlogArticleRepository implements IBlogArticleRepository {
       return [];
     }
 
-    // Chercher les articles avec des tags similaires (même langue si précisée)
+    // Chercher les articles avec des tags similaires (même langue si précisée).
+    // Projection sans `content` : la liste « articles liés » n'affiche que titre/méta.
     let query = this.supabase
       .from('blog_articles')
-      .select('*')
+      .select(LIST_COLUMNS)
       .eq('status', 'published')
       .neq('id', articleId)
       .overlaps('tags', tags);

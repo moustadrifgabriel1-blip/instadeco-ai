@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       description: 'Inspiration déco pour salon, chambre, cuisine, bureau et plus. Visualisez avec l\'IA.',
       type: 'website',
       url: getLocalizedCanonicalUrl(locale, path),
-      images: [getCanonicalUrl('/api/og')],
+      images: [getCanonicalUrl('/og-image.png')],
     },
     alternates: {
       canonical: getLocalizedCanonicalUrl(locale, path),

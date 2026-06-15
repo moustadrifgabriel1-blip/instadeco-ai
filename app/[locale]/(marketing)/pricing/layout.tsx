@@ -33,7 +33,7 @@ export async function generateMetadata({
       description: t('ogDescription'),
       type: 'website',
       url: getLocalizedCanonicalUrl(locale, '/pricing'),
-      images: [getCanonicalUrl('/api/og')],
+      images: [getCanonicalUrl('/og-image.png')],
     },
     twitter: {
       card: 'summary_large_image',

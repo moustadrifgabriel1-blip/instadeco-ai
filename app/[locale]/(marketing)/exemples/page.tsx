@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       description: 'Avant/après spectaculaires de salons, chambres, cuisines et bureaux transformés par l\'IA.',
       type: 'website',
       url: getLocalizedCanonicalUrl(locale, path),
-      images: [getCanonicalUrl('/api/og')],
+      images: [getCanonicalUrl('/og-image.png')],
     },
     twitter: {
       card: 'summary_large_image',

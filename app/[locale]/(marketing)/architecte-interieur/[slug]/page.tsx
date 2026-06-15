@@ -130,7 +130,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       type: 'website',
       locale: 'fr_FR',
       url: getLocalizedCanonicalUrl(locale, path),
-      images: [getCanonicalUrl('/api/og')],
+      images: [getCanonicalUrl('/og-image.png')],
     },
     twitter: {
       card: 'summary_large_image',

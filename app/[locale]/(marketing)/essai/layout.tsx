@@ -24,7 +24,7 @@ export async function generateMetadata({
         'Testez gratuitement sans inscription. Uploadez une photo → choisissez un style → résultat en 30 secondes.',
       type: 'website',
       url: getLocalizedCanonicalUrl(locale, '/essai'),
-      images: [getCanonicalUrl('/api/og')],
+      images: [getCanonicalUrl('/og-image.png')],
     },
     robots: { index: true, follow: true },
     // Canonical AUTO-RÉFÉRENT par locale (corrige le bug : pointait vers la home /fr → page désindexée)

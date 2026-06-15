@@ -54,7 +54,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description: page.metaDescription,
       type: 'website',
       url: getLocalizedCanonicalUrl(locale, path),
-      images: [getCanonicalUrl('/api/og')],
+      images: [getCanonicalUrl('/og-image.png')],
     },
     twitter: {
       card: 'summary_large_image',

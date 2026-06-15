@@ -16,7 +16,7 @@ export const SEO_CONFIG = {
   
   // Branding
   logo: '/images/logo-v3-house-sparkle.svg',
-  ogImage: '/api/og', // OG généré dynamiquement (app/api/og/route.tsx) — l'ancien /og-image.png renvoyait 404
+  ogImage: '/og-image.png', // PNG statique 1200x630 (public/og-image.png, dérivé de og-image.svg). Robuste sur tous les réseaux ; la route edge /api/og renvoyait un corps vide.
   themeColor: '#E07B54',
   
   // Contact

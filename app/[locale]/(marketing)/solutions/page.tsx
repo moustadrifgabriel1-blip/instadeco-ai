@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       description: 'Home staging virtuel, simulateur déco, avant/après : toutes nos solutions IA pour votre intérieur.',
       type: 'website',
       url: getLocalizedCanonicalUrl(locale, path),
-      images: [getCanonicalUrl('/api/og')],
+      images: [getCanonicalUrl('/og-image.png')],
     },
     alternates: {
       canonical: getLocalizedCanonicalUrl(locale, path),

@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       description: 'Un couple suisse, une passion pour la déco et la tech, et une mission : démocratiser la décoration d\'intérieur grâce à l\'IA.',
       type: 'website',
       url: getLocalizedCanonicalUrl(locale, path),
-      images: [getCanonicalUrl('/api/og')],
+      images: [getCanonicalUrl('/og-image.png')],
     },
     alternates: {
       canonical: getLocalizedCanonicalUrl(locale, path),

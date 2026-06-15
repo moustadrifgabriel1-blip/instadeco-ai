@@ -37,7 +37,7 @@ export async function generateMetadata({
         'Un rendu d\'intérieur soigné, prêt à être présenté. Styles haut de gamme, résultat en une trentaine de secondes.',
       type: 'website',
       url: getLocalizedCanonicalUrl(locale, '/generate'),
-      images: [getCanonicalUrl('/api/og')],
+      images: [getCanonicalUrl('/og-image.png')],
     },
     twitter: {
       card: 'summary_large_image',

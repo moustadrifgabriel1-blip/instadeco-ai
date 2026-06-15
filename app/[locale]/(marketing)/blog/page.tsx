@@ -14,6 +14,10 @@ import { useCases } from '@/src/infrastructure/config/di-container';
 import { BlogArticleMapper } from '@/src/application/mappers/BlogArticleMapper';
 import { getLocalizedCanonicalUrl } from '@/lib/seo/config';
 
+// ISR : la liste blog change au plus une fois/heure (publication d'articles).
+// Évite un rendu SSR à chaque requête (x-vercel-cache MISS age 0 constaté en prod).
+export const revalidate = 3600;
+
 // Métadonnées SEO (localisées)
 export async function generateMetadata({
   params,

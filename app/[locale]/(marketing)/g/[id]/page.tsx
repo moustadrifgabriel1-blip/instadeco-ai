@@ -47,7 +47,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const title = `${roomName} style ${styleName} — Transformation IA | InstaDeco`;
   const description = `Découvrez cette transformation d'un${roomName === 'Entrée' || roomName === 'Terrasse' ? 'e' : ''} ${roomName.toLowerCase()} en style ${styleName} réalisée par l'IA InstaDeco. Créez le vôtre en 30 secondes.`;
 
-  const ogImageUrl = `${getCanonicalUrl('/api/og')}?id=${id}&style=${encodeURIComponent(styleName)}&room=${encodeURIComponent(roomName)}&img=${encodeURIComponent(generation.output_image_url)}`;
+  // L'image générée elle-même sert d'aperçu social (meilleur pour le partage viral
+  // qu'une carte composée). Fallback sur l'OG statique si l'output manque.
+  // NB : on n'utilise plus /api/og (route edge ImageResponse → corps vide sur Vercel).
+  const ogImageUrl = generation.output_image_url || getCanonicalUrl('/og-image.png');
 
   return {
     title,

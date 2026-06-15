@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       description: 'Explorez tous les styles déco et appliquez-les à votre intérieur en 30 secondes.',
       type: 'website',
       url: getLocalizedCanonicalUrl(locale, path),
-      images: [getCanonicalUrl('/api/og')],
+      images: [getCanonicalUrl('/og-image.png')],
     },
     alternates: {
       canonical: getLocalizedCanonicalUrl(locale, path),

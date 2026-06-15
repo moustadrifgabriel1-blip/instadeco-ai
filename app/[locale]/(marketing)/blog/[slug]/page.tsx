@@ -25,6 +25,7 @@ import { sanitizeHtml, sanitizeJsonLd } from '@/lib/security/sanitize';
 import { useCases } from '@/src/infrastructure/config/di-container';
 import { BlogArticleMapper } from '@/src/application/mappers/BlogArticleMapper';
 import { SEO_CONFIG, getCanonicalUrl, getLocalizedCanonicalUrl } from '@/lib/seo/config';
+import { generateBreadcrumbSchema } from '@/lib/seo/schemas';
 
 const SITE_URL = SEO_CONFIG.siteUrl.replace(/\/$/, '');
 
@@ -571,6 +572,21 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             keywords: article.tags.join(', '),
             wordCount: article.wordCount,
             articleBody: article.content.replace(/<[^>]*>/g, '').replace(/placeholder\.jpg/g, '').slice(0, 500),
+          }),
+        }}
+      />
+
+      {/* BreadcrumbList — génère le fil d'ariane dans les SERP Google */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: sanitizeJsonLd({
+            '@context': 'https://schema.org',
+            ...generateBreadcrumbSchema([
+              { name: 'Accueil', url: getLocalizedCanonicalUrl(locale, '/') },
+              { name: 'Blog', url: getLocalizedCanonicalUrl(locale, '/blog') },
+              { name: formatBlogTitle(article.title), url: getLocalizedCanonicalUrl(locale, `/blog/${article.slug}`) },
+            ]),
           }),
         }}
       />

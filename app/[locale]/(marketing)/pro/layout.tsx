@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       description: 'Générations illimitées + qualité HD. Vendez plus vite avec le home staging virtuel par IA.',
       url: getLocalizedCanonicalUrl(locale, path),
       type: 'website',
-      images: [getCanonicalUrl('/api/og')],
+      images: [getCanonicalUrl('/og-image.png')],
     },
     keywords: [
       'home staging virtuel',
