@@ -1,11 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useLocale } from 'next-intl';
 import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from '@/i18n/navigation';
 import { createSubscriptionSession } from '@/src/presentation/api/client';
+import { trackBeginCheckout } from '@/lib/analytics/gtag';
+import { fbTrackInitiateCheckout, fbTrackViewContent } from '@/lib/analytics/fb-pixel';
 import {
   Building2, Camera, Check, ArrowRight,
   Shield, ChevronDown, Home,
@@ -184,7 +186,19 @@ export default function ProPage() {
   const router = useRouter();
   const locale = useLocale();
 
+  // Funnel : vue de la page Pro (GEO/retargeting agents).
+  useEffect(() => {
+    fbTrackViewContent('pro', 'pricing');
+  }, []);
+
   const handleSubscribe = async (planId: PlanId) => {
+    const plan = PRO_PLANS.find((p) => p.id === planId);
+    const value = plan ? (billingPeriod === 'monthly' ? plan.monthly : plan.annual) : 0;
+
+    // Funnel : début de checkout (mesure essai→Pro).
+    trackBeginCheckout(planId, value);
+    fbTrackInitiateCheckout(planId, value);
+
     // Non connecté → inscription, puis retour au checkout du plan choisi.
     if (!user || !user.email) {
       router.push(`/signup?plan=${planId}&redirect=checkout`);
@@ -197,7 +211,7 @@ export default function ProPage() {
       const res = await createSubscriptionSession({
         planId,
         interval: billingPeriod,
-        successUrl: `${window.location.origin}/${locale}/dashboard?subscription=success`,
+        successUrl: `${window.location.origin}/${locale}/dashboard?subscription=success&plan=${planId}&v=${value}`,
         cancelUrl: `${window.location.origin}/${locale}/pro?subscription=cancelled`,
       });
       if (res.checkoutUrl) {

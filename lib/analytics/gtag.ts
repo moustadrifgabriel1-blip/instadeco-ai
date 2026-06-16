@@ -104,6 +104,16 @@ export function trackPurchase(packId: string, value: number, currency: string = 
   });
 }
 
+/** Début de checkout (abonnement Pro/Agence ou crédits) — GA4 begin_checkout */
+export function trackBeginCheckout(planId: string, value: number, currency: string = 'EUR') {
+  trackEvent('begin_checkout', {
+    items: planId,
+    value,
+    currency,
+    event_category: 'conversion',
+  });
+}
+
 /** Email capturé (lead) */
 export function trackLeadCaptured(source: string) {
   trackEvent('lead_captured', {

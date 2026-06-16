@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
+import { trackPurchase } from '@/lib/analytics/gtag';
+import { fbTrackPurchase } from '@/lib/analytics/fb-pixel';
 import { useAuth } from '@/hooks/use-auth';
 import { useSupabaseBrowser } from '@/hooks/use-supabase-browser';
 import { useGenerations } from '@/src/presentation/hooks/useGenerations';
@@ -44,6 +46,20 @@ export default function DashboardPageV2() {
       router.push('/login');
     }
   }, [user, authLoading, router]);
+
+  // Conversion : abonnement Pro/Agence payé (retour de Stripe Checkout).
+  // Une seule fois par session (anti double-comptage au refresh).
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('subscription') !== 'success') return;
+    const plan = params.get('plan') || 'pro';
+    const value = Number(params.get('v')) || 0;
+    const key = `sub_tracked_${plan}_${value}`;
+    if (sessionStorage.getItem(key)) return;
+    sessionStorage.setItem(key, '1');
+    trackPurchase(`sub_${plan}`, value);
+    fbTrackPurchase(plan, value);
+  }, []);
 
   const handleLogout = async () => {
     if (!supabase) return;
