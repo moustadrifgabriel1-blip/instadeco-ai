@@ -33,6 +33,19 @@ function withAlternatesForAllLocales(
   }));
 }
 
+/**
+ * Pages programmatiques NON traduites (contenu FR uniquement : architecte-interieur,
+ * style, piece, solution). On n'émet QUE l'URL fr (les variantes en/de sont noindex,
+ * cf. frOnlyProgrammaticMeta) → pas de hreflang en/de mensonger dans le sitemap.
+ */
+function frOnlySitemap(
+  path: string,
+  meta: Omit<MetadataRoute.Sitemap[number], 'url' | 'alternates'>,
+): MetadataRoute.Sitemap {
+  const fr = `${BASE_URL}/fr${path}`;
+  return [{ url: fr, ...meta, alternates: { languages: { 'fr-FR': fr, 'x-default': fr } } }];
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 
@@ -160,7 +173,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
 
     cityPages = CITIES.flatMap((city) =>
-      withAlternatesForAllLocales(`/architecte-interieur/${city.slug}`, {
+      frOnlySitemap(`/architecte-interieur/${city.slug}`, {
         lastModified: now,
         changeFrequency: 'monthly' as const,
         priority: 0.6,
@@ -184,7 +197,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     'mid-century',
     'luxe',
   ].flatMap((style) =>
-    withAlternatesForAllLocales(`/style/${style}`, {
+    frOnlySitemap(`/style/${style}`, {
       lastModified: now,
       changeFrequency: 'monthly' as const,
       priority: 0.6,
@@ -201,7 +214,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     'terrasse',
     'salle-a-manger',
   ].flatMap((room) =>
-    withAlternatesForAllLocales(`/piece/${room}`, {
+    frOnlySitemap(`/piece/${room}`, {
       lastModified: now,
       changeFrequency: 'monthly' as const,
       priority: 0.6,
@@ -230,7 +243,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     'rustique/salle-a-manger',
   ];
   const decoPages: MetadataRoute.Sitemap = priorityCombos.flatMap((combo) =>
-    withAlternatesForAllLocales(`/deco/${combo}`, {
+    frOnlySitemap(`/deco/${combo}`, {
       lastModified: now,
       changeFrequency: 'monthly' as const,
       priority: 0.6,
@@ -247,7 +260,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     'decoration-chambre',
     'avant-apres-decoration',
   ].flatMap((slug) =>
-    withAlternatesForAllLocales(`/solution/${slug}`, {
+    frOnlySitemap(`/solution/${slug}`, {
       lastModified: now,
       changeFrequency: 'monthly' as const,
       priority: 0.7,

@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { generateServiceSchema, generateBreadcrumbList, generateFAQSchema } from '@/lib/seo/schemas';
-import { getCanonicalUrl, getLocalizedCanonicalUrl, withLocalePath } from '@/lib/seo/config';
+import { getCanonicalUrl, getLocalizedCanonicalUrl, withLocalePath, frOnlyProgrammaticMeta } from '@/lib/seo/config';
 import { LeadCaptureLazy } from '@/components/features/lead-capture-lazy';
 
 interface PageProps {
@@ -137,15 +137,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title,
       description,
     },
-    alternates: {
-      canonical: getLocalizedCanonicalUrl(locale, path),
-      languages: {
-        'fr-FR': getLocalizedCanonicalUrl('fr', path),
-        en: getLocalizedCanonicalUrl('en', path),
-        de: getLocalizedCanonicalUrl('de', path),
-        'x-default': getLocalizedCanonicalUrl('fr', path),
-      },
-    },
+    ...frOnlyProgrammaticMeta(locale, path),
   };
 }
 

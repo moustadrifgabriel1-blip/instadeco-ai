@@ -99,6 +99,26 @@ export function getLocalizedCanonicalUrl(locale: string, path: string): string {
   return `${base}/${locale}${cleanPath}`;
 }
 
+/**
+ * Métadonnées pour les pages programmatiques NON traduites (contenu FR uniquement :
+ * architecte-interieur, style, piece, solution). Tant qu'il n'existe pas de vraie
+ * traduction en/de, on :
+ *  - ne déclare PAS de hreflang en/de (sinon Google indexe du FR sous une URL en/de) ;
+ *  - consolide tout vers la version FR (canonical → /fr/...) ;
+ *  - noindexe les variantes non-fr (elles servent du FR → mauvais signal SEO).
+ * À remplacer par de vraies traductions (getTranslations) le jour où le contenu est localisé.
+ */
+export function frOnlyProgrammaticMeta(locale: string, path: string) {
+  const frUrl = getLocalizedCanonicalUrl('fr', path);
+  return {
+    alternates: {
+      canonical: frUrl,
+      languages: { 'fr-FR': frUrl, 'x-default': frUrl },
+    },
+    robots: locale === 'fr' ? undefined : { index: false, follow: true },
+  } as const;
+}
+
 /** Chemin relatif avec préfixe locale (ex: withLocalePath('fr', '/pricing') → '/fr/pricing') */
 export function withLocalePath(locale: string, path: string): string {
   if (path === '/' || path === '') {

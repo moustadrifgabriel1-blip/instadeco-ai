@@ -16,7 +16,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { generateFAQSchema, generateBreadcrumbList, generateWebPageSchema } from '@/lib/seo/schemas';
-import { getCanonicalUrl, getLocalizedCanonicalUrl, withLocalePath } from '@/lib/seo/config';
+import { getCanonicalUrl, getLocalizedCanonicalUrl, withLocalePath, frOnlyProgrammaticMeta } from '@/lib/seo/config';
 import { ROOM_SEO_DATA, STYLE_SEO_DATA, getRoomSEOBySlug } from '@/lib/seo/programmatic-data';
 import { LeadCaptureLazy } from '@/components/features/lead-capture-lazy';
 import { CITIES } from '@/src/shared/constants/cities';
@@ -55,15 +55,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: room.name,
       description: room.metaDescription,
     },
-    alternates: {
-      canonical: getLocalizedCanonicalUrl(locale, path),
-      languages: {
-        'fr-FR': getLocalizedCanonicalUrl('fr', path),
-        en: getLocalizedCanonicalUrl('en', path),
-        de: getLocalizedCanonicalUrl('de', path),
-        'x-default': getLocalizedCanonicalUrl('fr', path),
-      },
-    },
+    ...frOnlyProgrammaticMeta(locale, path),
   };
 }
 

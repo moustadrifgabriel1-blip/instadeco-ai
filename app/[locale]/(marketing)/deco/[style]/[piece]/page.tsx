@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { LeadCaptureLazy } from '@/components/features/lead-capture-lazy';
 import { STYLE_SEO_DATA, ROOM_SEO_DATA, getStyleSEOBySlug, getRoomSEOBySlug } from '@/lib/seo/programmatic-data';
-import { getLocalizedCanonicalUrl } from '@/lib/seo/config';
+import { getLocalizedCanonicalUrl, frOnlyProgrammaticMeta } from '@/lib/seo/config';
 import { sanitizeJsonLd } from '@/lib/security/sanitize';
 
 interface PageProps {
@@ -75,22 +75,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       type: 'article',
       siteName: 'InstaDeco AI',
     },
-    alternates: {
-      canonical: getLocalizedCanonicalUrl(locale, path),
-      languages: {
-        'fr-FR': getLocalizedCanonicalUrl('fr', path),
-        en: getLocalizedCanonicalUrl('en', path),
-        de: getLocalizedCanonicalUrl('de', path),
-        'x-default': getLocalizedCanonicalUrl('fr', path),
-      },
-    },
-    // Pages non-prioritaires = noindex (maillage interne uniquement)
-    ...(!indexable && {
-      robots: {
-        index: false,
-        follow: true,
-      },
-    }),
+    // Contenu FR only : fr-only hreflang + canonical → fr, noindex des variantes non-fr.
+    ...frOnlyProgrammaticMeta(locale, path),
+    // En plus : pages fr non-prioritaires = noindex (maillage interne uniquement).
+    ...(locale === 'fr' && !indexable ? { robots: { index: false, follow: true } } : {}),
   };
 }
 

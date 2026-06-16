@@ -26,7 +26,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { generateFAQSchema, generateBreadcrumbList, generateWebPageSchema } from '@/lib/seo/schemas';
-import { getCanonicalUrl, getLocalizedCanonicalUrl, withLocalePath } from '@/lib/seo/config';
+import { getCanonicalUrl, getLocalizedCanonicalUrl, withLocalePath, frOnlyProgrammaticMeta } from '@/lib/seo/config';
 import { INTENT_PAGES, getIntentPageBySlug } from '@/lib/seo/intent-pages-data';
 import { LeadCaptureLazy } from '@/components/features/lead-capture-lazy';
 
@@ -61,15 +61,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: page.title,
       description: page.metaDescription,
     },
-    alternates: {
-      canonical: getLocalizedCanonicalUrl(locale, path),
-      languages: {
-        'fr-FR': getLocalizedCanonicalUrl('fr', path),
-        en: getLocalizedCanonicalUrl('en', path),
-        de: getLocalizedCanonicalUrl('de', path),
-        'x-default': getLocalizedCanonicalUrl('fr', path),
-      },
-    },
+    ...frOnlyProgrammaticMeta(locale, path),
   };
 }
 
