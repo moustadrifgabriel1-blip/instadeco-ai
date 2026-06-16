@@ -13,6 +13,7 @@ import { GenerationsTab } from '@/components/features/dashboard/GenerationsTab';
 import { AccountTab } from '@/components/features/dashboard/AccountTab';
 import { SecurityTab } from '@/components/features/dashboard/SecurityTab';
 import { ReferralTab } from '@/components/features/dashboard/ReferralTab';
+import { TeamTab } from '@/components/features/dashboard/TeamTab';
 import { useReferral } from '@/components/features/dashboard/useReferral';
 import type { ActiveTab } from '@/components/features/dashboard/types';
 
@@ -108,6 +109,7 @@ export default function DashboardPageV2() {
             {activeTab === 'referral' && (
               <ReferralTab referralCode={referralCode} referralStats={referralStats} />
             )}
+            {activeTab === 'team' && <TeamTab />}
           </main>
         </div>
       </div>

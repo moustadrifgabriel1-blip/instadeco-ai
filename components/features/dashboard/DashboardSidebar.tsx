@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ImageIcon, User, Lock, Gift, CreditCard } from 'lucide-react';
+import { ImageIcon, User, Lock, Gift, CreditCard, Users } from 'lucide-react';
 import type { ActiveTab } from './types';
 
 interface DashboardSidebarProps {
@@ -30,6 +30,10 @@ export function DashboardSidebar({ activeTab, setActiveTab, referredCount }: Das
         <button onClick={() => setActiveTab('security')} className={tabClass(activeTab === 'security')}>
           <Lock className="w-5 h-5" />
           Sécurité
+        </button>
+        <button onClick={() => setActiveTab('team')} className={tabClass(activeTab === 'team')}>
+          <Users className="w-5 h-5" />
+          Équipe
         </button>
         <button onClick={() => setActiveTab('referral')} className={tabClass(activeTab === 'referral')}>
           <Gift className="w-5 h-5" />
