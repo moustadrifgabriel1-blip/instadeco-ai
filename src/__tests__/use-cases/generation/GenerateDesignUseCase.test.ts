@@ -18,6 +18,8 @@ import {
 } from '@/src/__tests__/mocks';
 import type { IImageGeneratorService } from '@/src/domain/ports/services/IImageGeneratorService';
 import type { IStorageService } from '@/src/domain/ports/services/IStorageService';
+import { createMockUserRepository } from '@/src/__tests__/mocks/userRepository.mock';
+import type { User } from '@/src/domain/entities/User';
 
 const GENERATION_ID = 'gen-123';
 const USER_ID = 'user-123';
@@ -153,5 +155,119 @@ describe('GenerateDesignUseCase', () => {
     expect(generationRepo.delete).toHaveBeenCalledWith(GENERATION_ID);
     // L'IA ne doit jamais être appelée si la déduction a échoué
     expect(imageGenerator.generate).not.toHaveBeenCalled();
+  });
+});
+
+describe('GenerateDesignUseCase — abonné illimité (Pro/Agence)', () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  function makeUser(overrides: Partial<User> = {}): User {
+    return {
+      id: USER_ID, email: 'a@b.c', fullName: null, avatarUrl: null, credits: 0,
+      stripeCustomerId: null, stripeSubscriptionId: null,
+      proPlan: null, proStatus: null, proRenewsAt: null,
+      createdAt: new Date(), updatedAt: new Date(), ...overrides,
+    };
+  }
+
+  it('Pro illimité actif : génère SANS déduire de crédits (même solde 0)', async () => {
+    const userRepo = createMockUserRepository({
+      findById: vi.fn().mockResolvedValue(success(makeUser({ proStatus: 'active', proPlan: 'pro' }))),
+    });
+    const creditRepo = createMockCreditRepository({
+      getBalance: vi.fn().mockResolvedValue(success(0)),
+      deductCredits: vi.fn(),
+    });
+    const useCase = new GenerateDesignUseCase(
+      createMockGenerationRepository(), creditRepo, createMockImageGenerator(), createMockStorage(), createMockLogger(), userRepo,
+    );
+
+    const result = await useCase.execute(baseInput);
+
+    expect(result.success).toBe(true);
+    expect(creditRepo.deductCredits).not.toHaveBeenCalled();
+  });
+
+  it('Pro illimité : creditsRemaining = solde courant (informatif)', async () => {
+    const userRepo = createMockUserRepository({
+      findById: vi.fn().mockResolvedValue(success(makeUser({ proStatus: 'active', proPlan: 'agence' }))),
+    });
+    const creditRepo = createMockCreditRepository({
+      getBalance: vi.fn().mockResolvedValue(success(7)),
+      deductCredits: vi.fn(),
+    });
+    const useCase = new GenerateDesignUseCase(
+      createMockGenerationRepository(), creditRepo, createMockImageGenerator(), createMockStorage(), createMockLogger(), userRepo,
+    );
+
+    const result = await useCase.execute(baseInput);
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.data.creditsRemaining).toBe(7);
+  });
+
+  it('Pro illimité + échec IA : AUCUN remboursement (rien n\'a été débité)', async () => {
+    const userRepo = createMockUserRepository({
+      findById: vi.fn().mockResolvedValue(success(makeUser({ proStatus: 'active', proPlan: 'pro' }))),
+    });
+    const creditRepo = createMockCreditRepository();
+    const imageGenerator = createMockImageGenerator({
+      generate: vi.fn().mockResolvedValue(failure(new Error('AI down'))),
+    });
+    const useCase = new GenerateDesignUseCase(
+      createMockGenerationRepository(), creditRepo, imageGenerator, createMockStorage(), createMockLogger(), userRepo,
+    );
+
+    const result = await useCase.execute(baseInput);
+    expect(result.success).toBe(false);
+    expect(creditRepo.deductCredits).not.toHaveBeenCalled();
+    expect(creditRepo.addCredits).not.toHaveBeenCalled();
+  });
+
+  it('Solo actif (quota) : déduit normalement les crédits', async () => {
+    const userRepo = createMockUserRepository({
+      findById: vi.fn().mockResolvedValue(success(makeUser({ proStatus: 'active', proPlan: 'solo' }))),
+    });
+    const creditRepo = createMockCreditRepository({
+      getBalance: vi.fn().mockResolvedValue(success(5)),
+      deductCredits: vi.fn().mockResolvedValue(success(4)),
+    });
+    const useCase = new GenerateDesignUseCase(
+      createMockGenerationRepository(), creditRepo, createMockImageGenerator(), createMockStorage(), createMockLogger(), userRepo,
+    );
+
+    const result = await useCase.execute(baseInput);
+    expect(result.success).toBe(true);
+    expect(creditRepo.deductCredits).toHaveBeenCalled();
+  });
+
+  it('abonnement annulé (canceled) : déduit normalement (plus d\'illimité)', async () => {
+    const userRepo = createMockUserRepository({
+      findById: vi.fn().mockResolvedValue(success(makeUser({ proStatus: 'canceled', proPlan: 'pro' }))),
+    });
+    const creditRepo = createMockCreditRepository({
+      getBalance: vi.fn().mockResolvedValue(success(5)),
+      deductCredits: vi.fn().mockResolvedValue(success(4)),
+    });
+    const useCase = new GenerateDesignUseCase(
+      createMockGenerationRepository(), creditRepo, createMockImageGenerator(), createMockStorage(), createMockLogger(), userRepo,
+    );
+
+    const result = await useCase.execute(baseInput);
+    expect(result.success).toBe(true);
+    expect(creditRepo.deductCredits).toHaveBeenCalled();
+  });
+
+  it('sans userRepo (rétro-compat) : déduit normalement', async () => {
+    const creditRepo = createMockCreditRepository({
+      getBalance: vi.fn().mockResolvedValue(success(5)),
+      deductCredits: vi.fn().mockResolvedValue(success(4)),
+    });
+    const useCase = new GenerateDesignUseCase(
+      createMockGenerationRepository(), creditRepo, createMockImageGenerator(), createMockStorage(), createMockLogger(),
+    );
+
+    const result = await useCase.execute(baseInput);
+    expect(result.success).toBe(true);
+    expect(creditRepo.deductCredits).toHaveBeenCalled();
   });
 });

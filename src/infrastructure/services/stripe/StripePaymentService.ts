@@ -134,30 +134,60 @@ export class StripePaymentService implements IPaymentService {
         this.webhookSecret
       );
 
-      // On ne traite que checkout.session.completed
-      if (event.type !== 'checkout.session.completed') {
+      const base = {
+        eventId: event.id,
+        type: event.type,
+        sessionId: '',
+        customerId: '',
+        customerEmail: '',
+        amountTotal: 0,
+        metadata: {} as Record<string, string>,
+      };
+
+      // Achat / abonnement initial : checkout.session.completed (crédits OU subscription).
+      if (event.type === 'checkout.session.completed') {
+        const session = event.data.object as Stripe.Checkout.Session;
         return success({
-          eventId: event.id,
-          type: event.type,
-          sessionId: '',
-          customerId: '',
-          customerEmail: '',
-          amountTotal: 0,
-          metadata: {},
+          ...base,
+          sessionId: session.id,
+          customerId: (session.customer as string) || '',
+          customerEmail: session.customer_email || '',
+          amountTotal: session.amount_total || 0,
+          metadata: (session.metadata || {}) as Record<string, string>,
+          subscriptionId: (session.subscription as string) || undefined,
         });
       }
 
-      const session = event.data.object as Stripe.Checkout.Session;
+      // Renouvellement d'abonnement (initial + cycles). billingReason distingue les deux.
+      if (event.type === 'invoice.paid') {
+        const invoice = event.data.object as Stripe.Invoice;
+        const sub = (invoice as unknown as { subscription?: string | { id: string } }).subscription;
+        const subscriptionId = typeof sub === 'string' ? sub : sub?.id;
+        return success({
+          ...base,
+          customerId: (invoice.customer as string) || '',
+          customerEmail: invoice.customer_email || '',
+          amountTotal: invoice.amount_paid || 0,
+          metadata: (invoice.metadata || {}) as Record<string, string>,
+          subscriptionId: subscriptionId || undefined,
+          billingReason: invoice.billing_reason || undefined,
+          periodEnd: invoice.lines?.data?.[0]?.period?.end,
+        });
+      }
 
-      return success({
-        eventId: event.id,
-        type: event.type,
-        sessionId: session.id,
-        customerId: (session.customer as string) || '',
-        customerEmail: session.customer_email || '',
-        amountTotal: session.amount_total || 0,
-        metadata: (session.metadata || {}) as Record<string, string>,
-      });
+      // Annulation d'abonnement.
+      if (event.type === 'customer.subscription.deleted') {
+        const sub = event.data.object as Stripe.Subscription;
+        return success({
+          ...base,
+          customerId: (sub.customer as string) || '',
+          metadata: (sub.metadata || {}) as Record<string, string>,
+          subscriptionId: sub.id,
+        });
+      }
+
+      // Autres events : ignorés en amont (use-case), event minimal pour l'idempotence.
+      return success(base);
 
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown error';

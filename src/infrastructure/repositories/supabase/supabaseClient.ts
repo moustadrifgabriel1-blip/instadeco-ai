@@ -103,6 +103,10 @@ export interface ProfileRow {
   avatar_url: string | null;
   credits: number;
   stripe_customer_id: string | null;
+  stripe_subscription_id: string | null;
+  pro_plan: string | null;
+  pro_status: string | null;
+  pro_renews_at: string | null;
   created_at: string;
   updated_at: string;
 }

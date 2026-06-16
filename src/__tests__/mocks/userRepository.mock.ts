@@ -11,6 +11,10 @@ export function createMockUserRepository(overrides: Partial<IUserRepository> = {
     avatarUrl: null,
     credits: 3,
     stripeCustomerId: null,
+    stripeSubscriptionId: null,
+    proPlan: null,
+    proStatus: null,
+    proRenewsAt: null,
     createdAt: new Date(),
     updatedAt: new Date(),
   };
@@ -19,6 +23,7 @@ export function createMockUserRepository(overrides: Partial<IUserRepository> = {
     create: vi.fn().mockResolvedValue(success(mockUser)),
     findById: vi.fn().mockResolvedValue(success(mockUser)),
     findByEmail: vi.fn().mockResolvedValue(success(mockUser)),
+    findByStripeSubscriptionId: vi.fn().mockResolvedValue(success(null)),
     update: vi.fn().mockResolvedValue(success(mockUser)),
     delete: vi.fn().mockResolvedValue(success(undefined)),
     exists: vi.fn().mockResolvedValue(success(true)),

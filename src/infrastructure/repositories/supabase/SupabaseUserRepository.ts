@@ -23,6 +23,10 @@ export class SupabaseUserRepository implements IUserRepository {
       avatarUrl: row.avatar_url,
       credits: row.credits,
       stripeCustomerId: row.stripe_customer_id,
+      stripeSubscriptionId: row.stripe_subscription_id ?? null,
+      proPlan: (row.pro_plan as User['proPlan']) ?? null,
+      proStatus: (row.pro_status as User['proStatus']) ?? null,
+      proRenewsAt: row.pro_renews_at ? new Date(row.pro_renews_at) : null,
       createdAt: new Date(row.created_at),
       updatedAt: new Date(row.updated_at),
     };
@@ -82,6 +86,20 @@ export class SupabaseUserRepository implements IUserRepository {
     return success(this.toEntity(data as ProfileRow));
   }
 
+  async findByStripeSubscriptionId(subscriptionId: string): Promise<Result<User | null>> {
+    const { data, error } = await this.supabase
+      .from('profiles')
+      .select('*')
+      .eq('stripe_subscription_id', subscriptionId)
+      .maybeSingle();
+
+    if (error) {
+      return failure(new Error(`Failed to find user by subscription: ${error.message}`));
+    }
+
+    return success(data ? this.toEntity(data as ProfileRow) : null);
+  }
+
   async update(id: string, input: UpdateUserInput): Promise<Result<User>> {
     const updateData: Record<string, unknown> = {
       updated_at: new Date().toISOString(),
@@ -91,6 +109,13 @@ export class SupabaseUserRepository implements IUserRepository {
     if (input.avatarUrl !== undefined) updateData.avatar_url = input.avatarUrl;
     if (input.credits !== undefined) updateData.credits = input.credits;
     if (input.stripeCustomerId !== undefined) updateData.stripe_customer_id = input.stripeCustomerId;
+    if (input.stripeSubscriptionId !== undefined) updateData.stripe_subscription_id = input.stripeSubscriptionId;
+    if (input.proPlan !== undefined) updateData.pro_plan = input.proPlan;
+    if (input.proStatus !== undefined) updateData.pro_status = input.proStatus;
+    if (input.proRenewsAt !== undefined) {
+      updateData.pro_renews_at =
+        input.proRenewsAt instanceof Date ? input.proRenewsAt.toISOString() : input.proRenewsAt;
+    }
 
     const { data, error } = await this.supabase
       .from('profiles')

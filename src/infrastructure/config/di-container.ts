@@ -197,6 +197,7 @@ class DIContainer {
       this.imageGeneratorService,
       this.storageService,
       this.logger,
+      this.userRepository,
     );
   }
 
@@ -327,6 +328,7 @@ class DIContainer {
       this.logger,
       this.processedEventRepository,
       this.authService,
+      this.userRepository,
     );
   }
 

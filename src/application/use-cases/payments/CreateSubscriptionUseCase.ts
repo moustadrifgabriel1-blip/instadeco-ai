@@ -2,7 +2,9 @@ import { Result, success, failure } from '@/src/shared/types/Result';
 import { IPaymentService } from '@/src/domain/ports/services/IPaymentService';
 import { ILoggerService } from '@/src/domain/ports/services/ILoggerService';
 
-export type SubscriptionPlanId = 'sub_essentiel' | 'sub_pro' | 'sub_business';
+export type SubscriptionPlanId =
+  | 'sub_essentiel' | 'sub_pro' | 'sub_business' // legacy (crédits, page /pricing)
+  | 'solo' | 'pro' | 'agence';                    // offre immobilier (page /pro)
 export type SubscriptionInterval = 'monthly' | 'annual';
 
 export interface CreateSubscriptionInput {
@@ -35,6 +37,10 @@ const PLAN_CONFIG: Record<
   sub_essentiel: { monthlyEnv: 'STRIPE_PRICE_SUB_ESSENTIEL_MONTHLY', annualEnv: 'STRIPE_PRICE_SUB_ESSENTIEL_ANNUAL', creditsPerMonth: 30, planName: 'Essentiel' },
   sub_pro: { monthlyEnv: 'STRIPE_PRICE_SUB_PRO_MONTHLY', annualEnv: 'STRIPE_PRICE_SUB_PRO_ANNUAL', creditsPerMonth: 80, planName: 'Pro' },
   sub_business: { monthlyEnv: 'STRIPE_PRICE_SUB_BUSINESS_MONTHLY', annualEnv: 'STRIPE_PRICE_SUB_BUSINESS_ANNUAL', creditsPerMonth: 200, planName: 'Business' },
+  // Offre immobilier (page /pro). Solo = 40 crédits/mois ; Pro/Agence = illimité (0 = pas de quota crédité).
+  solo: { monthlyEnv: 'STRIPE_PRICE_SOLO_MONTHLY', annualEnv: 'STRIPE_PRICE_SOLO_ANNUAL', creditsPerMonth: 40, planName: 'Solo' },
+  pro: { monthlyEnv: 'STRIPE_PRICE_PRO_MONTHLY', annualEnv: 'STRIPE_PRICE_PRO_ANNUAL', creditsPerMonth: 0, planName: 'Pro' },
+  agence: { monthlyEnv: 'STRIPE_PRICE_AGENCE_MONTHLY', annualEnv: 'STRIPE_PRICE_AGENCE_ANNUAL', creditsPerMonth: 0, planName: 'Agence' },
 };
 
 /**

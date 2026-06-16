@@ -22,6 +22,13 @@ export interface IUserRepository {
   findByEmail(email: string): Promise<Result<User | null>>;
 
   /**
+   * Récupère un utilisateur par son ID d'abonnement Stripe.
+   * Sert au mapping des events de renouvellement/annulation (invoice.paid,
+   * customer.subscription.deleted) qui ne portent pas l'userId.
+   */
+  findByStripeSubscriptionId(subscriptionId: string): Promise<Result<User | null>>;
+
+  /**
    * Met à jour un utilisateur
    */
   update(id: string, input: UpdateUserInput): Promise<Result<User>>;

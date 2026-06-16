@@ -9,6 +9,8 @@ import {
 } from '@/src/__tests__/mocks';
 import { success, failure } from '@/src/shared/types/Result';
 import { createMockGenerationRepository } from '@/src/__tests__/mocks/generationRepository.mock';
+import { createMockUserRepository } from '@/src/__tests__/mocks/userRepository.mock';
+import type { User } from '@/src/domain/entities/User';
 
 describe('ProcessStripeWebhookUseCase — idempotence', () => {
   let useCase: ProcessStripeWebhookUseCase;
@@ -228,5 +230,143 @@ describe('ProcessStripeWebhookUseCase — guest checkout', () => {
     expect(result.success).toBe(false);
     expect(mockCreditRepo.addCredits).not.toHaveBeenCalled();
     expect(mockProcessedEventRepo.unmarkProcessed).toHaveBeenCalledWith('evt_guest_1');
+  });
+});
+
+describe('ProcessStripeWebhookUseCase — abonnements', () => {
+  let mockCreditRepo: ReturnType<typeof createMockCreditRepository>;
+  let mockPaymentService: ReturnType<typeof createMockPaymentService>;
+  let mockLogger: ReturnType<typeof createMockLogger>;
+  let mockGenerationRepo: ReturnType<typeof createMockGenerationRepository>;
+  let mockProcessedEventRepo: ReturnType<typeof createMockProcessedEventRepository>;
+
+  function makeUser(overrides: Partial<User> = {}): User {
+    return {
+      id: 'u', email: 'a@b.c', fullName: null, avatarUrl: null, credits: 0,
+      stripeCustomerId: null, stripeSubscriptionId: null,
+      proPlan: null, proStatus: null, proRenewsAt: null,
+      createdAt: new Date(), updatedAt: new Date(), ...overrides,
+    };
+  }
+
+  beforeEach(() => {
+    mockCreditRepo = createMockCreditRepository();
+    mockPaymentService = createMockPaymentService();
+    mockLogger = createMockLogger();
+    mockGenerationRepo = createMockGenerationRepository();
+    mockProcessedEventRepo = createMockProcessedEventRepository();
+  });
+
+  function make(event: unknown, userRepo?: ReturnType<typeof createMockUserRepository>) {
+    mockPaymentService.verifyWebhook = vi.fn().mockResolvedValue(success(event));
+    return new ProcessStripeWebhookUseCase(
+      mockCreditRepo, mockGenerationRepo, mockPaymentService, mockLogger,
+      mockProcessedEventRepo, undefined, userRepo,
+    );
+  }
+
+  const SUB_PRO = {
+    eventId: 'evt_sub_pro', type: 'checkout.session.completed', sessionId: 'cs_p',
+    customerId: 'cus_pro', customerEmail: 'agent@x.com', amountTotal: 4900,
+    metadata: { type: 'subscription', planId: 'pro', userId: 'user-pro' }, subscriptionId: 'sub_pro_1',
+  };
+  const SUB_SOLO = {
+    eventId: 'evt_sub_solo', type: 'checkout.session.completed', sessionId: 'cs_s',
+    customerId: 'cus_solo', customerEmail: 'agent2@x.com', amountTotal: 1900,
+    metadata: { type: 'subscription', planId: 'solo', userId: 'user-solo' }, subscriptionId: 'sub_solo_1',
+  };
+  const INVOICE_CYCLE = {
+    eventId: 'evt_inv_cycle', type: 'invoice.paid', sessionId: '', customerId: 'cus_solo',
+    customerEmail: '', amountTotal: 1900, metadata: {}, subscriptionId: 'sub_solo_1',
+    billingReason: 'subscription_cycle', periodEnd: 1790000000,
+  };
+  const INVOICE_CREATE = { ...INVOICE_CYCLE, eventId: 'evt_inv_create', billingReason: 'subscription_create' };
+  const INVOICE_CYCLE_PRO = { ...INVOICE_CYCLE, eventId: 'evt_inv_pro', subscriptionId: 'sub_pro_1' };
+  const SUB_DELETED = {
+    eventId: 'evt_del', type: 'customer.subscription.deleted', sessionId: '', customerId: 'cus_pro',
+    customerEmail: '', amountTotal: 0, metadata: {}, subscriptionId: 'sub_pro_1',
+  };
+
+  it('active un abonnement Pro illimité SANS créditer', async () => {
+    const userRepo = createMockUserRepository();
+    const r = await make(SUB_PRO, userRepo).execute({ payload: '{}', signature: 's' });
+    expect(r.success).toBe(true);
+    expect(userRepo.update).toHaveBeenCalledWith('user-pro', expect.objectContaining({ proPlan: 'pro', proStatus: 'active' }));
+    expect(mockCreditRepo.addCredits).not.toHaveBeenCalled();
+  });
+
+  it('active un abonnement Solo et crédite 40', async () => {
+    const userRepo = createMockUserRepository();
+    const r = await make(SUB_SOLO, userRepo).execute({ payload: '{}', signature: 's' });
+    expect(r.success).toBe(true);
+    expect(userRepo.update).toHaveBeenCalledWith('user-solo', expect.objectContaining({ proPlan: 'solo', proStatus: 'active' }));
+    expect(mockCreditRepo.addCredits).toHaveBeenCalledWith('user-solo', 40, expect.any(String), 'sub_solo_1', 'purchase');
+  });
+
+  it('renouvellement Solo (cycle) recharge 40 crédits', async () => {
+    const userRepo = createMockUserRepository({
+      findByStripeSubscriptionId: vi.fn().mockResolvedValue(success(makeUser({ id: 'user-solo', proPlan: 'solo', proStatus: 'active', stripeSubscriptionId: 'sub_solo_1' }))),
+    });
+    const r = await make(INVOICE_CYCLE, userRepo).execute({ payload: '{}', signature: 's' });
+    expect(r.success).toBe(true);
+    expect(mockCreditRepo.addCredits).toHaveBeenCalledWith('user-solo', 40, expect.any(String), 'sub_solo_1', 'purchase');
+  });
+
+  it('facture initiale (subscription_create) NE recharge PAS (déjà crédité à l\'activation)', async () => {
+    const userRepo = createMockUserRepository({
+      findByStripeSubscriptionId: vi.fn().mockResolvedValue(success(makeUser({ id: 'user-solo', proPlan: 'solo', proStatus: 'active', stripeSubscriptionId: 'sub_solo_1' }))),
+    });
+    const r = await make(INVOICE_CREATE, userRepo).execute({ payload: '{}', signature: 's' });
+    expect(r.success).toBe(true);
+    expect(mockCreditRepo.addCredits).not.toHaveBeenCalled();
+    expect(userRepo.update).toHaveBeenCalled(); // statut + renews_at
+  });
+
+  it('renouvellement Pro illimité NE crédite jamais', async () => {
+    const userRepo = createMockUserRepository({
+      findByStripeSubscriptionId: vi.fn().mockResolvedValue(success(makeUser({ id: 'user-pro', proPlan: 'pro', proStatus: 'active', stripeSubscriptionId: 'sub_pro_1' }))),
+    });
+    const r = await make(INVOICE_CYCLE_PRO, userRepo).execute({ payload: '{}', signature: 's' });
+    expect(r.success).toBe(true);
+    expect(mockCreditRepo.addCredits).not.toHaveBeenCalled();
+  });
+
+  it('invoice.paid sans profil mappé est ignoré sans erreur', async () => {
+    const userRepo = createMockUserRepository({ findByStripeSubscriptionId: vi.fn().mockResolvedValue(success(null)) });
+    const r = await make(INVOICE_CYCLE, userRepo).execute({ payload: '{}', signature: 's' });
+    expect(r.success).toBe(true);
+    if (r.success) expect(r.data.action).toBe('unmapped');
+    expect(mockCreditRepo.addCredits).not.toHaveBeenCalled();
+  });
+
+  it('invoice.paid sans subscriptionId → no_subscription', async () => {
+    const userRepo = createMockUserRepository();
+    const r = await make({ ...INVOICE_CYCLE, subscriptionId: undefined }, userRepo).execute({ payload: '{}', signature: 's' });
+    expect(r.success).toBe(true);
+    if (r.success) expect(r.data.action).toBe('no_subscription');
+  });
+
+  it('annule l\'abonnement (customer.subscription.deleted) → statut canceled', async () => {
+    const userRepo = createMockUserRepository({
+      findByStripeSubscriptionId: vi.fn().mockResolvedValue(success(makeUser({ id: 'user-pro', proPlan: 'pro', proStatus: 'active', stripeSubscriptionId: 'sub_pro_1' }))),
+    });
+    const r = await make(SUB_DELETED, userRepo).execute({ payload: '{}', signature: 's' });
+    expect(r.success).toBe(true);
+    expect(userRepo.update).toHaveBeenCalledWith('user-pro', { proStatus: 'canceled' });
+  });
+
+  it('activation avec plan invalide → échec propre (verrou libéré)', async () => {
+    const userRepo = createMockUserRepository();
+    const r = await make({ ...SUB_PRO, metadata: { type: 'subscription', planId: 'inexistant', userId: 'user-x' } }, userRepo)
+      .execute({ payload: '{}', signature: 's' });
+    expect(r.success).toBe(false);
+    expect(mockCreditRepo.addCredits).not.toHaveBeenCalled();
+    expect(mockProcessedEventRepo.unmarkProcessed).toHaveBeenCalledWith('evt_sub_pro');
+  });
+
+  it('activation sans userRepo → échec propre', async () => {
+    const r = await make(SUB_PRO, undefined).execute({ payload: '{}', signature: 's' });
+    expect(r.success).toBe(false);
+    expect(mockProcessedEventRepo.unmarkProcessed).toHaveBeenCalledWith('evt_sub_pro');
   });
 });

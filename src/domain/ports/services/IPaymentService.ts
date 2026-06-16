@@ -50,6 +50,12 @@ export interface PaymentWebhookEvent {
   customerEmail: string;
   amountTotal: number;
   metadata: Record<string, string>;
+  /** Abonnements : id de la subscription Stripe (sub_...) si l'event en porte une. */
+  subscriptionId?: string;
+  /** invoice.paid : 'subscription_create' (initial) | 'subscription_cycle' (renouvellement) | ... */
+  billingReason?: string;
+  /** Fin de la période courante (epoch s) — pour pro_renews_at. */
+  periodEnd?: number;
 }
 
 /**

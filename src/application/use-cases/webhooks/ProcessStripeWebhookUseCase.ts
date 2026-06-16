@@ -3,8 +3,10 @@ import { ICreditRepository } from '@/src/domain/ports/repositories/ICreditReposi
 import { IProcessedEventRepository } from '@/src/domain/ports/repositories/IProcessedEventRepository';
 import { IPaymentService, PaymentWebhookEvent } from '@/src/domain/ports/services/IPaymentService';
 import { IGenerationRepository } from '@/src/domain/ports/repositories/IGenerationRepository';
+import { IUserRepository } from '@/src/domain/ports/repositories/IUserRepository';
 import { ILoggerService } from '@/src/domain/ports/services/ILoggerService';
 import { IAuthService } from '@/src/domain/ports/services/IAuthService';
+import type { ProPlan } from '@/src/domain/entities/User';
 import { DomainError } from '@/src/domain/errors/DomainError';
 import { PaymentError } from '@/src/domain/errors/PaymentError';
 import { WebhookSignatureError } from '@/src/domain/errors/WebhookSignatureError';
@@ -27,10 +29,22 @@ export interface ProcessWebhookOutput {
 }
 
 /**
+ * Mapping plan d'abonnement → profil.
+ * Solo = quota mensuel crédité (ledger) ; Pro/Agence = illimité (pas de débit à la génération).
+ */
+const SUBSCRIPTION_PLANS: Record<string, { proPlan: ProPlan; monthlyCredits: number; unlimited: boolean }> = {
+  solo: { proPlan: 'solo', monthlyCredits: 40, unlimited: false },
+  pro: { proPlan: 'pro', monthlyCredits: 0, unlimited: true },
+  agence: { proPlan: 'agence', monthlyCredits: 0, unlimited: true },
+};
+
+/**
  * Use Case: Traiter les webhooks Stripe
- * 
+ *
  * Gère les événements:
- * - checkout.session.completed (crédits ou HD unlock)
+ * - checkout.session.completed (crédits, HD unlock, ou abonnement)
+ * - invoice.paid (renouvellement d'abonnement)
+ * - customer.subscription.deleted (annulation)
  */
 export class ProcessStripeWebhookUseCase {
   constructor(
@@ -41,6 +55,8 @@ export class ProcessStripeWebhookUseCase {
     private readonly processedEventRepo: IProcessedEventRepository,
     /** Optionnel : requis uniquement pour le guest checkout (création de compte). */
     private readonly authService?: IAuthService,
+    /** Optionnel : requis pour les abonnements (activation/renouvellement/annulation). */
+    private readonly userRepo?: IUserRepository,
   ) {}
 
   async execute(input: ProcessWebhookInput): Promise<Result<ProcessWebhookOutput, DomainError>> {
@@ -70,7 +86,11 @@ export class ProcessStripeWebhookUseCase {
       case 'checkout.session.completed':
         return this.withIdempotency(event, () => this.handleCheckoutCompleted(event));
 
-      // case 'invoice.paid':  // abonnements : même protection via withIdempotency
+      case 'invoice.paid':
+        return this.withIdempotency(event, () => this.handleInvoicePaid(event));
+
+      case 'customer.subscription.deleted':
+        return this.withIdempotency(event, () => this.handleSubscriptionDeleted(event));
 
       default:
         this.logger.debug('Unhandled webhook event', { type: event.type });
@@ -137,6 +157,11 @@ export class ProcessStripeWebhookUseCase {
       type,
       userId: metadata.userId,
     });
+
+    // Abonnement immobilier (Solo / Pro illimité / Agence)
+    if (type === 'subscription') {
+      return this.handleSubscriptionActivation(event);
+    }
 
     if (type === 'credits_purchase') {
       // Achat de crédits
@@ -224,5 +249,137 @@ export class ProcessStripeWebhookUseCase {
       processed: false,
       eventType: event.type,
     });
+  }
+
+  /** Activation initiale d'un abonnement (checkout.session.completed, type=subscription). */
+  private async handleSubscriptionActivation(
+    event: PaymentWebhookEvent,
+  ): Promise<Result<ProcessWebhookOutput, DomainError>> {
+    if (!this.userRepo) {
+      this.logger.error('Abonnement reçu mais userRepo non configuré', undefined as unknown as Error);
+      return failure(new PaymentError('Service utilisateur indisponible'));
+    }
+
+    const userId = event.metadata.userId;
+    const planId = event.metadata.planId;
+    const cfg = SUBSCRIPTION_PLANS[planId];
+
+    if (!userId || !cfg) {
+      this.logger.error('Abonnement: userId ou plan invalide', undefined as unknown as Error, { userId, planId });
+      return failure(new PaymentError('Données abonnement invalides'));
+    }
+
+    // Mapping Stripe + statut actif (Pro/Agence = illimité).
+    const upd = await this.userRepo.update(userId, {
+      stripeCustomerId: event.customerId || undefined,
+      stripeSubscriptionId: event.subscriptionId ?? null,
+      proPlan: cfg.proPlan,
+      proStatus: 'active',
+    });
+    if (!upd.success) {
+      this.logger.error('Échec activation abonnement (update profil)', upd.error as Error, { userId });
+      return failure(new PaymentError('Échec de l\'activation de l\'abonnement'));
+    }
+
+    // Solo : créditer le quota du mois. Pro/Agence : illimité → aucun crédit.
+    if (cfg.monthlyCredits > 0) {
+      const credit = await this.creditRepo.addCredits(
+        userId,
+        cfg.monthlyCredits,
+        `Abonnement ${cfg.proPlan} — crédits du mois`,
+        event.subscriptionId,
+        'purchase',
+      );
+      if (!credit.success) {
+        // Abonnement actif quand même ; régularisation possible au prochain cycle.
+        this.logger.error('CRITICAL: abonnement activé mais crédits non accordés', credit.error as Error, { userId, planId });
+      }
+    }
+
+    this.logger.info('Abonnement activé', { userId, plan: cfg.proPlan, unlimited: cfg.unlimited });
+    return success({ processed: true, eventType: event.type, action: `subscription_activated_${cfg.proPlan}` });
+  }
+
+  /** Renouvellement (invoice.paid). billingReason distingue initial vs cycle. */
+  private async handleInvoicePaid(
+    event: PaymentWebhookEvent,
+  ): Promise<Result<ProcessWebhookOutput, DomainError>> {
+    if (!this.userRepo) {
+      return failure(new PaymentError('Service utilisateur indisponible'));
+    }
+    if (!event.subscriptionId) {
+      return success({ processed: false, eventType: event.type, action: 'no_subscription' });
+    }
+
+    const found = await this.userRepo.findByStripeSubscriptionId(event.subscriptionId);
+    if (!found.success) {
+      return failure(new PaymentError('Échec lecture abonnement'));
+    }
+    const user = found.data;
+    if (!user || !user.proPlan) {
+      // Mapping pas encore posé (l'activation checkout le fera) → ignoré sans erreur.
+      this.logger.info('invoice.paid sans profil mappé (ignoré)', { subscriptionId: event.subscriptionId });
+      return success({ processed: false, eventType: event.type, action: 'unmapped' });
+    }
+
+    const cfg = SUBSCRIPTION_PLANS[user.proPlan];
+    const renewsAt = event.periodEnd ? new Date(event.periodEnd * 1000) : undefined;
+
+    const upd = await this.userRepo.update(user.id, {
+      proStatus: 'active',
+      ...(renewsAt ? { proRenewsAt: renewsAt } : {}),
+    });
+    if (!upd.success) {
+      this.logger.error('Échec maj renouvellement', upd.error as Error, { userId: user.id });
+      return failure(new PaymentError('Échec du renouvellement'));
+    }
+
+    // Recharge crédits UNIQUEMENT sur un cycle (l'initial a déjà été crédité à l'activation)
+    // et seulement pour les plans à quota (Solo).
+    if (event.billingReason === 'subscription_cycle' && cfg && cfg.monthlyCredits > 0) {
+      const credit = await this.creditRepo.addCredits(
+        user.id,
+        cfg.monthlyCredits,
+        `Abonnement ${cfg.proPlan} — renouvellement mensuel`,
+        event.subscriptionId,
+        'purchase',
+      );
+      if (!credit.success) {
+        this.logger.error('CRITICAL: renouvellement sans recharge crédits', credit.error as Error, { userId: user.id });
+        return failure(new PaymentError('Échec de la recharge mensuelle'));
+      }
+    }
+
+    this.logger.info('Abonnement renouvelé', { userId: user.id, plan: user.proPlan, reason: event.billingReason });
+    return success({ processed: true, eventType: event.type, action: `subscription_renewed_${user.proPlan}` });
+  }
+
+  /** Annulation (customer.subscription.deleted) → statut canceled. */
+  private async handleSubscriptionDeleted(
+    event: PaymentWebhookEvent,
+  ): Promise<Result<ProcessWebhookOutput, DomainError>> {
+    if (!this.userRepo) {
+      return failure(new PaymentError('Service utilisateur indisponible'));
+    }
+    if (!event.subscriptionId) {
+      return success({ processed: false, eventType: event.type });
+    }
+
+    const found = await this.userRepo.findByStripeSubscriptionId(event.subscriptionId);
+    if (!found.success) {
+      return failure(new PaymentError('Échec lecture abonnement'));
+    }
+    if (!found.data) {
+      return success({ processed: false, eventType: event.type, action: 'unmapped' });
+    }
+
+    const upd = await this.userRepo.update(found.data.id, { proStatus: 'canceled' });
+    if (!upd.success) {
+      this.logger.error('Échec annulation abonnement', upd.error as Error, { userId: found.data.id });
+      return failure(new PaymentError('Échec de l\'annulation'));
+    }
+
+    this.logger.info('Abonnement annulé', { userId: found.data.id });
+    return success({ processed: true, eventType: event.type, action: 'subscription_canceled' });
   }
 }

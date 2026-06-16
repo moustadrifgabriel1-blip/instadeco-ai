@@ -28,6 +28,8 @@ import { InsufficientCreditsError } from '@/src/domain/errors/InsufficientCredit
 import { ImageGenerationError } from '@/src/domain/errors/ImageGenerationError';
 import { DomainError } from '@/src/domain/errors/DomainError';
 import { CREDIT_COSTS } from '@/src/shared/constants/pricing';
+import { IUserRepository } from '@/src/domain/ports/repositories/IUserRepository';
+import { isUnlimitedPro } from '@/src/domain/entities/User';
 
 /**
  * Extraire les dimensions d'une image à partir de son base64 (JPEG/PNG)
@@ -133,6 +135,8 @@ export class GenerateDesignUseCase {
     private readonly imageGenerator: IImageGeneratorService,
     private readonly storage: IStorageService,
     private readonly logger: ILoggerService,
+    /** Optionnel : permet de détecter un abonné Pro/Agence illimité (génération sans débit). */
+    private readonly userRepo?: IUserRepository,
   ) {}
 
   async execute(input: GenerateDesignInput): Promise<Result<GenerateDesignOutput, DomainError>> {
@@ -144,23 +148,39 @@ export class GenerateDesignUseCase {
       roomType: input.roomType,
     });
 
-    // 1. Vérifier les crédits
-    const creditsResult = await this.creditRepo.getBalance(input.userId);
-    if (!creditsResult.success) {
-      this.logger.error('Failed to get credits', creditsResult.error as Error);
-      return failure(new ImageGenerationError('Impossible de vérifier les crédits'));
-    }
-
-    const currentCredits = creditsResult.data;
     const requiredCredits = CREDIT_COSTS.GENERATION;
 
-    if (currentCredits < requiredCredits) {
-      this.logger.warn('Insufficient credits', {
-        userId: input.userId,
-        currentCredits,
-        requiredCredits,
-      });
-      return failure(new InsufficientCreditsError(currentCredits, requiredCredits));
+    // 0. Abonné Pro/Agence illimité → génération SANS débit de crédits (fair-use géré
+    //    en amont par le rate-limiting). Solo + grand public passent par le ledger crédits.
+    let chargesCredits = true;
+    if (this.userRepo) {
+      const userResult = await this.userRepo.findById(input.userId);
+      if (userResult.success && userResult.data && isUnlimitedPro(userResult.data)) {
+        chargesCredits = false;
+        this.logger.info('Abonné illimité — génération sans débit', {
+          userId: input.userId,
+          plan: userResult.data.proPlan,
+        });
+      }
+    }
+
+    // 1. Vérifier les crédits (sauf abonné illimité)
+    if (chargesCredits) {
+      const creditsResult = await this.creditRepo.getBalance(input.userId);
+      if (!creditsResult.success) {
+        this.logger.error('Failed to get credits', creditsResult.error as Error);
+        return failure(new ImageGenerationError('Impossible de vérifier les crédits'));
+      }
+
+      const currentCredits = creditsResult.data;
+      if (currentCredits < requiredCredits) {
+        this.logger.warn('Insufficient credits', {
+          userId: input.userId,
+          currentCredits,
+          requiredCredits,
+        });
+        return failure(new InsufficientCreditsError(currentCredits, requiredCredits));
+      }
     }
 
     // 2. Extraire les dimensions de l'image source
@@ -201,22 +221,28 @@ export class GenerateDesignUseCase {
 
     const generation = createResult.data;
 
-    // 4. Déduire les crédits
-    const deductResult = await this.creditRepo.deductCredits(
-      input.userId,
-      requiredCredits,
-      `Génération #${generation.id.slice(0, 8)}`,
-      generation.id,
-    );
+    // 4. Déduire les crédits (sauf abonné illimité)
+    let creditsRemaining = 0;
+    if (chargesCredits) {
+      const deductResult = await this.creditRepo.deductCredits(
+        input.userId,
+        requiredCredits,
+        `Génération #${generation.id.slice(0, 8)}`,
+        generation.id,
+      );
 
-    if (!deductResult.success) {
-      // Rollback: supprimer la génération
-      await this.generationRepo.delete(generation.id);
-      this.logger.error('Failed to deduct credits', deductResult.error as Error);
-      return failure(new ImageGenerationError('Échec de la déduction des crédits'));
+      if (!deductResult.success) {
+        // Rollback: supprimer la génération
+        await this.generationRepo.delete(generation.id);
+        this.logger.error('Failed to deduct credits', deductResult.error as Error);
+        return failure(new ImageGenerationError('Échec de la déduction des crédits'));
+      }
+      creditsRemaining = deductResult.data;
+    } else {
+      // Illimité : pas de débit ; on renvoie le solde courant (informatif).
+      const balance = await this.creditRepo.getBalance(input.userId);
+      creditsRemaining = balance.success ? balance.data : 0;
     }
-
-    const creditsRemaining = deductResult.data;
 
     // 5. Mettre à jour le statut à "processing"
     await this.generationRepo.update(generation.id, { status: 'processing' });
@@ -263,31 +289,38 @@ export class GenerateDesignUseCase {
       const failureReason = (genResult.error as Error)?.message?.slice(0, 2000) ?? 'Échec génération IA (cause inconnue)';
       await this.generationRepo.update(generation.id, { status: 'failed', errorMessage: failureReason });
       
-      // 🔴 REMBOURSEMENT — l'utilisateur ne doit JAMAIS perdre un crédit pour une génération ratée
-      const refundResult = await this.creditRepo.addCredits(
-        input.userId,
-        requiredCredits,
-        `Remboursement — échec génération #${generation.id.slice(0, 8)}`,
-        undefined,
-        'refund',
-      );
-      if (refundResult.success) {
-        this.logger.info('Credits refunded after AI failure', {
-          userId: input.userId,
-          generationId: generation.id,
-          amount: requiredCredits,
-        });
-      } else {
-        this.logger.error('CRITICAL: Failed to refund credits after AI failure', refundResult.error as Error, {
-          userId: input.userId,
-          generationId: generation.id,
-        });
+      // 🔴 REMBOURSEMENT — l'utilisateur ne doit JAMAIS perdre un crédit pour une génération
+      // ratée (sauf abonné illimité : aucun crédit n'a été débité).
+      if (chargesCredits) {
+        const refundResult = await this.creditRepo.addCredits(
+          input.userId,
+          requiredCredits,
+          `Remboursement — échec génération #${generation.id.slice(0, 8)}`,
+          undefined,
+          'refund',
+        );
+        if (refundResult.success) {
+          this.logger.info('Credits refunded after AI failure', {
+            userId: input.userId,
+            generationId: generation.id,
+            amount: requiredCredits,
+          });
+        } else {
+          this.logger.error('CRITICAL: Failed to refund credits after AI failure', refundResult.error as Error, {
+            userId: input.userId,
+            generationId: generation.id,
+          });
+        }
       }
-      
+
       this.logger.error('AI generation failed', genResult.error as Error, {
         generationId: generation.id,
       });
-      return failure(new ImageGenerationError('La génération IA a échoué. Votre crédit a été remboursé.'));
+      return failure(new ImageGenerationError(
+        chargesCredits
+          ? 'La génération IA a échoué. Votre crédit a été remboursé.'
+          : 'La génération IA a échoué. Réessayez.',
+      ));
     }
 
     // 7. L'image est déjà générée (fal.run synchrone) → Upload vers Supabase Storage
@@ -324,23 +357,29 @@ export class GenerateDesignUseCase {
      if (!updateResult.success) {
       this.logger.error('Failed to update generation with providerId', updateResult.error as Error);
       
-      // 🔴 REMBOURSEMENT — l'image existe mais l'update DB a échoué
-      const refundResult = await this.creditRepo.addCredits(
-        input.userId,
-        requiredCredits,
-        `Remboursement — échec mise à jour #${generation.id.slice(0, 8)}`,
-        undefined,
-        'refund',
-      );
-      if (refundResult.success) {
-        this.logger.info('Credits refunded after DB update failure', {
-          userId: input.userId, generationId: generation.id,
-        });
-      } else {
-        this.logger.error('CRITICAL: Failed to refund credits after DB update failure', refundResult.error as Error);
+      // 🔴 REMBOURSEMENT — l'image existe mais l'update DB a échoué (sauf abonné illimité).
+      if (chargesCredits) {
+        const refundResult = await this.creditRepo.addCredits(
+          input.userId,
+          requiredCredits,
+          `Remboursement — échec mise à jour #${generation.id.slice(0, 8)}`,
+          undefined,
+          'refund',
+        );
+        if (refundResult.success) {
+          this.logger.info('Credits refunded after DB update failure', {
+            userId: input.userId, generationId: generation.id,
+          });
+        } else {
+          this.logger.error('CRITICAL: Failed to refund credits after DB update failure', refundResult.error as Error);
+        }
       }
-      
-      return failure(new ImageGenerationError('Échec de la mise à jour. Votre crédit a été remboursé.'));
+
+      return failure(new ImageGenerationError(
+        chargesCredits
+          ? 'Échec de la mise à jour. Votre crédit a été remboursé.'
+          : 'Échec de la mise à jour. Réessayez.',
+      ));
     }
 
     const duration = Date.now() - startTime;

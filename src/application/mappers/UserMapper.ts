@@ -37,6 +37,10 @@ export class UserMapper {
       avatarUrl: dto.avatarUrl,
       credits: dto.credits,
       stripeCustomerId: null,
+      stripeSubscriptionId: null,
+      proPlan: null,
+      proStatus: null,
+      proRenewsAt: null,
       createdAt: new Date(dto.createdAt),
       updatedAt: new Date(dto.createdAt),
     };
