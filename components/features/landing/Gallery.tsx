@@ -60,7 +60,7 @@ function GalleryCard({
           className={`object-cover transition-opacity duration-500 ${showAfter ? 'opacity-100' : 'opacity-0'}`}
         />
 
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0c0a09]/70 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0c0a09]/90 via-[#0c0a09]/15 to-transparent" />
 
         <div className="absolute top-3 left-3">
           <span

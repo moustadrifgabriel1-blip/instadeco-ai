@@ -88,7 +88,7 @@ export function Footer() {
           <div className="col-span-2 sm:col-span-3 lg:col-span-2">
             <Link href="/" className="flex items-center gap-2 font-bold text-xl mb-4 group">
               <Image
-                src="/images/logo-v3-house-sparkle.svg"
+                src={prestige ? '/images/logo-prestige.svg' : '/images/logo-v3-house-sparkle.svg'}
                 alt="InstaDeco AI"
                 width={36}
                 height={36}

@@ -88,14 +88,14 @@ export function SocialProofToast({
         isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
       }`}
     >
-      <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-border/50 p-4 flex items-start gap-3 animate-in slide-in-from-bottom-4">
-        <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
-          <Sparkles className="h-5 w-5 text-primary" />
+      <div className="bg-card rounded-2xl shadow-2xl border border-[var(--gold-line)] p-4 flex items-start gap-3 animate-in slide-in-from-bottom-4">
+        <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-[rgba(200,162,77,0.14)] border border-[var(--gold-line)] flex items-center justify-center">
+          <Sparkles className="h-5 w-5 text-[var(--gold)]" />
         </div>
 
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-foreground leading-snug">{notification.message}</p>
-          <p className="text-[11px] text-muted-foreground/60 mt-1">{tLand('toast.caption')}</p>
+          <p className="prestige-body text-sm font-medium text-foreground leading-snug">{notification.message}</p>
+          <p className="prestige-body text-[11px] text-muted-foreground mt-1">{tLand('toast.caption')}</p>
         </div>
 
         <button

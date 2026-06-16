@@ -84,7 +84,7 @@ export function Header() {
         <div className="flex h-16 items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2 font-bold text-xl group shrink-0">
             <Image
-              src="/images/logo-v3-house-sparkle.svg"
+              src={prestige ? '/images/logo-prestige.svg' : '/images/logo-v3-house-sparkle.svg'}
               alt="InstaDeco AI"
               width={32}
               height={32}
