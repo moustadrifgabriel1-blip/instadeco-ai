@@ -6,10 +6,10 @@ import { PrestigeEditorial } from '../_components/prestige-editorial';
 import { PrestigeClimax } from '../_components/prestige-climax';
 import { PrestigeService } from '../_components/prestige-service';
 import { PrestigeSignature } from '../_components/prestige-signature';
-import { usePrestigeSmoothScroll } from '../_components/use-prestige-scroll';
+import { usePrestigeSmoothScroll } from '@/lib/prestige-scroll';
 
 /**
- * /[locale]/visite — Maquette FLAGSHIP « Visite de prestige ».
+ * /[locale]/visite, Maquette FLAGSHIP « Visite de prestige ».
  *
  * Une visite guidée, pièce après pièce, qui garde le plus beau pour la fin.
  * Page isolée (route group (prestige)) pour validation avant de dérouler la

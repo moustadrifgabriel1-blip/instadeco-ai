@@ -4,7 +4,7 @@ import { useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
-import { prefersReducedMotion } from './use-prestige-scroll';
+import { prefersReducedMotion } from '@/lib/prestige-scroll';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -27,7 +27,7 @@ const STEPS = [
 ];
 
 /**
- * LE SERVICE — présenté simplement, après l'émotion. Trois gestes, rien de
+ * LE SERVICE, présenté simplement, après l'émotion. Trois gestes, rien de
  * plus. C'est ici qu'on explique le home staging virtuel de façon claire et
  * minimaliste, une fois que la valeur a été ressentie.
  */

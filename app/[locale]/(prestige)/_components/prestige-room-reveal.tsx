@@ -5,12 +5,12 @@ import { useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
-import { prefersReducedMotion } from './use-prestige-scroll';
+import { prefersReducedMotion } from '@/lib/prestige-scroll';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 /**
- * CHAPITRE I — Le salon. Section PINNÉE au scroll.
+ * CHAPITRE I, Le salon. Section PINNÉE au scroll.
  *
  * Deux temps, un seul geste :
  *  1. Révélation cinématique. Pendant le pin, l'« après » (pièce meublée)

@@ -5,12 +5,12 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import { Link } from '@/i18n/navigation';
-import { prefersReducedMotion } from './use-prestige-scroll';
+import { prefersReducedMotion } from '@/lib/prestige-scroll';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 /**
- * SIGNATURE — la sortie. On reconduit le visiteur vers la porte, mais cette
+ * SIGNATURE, la sortie. On reconduit le visiteur vers la porte, mais cette
  * fois c'est lui qui repart avec l'idée. Appel clair pour les agences.
  */
 export function PrestigeSignature() {

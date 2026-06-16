@@ -17,6 +17,7 @@ export function prefersReducedMotion(): boolean {
 
 /**
  * Lenis (smooth scroll cinématographique) synchronisé avec GSAP ScrollTrigger.
+ * Partagé par toutes les surfaces prestige (visite, exemples, home).
  *
  * - Respecte prefers-reduced-motion : si réduit, on N'INSTALLE PAS Lenis
  *   (scroll natif) et le caller désactive pin/scrub/parallax de son côté.

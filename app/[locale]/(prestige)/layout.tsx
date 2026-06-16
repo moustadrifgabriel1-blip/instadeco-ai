@@ -3,13 +3,13 @@ import { cormorant, josefin } from '@/lib/fonts';
 import './prestige.css';
 
 /**
- * Layout du route group (prestige) — maquette de refonte ultra-premium.
+ * Layout du route group (prestige), maquette de refonte ultra-premium.
  *
  * Imbriqué SOUS app/[locale]/layout.tsx : on NE redéclare donc PAS
  * <html>/<body> (interdit par Next pour un layout enfant). On injecte
  * ici les fonts éditoriales en variables CSS et on enrobe le contenu
  * dans un wrapper noir scopé. Le header/footer marketing global est
- * masqué via :has([data-prestige-root]) (cf. prestige.css) — aucune
+ * masqué via :has([data-prestige-root]) (cf. prestige.css), aucune
  * modification du layout global.
  */
 

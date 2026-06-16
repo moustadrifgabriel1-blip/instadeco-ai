@@ -6,7 +6,7 @@ import type { ReactNode } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
-import { prefersReducedMotion } from './use-prestige-scroll';
+import { prefersReducedMotion } from '@/lib/prestige-scroll';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 

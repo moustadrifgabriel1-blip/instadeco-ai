@@ -5,12 +5,12 @@ import { useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
-import { prefersReducedMotion } from './use-prestige-scroll';
+import { prefersReducedMotion } from '@/lib/prestige-scroll';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 /**
- * HERO — « L'Entrée ».
+ * HERO, « L'Entrée ».
  *
  * - LCP : le titre N'EST PAS opacity:0 figé jusqu'au JS. L'entrée est
  *   100% CSS (classes .prestige-anim + --d). GSAP ne fait QUE le parallax
@@ -64,9 +64,9 @@ export function PrestigeHero() {
     <section
       ref={root}
       className="relative h-[100svh] min-h-[640px] w-full overflow-hidden"
-      aria-label="L’entrée — bien d’exception"
+      aria-label="L’entrée, bien d’exception"
     >
-      {/* Couche image — flux normal, jamais z négatif */}
+      {/* Couche image, flux normal, jamais z négatif */}
       <div className="absolute inset-0">
         <div data-hero-img className="prestige-hero-img absolute inset-0 will-change-transform">
           <Image
@@ -88,7 +88,7 @@ export function PrestigeHero() {
         />
       </div>
 
-      {/* Contenu — relative z-10 au-dessus des couches de fond */}
+      {/* Contenu, relative z-10 au-dessus des couches de fond */}
       <div className="relative z-10 mx-auto flex h-full max-w-6xl flex-col justify-end px-6 pb-[clamp(3rem,9vh,7rem)] sm:px-10">
         {/* Sur-titre or */}
         <div

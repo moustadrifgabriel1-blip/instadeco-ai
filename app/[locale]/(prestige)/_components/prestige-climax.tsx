@@ -5,12 +5,12 @@ import { useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
-import { prefersReducedMotion } from './use-prestige-scroll';
+import { prefersReducedMotion } from '@/lib/prestige-scroll';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 /**
- * LE CLOU — le sommet de la visite. Section plein écran épinglée : l'image
+ * LE CLOU, le sommet de la visite. Section plein écran épinglée : l'image
  * grandiose se rapproche lentement pendant que la phrase la plus forte se
  * pose, mot par mot. C'est le moment qu'on garde pour la fin.
  */
