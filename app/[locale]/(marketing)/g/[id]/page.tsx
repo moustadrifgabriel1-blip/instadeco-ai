@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const generation = await getGeneration(id);
 
   if (!generation) {
-    return { title: 'Génération introuvable — InstaDeco AI' };
+    return { title: 'Génération introuvable, InstaDeco AI' };
   }
 
   const style = STYLE_SEO_DATA.find(s => s.slug === generation.style_slug);
@@ -44,7 +44,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const styleName = style?.name || generation.style_slug;
   const roomName = room?.name || generation.room_type_slug;
   
-  const title = `${roomName} style ${styleName} — Transformation IA | InstaDeco`;
+  const title = `${roomName} style ${styleName}, Transformation IA | InstaDeco`;
   const description = `Découvrez cette transformation d'un${roomName === 'Entrée' || roomName === 'Terrasse' ? 'e' : ''} ${roomName.toLowerCase()} en style ${styleName} réalisée par l'IA InstaDeco. Créez le vôtre en 30 secondes.`;
 
   // L'image générée elle-même sert d'aperçu social (meilleur pour le partage viral
@@ -65,7 +65,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
           url: ogImageUrl,
           width: 1200,
           height: 630,
-          alt: `${roomName} style ${styleName} — InstaDeco AI`,
+          alt: `${roomName} style ${styleName}, InstaDeco AI`,
         },
       ],
       siteName: 'InstaDeco AI',
@@ -107,7 +107,7 @@ export default async function PublicGenerationPage({ params }: PageProps) {
   });
 
   const shareUrl = getCanonicalUrl(`/g/${id}`);
-  const shareTitle = `${roomName} style ${styleName} — Transformation IA`;
+  const shareTitle = `${roomName} style ${styleName}, Transformation IA`;
 
   // Styles recommandés pour ce type de pièce
   const recommendedStyles = STYLE_SEO_DATA
@@ -272,7 +272,7 @@ export default async function PublicGenerationPage({ params }: PageProps) {
           __html: JSON.stringify({
             '@context': 'https://schema.org',
             '@type': 'ImageObject',
-            name: `${roomName} style ${styleName} — InstaDeco AI`,
+            name: `${roomName} style ${styleName}, InstaDeco AI`,
             description: `Transformation d'un${roomName === 'Entrée' || roomName === 'Terrasse' ? 'e' : ''} ${roomName.toLowerCase()} en style ${styleName} par intelligence artificielle`,
             contentUrl: generation.output_image_url,
             url: shareUrl,

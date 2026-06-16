@@ -31,67 +31,67 @@ export default function MentionsLegalesPage() {
   const lastUpdated = '22 janvier 2026';
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <div className="max-w-4xl mx-auto px-4 py-16">
         <LegalFrenchBodyNotice />
-        <h1 className="text-4xl font-bold text-gray-900 mb-8">Mentions Légales</h1>
-        
-        <p className="text-sm text-gray-500 mb-8">
+        <h1 className="prestige-display text-4xl font-bold text-foreground mb-8">Mentions <span className="text-[var(--gold)]">Légales</span></h1>
+
+        <p className="text-sm text-muted-foreground mb-8">
           Dernière mise à jour : {lastUpdated}
         </p>
 
         {/* Éditeur du site */}
-        <section className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Éditeur du site</h2>
-          <div className="space-y-2 text-gray-700">
+        <section className="bg-card border border-border rounded-lg shadow-sm p-6 mb-6">
+          <h2 className="prestige-display text-2xl font-semibold text-foreground mb-4">1. Éditeur du site</h2>
+          <div className="space-y-2 text-muted-foreground">
             <p><strong>Raison sociale :</strong> Moustadrif E-Comm</p>
             <p><strong>Forme juridique :</strong> Entreprise individuelle</p>
             <p><strong>Titulaire :</strong> Gabriel Moustadrif</p>
             <p><strong>Adresse du siège :</strong> Route du Bon 3, 1167 Lussy-sur-Morges, Vaud, Suisse</p>
             <p><strong>Numéro IDE :</strong> CHE-145.897.362</p>
-            <p><strong>Email :</strong> <a href="mailto:contact@instadeco.app" className="text-blue-600 hover:underline">contact@instadeco.app</a></p>
-            <p><strong>Site web :</strong> <a href="https://instadeco.app" className="text-blue-600 hover:underline">https://instadeco.app</a></p>
+            <p><strong>Email :</strong> <a href="mailto:contact@instadeco.app" className="text-[var(--gold)] hover:underline">contact@instadeco.app</a></p>
+            <p><strong>Site web :</strong> <a href="https://instadeco.app" className="text-[var(--gold)] hover:underline">https://instadeco.app</a></p>
           </div>
         </section>
 
         {/* Directeur de publication */}
-        <section className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">2. Directeur de la publication</h2>
-          <p className="text-gray-700">
+        <section className="bg-card border border-border rounded-lg shadow-sm p-6 mb-6">
+          <h2 className="prestige-display text-2xl font-semibold text-foreground mb-4">2. Directeur de la publication</h2>
+          <p className="text-muted-foreground">
             <strong>Gabriel Moustadrif</strong><br />
-            Contact : <a href="mailto:contact@instadeco.app" className="text-blue-600 hover:underline">contact@instadeco.app</a>
+            Contact : <a href="mailto:contact@instadeco.app" className="text-[var(--gold)] hover:underline">contact@instadeco.app</a>
           </p>
         </section>
 
         {/* Hébergement */}
-        <section className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">3. Hébergement</h2>
-          <div className="space-y-4 text-gray-700">
+        <section className="bg-card border border-border rounded-lg shadow-sm p-6 mb-6">
+          <h2 className="prestige-display text-2xl font-semibold text-foreground mb-4">3. Hébergement</h2>
+          <div className="space-y-4 text-muted-foreground">
             <div>
               <p><strong>Application web :</strong></p>
               <p>Vercel Inc.</p>
               <p>340 S Lemon Ave #4133</p>
               <p>Walnut, CA 91789, États-Unis</p>
-              <p>Site : <a href="https://vercel.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">https://vercel.com</a></p>
+              <p>Site : <a href="https://vercel.com" target="_blank" rel="noopener noreferrer" className="text-[var(--gold)] hover:underline">https://vercel.com</a></p>
             </div>
             <div>
               <p><strong>Base de données et stockage :</strong></p>
               <p>Supabase Inc.</p>
               <p>970 Toa Payoh North #07-04</p>
               <p>Singapour 318992</p>
-              <p>Site : <a href="https://supabase.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">https://supabase.com</a></p>
+              <p>Site : <a href="https://supabase.com" target="_blank" rel="noopener noreferrer" className="text-[var(--gold)] hover:underline">https://supabase.com</a></p>
             </div>
           </div>
         </section>
 
         {/* Nature du service */}
-        <section className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">4. Nature du service</h2>
-          <p className="text-gray-700 mb-4">
+        <section className="bg-card border border-border rounded-lg shadow-sm p-6 mb-6">
+          <h2 className="prestige-display text-2xl font-semibold text-foreground mb-4">4. Nature du service</h2>
+          <p className="text-muted-foreground mb-4">
             <strong>InstaDeco AI</strong> est un service en ligne (SaaS) de décoration d&apos;intérieur assistée par intelligence artificielle. 
             Le service permet aux utilisateurs de :
           </p>
-          <ul className="list-disc list-inside text-gray-700 space-y-2 ml-4">
+          <ul className="list-disc list-inside text-muted-foreground space-y-2 ml-4">
             <li>Télécharger des photos de leurs pièces</li>
             <li>Sélectionner un style de décoration</li>
             <li>Générer des propositions de redécoration par IA</li>
@@ -100,9 +100,9 @@ export default function MentionsLegalesPage() {
         </section>
 
         {/* Propriété intellectuelle */}
-        <section className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">5. Propriété intellectuelle</h2>
-          <div className="space-y-4 text-gray-700">
+        <section className="bg-card border border-border rounded-lg shadow-sm p-6 mb-6">
+          <h2 className="prestige-display text-2xl font-semibold text-foreground mb-4">5. Propriété intellectuelle</h2>
+          <div className="space-y-4 text-muted-foreground">
             <p>
               L&apos;ensemble du contenu du site InstaDeco AI (textes, graphismes, logos, icônes, images, 
               code source, logiciels) est la propriété exclusive de Moustadrif E-Comm ou de ses partenaires 
@@ -123,9 +123,9 @@ export default function MentionsLegalesPage() {
         </section>
 
         {/* Limitation de responsabilité */}
-        <section className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">6. Limitation de responsabilité</h2>
-          <div className="space-y-4 text-gray-700">
+        <section className="bg-card border border-border rounded-lg shadow-sm p-6 mb-6">
+          <h2 className="prestige-display text-2xl font-semibold text-foreground mb-4">6. Limitation de responsabilité</h2>
+          <div className="space-y-4 text-muted-foreground">
             <p>
               <strong>6.1 Disponibilité du service :</strong> Moustadrif E-Comm s&apos;efforce d&apos;assurer 
               l&apos;accès au site 24h/24, 7j/7, mais ne peut garantir une disponibilité absolue. 
@@ -151,9 +151,9 @@ export default function MentionsLegalesPage() {
         </section>
 
         {/* Droit applicable */}
-        <section className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">7. Droit applicable et juridiction</h2>
-          <div className="space-y-4 text-gray-700">
+        <section className="bg-card border border-border rounded-lg shadow-sm p-6 mb-6">
+          <h2 className="prestige-display text-2xl font-semibold text-foreground mb-4">7. Droit applicable et juridiction</h2>
+          <div className="space-y-4 text-muted-foreground">
             <p>
               Les présentes mentions légales sont régies par le droit suisse.
             </p>
@@ -170,16 +170,16 @@ export default function MentionsLegalesPage() {
         </section>
 
         {/* Liens vers autres pages légales */}
-        <section className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">8. Documents complémentaires</h2>
+        <section className="bg-card border border-border rounded-lg shadow-sm p-6 mb-6">
+          <h2 className="prestige-display text-2xl font-semibold text-foreground mb-4">8. Documents complémentaires</h2>
           <ul className="space-y-2">
             <li>
-              <Link href="/legal/privacy" className="text-blue-600 hover:underline">
+              <Link href="/legal/privacy" className="text-[var(--gold)] hover:underline">
                 → Politique de confidentialité (Protection des données)
               </Link>
             </li>
             <li>
-              <Link href="/legal/cgv" className="text-blue-600 hover:underline">
+              <Link href="/legal/cgv" className="text-[var(--gold)] hover:underline">
                 → Conditions Générales de Vente (CGV)
               </Link>
             </li>
@@ -187,11 +187,11 @@ export default function MentionsLegalesPage() {
         </section>
 
         {/* Contact */}
-        <section className="bg-blue-50 rounded-lg p-6">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">Contact</h2>
-          <p className="text-gray-700">
+        <section className="bg-[rgba(200,162,77,0.12)] border border-[var(--gold-line)] rounded-lg p-6">
+          <h2 className="prestige-display text-2xl font-semibold text-foreground mb-4">Contact</h2>
+          <p className="text-muted-foreground">
             Pour toute question concernant ces mentions légales, vous pouvez nous contacter à :<br />
-            <a href="mailto:contact@instadeco.app" className="text-blue-600 hover:underline font-medium">
+            <a href="mailto:contact@instadeco.app" className="text-[var(--gold)] hover:underline font-medium">
               contact@instadeco.app
             </a>
           </p>

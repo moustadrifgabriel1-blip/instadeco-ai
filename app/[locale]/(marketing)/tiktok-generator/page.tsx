@@ -14,7 +14,7 @@ export default function TikTokGeneratorPage() {
         <div className="container px-4 md:px-6 text-center space-y-6">
           <Badge variant="outline" className="px-4 py-1.5 border-primary/20 bg-primary/5 text-primary">
             <Film className="w-3 h-3 mr-2" />
-            100% gratuit — aucun compte requis
+            100% gratuit, aucun compte requis
           </Badge>
 
           <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight">
@@ -68,26 +68,26 @@ export default function TikTokGeneratorPage() {
 
             <h3>Pourquoi les avant/après fonctionnent sur TikTok ?</h3>
             <p>
-              Le format avant/après crée un &quot;pattern interrupt&quot; — le spectateur est captivé 
+              Le format avant/après crée un &quot;pattern interrupt&quot;, le spectateur est captivé 
               par la transformation et reste jusqu&apos;au bout. C&apos;est le format qui génère 
               le plus d&apos;engagement et de partages dans la niche déco/rénovation.
             </p>
 
             <h3>6 transitions dignes d&apos;une agence</h3>
             <ul>
-              <li><strong>Swipe Reveal</strong> — Le classique ultra satisfaisant du balayage latéral</li>
-              <li><strong>Zoom Burst</strong> — Zoom dramatique puis reveal avec bounce</li>
-              <li><strong>Flash Cut</strong> — Flash blanc cinématique entre les deux images</li>
-              <li><strong>Circle Open</strong> — Cercle lumineux qui s&apos;ouvre depuis le centre</li>
-              <li><strong>Glitch RGB</strong> — Effet glitch + séparation RGB virale</li>
-              <li><strong>Shake Drop</strong> — Secousse puis drop dramatique du résultat</li>
+              <li><strong>Swipe Reveal</strong>, Le classique ultra satisfaisant du balayage latéral</li>
+              <li><strong>Zoom Burst</strong>, Zoom dramatique puis reveal avec bounce</li>
+              <li><strong>Flash Cut</strong>, Flash blanc cinématique entre les deux images</li>
+              <li><strong>Circle Open</strong>, Cercle lumineux qui s&apos;ouvre depuis le centre</li>
+              <li><strong>Glitch RGB</strong>, Effet glitch + séparation RGB virale</li>
+              <li><strong>Shake Drop</strong>, Secousse puis drop dramatique du résultat</li>
             </ul>
 
             <h3>Format optimisé pour les réseaux sociaux</h3>
             <p>
               Toutes les vidéos sont générées en format vertical 9:16 (1080×1920), 
               le format natif de TikTok, Instagram Reels et YouTube Shorts. 
-              Le rendu se fait directement dans votre navigateur — aucune donnée 
+              Le rendu se fait directement dans votre navigateur, aucune donnée 
               n&apos;est envoyée sur un serveur.
             </p>
           </div>

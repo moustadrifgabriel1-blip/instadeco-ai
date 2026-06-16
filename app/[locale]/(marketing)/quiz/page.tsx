@@ -95,7 +95,7 @@ const STYLE_RESULTS: Record<string, StyleResult> = {
     colors: ['#C2B280', '#8B8378', '#2F4F4F', '#6B8E6B'],
     traits: ['Zen', 'Raffiné', 'Naturel', 'Apaisant'],
     compatibility: ['Scandinave', 'Minimaliste', 'Moderne'],
-    tip: 'Choisissez des matériaux naturels (bambou, céramique) et laissez de l\'espace vide — il fait partie du décor.',
+    tip: 'Choisissez des matériaux naturels (bambou, céramique) et laissez de l\'espace vide. Il fait partie du décor.',
   },
   minimaliste: {
     slug: 'minimaliste',
@@ -150,7 +150,7 @@ const STYLE_RESULTS: Record<string, StyleResult> = {
     colors: ['#000080', '#FFFFFF', '#C2B280', '#FF7F50'],
     traits: ['Apaisant', 'Lumineux', 'Frais', 'Détendu'],
     compatibility: ['Scandinave', 'Bohème', 'Rustique'],
-    tip: 'Évitez le total look marin — préférez des touches subtiles de bleu et des matières naturelles.',
+    tip: 'Évitez le total look marin. Préférez des touches subtiles de bleu et des matières naturelles.',
   },
   'mid-century': {
     slug: 'mid-century',
@@ -355,49 +355,49 @@ export default function QuizPage() {
   // ── INTRO ──
   if (step === 'intro') {
     return (
-      <div className="min-h-screen bg-[#fbfbfd]">
+      <div className="min-h-screen bg-background">
         <section className="pt-6 pb-12 px-4 sm:pt-8 sm:pb-20 sm:px-6">
           <div className="max-w-[600px] mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#FFF3ED] text-[#E07B54] rounded-full text-sm font-medium mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[rgba(200,162,77,0.12)] border border-[var(--gold-line)] text-[var(--gold)] rounded-full text-sm font-medium mb-6">
               <Star className="w-4 h-4" />
-              Quiz gratuit — 2 min
+              Quiz gratuit, 2 min
             </div>
 
-            <h1 className="text-[28px] sm:text-[36px] md:text-[52px] font-semibold tracking-[-0.03em] text-[#1d1d1f] leading-[1.06] mb-4">
+            <h1 className="prestige-display text-[28px] sm:text-[36px] md:text-[52px] font-semibold tracking-[-0.03em] text-foreground leading-[1.06] mb-4">
               Quel est votre style
               <br />
-              <span className="bg-gradient-to-r from-[#E07B54] to-[#D4603C] bg-clip-text text-transparent">
+              <span className="text-[var(--gold)]">
                 de décoration ?
               </span>
             </h1>
 
-            <p className="text-[15px] sm:text-[17px] md:text-[19px] text-[#636366] leading-[1.5] mb-8 max-w-md mx-auto">
+            <p className="text-[15px] sm:text-[17px] md:text-[19px] text-muted-foreground leading-[1.5] mb-8 max-w-md mx-auto">
               Répondez à {totalQuestions} questions visuelles et découvrez le style qui vous correspond le mieux.
             </p>
 
             <button
               onClick={() => setStep('quiz')}
-              className="group inline-flex items-center gap-2 bg-[#E07B54] text-white px-6 py-3.5 sm:px-8 sm:py-4 rounded-full text-[15px] sm:text-[17px] font-semibold hover:bg-[#d06a45] transition-all duration-200 shadow-lg shadow-[#E07B54]/20 active:scale-95"
+              className="group inline-flex items-center gap-2 bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] px-6 py-3.5 sm:px-8 sm:py-4 rounded-full text-[15px] sm:text-[17px] font-semibold hover:bg-transparent hover:text-[var(--gold)] transition-all duration-200 shadow-lg shadow-[var(--gold-soft)]/20 active:scale-95"
             >
               <Sparkles className="w-5 h-5" />
               Découvrir mon style
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </button>
 
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-[12px] sm:text-[13px] text-[#636366]">
-              <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-500" /> 100% gratuit</span>
-              <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-500" /> 8 questions</span>
-              <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-500" /> Résultat immédiat</span>
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-[12px] sm:text-[13px] text-muted-foreground">
+              <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-emerald-400" /> 100% gratuit</span>
+              <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-emerald-400" /> 8 questions</span>
+              <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-emerald-400" /> Résultat immédiat</span>
             </div>
 
             {/* Social proof */}
-            <div className="mt-10 pt-8 border-t border-black/5">
-              <p className="text-[13px] text-[#636366] mb-3">Découvrez votre style en 2 minutes</p>
+            <div className="mt-10 pt-8 border-t border-[var(--gold-line)]">
+              <p className="text-[13px] text-muted-foreground mb-3">Découvrez votre style en 2 minutes</p>
               <div className="flex items-center justify-center gap-1">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 fill-[#E07B54] text-[#E07B54]" />
+                  <Star key={i} className="w-5 h-5 fill-[var(--gold)] text-[var(--gold)]" />
                 ))}
-                <span className="ml-2 text-[14px] font-semibold text-[#1d1d1f]">12 styles</span>
+                <span className="ml-2 text-[14px] font-semibold text-foreground">12 styles</span>
               </div>
             </div>
           </div>
@@ -411,29 +411,29 @@ export default function QuizPage() {
     const question = QUIZ_QUESTIONS[currentQuestion];
 
     return (
-      <div className="min-h-screen bg-[#fbfbfd]">
+      <div className="min-h-screen bg-background">
         {/* Header avec progression */}
-        <nav className="sticky top-16 z-40 bg-[#fbfbfd]/80 backdrop-blur-xl border-b border-black/5">
+        <nav className="sticky top-16 z-40 bg-background/80 backdrop-blur-xl border-b border-[var(--gold-line)]">
           <div className="max-w-[980px] mx-auto px-6">
             <div className="h-12 flex items-center justify-between">
               <button
                 onClick={handleBack}
                 disabled={currentQuestion === 0}
-                className="text-[#636366] hover:text-[#1d1d1f] disabled:opacity-30 transition-colors"
+                className="text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors"
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
-              <span className="text-[13px] font-medium text-[#636366]">
+              <span className="text-[13px] font-medium text-muted-foreground">
                 {currentQuestion + 1} / {totalQuestions}
               </span>
-              <Link href="/" className="text-[13px] text-[#636366] hover:text-[#1d1d1f] transition-colors">
+              <Link href="/" className="text-[13px] text-muted-foreground hover:text-foreground transition-colors">
                 Quitter
               </Link>
             </div>
             {/* Barre de progression */}
-            <div className="h-[3px] bg-[#f5f5f7] -mx-6">
+            <div className="h-[3px] bg-secondary -mx-6">
               <div
-                className="h-full bg-gradient-to-r from-[#E07B54] to-[#e8956e] transition-all duration-500 ease-out"
+                className="h-full bg-[var(--gold)] transition-all duration-500 ease-out"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -444,10 +444,10 @@ export default function QuizPage() {
           <div className="max-w-[720px] mx-auto">
             {/* Question */}
             <div className="text-center mb-8">
-              <h2 className="text-[22px] sm:text-[28px] md:text-[34px] font-semibold tracking-[-0.02em] text-[#1d1d1f] leading-tight">
+              <h2 className="prestige-display text-[22px] sm:text-[28px] md:text-[34px] font-semibold tracking-[-0.02em] text-foreground leading-tight">
                 {question.question}
               </h2>
-              <p className="mt-2 text-[15px] text-[#636366]">{question.subtitle}</p>
+              <p className="mt-2 text-[15px] text-muted-foreground">{question.subtitle}</p>
             </div>
 
             {/* Options (grille 2x2) */}
@@ -460,8 +460,8 @@ export default function QuizPage() {
                     onClick={() => handleAnswer(question.id, option.id, option.scores)}
                     className={`group relative rounded-[20px] overflow-hidden border-2 transition-all duration-300 hover:shadow-lg active:scale-[0.98] aspect-[4/3] ${
                       isSelected
-                        ? 'border-[#E07B54] shadow-lg shadow-[#E07B54]/20'
-                        : 'border-transparent hover:border-[#E07B54]/30'
+                        ? 'border-[var(--gold)] shadow-lg shadow-[var(--gold-soft)]/20'
+                        : 'border-transparent hover:border-[var(--gold-line)]'
                     }`}
                   >
                     <OptimizedRemoteImage
@@ -479,8 +479,8 @@ export default function QuizPage() {
                       </p>
                     </div>
                     {isSelected && (
-                      <div className="absolute top-3 right-3 w-7 h-7 bg-[#E07B54] rounded-full flex items-center justify-center">
-                        <Check className="w-4 h-4 text-white" />
+                      <div className="absolute top-3 right-3 w-7 h-7 bg-[var(--gold)] rounded-full flex items-center justify-center">
+                        <Check className="w-4 h-4 text-[#0c0a09]" />
                       </div>
                     )}
                   </button>
@@ -496,16 +496,16 @@ export default function QuizPage() {
   // ── EMAIL CAPTURE ──
   if (step === 'email') {
     return (
-      <div className="min-h-screen bg-[#fbfbfd] flex items-center justify-center px-6">
+      <div className="min-h-screen bg-background flex items-center justify-center px-6">
         <div className="max-w-[440px] w-full text-center">
-          <div className="w-16 h-16 mx-auto mb-5 rounded-full bg-gradient-to-br from-[#E07B54] to-[#D4603C] flex items-center justify-center shadow-lg shadow-[#E07B54]/20">
-            <Sparkles className="w-7 h-7 text-white" />
+          <div className="w-16 h-16 mx-auto mb-5 rounded-full bg-[rgba(200,162,77,0.12)] border border-[var(--gold-line)] flex items-center justify-center shadow-lg shadow-[var(--gold-soft)]/20">
+            <Sparkles className="w-7 h-7 text-[var(--gold)]" />
           </div>
 
-          <h2 className="text-[28px] sm:text-[34px] font-bold text-[#1d1d1f] tracking-[-0.02em] mb-2">
+          <h2 className="prestige-display text-[28px] sm:text-[34px] font-bold text-foreground tracking-[-0.02em] mb-2">
             Votre résultat est prêt !
           </h2>
-          <p className="text-[15px] text-[#636366] mb-8 max-w-sm mx-auto leading-relaxed">
+          <p className="text-[15px] text-muted-foreground mb-8 max-w-sm mx-auto leading-relaxed">
             Entrez votre email pour recevoir votre profil déco complet et des recommandations personnalisées.
           </p>
 
@@ -515,16 +515,16 @@ export default function QuizPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="votre@email.com"
-              className="w-full px-5 py-3.5 rounded-2xl border border-[#d2d2d7] bg-white text-[15px] text-[#1d1d1f] placeholder:text-[#aeaeb2] focus:outline-none focus:border-[#E07B54] focus:ring-2 focus:ring-[#E07B54]/20 transition-all"
+              className="w-full px-5 py-3.5 rounded-2xl border border-border bg-card text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[var(--gold)] focus:ring-2 focus:ring-[var(--gold-soft)]/20 transition-all"
             />
             <button
               type="submit"
               disabled={emailSubmitting}
-              className="group w-full inline-flex items-center justify-center gap-2 bg-[#E07B54] text-white px-8 py-3.5 rounded-full text-[16px] font-semibold hover:bg-[#d06a45] transition-all duration-200 shadow-lg shadow-[#E07B54]/20 active:scale-95 disabled:opacity-60"
+              className="group w-full inline-flex items-center justify-center gap-2 bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] px-8 py-3.5 rounded-full text-[16px] font-semibold hover:bg-transparent hover:text-[var(--gold)] transition-all duration-200 shadow-lg shadow-[var(--gold-soft)]/20 active:scale-95 disabled:opacity-60"
             >
               {emailSubmitting ? (
                 <span className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-[#0c0a09]/30 border-t-[#0c0a09] rounded-full animate-spin" />
                   Chargement...
                 </span>
               ) : (
@@ -538,12 +538,12 @@ export default function QuizPage() {
 
           <button
             onClick={handleSkipEmail}
-            className="mt-4 text-[13px] text-[#636366] hover:text-[#1d1d1f] transition-colors underline"
+            className="mt-4 text-[13px] text-muted-foreground hover:text-foreground transition-colors underline"
           >
             Passer cette étape
           </button>
 
-          <p className="mt-6 text-[11px] text-[#aeaeb2] max-w-xs mx-auto">
+          <p className="mt-6 text-[11px] text-muted-foreground max-w-xs mx-auto">
             En continuant, vous acceptez de recevoir des emails de la part d&apos;InstaDeco. Vous pouvez vous désabonner à tout moment.
           </p>
         </div>
@@ -554,46 +554,46 @@ export default function QuizPage() {
   // ── RÉSULTAT ──
   if (step === 'result' && resultStyle) {
     return (
-      <div className="min-h-screen bg-[#fbfbfd]">
+      <div className="min-h-screen bg-background">
         <section className="pt-8 pb-20 px-6">
           <div className="max-w-[640px] mx-auto">
             {/* Résultat principal */}
             <div className="text-center mb-8">
               <div className="text-[56px] mb-3">{resultStyle.emoji}</div>
-              <h1 className="text-[32px] sm:text-[40px] font-bold tracking-[-0.03em] text-[#1d1d1f] leading-[1.1] mb-3">
+              <h1 className="prestige-display text-[32px] sm:text-[40px] font-bold tracking-[-0.03em] text-foreground leading-[1.1] mb-3">
                 {resultStyle.headline}
               </h1>
-              <p className="text-[16px] text-[#636366] leading-relaxed max-w-lg mx-auto">
+              <p className="text-[16px] text-muted-foreground leading-relaxed max-w-lg mx-auto">
                 {resultStyle.description}
               </p>
             </div>
 
             {/* Palette de couleurs */}
-            <div className="bg-white rounded-[24px] border border-black/5 p-6 mb-4 shadow-sm">
-              <h3 className="text-[13px] font-semibold text-[#636366] uppercase tracking-wider mb-4">
+            <div className="bg-card rounded-[24px] border border-border p-6 mb-4 shadow-sm">
+              <h3 className="text-[13px] font-semibold text-[var(--gold)] uppercase tracking-wider mb-4">
                 Votre palette
               </h3>
               <div className="flex gap-3">
                 {resultStyle.colors.map((color, i) => (
                   <div key={i} className="flex-1">
                     <div
-                      className="aspect-square rounded-2xl shadow-inner border border-black/5"
+                      className="aspect-square rounded-2xl shadow-inner border border-[var(--gold-line)]"
                       style={{ backgroundColor: color }}
                     />
-                    <p className="text-[11px] text-[#636366] text-center mt-2 font-mono">{color}</p>
+                    <p className="text-[11px] text-muted-foreground text-center mt-2 font-mono">{color}</p>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Traits */}
-            <div className="bg-white rounded-[24px] border border-black/5 p-6 mb-4 shadow-sm">
-              <h3 className="text-[13px] font-semibold text-[#636366] uppercase tracking-wider mb-4">
+            <div className="bg-card rounded-[24px] border border-border p-6 mb-4 shadow-sm">
+              <h3 className="text-[13px] font-semibold text-[var(--gold)] uppercase tracking-wider mb-4">
                 Vos traits déco
               </h3>
               <div className="flex flex-wrap gap-2">
                 {resultStyle.traits.map((trait) => (
-                  <span key={trait} className="px-4 py-2 bg-[#FFF3ED] text-[#E07B54] rounded-full text-[14px] font-medium">
+                  <span key={trait} className="px-4 py-2 bg-[rgba(200,162,77,0.12)] border border-[var(--gold-line)] text-[var(--gold)] rounded-full text-[14px] font-medium">
                     {trait}
                   </span>
                 ))}
@@ -601,8 +601,8 @@ export default function QuizPage() {
             </div>
 
             {/* Styles compatibles */}
-            <div className="bg-white rounded-[24px] border border-black/5 p-6 mb-4 shadow-sm">
-              <h3 className="text-[13px] font-semibold text-[#636366] uppercase tracking-wider mb-4">
+            <div className="bg-card rounded-[24px] border border-border p-6 mb-4 shadow-sm">
+              <h3 className="text-[13px] font-semibold text-[var(--gold)] uppercase tracking-wider mb-4">
                 Styles compatibles
               </h3>
               <div className="flex flex-wrap gap-2">
@@ -610,30 +610,30 @@ export default function QuizPage() {
                   <Link
                     key={style}
                     href={`/style/${style.toLowerCase().replace(/\s+/g, '-')}`}
-                    className="inline-flex items-center gap-1 px-4 py-2 bg-[#f5f5f7] text-[#1d1d1f] rounded-full text-[14px] font-medium hover:bg-[#e8e8ed] transition-colors"
+                    className="inline-flex items-center gap-1 px-4 py-2 bg-secondary text-foreground rounded-full text-[14px] font-medium hover:bg-accent transition-colors"
                   >
                     {style}
-                    <ChevronRight className="w-3.5 h-3.5 text-[#636366]" />
+                    <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />
                   </Link>
                 ))}
               </div>
             </div>
 
             {/* Conseil pro */}
-            <div className="bg-gradient-to-br from-[#FFF8F5] to-[#FFF0E8] rounded-[24px] border border-[#F0E6E0] p-6 mb-6">
-              <h3 className="text-[13px] font-semibold text-[#E07B54] uppercase tracking-wider mb-2">
+            <div className="bg-[rgba(200,162,77,0.08)] rounded-[24px] border border-[var(--gold-line)] p-6 mb-6">
+              <h3 className="text-[13px] font-semibold text-[var(--gold)] uppercase tracking-wider mb-2">
                 💡 Conseil de pro
               </h3>
-              <p className="text-[15px] text-[#1d1d1f] leading-relaxed">
+              <p className="text-[15px] text-foreground leading-relaxed">
                 {resultStyle.tip}
               </p>
             </div>
 
             {/* Partage */}
-            <div className="bg-white rounded-[24px] border border-black/5 p-6 mb-6 shadow-sm text-center">
+            <div className="bg-card rounded-[24px] border border-border p-6 mb-6 shadow-sm text-center">
               <div className="flex items-center justify-center gap-2 mb-3">
-                <Share2 className="w-4 h-4 text-[#E07B54]" />
-                <span className="text-[14px] font-semibold text-[#1d1d1f]">Partagez votre résultat</span>
+                <Share2 className="w-4 h-4 text-[var(--gold)]" />
+                <span className="text-[14px] font-semibold text-foreground">Partagez votre résultat</span>
               </div>
               <ShareButtons
                 url="https://instadeco.app/quiz"
@@ -644,27 +644,27 @@ export default function QuizPage() {
             </div>
 
             {/* CTA : Essayer ce style */}
-            <div className="bg-gradient-to-br from-[#E07B54] to-[#D4603C] rounded-[24px] p-5 sm:p-8 text-center shadow-xl shadow-[#E07B54]/20">
-              <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-white/20 flex items-center justify-center">
-                <Home className="w-7 h-7 text-white" />
+            <div className="bg-[var(--stone-900)] rounded-[24px] border border-[var(--gold-line)] p-5 sm:p-8 text-center shadow-xl shadow-[var(--gold-soft)]/10">
+              <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-[rgba(200,162,77,0.12)] border border-[var(--gold-line)] flex items-center justify-center">
+                <Home className="w-7 h-7 text-[var(--gold)]" />
               </div>
-              <h2 className="text-[20px] sm:text-[24px] md:text-[28px] font-bold text-white tracking-[-0.02em] mb-2">
+              <h2 className="prestige-display text-[20px] sm:text-[24px] md:text-[28px] font-bold text-[var(--ivory)] tracking-[-0.02em] mb-2">
                 Voyez votre pièce en style {resultStyle.name}
               </h2>
-              <p className="text-[14px] sm:text-[15px] text-white/80 max-w-md mx-auto mb-6 leading-relaxed">
+              <p className="text-[14px] sm:text-[15px] text-[var(--mist)] max-w-md mx-auto mb-6 leading-relaxed">
                 Uploadez une photo et notre IA transforme votre pièce en style {resultStyle.name} en 30 secondes. Gratuit, sans inscription.
               </p>
               <Link
                 href="/essai"
-                className="group inline-flex items-center gap-2 bg-white text-[#E07B54] px-6 py-3 sm:px-8 sm:py-4 rounded-full text-[15px] sm:text-[17px] font-bold hover:bg-white/90 transition-all duration-200 shadow-lg active:scale-95"
+                className="group inline-flex items-center gap-2 bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] px-6 py-3 sm:px-8 sm:py-4 rounded-full text-[15px] sm:text-[17px] font-bold hover:bg-transparent hover:text-[var(--gold)] transition-all duration-200 shadow-lg active:scale-95"
               >
                 <Sparkles className="w-5 h-5" />
                 Essayer gratuitement
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
-              <p className="mt-4 text-[12px] text-white/60">
+              <p className="mt-4 text-[12px] text-[var(--mist)]">
                 <span className="flex items-center justify-center gap-1.5">
-                  <Check className="w-3.5 h-3.5" /> Gratuit — Sans inscription — Résultat en 30s
+                  <Check className="w-3.5 h-3.5" /> Gratuit, sans inscription, résultat en 30s
                 </span>
               </p>
             </div>
@@ -680,7 +680,7 @@ export default function QuizPage() {
                   setResultStyle(null);
                   setEmail('');
                 }}
-                className="text-[14px] text-[#636366] hover:text-[#1d1d1f] transition-colors underline"
+                className="text-[14px] text-muted-foreground hover:text-foreground transition-colors underline"
               >
                 Refaire le quiz
               </button>

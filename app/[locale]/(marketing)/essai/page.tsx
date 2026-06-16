@@ -78,7 +78,7 @@ export default function EssaiPage() {
   useEffect(() => {
     const isDevMode = document.cookie.includes('instadeco_dev=');
     if (isDevMode) {
-      console.log('🔓 Dev mode actif — trial illimité');
+      console.log('🔓 Dev mode actif, trial illimité');
       return; // Ne pas bloquer
     }
     const used = readTrialCount();
@@ -243,16 +243,16 @@ export default function EssaiPage() {
   const selectedStyleInfo = TRIAL_STYLES.find((s) => s.id === selectedStyle);
 
   return (
-    <div className="min-h-screen bg-[#fbfbfd]">
+    <div className="min-h-screen bg-background">
       {/* Navigation simplifiée */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#fbfbfd]/80 backdrop-blur-xl border-b border-black/5">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-[var(--gold-line)]">
         <div className="max-w-[980px] mx-auto px-6 h-12 flex items-center justify-between">
-          <Link href="/" className="text-[21px] font-semibold tracking-[-0.01em] text-[#1d1d1f]">
+          <Link href="/" className="prestige-display text-[21px] font-semibold tracking-[-0.01em] text-foreground">
             InstaDeco
           </Link>
           <Link
             href="/signup"
-            className="text-xs font-medium text-[#fbfbfd] bg-[#E07B54] px-4 py-1.5 rounded-full hover:bg-[#d06a45] transition-colors"
+            className="text-xs font-medium text-[#0c0a09] bg-[var(--gold)] border border-[var(--gold)] px-4 py-1.5 rounded-full hover:bg-transparent hover:text-[var(--gold)] transition-colors"
           >
             Créer un compte gratuit
           </Link>
@@ -262,14 +262,14 @@ export default function EssaiPage() {
       {/* Hero */}
       <section className="pt-20 pb-6 px-4 sm:pt-24 sm:pb-8 sm:px-6">
         <div className="max-w-[680px] mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#FFF3ED] text-[#E07B54] rounded-full text-sm font-medium mb-4">
+          <div className="prestige-eyebrow inline-flex items-center gap-2 px-4 py-1.5 bg-[rgba(200,162,77,0.12)] border border-[var(--gold-line)] rounded-full mb-4">
             <Gift className="w-4 h-4" />
-            Essai gratuit — Sans inscription
+            Essai gratuit, sans inscription
           </div>
-          <h1 className="text-[26px] sm:text-[36px] md:text-[48px] font-semibold tracking-[-0.025em] text-[#1d1d1f] leading-[1.08]">
+          <h1 className="prestige-display text-[26px] sm:text-[36px] md:text-[48px] font-semibold tracking-[-0.025em] text-foreground leading-[1.08]">
             Testez InstaDeco en 30 secondes
           </h1>
-          <p className="mt-3 text-[15px] sm:text-[17px] md:text-[19px] text-[#636366] font-normal leading-[1.4]">
+          <p className="mt-3 text-[15px] sm:text-[17px] md:text-[19px] text-muted-foreground font-normal leading-[1.4]">
             Uploadez une photo de votre pièce, choisissez un style, et découvrez la magie de l&apos;IA.
           </p>
         </div>
@@ -286,26 +286,26 @@ export default function EssaiPage() {
               className={`
                 relative rounded-[28px] border-2 border-dashed transition-all duration-300 cursor-pointer
                 ${isDragActive
-                  ? 'border-[#E07B54] bg-[#FFF3ED]'
-                  : 'border-[#d2d2d7] hover:border-[#E07B54] bg-white'
+                  ? 'border-[var(--gold)] bg-[rgba(200,162,77,0.12)]'
+                  : 'border-border hover:border-[var(--gold)] bg-card'
                 }
               `}
             >
               <input {...getInputProps()} />
               <div className="py-14 px-4 sm:py-20 sm:px-8 text-center">
-                <div className="w-16 h-16 mx-auto mb-5 rounded-full bg-[#FFF3ED] flex items-center justify-center">
-                  <Plus className="w-7 h-7 text-[#E07B54]" strokeWidth={1.5} />
+                <div className="w-16 h-16 mx-auto mb-5 rounded-full bg-[rgba(200,162,77,0.12)] border border-[var(--gold-line)] flex items-center justify-center">
+                  <Plus className="w-7 h-7 text-[var(--gold)]" strokeWidth={1.5} />
                 </div>
-                <p className="text-[17px] sm:text-[19px] text-[#1d1d1f] font-semibold tracking-[-0.01em]">
+                <p className="prestige-display text-[17px] sm:text-[19px] text-foreground font-semibold tracking-[-0.01em]">
                   {isDragActive ? 'Déposez votre image ici' : 'Ajoutez une photo de votre pièce'}
                 </p>
-                <p className="mt-2 text-[14px] text-[#636366]">
-                  Glissez-déposez ou cliquez — PNG, JPG, WEBP — Max 10 Mo
+                <p className="mt-2 text-[14px] text-muted-foreground">
+                  Glissez-déposez ou cliquez. PNG, JPG, WEBP. Max 10 Mo
                 </p>
-                <div className="mt-6 flex items-center justify-center gap-3 sm:gap-6 flex-wrap text-[12px] text-[#636366]">
-                  <span className="flex items-center gap-1"><Zap className="w-3 h-3" /> Résultat en 30s</span>
-                  <span className="flex items-center gap-1"><Shield className="w-3 h-3" /> 100% privé</span>
-                  <span className="flex items-center gap-1"><Star className="w-3 h-3" /> Gratuit</span>
+                <div className="mt-6 flex items-center justify-center gap-3 sm:gap-6 flex-wrap text-[12px] text-muted-foreground">
+                  <span className="flex items-center gap-1"><Zap className="w-3 h-3 text-[var(--gold)]" /> Résultat en 30s</span>
+                  <span className="flex items-center gap-1"><Shield className="w-3 h-3 text-[var(--gold)]" /> 100% privé</span>
+                  <span className="flex items-center gap-1"><Star className="w-3 h-3 text-[var(--gold)]" /> Gratuit</span>
                 </div>
               </div>
             </div>
@@ -315,10 +315,10 @@ export default function EssaiPage() {
           {step === 'options' && imagePreview && (
             <div className="space-y-8">
               {/* Aperçu de l'image */}
-              <div className="relative rounded-[20px] overflow-hidden bg-[#f5f5f7] shadow-sm">
+              <div className="relative rounded-[20px] overflow-hidden bg-card border border-border shadow-sm">
                 <Image
                   src={imagePreview}
-                  alt="Votre pièce — aperçu avant transformation"
+                  alt="Votre pièce, aperçu avant transformation"
                   width={800}
                   height={533}
                   className="w-full h-auto max-h-[400px] object-cover"
@@ -327,7 +327,7 @@ export default function EssaiPage() {
                 />
                 <button
                   onClick={() => { setImageFile(null); setImagePreview(null); setStep('upload'); }}
-                  className="absolute top-3 right-3 px-3 py-1.5 bg-white/90 backdrop-blur-md rounded-full text-[12px] font-medium text-[#1d1d1f] hover:bg-white transition-colors shadow-sm"
+                  className="absolute top-3 right-3 px-3 py-1.5 bg-background/90 backdrop-blur-md border border-[var(--gold-line)] rounded-full text-[12px] font-medium text-foreground hover:bg-background transition-colors shadow-sm"
                 >
                   Changer de photo
                 </button>
@@ -335,7 +335,7 @@ export default function EssaiPage() {
 
               {/* Type de pièce */}
               <div className="text-center">
-                <label className="block text-[12px] font-semibold text-[#636366] uppercase tracking-[.1em] mb-3">
+                <label className="prestige-eyebrow block mb-3">
                   Type de pièce
                 </label>
                 <div className="flex flex-wrap justify-center gap-2">
@@ -344,10 +344,10 @@ export default function EssaiPage() {
                       key={room.id}
                       onClick={() => setSelectedRoom(room.id)}
                       className={`
-                        px-4 py-2 rounded-full text-[14px] font-medium transition-all duration-200
+                        px-4 py-2 rounded-full text-[14px] font-medium transition-all duration-200 border
                         ${selectedRoom === room.id
-                          ? 'bg-[#1d1d1f] text-white'
-                          : 'bg-[#f5f5f7] text-[#1d1d1f] hover:bg-[#e8e8ed]'
+                          ? 'bg-[var(--gold)] border-[var(--gold)] text-[#0c0a09]'
+                          : 'bg-card border-border text-foreground hover:border-[var(--gold-line)]'
                         }
                       `}
                     >
@@ -359,7 +359,7 @@ export default function EssaiPage() {
 
               {/* Style */}
               <div className="text-center">
-                <label className="block text-[12px] font-semibold text-[#636366] uppercase tracking-[.1em] mb-3">
+                <label className="prestige-eyebrow block mb-3">
                   Style de décoration
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-w-xl mx-auto">
@@ -370,16 +370,16 @@ export default function EssaiPage() {
                       className={`
                         p-4 rounded-2xl text-left transition-all duration-200 border-2
                         ${selectedStyle === style.id
-                          ? 'border-[#E07B54] bg-[#FFF3ED]'
-                          : 'border-transparent bg-[#f5f5f7] hover:bg-[#e8e8ed]'
+                          ? 'border-[var(--gold)] bg-[rgba(200,162,77,0.12)]'
+                          : 'border-border bg-card hover:border-[var(--gold-line)]'
                         }
                       `}
                     >
                       <span className="text-2xl">{style.icon}</span>
-                      <p className={`font-semibold text-[14px] mt-1 ${selectedStyle === style.id ? 'text-[#E07B54]' : 'text-[#1d1d1f]'}`}>
+                      <p className={`prestige-display font-semibold text-[14px] mt-1 ${selectedStyle === style.id ? 'text-[var(--gold)]' : 'text-foreground'}`}>
                         {style.name}
                       </p>
-                      <p className="text-[11px] text-[#636366] mt-0.5">{style.desc}</p>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">{style.desc}</p>
                     </button>
                   ))}
                 </div>
@@ -388,7 +388,7 @@ export default function EssaiPage() {
               {/* Erreur */}
               {error && (
                 <div className="text-center py-2" role="alert">
-                  <p className="text-red-500 text-[14px]">{error}</p>
+                  <p className="text-destructive text-[14px]">{error}</p>
                 </div>
               )}
 
@@ -396,14 +396,14 @@ export default function EssaiPage() {
               <div className="flex flex-col items-center pt-2 gap-3">
                 <button
                   onClick={handleGenerate}
-                  className="group inline-flex items-center gap-2 bg-[#E07B54] text-white px-8 py-4 rounded-full text-[17px] font-semibold hover:bg-[#d06a45] transition-all duration-200 shadow-lg shadow-[#E07B54]/20 active:scale-95"
+                  className="group inline-flex items-center gap-2 bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] px-8 py-4 rounded-full text-[17px] font-semibold hover:bg-transparent hover:text-[var(--gold)] transition-all duration-200 shadow-lg shadow-[var(--gold-soft)]/20 active:scale-95"
                 >
                   <Sparkles className="w-5 h-5" />
                   Transformer ma pièce
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </button>
-                <span className="text-[12px] text-[#636366]">
-                  100% gratuit — {remainingTrials} essai{remainingTrials > 1 ? 's' : ''} disponible{remainingTrials > 1 ? 's' : ''}
+                <span className="text-[12px] text-muted-foreground">
+                  100% gratuit. {remainingTrials} essai{remainingTrials > 1 ? 's' : ''} disponible{remainingTrials > 1 ? 's' : ''}
                 </span>
               </div>
             </div>
@@ -413,19 +413,19 @@ export default function EssaiPage() {
           {step === 'generating' && (
             <div className="flex flex-col items-center py-16">
               <div className="relative w-20 h-20 mb-6">
-                <div className="absolute inset-0 rounded-full border-[3px] border-[#f5f5f7]" />
-                <div className="absolute inset-0 rounded-full border-[3px] border-[#E07B54] border-t-transparent animate-spin" />
-                <div className="absolute inset-2 rounded-full border-[2px] border-[#E07B54]/20 border-b-transparent animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }} />
+                <div className="absolute inset-0 rounded-full border-[3px] border-border" />
+                <div className="absolute inset-0 rounded-full border-[3px] border-[var(--gold)] border-t-transparent animate-spin" />
+                <div className="absolute inset-2 rounded-full border-[2px] border-[var(--gold-line)] border-b-transparent animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }} />
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <Sparkles className="w-6 h-6 text-[#E07B54]" />
+                  <Sparkles className="w-6 h-6 text-[var(--gold)]" />
                 </div>
               </div>
-              <p className="text-[19px] text-[#1d1d1f] font-semibold tracking-[-0.01em]">
+              <p className="prestige-display text-[19px] text-foreground font-semibold tracking-[-0.01em]">
                 {LOADING_MESSAGES.filter((m) => m.threshold <= Math.round(progress)).pop()?.text || 'Préparation...'}
               </p>
-              <p className="mt-1 text-[15px] text-[#636366]">{Math.round(progress)}%</p>
+              <p className="mt-1 text-[15px] text-muted-foreground">{Math.round(progress)}%</p>
               <div
-                className="w-56 h-[4px] bg-[#f5f5f7] rounded-full mt-5 overflow-hidden"
+                className="w-56 h-[4px] bg-card rounded-full mt-5 overflow-hidden"
                 role="progressbar"
                 aria-valuenow={Math.round(progress)}
                 aria-valuemin={0}
@@ -433,11 +433,11 @@ export default function EssaiPage() {
                 aria-label="Progression de la génération"
               >
                 <div
-                  className="h-full bg-gradient-to-r from-[#E07B54] to-[#e8956e] rounded-full transition-all duration-700 ease-out"
+                  className="h-full bg-[var(--gold)] rounded-full transition-all duration-700 ease-out"
                   style={{ width: `${Math.round(progress)}%` }}
                 />
               </div>
-              <p className="mt-6 text-[12px] text-[#636366]">
+              <p className="mt-6 text-[12px] text-muted-foreground">
                 Votre photo reste 100% privée
               </p>
             </div>
@@ -448,7 +448,7 @@ export default function EssaiPage() {
             <div ref={resultRef} className="space-y-8 scroll-mt-4">
               {/* Bandeau wow moment */}
               <div className="text-center">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#FFF3ED] text-[#E07B54] rounded-full text-sm font-semibold">
+                <div className="prestige-eyebrow inline-flex items-center gap-2 px-4 py-1.5 bg-[rgba(200,162,77,0.12)] border border-[var(--gold-line)] rounded-full">
                   <Sparkles className="w-4 h-4" />
                   Voici votre transformation !
                 </div>
@@ -457,18 +457,18 @@ export default function EssaiPage() {
               {/* Avant / Après */}
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <span className="block text-[12px] font-semibold text-[#636366] uppercase tracking-[.1em]">
+                  <span className="prestige-eyebrow block">
                     Avant
                   </span>
-                  <div className="rounded-[16px] overflow-hidden bg-[#f5f5f7]">
+                  <div className="rounded-[16px] overflow-hidden bg-card border border-border">
                     <Image src={imagePreview} alt="Votre pièce avant transformation" width={600} height={400} className="w-full h-auto" sizes="(max-width: 768px) 100vw, 50vw" unoptimized />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <span className="block text-[12px] font-semibold text-[#636366] uppercase tracking-[.1em]">
-                    Après — {selectedStyleInfo?.name}
+                  <span className="prestige-eyebrow block">
+                    Après, {selectedStyleInfo?.name}
                   </span>
-                  <div className="relative rounded-[16px] overflow-hidden bg-[#f5f5f7]">
+                  <div className="relative rounded-[16px] overflow-hidden bg-card border border-[var(--gold-line)]">
                     <Image src={generatedImage} alt="Résultat après transformation IA" width={600} height={400} className="w-full h-auto" sizes="(max-width: 768px) 100vw, 50vw" />
                     {/* Filigrane */}
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -493,23 +493,23 @@ export default function EssaiPage() {
                       setStep('options');
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
-                    className="inline-flex items-center gap-2 bg-[#1d1d1f] text-white px-6 py-3 rounded-full text-[15px] font-semibold hover:bg-[#333] transition-all active:scale-95"
+                    className="inline-flex items-center gap-2 bg-transparent text-[var(--gold)] border border-[var(--gold)] px-6 py-3 rounded-full text-[15px] font-semibold hover:bg-[var(--gold)] hover:text-[#0c0a09] transition-all active:scale-95"
                   >
                     <Sparkles className="w-4 h-4" />
-                    Essayer un autre style — {remainingTrials} essai{remainingTrials > 1 ? 's' : ''} restant{remainingTrials > 1 ? 's' : ''}
+                    Essayer un autre style. {remainingTrials} essai{remainingTrials > 1 ? 's' : ''} restant{remainingTrials > 1 ? 's' : ''}
                   </button>
                 </div>
               )}
 
-              {/* Email OPTIONNEL — débloque le HD sans filigrane (pas un gate) */}
+              {/* Email OPTIONNEL, débloque le HD sans filigrane (pas un gate) */}
               {!emailUnlocked ? (
-                <div className="bg-white rounded-[20px] border border-black/5 p-5 sm:p-6 shadow-sm">
+                <div className="bg-card rounded-[20px] border border-border p-5 sm:p-6 shadow-sm">
                   <div className="flex items-center justify-center gap-2 mb-1.5">
-                    <Mail className="w-4 h-4 text-[#E07B54]" />
-                    <span className="text-[15px] font-semibold text-[#1d1d1f]">Recevez votre image en HD, sans filigrane</span>
+                    <Mail className="w-4 h-4 text-[var(--gold)]" />
+                    <span className="prestige-display text-[15px] font-semibold text-foreground">Recevez votre image en HD, sans filigrane</span>
                   </div>
-                  <p className="text-[13px] text-[#636366] text-center mb-4">
-                    Entrez votre email pour télécharger la version haute définition (optionnel) — et recevez <span className="font-semibold text-[#E07B54]">3 crédits offerts</span>.
+                  <p className="text-[13px] text-muted-foreground text-center mb-4">
+                    Entrez votre email pour télécharger la version haute définition (optionnel) et recevez <span className="font-semibold text-[var(--gold)]">3 crédits offerts</span>.
                   </p>
                   <form
                     onSubmit={async (e) => {
@@ -548,42 +548,42 @@ export default function EssaiPage() {
                       value={trialEmail}
                       onChange={(e) => { setTrialEmail(e.target.value); setEmailStatus('idle'); }}
                       placeholder="votre@email.com"
-                      className="flex-1 px-4 py-3 rounded-xl border border-[#d2d2d7] focus:border-[#E07B54] focus:ring-2 focus:ring-[#E07B54]/20 outline-none transition-all text-[#1d1d1f] text-[15px]"
+                      className="flex-1 px-4 py-3 rounded-xl bg-background border border-border focus:border-[var(--gold)] focus:ring-2 focus:ring-[var(--gold-soft)]/20 outline-none transition-all text-foreground placeholder:text-muted-foreground text-[15px]"
                       required
                     />
                     <button
                       type="submit"
                       disabled={emailStatus === 'loading'}
-                      className="inline-flex items-center justify-center gap-2 bg-[#E07B54] text-white px-5 py-3 rounded-xl text-[15px] font-semibold hover:bg-[#d06a45] transition-all disabled:opacity-50"
+                      className="inline-flex items-center justify-center gap-2 bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] px-5 py-3 rounded-xl text-[15px] font-semibold hover:bg-transparent hover:text-[var(--gold)] transition-all disabled:opacity-50"
                     >
                       {emailStatus === 'loading' ? (
-                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        <div className="w-5 h-5 border-2 border-[#0c0a09]/30 border-t-[#0c0a09] rounded-full animate-spin" />
                       ) : (
                         <>Débloquer le HD</>
                       )}
                     </button>
                   </form>
                   {emailStatus === 'error' && (
-                    <p className="text-red-500 text-[12px] text-center mt-2">{emailError}</p>
+                    <p className="text-destructive text-[12px] text-center mt-2">{emailError}</p>
                   )}
-                  <p className="text-[11px] text-[#aaa] text-center mt-2">
+                  <p className="text-[11px] text-muted-foreground text-center mt-2">
                     Pas de spam. Désinscription en 1 clic.
                   </p>
                 </div>
               ) : (
-                <div className="bg-[#F0FDF4] rounded-[20px] border border-green-200 p-4 text-center">
-                  <p className="text-[14px] font-semibold text-green-700 flex items-center justify-center gap-2">
+                <div className="bg-[rgba(16,185,129,0.10)] rounded-[20px] border border-emerald-500/30 p-4 text-center">
+                  <p className="text-[14px] font-semibold text-emerald-400 flex items-center justify-center gap-2">
                     <Check className="w-4 h-4" />
-                    Version HD envoyée — vérifiez votre boîte mail.
+                    Version HD envoyée, vérifiez votre boîte mail.
                   </p>
                 </div>
               )}
 
-              {/* Partage — Encourager la viralité */}
-              <div className="bg-white rounded-[20px] border border-black/5 p-5 text-center shadow-sm">
+              {/* Partage, Encourager la viralité */}
+              <div className="bg-card rounded-[20px] border border-border p-5 text-center shadow-sm">
                 <div className="flex items-center justify-center gap-2 mb-3">
-                  <Share2 className="w-4 h-4 text-[#E07B54]" />
-                  <span className="text-[14px] font-semibold text-[#1d1d1f]">Montrez votre transformation à vos proches</span>
+                  <Share2 className="w-4 h-4 text-[var(--gold)]" />
+                  <span className="prestige-display text-[14px] font-semibold text-foreground">Montrez votre transformation à vos proches</span>
                 </div>
                 <ShareButtons
                   url="https://instadeco.app/essai"
@@ -594,7 +594,7 @@ export default function EssaiPage() {
                 />
               </div>
 
-              {/* OFFRE FLASH — Conversion immédiate */}
+              {/* OFFRE FLASH, Conversion immédiate */}
               <FlashOffer
                 stripePaymentUrl="/signup?redirect=/pricing"
                 durationMinutes={15}
@@ -604,46 +604,46 @@ export default function EssaiPage() {
               />
 
               {/* OU Créer un compte gratuit */}
-              <div className="bg-gradient-to-br from-[#FFF8F5] to-[#FFF0E8] rounded-[24px] border border-[#F0E6E0] p-6 sm:p-8 text-center">
-                <p className="text-[13px] font-medium text-[#636366] uppercase tracking-wider mb-3">Ou bien</p>
-                <h2 className="text-[22px] sm:text-[26px] font-bold text-[#1d1d1f] tracking-[-0.02em]">
+              <div className="bg-[var(--stone-900)] rounded-[24px] border border-[var(--gold-line)] p-6 sm:p-8 text-center">
+                <p className="prestige-eyebrow mb-3">Ou bien</p>
+                <h2 className="prestige-display text-[22px] sm:text-[26px] font-bold text-foreground tracking-[-0.02em]">
                   Créez votre compte gratuit
                 </h2>
-                <p className="mt-2 text-[15px] text-[#6B6B6B] max-w-md mx-auto leading-relaxed">
-                  Recevez <span className="font-bold text-[#E07B54]">3 crédits offerts</span> pour transformer d&apos;autres pièces.
+                <p className="mt-2 text-[15px] text-muted-foreground max-w-md mx-auto leading-relaxed">
+                  Recevez <span className="font-bold text-[var(--gold)]">3 crédits offerts</span> pour transformer d&apos;autres pièces.
                 </p>
 
                 <div className="mt-5 flex flex-col sm:flex-row items-center justify-center gap-4">
                   <Link
                     href="/signup"
-                    className="group inline-flex items-center gap-2 bg-[#1d1d1f] text-white px-7 py-3.5 rounded-full text-[15px] font-semibold hover:bg-[#333] transition-all duration-200 shadow-lg active:scale-95"
+                    className="group inline-flex items-center gap-2 bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] px-7 py-3.5 rounded-full text-[15px] font-semibold hover:bg-transparent hover:text-[var(--gold)] transition-all duration-200 shadow-lg active:scale-95"
                   >
                     <UserPlus className="w-4 h-4" />
-                    Créer mon compte — c&apos;est gratuit
+                    Créer mon compte, c&apos;est gratuit
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </Link>
                 </div>
 
-                <div className="mt-4 flex flex-wrap items-center justify-center gap-4 text-[12px] text-[#636366]">
-                  <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-green-500" /> 3 crédits offerts</span>
-                  <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-green-500" /> Sans engagement</span>
-                  <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-green-500" /> 20+ styles</span>
+                <div className="mt-4 flex flex-wrap items-center justify-center gap-4 text-[12px] text-muted-foreground">
+                  <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-emerald-400" /> 3 crédits offerts</span>
+                  <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-emerald-400" /> Sans engagement</span>
+                  <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-emerald-400" /> 20+ styles</span>
                 </div>
               </div>
 
               {/* Stats en bas */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-lg mx-auto">
-                <div className="text-center p-4 rounded-2xl bg-white border border-black/5">
-                  <p className="text-[20px] sm:text-[24px] font-bold text-[#E07B54]">0,99 €</p>
-                  <p className="text-[12px] text-[#636366] mt-1">par transformation</p>
+                <div className="text-center p-4 rounded-2xl bg-card border border-border">
+                  <p className="prestige-display text-[20px] sm:text-[24px] font-bold text-[var(--gold)]">0,99 €</p>
+                  <p className="text-[12px] text-muted-foreground mt-1">par transformation</p>
                 </div>
-                <div className="text-center p-4 rounded-2xl bg-white border border-black/5">
-                  <p className="text-[20px] sm:text-[24px] font-bold text-[#1d1d1f]">30s</p>
-                  <p className="text-[12px] text-[#636366] mt-1">temps de rendu</p>
+                <div className="text-center p-4 rounded-2xl bg-card border border-border">
+                  <p className="prestige-display text-[20px] sm:text-[24px] font-bold text-foreground">30s</p>
+                  <p className="text-[12px] text-muted-foreground mt-1">temps de rendu</p>
                 </div>
-                <div className="text-center p-4 rounded-2xl bg-white border border-black/5">
-                  <p className="text-[20px] sm:text-[24px] font-bold text-[#1d1d1f]">20+</p>
-                  <p className="text-[12px] text-[#636366] mt-1">styles disponibles</p>
+                <div className="text-center p-4 rounded-2xl bg-card border border-border">
+                  <p className="prestige-display text-[20px] sm:text-[24px] font-bold text-foreground">20+</p>
+                  <p className="text-[12px] text-muted-foreground mt-1">styles disponibles</p>
                 </div>
               </div>
             </div>
@@ -652,38 +652,38 @@ export default function EssaiPage() {
           {/* ── ESSAI DÉJÀ UTILISÉ ── */}
           {step === 'trial-used' && (
             <div className="text-center py-16">
-              <div className="w-16 h-16 mx-auto mb-5 rounded-full bg-[#FFF3ED] flex items-center justify-center">
-                <Sparkles className="w-7 h-7 text-[#E07B54]" />
+              <div className="w-16 h-16 mx-auto mb-5 rounded-full bg-[rgba(200,162,77,0.12)] border border-[var(--gold-line)] flex items-center justify-center">
+                <Sparkles className="w-7 h-7 text-[var(--gold)]" />
               </div>
-              <h2 className="text-[22px] sm:text-[28px] md:text-[32px] font-bold text-[#1d1d1f] tracking-[-0.02em]">
+              <h2 className="prestige-display text-[22px] sm:text-[28px] md:text-[32px] font-bold text-foreground tracking-[-0.02em]">
                 Votre essai gratuit est terminé
               </h2>
-              <p className="mt-3 text-[17px] text-[#636366] max-w-md mx-auto leading-relaxed">
-                Vous avez déjà utilisé votre essai gratuit. Créez un compte pour obtenir <span className="font-bold text-[#E07B54]">3 crédits offerts</span> et continuer à transformer vos pièces.
+              <p className="mt-3 text-[17px] text-muted-foreground max-w-md mx-auto leading-relaxed">
+                Vous avez déjà utilisé votre essai gratuit. Créez un compte pour obtenir <span className="font-bold text-[var(--gold)]">3 crédits offerts</span> et continuer à transformer vos pièces.
               </p>
 
               <div className="mt-8 flex flex-col items-center gap-4">
                 <Link
                   href="/signup"
-                  className="group inline-flex items-center gap-2 bg-[#E07B54] text-white px-8 py-4 rounded-full text-[17px] font-semibold hover:bg-[#d06a45] transition-all duration-200 shadow-lg shadow-[#E07B54]/20 active:scale-95"
+                  className="group inline-flex items-center gap-2 bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] px-8 py-4 rounded-full text-[17px] font-semibold hover:bg-transparent hover:text-[var(--gold)] transition-all duration-200 shadow-lg shadow-[var(--gold-soft)]/20 active:scale-95"
                 >
                   <UserPlus className="w-5 h-5" />
-                  Créer mon compte — 3 crédits offerts
+                  Créer mon compte, 3 crédits offerts
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
 
                 <Link
                   href="/pricing"
-                  className="text-[14px] text-[#636366] hover:text-[#1d1d1f] transition-colors underline"
+                  className="text-[14px] text-muted-foreground hover:text-foreground transition-colors underline"
                 >
                   Voir les tarifs
                 </Link>
               </div>
 
-              <div className="mt-8 flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-[12px] sm:text-[13px] text-[#636366]">
-                <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-500" /> 3 crédits offerts</span>
-                <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-500" /> Sans engagement</span>
-                <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-500" /> 0,99 €/transformation</span>
+              <div className="mt-8 flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-[12px] sm:text-[13px] text-muted-foreground">
+                <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-emerald-400" /> 3 crédits offerts</span>
+                <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-emerald-400" /> Sans engagement</span>
+                <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-emerald-400" /> 0,99 €/transformation</span>
               </div>
             </div>
           )}

@@ -40,7 +40,7 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#fbfbfd] flex items-center justify-center px-6">
+    <div className="min-h-screen bg-background flex items-center justify-center px-6">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Image
@@ -50,43 +50,43 @@ export default function ResetPasswordPage() {
             height={64}
             className="mx-auto mb-4 rounded-2xl"
           />
-          <h1 className="text-[40px] font-semibold tracking-[-0.025em] text-[#1d1d1f] mb-2">
+          <h1 className="prestige-display text-[40px] font-semibold tracking-[-0.025em] text-foreground mb-2">
             Mot de passe oublié
           </h1>
-          <p className="text-[17px] text-[#636366]">
+          <p className="text-[17px] text-muted-foreground">
             Entrez votre email pour recevoir un lien de réinitialisation
           </p>
         </div>
 
-        <div className="bg-white rounded-[20px] p-8 shadow-[0_2px_16px_rgba(0,0,0,0.08)]">
+        <div className="bg-card border border-[var(--gold-line)] rounded-[20px] p-8 shadow-[0_2px_16px_rgba(0,0,0,0.45)]">
           {status === 'success' ? (
             <div className="text-center py-4">
-              <div className="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
-                <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="w-16 h-16 mx-auto mb-4 bg-emerald-500/15 rounded-full flex items-center justify-center">
+                <svg className="w-8 h-8 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <h2 className="text-[20px] font-semibold text-[#1d1d1f] mb-2">
+              <h2 className="prestige-display text-[20px] font-semibold text-foreground mb-2">
                 Email envoyé !
               </h2>
-              <p className="text-[14px] text-[#636366] mb-6">
-                Si un compte existe avec l&apos;adresse <strong>{email}</strong>, vous recevrez un lien de réinitialisation dans quelques minutes.
+              <p className="text-[14px] text-muted-foreground mb-6">
+                Si un compte existe avec l&apos;adresse <strong className="text-foreground">{email}</strong>, vous recevrez un lien de réinitialisation dans quelques minutes.
               </p>
-              <p className="text-[13px] text-[#636366]">
+              <p className="text-[13px] text-muted-foreground">
                 Vérifiez aussi vos spams.
               </p>
             </div>
           ) : (
             <>
               {error && (
-                <div role="alert" className="mb-6 p-4 bg-red-50 border border-red-200 rounded-[12px] text-[14px] text-red-600">
+                <div role="alert" className="mb-6 p-4 bg-destructive/10 border border-destructive/30 rounded-[12px] text-[14px] text-destructive">
                   {error}
                 </div>
               )}
 
               <form onSubmit={handleReset} className="space-y-5">
                 <div>
-                  <label htmlFor="reset-email" className="block text-[12px] font-medium text-[#636366] uppercase tracking-[.1em] mb-2">
+                  <label htmlFor="reset-email" className="prestige-eyebrow block text-[12px] font-medium uppercase tracking-[.1em] mb-2">
                     Email
                   </label>
                   <input
@@ -94,7 +94,7 @@ export default function ResetPasswordPage() {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-4 py-3 rounded-[12px] border border-[#d2d2d7] text-[17px] focus:outline-none focus:border-[#0071e3] transition-colors"
+                    className="w-full px-4 py-3 rounded-[12px] bg-background border border-border text-foreground text-[17px] placeholder:text-muted-foreground focus:outline-none focus:border-[var(--gold)] transition-colors"
                     placeholder="vous@exemple.com"
                     required
                     autoFocus
@@ -104,7 +104,7 @@ export default function ResetPasswordPage() {
                 <button
                   type="submit"
                   disabled={status === 'loading'}
-                  className="w-full py-3 bg-[#1d1d1f] text-white rounded-full text-[17px] font-medium hover:bg-black transition-colors disabled:opacity-50"
+                  className="w-full py-3 bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] rounded-full text-[17px] font-medium hover:bg-transparent hover:text-[var(--gold)] transition-colors disabled:opacity-50"
                 >
                   {status === 'loading' ? 'Envoi en cours...' : 'Envoyer le lien'}
                 </button>
@@ -112,8 +112,8 @@ export default function ResetPasswordPage() {
             </>
           )}
 
-          <p className="mt-6 text-center text-[14px] text-[#636366]">
-            <Link href="/login" className="text-[#0071e3] hover:underline">
+          <p className="mt-6 text-center text-[14px] text-muted-foreground">
+            <Link href="/login" className="text-[var(--gold)] hover:underline">
               ← Retour à la connexion
             </Link>
           </p>

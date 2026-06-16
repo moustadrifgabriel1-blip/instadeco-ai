@@ -32,7 +32,7 @@ export async function generateMetadata({
       'avant après décoration IA',
     ],
     openGraph: {
-      title: 'Planche déco premium par IA — InstaDeco',
+      title: 'Planche déco premium par IA, InstaDeco',
       description:
         'Un rendu d\'intérieur soigné, prêt à être présenté. Styles haut de gamme, résultat en une trentaine de secondes.',
       type: 'website',
@@ -41,7 +41,7 @@ export async function generateMetadata({
     },
     twitter: {
       card: 'summary_large_image',
-      title: 'InstaDeco — rendu d\'intérieur niveau agence',
+      title: 'InstaDeco, rendu d\'intérieur niveau agence',
       description: 'Planches déco photoréalistes, styles premium, export HD.',
     },
     // Canonical localisé + hreflang (corrige : canonical sans préfixe de locale → 307)

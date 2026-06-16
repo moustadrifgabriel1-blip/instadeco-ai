@@ -109,7 +109,7 @@ interface ArticleData {
   }>;
 }
 
-// Fonction pour récupérer un article — wrappée avec React.cache()
+// Fonction pour récupérer un article, wrappée avec React.cache()
 // pour dédupliquer les appels entre generateMetadata et ArticlePage
 type BlogLocale = 'fr' | 'en' | 'de';
 function toBlogLocale(locale: string): BlogLocale {
@@ -212,7 +212,7 @@ function ArticleContent({ content, slug }: { content: string, slug: string }) {
   // Configuration du renderer Markdown
   const renderer = new marked.Renderer();
   
-  // Gestion personnalisée des images — optimisées via le proxy Next.js
+  // Gestion personnalisée des images, optimisées via le proxy Next.js
   renderer.image = ({ href, title, text }: { href: string; title: string | null; text: string }) => {
     let src = href;
     
@@ -253,7 +253,7 @@ function ArticleContent({ content, slug }: { content: string, slug: string }) {
     const sizesAttr = '(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 800px';
 
     // Fallback en cas d'erreur de chargement
-    const fallbackBg = 'background: linear-gradient(135deg, #fff7ed 0%, #fef3c7 100%)';
+    const fallbackBg = 'background: linear-gradient(135deg, rgba(28,25,23,1) 0%, rgba(200,162,77,0.12) 100%)';
     const onErrorHandler = `this.onerror=null;this.style.cssText='${fallbackBg};min-height:200px;display:flex;align-items:center;justify-content:center';this.alt='Image indisponible';this.removeAttribute('srcset')`;
 
     return `
@@ -262,8 +262,8 @@ function ArticleContent({ content, slug }: { content: string, slug: string }) {
           src="${optimizedSrc}" 
           ${srcset ? `srcset="${srcset}"` : ''}
           ${srcset ? `sizes="${sizesAttr}"` : ''}
-          alt="${safeAlt}" 
-          class="w-full h-auto object-cover min-h-[200px] bg-gradient-to-br from-orange-50 to-amber-50" 
+          alt="${safeAlt}"
+          class="w-full h-auto object-cover min-h-[200px] bg-[rgba(200,162,77,0.08)]"
           loading="lazy"
           decoding="async"
           fetchpriority="low"
@@ -311,61 +311,61 @@ function ArticleContent({ content, slug }: { content: string, slug: string }) {
   return (
     <div
       className="prose prose-lg max-w-none
-        prose-headings:font-bold prose-headings:text-foreground prose-headings:scroll-mt-20
-        prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-6 prose-h2:pb-2 prose-h2:border-b prose-h2:border-border
+        prose-headings:font-bold prose-headings:text-foreground prose-headings:scroll-mt-20 prose-headings:prestige-display
+        prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-6 prose-h2:pb-2 prose-h2:border-b prose-h2:border-[var(--gold-line)]
         prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-4
         prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:mb-6
         prose-strong:text-foreground prose-strong:font-semibold
-        prose-a:text-primary prose-a:font-medium prose-a:no-underline hover:prose-a:underline
+        prose-a:text-[var(--gold)] prose-a:font-medium prose-a:no-underline hover:prose-a:underline
         prose-ul:list-disc prose-ul:pl-6 prose-ul:my-6
         prose-ol:list-decimal prose-ol:pl-6 prose-ol:my-6
         prose-li:text-muted-foreground prose-li:mb-2 prose-li:leading-relaxed
-        prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:pl-6 prose-blockquote:py-4 prose-blockquote:my-8 prose-blockquote:italic prose-blockquote:bg-primary/5 prose-blockquote:rounded-r-lg
+        prose-blockquote:border-l-4 prose-blockquote:border-[var(--gold)] prose-blockquote:pl-6 prose-blockquote:py-4 prose-blockquote:my-8 prose-blockquote:italic prose-blockquote:bg-[rgba(200,162,77,0.08)] prose-blockquote:rounded-r-lg
         prose-figure:my-8
         prose-figcaption:text-center prose-figcaption:text-sm prose-figcaption:text-muted-foreground prose-figcaption:mt-2
         
         [&_.intro-hook]:text-xl [&_.intro-hook]:font-medium [&_.intro-hook]:text-foreground [&_.intro-hook]:leading-relaxed
         
-        [&_.article-toc]:bg-muted/50 [&_.article-toc]:rounded-xl [&_.article-toc]:p-6 [&_.article-toc]:my-8 [&_.article-toc]:border [&_.article-toc]:border-border
+        [&_.article-toc]:bg-card [&_.article-toc]:rounded-xl [&_.article-toc]:p-6 [&_.article-toc]:my-8 [&_.article-toc]:border [&_.article-toc]:border-[var(--gold-line)]
         [&_.article-toc_h2]:text-lg [&_.article-toc_h2]:font-semibold [&_.article-toc_h2]:mb-4 [&_.article-toc_h2]:mt-0 [&_.article-toc_h2]:border-0 [&_.article-toc_h2]:pb-0
         [&_.article-toc_ol]:space-y-2 [&_.article-toc_ol]:mb-0
         [&_.article-toc_li]:text-sm
-        [&_.article-toc_a]:text-primary [&_.article-toc_a]:hover:underline
+        [&_.article-toc_a]:text-[var(--gold)] [&_.article-toc_a]:hover:underline
+
+        [&_.key-takeaway]:bg-[rgba(200,162,77,0.10)] [&_.key-takeaway]:border-l-4 [&_.key-takeaway]:border-[var(--gold)] [&_.key-takeaway]:rounded-r-lg [&_.key-takeaway]:p-4 [&_.key-takeaway]:my-8
+        [&_.key-takeaway_strong]:text-[var(--gold)]
+        [&_.key-takeaway_p]:text-foreground [&_.key-takeaway_p]:mb-0 [&_.key-takeaway_p]:mt-2
+
+        [&_.pro-tip]:bg-card [&_.pro-tip]:border-l-4 [&_.pro-tip]:border-[var(--gold)] [&_.pro-tip]:rounded-r-lg [&_.pro-tip]:p-4 [&_.pro-tip]:my-8
+        [&_.pro-tip_strong]:text-[var(--gold)]
+        [&_.pro-tip_p]:text-foreground [&_.pro-tip_p]:mb-0 [&_.pro-tip_p]:mt-2
+
+        [&_.expert-tip]:bg-card [&_.expert-tip]:border-l-4 [&_.expert-tip]:border-[var(--gold)] [&_.expert-tip]:rounded-r-lg [&_.expert-tip]:p-4 [&_.expert-tip]:my-8 [&_.expert-tip]:italic
+        [&_.expert-tip_p]:text-foreground [&_.expert-tip_p]:mb-0
         
-        [&_.key-takeaway]:bg-amber-50 [&_.key-takeaway]:border-l-4 [&_.key-takeaway]:border-amber-500 [&_.key-takeaway]:rounded-r-lg [&_.key-takeaway]:p-4 [&_.key-takeaway]:my-8
-        [&_.key-takeaway_strong]:text-amber-700
-        [&_.key-takeaway_p]:text-amber-900 [&_.key-takeaway_p]:mb-0 [&_.key-takeaway_p]:mt-2
-        
-        [&_.pro-tip]:bg-blue-50 [&_.pro-tip]:border-l-4 [&_.pro-tip]:border-blue-500 [&_.pro-tip]:rounded-r-lg [&_.pro-tip]:p-4 [&_.pro-tip]:my-8
-        [&_.pro-tip_strong]:text-blue-700
-        [&_.pro-tip_p]:text-blue-900 [&_.pro-tip_p]:mb-0 [&_.pro-tip_p]:mt-2
-        
-        [&_.expert-tip]:bg-purple-50 [&_.expert-tip]:border-l-4 [&_.expert-tip]:border-purple-500 [&_.expert-tip]:rounded-r-lg [&_.expert-tip]:p-4 [&_.expert-tip]:my-8 [&_.expert-tip]:italic
-        [&_.expert-tip_p]:text-purple-900 [&_.expert-tip_p]:mb-0
-        
-        [&_.cta-contextual]:bg-gradient-to-r [&_.cta-contextual]:from-primary/10 [&_.cta-contextual]:to-primary/5 [&_.cta-contextual]:rounded-xl [&_.cta-contextual]:p-6 [&_.cta-contextual]:my-8 [&_.cta-contextual]:text-center [&_.cta-contextual]:border [&_.cta-contextual]:border-primary/20
+        [&_.cta-contextual]:bg-[rgba(200,162,77,0.10)] [&_.cta-contextual]:rounded-xl [&_.cta-contextual]:p-6 [&_.cta-contextual]:my-8 [&_.cta-contextual]:text-center [&_.cta-contextual]:border [&_.cta-contextual]:border-[var(--gold-line)]
         [&_.cta-contextual_p]:text-foreground [&_.cta-contextual_p]:mb-0 [&_.cta-contextual_p]:text-lg
-        [&_.cta-contextual_a]:text-primary [&_.cta-contextual_a]:font-semibold [&_.cta-contextual_a]:underline
+        [&_.cta-contextual_a]:text-[var(--gold)] [&_.cta-contextual_a]:font-semibold [&_.cta-contextual_a]:underline
+
+        [&_.cta-final]:bg-card [&_.cta-final]:rounded-xl [&_.cta-final]:p-8 [&_.cta-final]:my-8 [&_.cta-final]:text-center [&_.cta-final]:border [&_.cta-final]:border-[var(--gold-line)]
+        [&_.cta-final_h3]:text-foreground [&_.cta-final_h3]:text-xl [&_.cta-final_h3]:mb-4 [&_.cta-final_h3]:mt-0 [&_.cta-final_h3]:border-0
+        [&_.cta-final_p]:text-muted-foreground [&_.cta-final_p]:mb-2
+        [&_.cta-final_.cta-button]:inline-block [&_.cta-final_.cta-button]:bg-[var(--gold)] [&_.cta-final_.cta-button]:text-[#0c0a09] [&_.cta-final_.cta-button]:font-bold [&_.cta-final_.cta-button]:px-6 [&_.cta-final_.cta-button]:py-3 [&_.cta-final_.cta-button]:rounded-lg [&_.cta-final_.cta-button]:no-underline [&_.cta-final_.cta-button]:hover:bg-transparent [&_.cta-final_.cta-button]:hover:text-[var(--gold)] [&_.cta-final_.cta-button]:border [&_.cta-final_.cta-button]:border-[var(--gold)] [&_.cta-final_.cta-button]:transition-colors
+        [&_.cta-final_em]:text-muted-foreground [&_.cta-final_em]:text-sm
         
-        [&_.cta-final]:bg-gradient-to-r [&_.cta-final]:from-primary [&_.cta-final]:to-primary/80 [&_.cta-final]:rounded-xl [&_.cta-final]:p-8 [&_.cta-final]:my-8 [&_.cta-final]:text-center
-        [&_.cta-final_h3]:text-primary-foreground [&_.cta-final_h3]:text-xl [&_.cta-final_h3]:mb-4 [&_.cta-final_h3]:mt-0 [&_.cta-final_h3]:border-0
-        [&_.cta-final_p]:text-primary-foreground/90 [&_.cta-final_p]:mb-2
-        [&_.cta-final_.cta-button]:inline-block [&_.cta-final_.cta-button]:bg-white [&_.cta-final_.cta-button]:text-primary [&_.cta-final_.cta-button]:font-bold [&_.cta-final_.cta-button]:px-6 [&_.cta-final_.cta-button]:py-3 [&_.cta-final_.cta-button]:rounded-lg [&_.cta-final_.cta-button]:no-underline [&_.cta-final_.cta-button]:hover:bg-white/90 [&_.cta-final_.cta-button]:transition-colors
-        [&_.cta-final_em]:text-primary-foreground/70 [&_.cta-final_em]:text-sm
-        
-        [&_.faq-section]:bg-muted/30 [&_.faq-section]:rounded-xl [&_.faq-section]:p-6 [&_.faq-section]:my-10 [&_.faq-section]:border [&_.faq-section]:border-border
+        [&_.faq-section]:bg-card [&_.faq-section]:rounded-xl [&_.faq-section]:p-6 [&_.faq-section]:my-10 [&_.faq-section]:border [&_.faq-section]:border-[var(--gold-line)]
         [&_.faq-section>h2]:text-xl [&_.faq-section>h2]:mb-6 [&_.faq-section>h2]:mt-0 [&_.faq-section>h2]:border-0 [&_.faq-section>h2]:pb-0
-        [&_.faq-item]:bg-background [&_.faq-item]:rounded-lg [&_.faq-item]:p-4 [&_.faq-item]:mb-4 [&_.faq-item]:last:mb-0 [&_.faq-item]:border [&_.faq-item]:border-border
+        [&_.faq-item]:bg-background [&_.faq-item]:rounded-lg [&_.faq-item]:p-4 [&_.faq-item]:mb-4 [&_.faq-item]:last:mb-0 [&_.faq-item]:border [&_.faq-item]:border-[var(--gold-line)]
         [&_.faq-item_h3]:text-base [&_.faq-item_h3]:font-semibold [&_.faq-item_h3]:text-foreground [&_.faq-item_h3]:mb-2 [&_.faq-item_h3]:mt-0
         [&_.faq-item_p]:text-muted-foreground [&_.faq-item_p]:mb-0 [&_.faq-item_p]:text-sm [&_.faq-item_p]:leading-relaxed
-        
-        [&_.related-articles]:bg-muted/50 [&_.related-articles]:rounded-xl [&_.related-articles]:p-6 [&_.related-articles]:my-8 [&_.related-articles]:border [&_.related-articles]:border-border
+
+        [&_.related-articles]:bg-card [&_.related-articles]:rounded-xl [&_.related-articles]:p-6 [&_.related-articles]:my-8 [&_.related-articles]:border [&_.related-articles]:border-[var(--gold-line)]
         [&_.related-articles_h3]:text-lg [&_.related-articles_h3]:font-semibold [&_.related-articles_h3]:mb-4 [&_.related-articles_h3]:mt-0
         [&_.related-articles_ul]:space-y-2 [&_.related-articles_ul]:mb-0 [&_.related-articles_ul]:list-none [&_.related-articles_ul]:pl-0
-        [&_.related-articles_li]:pl-0 [&_.related-articles_li]:before:content-['→'] [&_.related-articles_li]:before:mr-2 [&_.related-articles_li]:before:text-primary
-        [&_.related-articles_a]:text-primary [&_.related-articles_a]:hover:underline
-        
-        [&_.conclusion]:mt-10 [&_.conclusion]:pt-6 [&_.conclusion]:border-t [&_.conclusion]:border-border
+        [&_.related-articles_li]:pl-0 [&_.related-articles_li]:before:content-['→'] [&_.related-articles_li]:before:mr-2 [&_.related-articles_li]:before:text-[var(--gold)]
+        [&_.related-articles_a]:text-[var(--gold)] [&_.related-articles_a]:hover:underline
+
+        [&_.conclusion]:mt-10 [&_.conclusion]:pt-6 [&_.conclusion]:border-t [&_.conclusion]:border-[var(--gold-line)]
         [&_.conclusion>h2]:text-2xl
         
         [&_.article-image]:rounded-lg [&_.article-image]:overflow-hidden [&_.article-image]:my-6
@@ -417,7 +417,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           <div className="container mx-auto px-4 pb-12">
             <Link
               href="/blog"
-              className="inline-flex items-center text-sm font-medium text-white/90 hover:text-white mb-6 bg-black/30 backdrop-blur-sm px-4 py-1.5 rounded-full border border-white/10 transition-colors hover:bg-black/40"
+              className="inline-flex items-center text-sm font-medium text-[var(--ivory)]/90 hover:text-[var(--gold)] mb-6 bg-black/40 backdrop-blur-sm px-4 py-1.5 rounded-full border border-[var(--gold-line)] transition-colors hover:bg-black/50"
             >
               <ChevronLeft className="h-4 w-4 mr-1" />
               Retour au blog
@@ -425,31 +425,31 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
             <div className="flex flex-wrap gap-2 mb-6">
               {article.tags.map((tag) => (
-                <Badge key={tag} className="bg-primary/90 hover:bg-primary text-white border-none text-sm px-3 py-1 backdrop-blur-sm shadow-sm">
+                <Badge key={tag} className="prestige-eyebrow bg-[rgba(200,162,77,0.18)] hover:bg-[rgba(200,162,77,0.28)] text-[var(--gold)] border border-[var(--gold-line)] text-sm px-3 py-1 backdrop-blur-sm shadow-sm">
                   {tag}
                 </Badge>
               ))}
             </div>
 
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-tight max-w-4xl tracking-tight [text-shadow:_0_2px_12px_rgb(0_0_0_/_40%),_0_1px_3px_rgb(0_0_0_/_60%)]">
+            <h1 className="prestige-display text-3xl md:text-5xl lg:text-6xl font-extrabold text-[var(--ivory)] mb-6 leading-tight max-w-4xl tracking-tight [text-shadow:_0_2px_12px_rgb(0_0_0_/_55%),_0_1px_3px_rgb(0_0_0_/_70%)]">
               {formatBlogTitle(article.title)}
             </h1>
 
-            <div className="flex flex-wrap items-center gap-6 text-sm md:text-base font-medium text-white/90">
+            <div className="flex flex-wrap items-center gap-6 text-sm md:text-base font-medium text-[var(--ivory)]/90">
                <div className="flex items-center gap-2">
-                 <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-white border border-white/20">
+                 <div className="w-8 h-8 rounded-full bg-[rgba(200,162,77,0.18)] backdrop-blur flex items-center justify-center text-[var(--gold)] border border-[var(--gold-line)]">
                     <User className="w-4 h-4" />
                  </div>
                  <span>InstaDeco Team</span>
                </div>
-               <div className="w-px h-4 bg-white/30 hidden sm:block"></div>
+               <div className="w-px h-4 bg-[var(--gold-line)] hidden sm:block"></div>
                <div className="flex items-center gap-2">
-                <CalendarDays className="h-4 w-4" />
+                <CalendarDays className="h-4 w-4 text-[var(--gold)]" />
                 <time dateTime={article.publishedAt}>{formattedDate}</time>
               </div>
-              <div className="w-px h-4 bg-white/30 hidden sm:block"></div>
+              <div className="w-px h-4 bg-[var(--gold-line)] hidden sm:block"></div>
               <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4" />
+                <Clock className="h-4 w-4 text-[var(--gold)]" />
                 <span>{article.readingTimeMinutes} min de lecture</span>
               </div>
             </div>
@@ -461,7 +461,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           {/* Sidebar Left (Share) - Visible Desktop */}
           <div className="hidden lg:flex lg:col-span-1 flex-col gap-4 mt-20 sticky top-24 h-fit items-center">
-            <div className="text-xs font-semibold text-muted-foreground uppercase tracking-widest py-4 writing-mode-vertical">Partager</div>
+            <div className="prestige-eyebrow text-xs font-semibold text-[var(--gold)] uppercase tracking-widest py-4 writing-mode-vertical">Partager</div>
             <ShareButton 
               title={formatBlogTitle(article.title)} 
               url={``}
@@ -483,17 +483,17 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             <Separator className="my-12" />
 
             {/* CTA Contextuel */}
-            <Card className="bg-primary/5 border-primary/20 overflow-hidden relative isolate">
-              <div className="absolute -right-16 -top-16 w-64 h-64 bg-primary/10 rounded-full blur-3xl -z-10"></div>
+            <Card className="bg-card border border-[var(--gold-line)] overflow-hidden relative isolate">
+              <div className="absolute -right-16 -top-16 w-64 h-64 bg-[var(--gold-soft)] rounded-full blur-3xl -z-10"></div>
               <CardContent className="p-8 sm:p-10 text-center">
-                <h2 className="text-2xl font-bold mb-3 font-serif">
+                <h2 className="prestige-display text-2xl font-bold mb-3">
                   Cet article vous a inspiré ?
                 </h2>
                 <p className="text-muted-foreground mb-8 max-w-xl mx-auto text-lg">
                   Passez de la théorie à la pratique. Testez ces idées de décoration sur vos propres photos avec notre IA.
                 </p>
                 <Link href="/generate">
-                   <Button size="lg" className="rounded-full px-8 text-lg h-12 shadow-lg shadow-primary/25 hover:scale-105 transition-transform">
+                   <Button size="lg" className="rounded-full px-8 text-lg h-12 bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)] shadow-lg shadow-[rgba(200,162,77,0.25)] hover:scale-105 transition-all">
                      Créer ma décoration maintenant
                    </Button>
                 </Link>
@@ -506,26 +506,26 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
              {/* Articles liés */}
              {article.relatedArticles && article.relatedArticles.length > 0 && (
                <div className="space-y-6 sticky top-24">
-                 <h3 className="font-bold text-xl font-serif border-b pb-2">
+                 <h3 className="prestige-display font-bold text-xl border-b border-[var(--gold-line)] pb-2">
                    À lire aussi
                  </h3>
                  <div className="space-y-6">
                    {article.relatedArticles.slice(0, 3).map(related => (
                      <Link key={related.slug} href={`/blog/${related.slug}`} className="group block space-y-3">
-                       <div className="relative aspect-[3/2] rounded-xl overflow-hidden shadow-sm">
-                         <Image 
+                       <div className="relative aspect-[3/2] rounded-xl overflow-hidden shadow-sm border border-[var(--gold-line)]">
+                         <Image
                            src={getBlogImageUrl(related.tags[0] || 'design', related.slug, 400, 300)}
                            alt={related.title}
                            fill
                            className="object-cover group-hover:scale-110 transition-transform duration-700"
                          />
-                         <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors" />
+                         <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors" />
                        </div>
                        <div>
-                         <div className="text-xs text-primary font-medium mb-1 uppercase tracking-wide">
+                         <div className="prestige-eyebrow text-xs text-[var(--gold)] font-medium mb-1 uppercase tracking-wide">
                             {related.tags[0]}
                          </div>
-                         <h4 className="font-bold leading-snug group-hover:text-primary transition-colors">
+                         <h4 className="font-bold leading-snug text-foreground group-hover:text-[var(--gold)] transition-colors">
                            {formatBlogTitle(related.title)}
                          </h4>
                        </div>
@@ -576,7 +576,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         }}
       />
 
-      {/* BreadcrumbList — génère le fil d'ariane dans les SERP Google */}
+      {/* BreadcrumbList : génère le fil d'ariane dans les SERP Google */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{

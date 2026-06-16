@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 
 // ============================================
-// DONNÉES — offre immobilier (Solo / Pro illimité / Agence)
+// DONNÉES : offre immobilier (Solo / Pro illimité / Agence)
 // ============================================
 
 type PlanId = 'solo' | 'pro' | 'agence';
@@ -62,7 +62,7 @@ const PRO_PLANS: ProPlan[] = [
       'Export « pièce vide »',
       'Tous les styles',
       'Support prioritaire',
-      'Sans engagement — annulez en 1 clic',
+      'Sans engagement, annulez en 1 clic',
     ],
     popular: true,
   },
@@ -122,7 +122,7 @@ const USE_CASES = [
   {
     icon: Building2,
     title: 'Agents immobiliers',
-    description: 'Meublez virtuellement vos biens vides. Aidez les acquéreurs à se projeter dans un espace aménagé — et vendez plus vite.',
+    description: 'Meublez virtuellement vos biens vides. Aidez les acquéreurs à se projeter dans un espace aménagé, et vendez plus vite.',
     stat: 'Tous les styles, illimité',
   },
   {
@@ -227,62 +227,63 @@ export default function ProPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       {/* ===== HERO ===== */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#334155] text-white">
+      <section className="relative overflow-hidden bg-[var(--ink)] text-[var(--ivory)]">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDE4YzEuNjU2IDAgMy0xLjM0NCAzLTNzLTEuMzQ0LTMtMy0zLTMgMS4zNDQtMyAzIDEuMzQ0IDMgMyAzem0wIDZjMS42NTYgMCAzLTEuMzQ0IDMtM3MtMS4zNDQtMy0zLTMtMyAxLjM0NC0zIDMgMS4zNDQgMyAzIDN6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-50" />
+        <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-96 w-96 rounded-full bg-[var(--gold-soft)] opacity-20 blur-3xl" />
 
         <div className="relative max-w-6xl mx-auto px-6 py-20 lg:py-28">
           <div className="text-center max-w-4xl mx-auto">
-            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2 mb-8">
-              <Building2 className="w-4 h-4 text-[#E07B54]" />
-              <span className="text-sm font-medium">Solution professionnelle — immobilier</span>
+            <div className="inline-flex items-center gap-2 bg-[rgba(200,162,77,0.12)] backdrop-blur-sm border border-[var(--gold-line)] rounded-full px-4 py-2 mb-8">
+              <Building2 className="w-4 h-4 text-[var(--gold)]" />
+              <span className="prestige-eyebrow !text-[var(--ivory)]">Solution professionnelle, immobilier</span>
             </div>
 
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
+            <h1 className="prestige-display text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
               Vendez vos biens plus vite,
               <br />
-              <span className="text-[#E07B54]">sans dépenser 2 000 € de home staging</span>
+              <span className="text-[var(--gold)]">sans dépenser 2 000 € de home staging</span>
             </h1>
 
-            <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-10 leading-relaxed">
+            <p className="text-lg md:text-xl text-[var(--mist)] max-w-3xl mx-auto mb-10 leading-relaxed">
               Meublez n&apos;importe quelle pièce (vide ou occupée) en 10 secondes par IA.
               Rendu HD prêt pour votre annonce.
-              <strong className="text-white"> Home staging virtuel illimité pour les pros de l&apos;immobilier.</strong>
+              <strong className="text-[var(--ivory)]"> Home staging virtuel illimité pour les pros de l&apos;immobilier.</strong>
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
               <Link
                 href="#plans"
-                className="inline-flex items-center gap-2 bg-[#E07B54] hover:bg-[#D4603C] text-white px-8 py-4 rounded-full text-lg font-semibold transition-all shadow-lg shadow-[#E07B54]/25 hover:shadow-xl"
+                className="inline-flex items-center gap-2 bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)] px-8 py-4 rounded-full text-lg font-semibold transition-all"
               >
                 Voir les tarifs Pro <ArrowRight className="w-5 h-5" />
               </Link>
               <Link
                 href="/generate"
-                className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 text-white px-8 py-4 rounded-full text-lg font-medium transition-all"
+                className="inline-flex items-center gap-2 bg-[rgba(200,162,77,0.10)] hover:bg-[rgba(200,162,77,0.18)] backdrop-blur-sm border border-[var(--gold-line)] text-[var(--ivory)] px-8 py-4 rounded-full text-lg font-medium transition-all"
               >
                 Testez gratuitement sur votre photo
               </Link>
             </div>
 
-            <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-400">
-              <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-400" /> Essai gratuit, sans CB</span>
-              <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-400" /> Sans engagement</span>
-              <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-400" /> Résultat en 10 secondes</span>
+            <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-[var(--mist)]">
+              <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-emerald-400" /> Essai gratuit, sans CB</span>
+              <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-emerald-400" /> Sans engagement</span>
+              <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-emerald-400" /> Résultat en 10 secondes</span>
             </div>
           </div>
         </div>
       </section>
 
       {/* ===== PROBLÈME / SOLUTION ===== */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-card">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Un bien meublé se vend <span className="text-[#E07B54]">jusqu&apos;à 73% plus vite</span>
+            <h2 className="prestige-display text-3xl md:text-4xl font-bold text-foreground mb-4">
+              Un bien meublé se vend <span className="text-[var(--gold)]">jusqu&apos;à 73% plus vite</span>
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               La majorité des acheteurs commencent leur recherche en ligne. Sans mise en scène,
               votre bien passe inaperçu parmi des milliers d&apos;annonces.
             </p>
@@ -294,26 +295,26 @@ export default function ProPage() {
                 key={item.label}
                 className={`rounded-xl p-6 ${
                   item.highlight
-                    ? 'bg-[#E07B54] text-white ring-2 ring-[#E07B54] ring-offset-4 shadow-xl scale-105'
-                    : 'bg-white border border-gray-200'
+                    ? 'bg-[rgba(200,162,77,0.12)] text-foreground ring-2 ring-[var(--gold)] ring-offset-4 ring-offset-background shadow-xl scale-105'
+                    : 'bg-background border border-border'
                 }`}
               >
-                <item.icon className={`w-8 h-8 mb-4 ${item.highlight ? 'text-white' : 'text-gray-400'}`} />
-                <h3 className={`text-lg font-bold mb-3 ${item.highlight ? 'text-white' : 'text-gray-900'}`}>
+                <item.icon className={`w-8 h-8 mb-4 ${item.highlight ? 'text-[var(--gold)]' : 'text-muted-foreground'}`} />
+                <h3 className={`text-lg font-bold mb-3 ${item.highlight ? 'text-[var(--gold)]' : 'text-foreground'}`}>
                   {item.label}
                 </h3>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className={item.highlight ? 'text-white/80' : 'text-gray-500'}>Coût</span>
-                    <span className="font-semibold">{item.price}</span>
+                    <span className="text-muted-foreground">Coût</span>
+                    <span className="font-semibold text-foreground">{item.price}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className={item.highlight ? 'text-white/80' : 'text-gray-500'}>Délai</span>
-                    <span className="font-semibold">{item.time}</span>
+                    <span className="text-muted-foreground">Délai</span>
+                    <span className="font-semibold text-foreground">{item.time}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className={item.highlight ? 'text-white/80' : 'text-gray-500'}>Qualité</span>
-                    <span className="font-semibold text-xs">{item.quality}</span>
+                    <span className="text-muted-foreground">Qualité</span>
+                    <span className="font-semibold text-xs text-foreground">{item.quality}</span>
                   </div>
                 </div>
               </div>
@@ -327,9 +328,9 @@ export default function ProPage() {
               { value: '8', label: 'types de pièces supportés' },
               { value: 'HD+', label: 'jusqu\'à 2048px inclus' },
             ].map((stat) => (
-              <div key={stat.label} className="text-center p-4 bg-white rounded-xl border border-gray-100">
-                <p className="text-3xl font-bold text-[#E07B54]">{stat.value}</p>
-                <p className="text-sm text-gray-600 mt-1">{stat.label}</p>
+              <div key={stat.label} className="text-center p-4 bg-background rounded-xl border border-border">
+                <p className="prestige-display text-3xl font-bold text-[var(--gold)]">{stat.value}</p>
+                <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
               </div>
             ))}
           </div>
@@ -340,25 +341,25 @@ export default function ProPage() {
       <section className="py-20">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="prestige-display text-3xl md:text-4xl font-bold text-foreground mb-4">
               Qui utilise InstaDeco Pro ?
             </h2>
-            <p className="text-lg text-gray-600">
+            <p className="text-lg text-muted-foreground">
               Des professionnels de l&apos;immobilier et du design dans toute la francophonie.
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8">
             {USE_CASES.map((useCase) => (
-              <div key={useCase.title} className="bg-gray-50 rounded-2xl p-8 hover:shadow-lg transition-shadow">
+              <div key={useCase.title} className="bg-card border border-border rounded-2xl p-8 hover:border-[var(--gold-line)] transition-colors">
                 <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 p-3 bg-[#E07B54]/10 rounded-xl">
-                    <useCase.icon className="w-6 h-6 text-[#E07B54]" />
+                  <div className="flex-shrink-0 p-3 bg-[rgba(200,162,77,0.12)] border border-[var(--gold-line)] rounded-xl">
+                    <useCase.icon className="w-6 h-6 text-[var(--gold)]" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">{useCase.title}</h3>
-                    <p className="text-gray-600 mb-3">{useCase.description}</p>
-                    <p className="text-sm font-semibold text-[#E07B54]">{useCase.stat}</p>
+                    <h3 className="prestige-display text-xl font-bold text-foreground mb-2">{useCase.title}</h3>
+                    <p className="text-muted-foreground mb-3">{useCase.description}</p>
+                    <p className="text-sm font-semibold text-[var(--gold)]">{useCase.stat}</p>
                   </div>
                 </div>
               </div>
@@ -368,10 +369,10 @@ export default function ProPage() {
       </section>
 
       {/* ===== COMMENT ÇA MARCHE ===== */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-card">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="prestige-display text-3xl md:text-4xl font-bold text-foreground mb-4">
               3 étapes, 10 secondes
             </h2>
           </div>
@@ -383,12 +384,12 @@ export default function ProPage() {
               { step: 3, icon: Download, title: 'Téléchargez en HD', desc: 'En 10 secondes, obtenez le rendu meublé en haute définition. Prêt pour vos annonces.' },
             ].map((item) => (
               <div key={item.step} className="text-center">
-                <div className="w-16 h-16 rounded-full bg-[#E07B54] text-white text-2xl font-bold flex items-center justify-center mx-auto mb-6">
+                <div className="prestige-display w-16 h-16 rounded-full bg-[var(--gold)] text-[#0c0a09] text-2xl font-bold flex items-center justify-center mx-auto mb-6">
                   {item.step}
                 </div>
-                <item.icon className="w-8 h-8 mx-auto mb-4 text-gray-400" />
-                <h3 className="text-xl font-bold text-gray-900 mb-2">{item.title}</h3>
-                <p className="text-gray-600">{item.desc}</p>
+                <item.icon className="w-8 h-8 mx-auto mb-4 text-[var(--gold)]" />
+                <h3 className="prestige-display text-xl font-bold text-foreground mb-2">{item.title}</h3>
+                <p className="text-muted-foreground">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -399,20 +400,20 @@ export default function ProPage() {
       <section className="py-20">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="prestige-display text-3xl md:text-4xl font-bold text-foreground mb-4">
               Comment les pros utilisent InstaDeco
             </h2>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {PRO_USE_CASES.map((t) => (
-              <div key={t.profile} className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
+              <div key={t.profile} className="bg-card rounded-2xl p-8 border border-border">
                 <div className="text-4xl mb-4">{t.icon}</div>
-                <h3 className="font-semibold text-gray-900 text-lg mb-2">{t.profile}</h3>
-                <p className="text-sm text-[#E07B54] font-medium mb-4">{t.role}</p>
-                <p className="text-gray-700 leading-relaxed mb-4">{t.useCase}</p>
-                <div className="border-t pt-4">
-                  <p className="text-sm font-bold text-[#E07B54]">{t.benefit}</p>
+                <h3 className="prestige-display font-semibold text-foreground text-lg mb-2">{t.profile}</h3>
+                <p className="prestige-eyebrow mb-4">{t.role}</p>
+                <p className="text-muted-foreground leading-relaxed mb-4">{t.useCase}</p>
+                <div className="border-t border-[var(--gold-line)] pt-4">
+                  <p className="text-sm font-bold text-[var(--gold)]">{t.benefit}</p>
                 </div>
               </div>
             ))}
@@ -421,22 +422,22 @@ export default function ProPage() {
       </section>
 
       {/* ===== PLANS PRO ===== */}
-      <section id="plans" className="py-20 bg-gradient-to-b from-gray-50 to-white">
+      <section id="plans" className="py-20 bg-card">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="prestige-display text-3xl md:text-4xl font-bold text-foreground mb-4">
               Choisissez votre plan
             </h2>
-            <p className="text-lg text-gray-600 mb-8">
+            <p className="text-lg text-muted-foreground mb-8">
               Rentabilisé dès le premier bien vendu plus vite.
             </p>
 
             {/* Toggle mensuel/annuel */}
-            <div className="inline-flex items-center bg-gray-100 rounded-full p-1">
+            <div className="inline-flex items-center bg-background border border-border rounded-full p-1">
               <button
                 onClick={() => setBillingPeriod('monthly')}
                 className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
-                  billingPeriod === 'monthly' ? 'bg-white shadow text-gray-900' : 'text-gray-500'
+                  billingPeriod === 'monthly' ? 'bg-[var(--gold)] text-[#0c0a09]' : 'text-muted-foreground'
                 }`}
               >
                 Mensuel
@@ -444,16 +445,16 @@ export default function ProPage() {
               <button
                 onClick={() => setBillingPeriod('annual')}
                 className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
-                  billingPeriod === 'annual' ? 'bg-white shadow text-gray-900' : 'text-gray-500'
+                  billingPeriod === 'annual' ? 'bg-[var(--gold)] text-[#0c0a09]' : 'text-muted-foreground'
                 }`}
               >
-                Annuel <span className="text-[#E07B54] font-bold">−30%</span>
+                Annuel <span className={`font-bold ${billingPeriod === 'annual' ? 'text-[#0c0a09]' : 'text-[var(--gold)]'}`}>−30%</span>
               </button>
             </div>
           </div>
 
           {error && (
-            <div className="max-w-md mx-auto mb-8 text-center bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3">
+            <div className="max-w-md mx-auto mb-8 text-center bg-destructive/10 border border-destructive/30 text-destructive text-sm rounded-xl px-4 py-3">
               {error}
             </div>
           )}
@@ -467,39 +468,39 @@ export default function ProPage() {
                   key={plan.id}
                   className={`rounded-2xl p-8 transition-all ${
                     plan.popular
-                      ? 'bg-[#0f172a] text-white ring-2 ring-[#E07B54] shadow-2xl md:scale-105'
-                      : 'bg-white border border-gray-200'
+                      ? 'bg-[var(--ink)] text-[var(--ivory)] ring-2 ring-[var(--gold)] shadow-2xl md:scale-105'
+                      : 'bg-background border border-border'
                   }`}
                 >
                   {plan.popular ? (
-                    <div className="inline-block bg-[#E07B54] text-white text-xs font-bold px-3 py-1 rounded-full mb-4">
+                    <div className="prestige-eyebrow inline-block bg-[var(--gold)] !text-[#0c0a09] px-3 py-1 rounded-full mb-4">
                       {plan.tagline.toUpperCase()}
                     </div>
                   ) : (
-                    <div className="inline-block bg-gray-100 text-gray-600 text-xs font-bold px-3 py-1 rounded-full mb-4">
+                    <div className="prestige-eyebrow inline-block bg-[rgba(200,162,77,0.12)] border border-[var(--gold-line)] px-3 py-1 rounded-full mb-4">
                       {plan.tagline.toUpperCase()}
                     </div>
                   )}
 
-                  <h3 className={`text-2xl font-bold mb-2 ${plan.popular ? 'text-white' : 'text-gray-900'}`}>
+                  <h3 className={`prestige-display text-2xl font-bold mb-2 ${plan.popular ? 'text-[var(--ivory)]' : 'text-foreground'}`}>
                     {plan.name}
                   </h3>
 
                   <div className="flex items-baseline gap-2 mb-1">
-                    <span className={`text-5xl font-bold ${plan.popular ? 'text-[#E07B54]' : 'text-gray-900'}`}>
+                    <span className={`prestige-display text-5xl font-bold ${plan.popular ? 'text-[var(--gold)]' : 'text-foreground'}`}>
                       {formatPrice(price)}€
                     </span>
-                    <span className={plan.popular ? 'text-gray-400' : 'text-gray-500'}>/mois</span>
+                    <span className={plan.popular ? 'text-[var(--mist)]' : 'text-muted-foreground'}>/mois</span>
                   </div>
-                  <p className={`text-sm mb-6 h-5 ${plan.popular ? 'text-gray-400' : 'text-gray-500'}`}>
+                  <p className={`text-sm mb-6 h-5 ${plan.popular ? 'text-[var(--mist)]' : 'text-muted-foreground'}`}>
                     {billingPeriod === 'annual' ? plan.annualBilled : ' '}
                   </p>
 
                   <ul className="space-y-3 mb-8">
                     {plan.features.map((feature) => (
                       <li key={feature} className="flex items-start gap-3">
-                        <Check className={`w-5 h-5 flex-shrink-0 mt-0.5 ${plan.popular ? 'text-green-400' : 'text-green-500'}`} />
-                        <span className={`text-sm ${plan.popular ? 'text-gray-300' : 'text-gray-600'}`}>{feature}</span>
+                        <Check className="w-5 h-5 flex-shrink-0 mt-0.5 text-emerald-400" />
+                        <span className={`text-sm ${plan.popular ? 'text-[var(--mist)]' : 'text-muted-foreground'}`}>{feature}</span>
                       </li>
                     ))}
                   </ul>
@@ -507,11 +508,7 @@ export default function ProPage() {
                   <button
                     onClick={() => handleSubscribe(plan.id)}
                     disabled={isLoading}
-                    className={`flex items-center justify-center gap-2 w-full text-center py-4 rounded-full text-base font-semibold transition-all disabled:opacity-70 ${
-                      plan.popular
-                        ? 'bg-[#E07B54] hover:bg-[#D4603C] text-white shadow-lg'
-                        : 'bg-gray-900 hover:bg-gray-800 text-white'
-                    }`}
+                    className="flex items-center justify-center gap-2 w-full text-center py-4 rounded-full text-base font-semibold transition-all disabled:opacity-70 bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)]"
                   >
                     {isLoading ? (
                       <><Loader2 className="w-5 h-5 animate-spin" /> Redirection…</>
@@ -526,10 +523,10 @@ export default function ProPage() {
 
           {/* Garantie */}
           <div className="text-center mt-12">
-            <div className="inline-flex items-center gap-3 bg-green-50 border border-green-200 rounded-xl px-6 py-3">
-              <Shield className="w-5 h-5 text-green-600" />
-              <span className="text-sm text-green-800">
-                <strong>Sans engagement</strong> — annulez en 1 clic. Essai gratuit sans carte bancaire.
+            <div className="inline-flex items-center gap-3 bg-[rgba(200,162,77,0.10)] border border-[var(--gold-line)] rounded-xl px-6 py-3">
+              <Shield className="w-5 h-5 text-[var(--gold)]" />
+              <span className="text-sm text-foreground">
+                <strong>Sans engagement.</strong> Annulez en 1 clic. Essai gratuit sans carte bancaire.
               </span>
             </div>
           </div>
@@ -539,26 +536,27 @@ export default function ProPage() {
       {/* ===== CALCULATEUR ROI ===== */}
       <section className="py-20">
         <div className="max-w-4xl mx-auto px-6">
-          <div className="bg-gradient-to-br from-[#0f172a] to-[#1e293b] rounded-3xl p-10 text-white text-center">
-            <Award className="w-12 h-12 text-[#E07B54] mx-auto mb-6" />
-            <h2 className="text-3xl font-bold mb-4">Le calcul est simple</h2>
-            <div className="grid md:grid-cols-3 gap-8 mt-8">
+          <div className="relative overflow-hidden bg-[var(--ink)] border border-[var(--gold-line)] rounded-3xl p-10 text-[var(--ivory)] text-center">
+            <div className="pointer-events-none absolute -top-20 left-1/2 -translate-x-1/2 h-64 w-64 rounded-full bg-[var(--gold-soft)] opacity-15 blur-3xl" />
+            <Award className="relative w-12 h-12 text-[var(--gold)] mx-auto mb-6" />
+            <h2 className="prestige-display relative text-3xl font-bold mb-4">Le calcul est simple</h2>
+            <div className="relative grid md:grid-cols-3 gap-8 mt-8">
               <div>
-                <p className="text-4xl font-bold text-[#E07B54]">49€</p>
-                <p className="text-gray-400 mt-2">par mois, générations illimitées</p>
+                <p className="prestige-display text-4xl font-bold text-[var(--gold)]">49€</p>
+                <p className="text-[var(--mist)] mt-2">par mois, générations illimitées</p>
               </div>
               <div>
-                <p className="text-4xl font-bold text-green-400">1 bien</p>
-                <p className="text-gray-400 mt-2">vendu plus vite suffit à rentabiliser l&apos;année</p>
+                <p className="prestige-display text-4xl font-bold text-emerald-400">1 bien</p>
+                <p className="text-[var(--mist)] mt-2">vendu plus vite suffit à rentabiliser l&apos;année</p>
               </div>
               <div>
-                <p className="text-4xl font-bold text-yellow-400">−95%</p>
-                <p className="text-gray-400 mt-2">vs un home staging physique</p>
+                <p className="prestige-display text-4xl font-bold text-[var(--gold)]">−95%</p>
+                <p className="text-[var(--mist)] mt-2">vs un home staging physique</p>
               </div>
             </div>
             <Link
               href="#plans"
-              className="inline-flex items-center gap-2 bg-[#E07B54] hover:bg-[#D4603C] text-white px-10 py-4 rounded-full text-lg font-semibold mt-10 transition-all shadow-lg"
+              className="relative inline-flex items-center gap-2 bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)] px-10 py-4 rounded-full text-lg font-semibold mt-10 transition-all"
             >
               Démarrer maintenant <ArrowRight className="w-5 h-5" />
             </Link>
@@ -567,24 +565,24 @@ export default function ProPage() {
       </section>
 
       {/* ===== FAQ ===== */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-card">
         <div className="max-w-3xl mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
+          <h2 className="prestige-display text-3xl font-bold text-center text-foreground mb-12">
             Questions fréquentes
           </h2>
 
           <div className="space-y-3">
             {FAQ.map((item, i) => (
-              <div key={i} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+              <div key={i} className="bg-background rounded-xl border border-border overflow-hidden">
                 <button
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
                   className="w-full flex items-center justify-between p-5 text-left"
                 >
-                  <span className="font-medium text-gray-900 pr-4">{item.q}</span>
-                  <ChevronDown className={`w-5 h-5 text-gray-400 flex-shrink-0 transition-transform ${openFaq === i ? 'rotate-180' : ''}`} />
+                  <span className="font-medium text-foreground pr-4">{item.q}</span>
+                  <ChevronDown className={`w-5 h-5 text-[var(--gold)] flex-shrink-0 transition-transform ${openFaq === i ? 'rotate-180' : ''}`} />
                 </button>
                 {openFaq === i && (
-                  <div className="px-5 pb-5 text-gray-600 text-sm leading-relaxed border-t border-gray-100 pt-4">
+                  <div className="px-5 pb-5 text-muted-foreground text-sm leading-relaxed border-t border-[var(--gold-line)] pt-4">
                     {item.a}
                   </div>
                 )}
@@ -595,30 +593,31 @@ export default function ProPage() {
       </section>
 
       {/* ===== CTA FINAL ===== */}
-      <section className="py-20 bg-[#0f172a] text-white text-center">
-        <div className="max-w-3xl mx-auto px-6">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
+      <section className="relative overflow-hidden py-20 bg-[var(--ink)] text-[var(--ivory)] text-center">
+        <div className="pointer-events-none absolute -bottom-24 left-1/2 -translate-x-1/2 h-80 w-80 rounded-full bg-[var(--gold-soft)] opacity-15 blur-3xl" />
+        <div className="relative max-w-3xl mx-auto px-6">
+          <h2 className="prestige-display text-3xl md:text-4xl font-bold mb-6">
             Prêt à vendre plus vite ?
           </h2>
-          <p className="text-lg text-gray-400 mb-10">
+          <p className="text-lg text-[var(--mist)] mb-10">
             Rejoignez les professionnels qui utilisent déjà
             le home staging virtuel par IA pour se démarquer.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href="#plans"
-              className="inline-flex items-center gap-2 bg-[#E07B54] hover:bg-[#D4603C] text-white px-10 py-4 rounded-full text-lg font-semibold transition-all shadow-lg shadow-[#E07B54]/25"
+              className="inline-flex items-center gap-2 bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)] px-10 py-4 rounded-full text-lg font-semibold transition-all"
             >
               Voir les plans <ArrowRight className="w-5 h-5" />
             </Link>
             <a
               href="mailto:contact@instadeco.app?subject=Demande%20offre%20Agence%20sur%20mesure"
-              className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-lg"
+              className="inline-flex items-center gap-2 text-[var(--mist)] hover:text-[var(--gold)] transition-colors text-lg"
             >
               Plus de 3 sièges ? Contactez-nous
             </a>
           </div>
-          <p className="text-sm text-gray-500 mt-6">
+          <p className="text-sm text-[var(--mist)] mt-6">
             Essai gratuit · Sans engagement · Annulez en 1 clic
           </p>
         </div>

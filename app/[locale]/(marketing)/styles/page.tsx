@@ -174,13 +174,14 @@ export default async function StylesIndexPage({ params }: { params: Promise<{ lo
       {/* HERO */}
       <section className="pt-16 pb-12">
         <div className="container px-4 md:px-6 text-center max-w-3xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
-            12 Styles de <span className="text-primary">Décoration Intérieure</span>
+          <p className="prestige-eyebrow text-[var(--gold)] mb-4">Galerie des styles</p>
+          <h1 className="prestige-display text-4xl md:text-5xl font-bold tracking-tight mb-4 text-foreground">
+            12 Styles de <span className="text-[var(--gold)]">Décoration Intérieure</span>
           </h1>
-          <p className="text-lg text-muted-foreground mb-8">
+          <p className="prestige-body text-lg text-muted-foreground mb-8">
             Explorez tous les styles disponibles sur InstaDeco AI. Chaque style peut être appliqué à n&apos;importe quelle pièce en 30 secondes. Trouvez le vôtre et testez-le sur votre photo.
           </p>
-          <Button size="lg" className="rounded-full" asChild>
+          <Button size="lg" className="rounded-full bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)]" asChild>
             <Link href="/quiz">
               <Palette className="w-4 h-4 mr-2" />
               Faire le quiz : mon style idéal
@@ -194,26 +195,26 @@ export default async function StylesIndexPage({ params }: { params: Promise<{ lo
         <div className="container px-4 md:px-6">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {STYLES.map((style) => (
-              <Card key={style.slug} className="group hover:shadow-lg transition-shadow border-border/50">
+              <Card key={style.slug} className="group bg-card border border-border hover:border-[var(--gold-line)] hover:shadow-lg transition-all">
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4">
                     <span className="text-3xl">{style.emoji}</span>
                     <div className="flex-1">
                       <Link href={`/style/${style.slug}`} className="block">
-                        <h2 className="text-xl font-bold group-hover:text-primary transition-colors mb-2">
+                        <h2 className="prestige-display text-xl font-bold text-foreground group-hover:text-[var(--gold)] transition-colors mb-2">
                           Style {style.name}
                         </h2>
                       </Link>
-                      <p className="text-sm text-muted-foreground mb-3">{style.description}</p>
+                      <p className="prestige-body text-sm text-muted-foreground mb-3">{style.description}</p>
                       <div className="flex flex-wrap gap-1 mb-3">
                         {style.keywords.map((kw) => (
-                          <span key={kw} className="text-xs bg-muted px-2 py-0.5 rounded-full">{kw}</span>
+                          <span key={kw} className="text-xs bg-[rgba(200,162,77,0.12)] text-[var(--gold)] border border-[var(--gold-line)] px-2 py-0.5 rounded-full">{kw}</span>
                         ))}
                       </div>
                       <div className="text-xs text-muted-foreground mb-3">
                         Idéal pour : {style.rooms.map((r, i) => (
                           <span key={r}>
-                            <Link href={`/deco/${style.slug}/${r}`} className="hover:text-primary hover:underline">
+                            <Link href={`/deco/${style.slug}/${r}`} className="hover:text-[var(--gold)] hover:underline">
                               {r.replace(/-/g, ' ')}
                             </Link>
                             {i < style.rooms.length - 1 && ', '}
@@ -222,7 +223,7 @@ export default async function StylesIndexPage({ params }: { params: Promise<{ lo
                       </div>
                       <Link
                         href={`/style/${style.slug}`}
-                        className="text-sm text-primary hover:underline inline-flex items-center gap-1"
+                        className="text-sm text-[var(--gold)] hover:underline inline-flex items-center gap-1"
                       >
                         Découvrir le style {style.name} <ArrowRight className="w-3 h-3" />
                       </Link>
@@ -236,35 +237,36 @@ export default async function StylesIndexPage({ params }: { params: Promise<{ lo
       </section>
 
       {/* TEXTE SEO */}
-      <section className="py-16 bg-muted/20 border-t">
-        <div className="container px-4 md:px-6 max-w-3xl mx-auto prose prose-sm">
-          <h2 className="text-2xl font-bold">Comment choisir son style de décoration intérieure ?</h2>
+      <section className="py-16 bg-card border-t border-[var(--gold-line)]">
+        <div className="container px-4 md:px-6 max-w-3xl mx-auto prose prose-sm prose-invert">
+          <h2 className="prestige-display text-2xl font-bold text-foreground">Comment choisir son style de décoration intérieure ?</h2>
           <p>
-            Choisir un style de décoration, c&apos;est donner une identité à votre intérieur. Chaque style reflète une personnalité, un mode de vie et des valeurs esthétiques. Que vous soyez attiré par le <Link href="/style/minimaliste" className="text-primary hover:underline">minimalisme</Link> épuré ou l&apos;exubérance du <Link href="/style/boheme" className="text-primary hover:underline">style bohème</Link>, il existe un style fait pour vous.
+            Choisir un style de décoration, c&apos;est donner une identité à votre intérieur. Chaque style reflète une personnalité, un mode de vie et des valeurs esthétiques. Que vous soyez attiré par le <Link href="/style/minimaliste" className="text-[var(--gold)] hover:underline">minimalisme</Link> épuré ou l&apos;exubérance du <Link href="/style/boheme" className="text-[var(--gold)] hover:underline">style bohème</Link>, il existe un style fait pour vous.
           </p>
           <p>
             Avec InstaDeco AI, vous n&apos;avez plus besoin de vous en remettre à votre imagination. Prenez une photo de votre pièce, sélectionnez un style, et visualisez le résultat en 30 secondes. C&apos;est la meilleure façon de comparer les styles avant de se lancer dans des achats ou des travaux.
           </p>
-          <h3 className="text-lg font-semibold">Les tendances déco en France</h3>
+          <h3 className="prestige-display text-lg font-semibold text-foreground">Les tendances déco en France</h3>
           <p>
-            En France, le <Link href="/style/scandinave" className="text-primary hover:underline">style Scandinave</Link> reste indétrônable pour les petits espaces grâce à sa luminosité. Le <Link href="/style/japandi" className="text-primary hover:underline">Japandi</Link> monte en puissance avec son approche zen et durable. Pour les grands volumes, le <Link href="/style/industriel" className="text-primary hover:underline">style Industriel</Link> et le <Link href="/style/contemporain" className="text-primary hover:underline">Contemporain</Link> continuent de séduire.
+            En France, le <Link href="/style/scandinave" className="text-[var(--gold)] hover:underline">style Scandinave</Link> reste indétrônable pour les petits espaces grâce à sa luminosité. Le <Link href="/style/japandi" className="text-[var(--gold)] hover:underline">Japandi</Link> monte en puissance avec son approche zen et durable. Pour les grands volumes, le <Link href="/style/industriel" className="text-[var(--gold)] hover:underline">style Industriel</Link> et le <Link href="/style/contemporain" className="text-[var(--gold)] hover:underline">Contemporain</Link> continuent de séduire.
           </p>
           <p>
-            Et pour ceux qui veulent aller plus loin, nos <Link href="/solutions" className="text-primary hover:underline">solutions de décoration par IA</Link> couvrent tous les cas d&apos;usage : du <Link href="/solution/home-staging-virtuel" className="text-primary hover:underline">home staging virtuel</Link> à la <Link href="/solution/simulateur-decoration-interieur" className="text-primary hover:underline">simulation de décoration</Link>.
+            Et pour ceux qui veulent aller plus loin, nos <Link href="/solutions" className="text-[var(--gold)] hover:underline">solutions de décoration par IA</Link> couvrent tous les cas d&apos;usage : du <Link href="/solution/home-staging-virtuel" className="text-[var(--gold)] hover:underline">home staging virtuel</Link> à la <Link href="/solution/simulateur-decoration-interieur" className="text-[var(--gold)] hover:underline">simulation de décoration</Link>.
           </p>
         </div>
       </section>
 
       {/* FAQ */}
-      <section className="py-16 border-t">
+      <section className="py-16 border-t border-[var(--gold-line)]">
         <div className="container px-4 md:px-6 max-w-3xl mx-auto">
-          <h2 className="text-2xl font-bold text-center mb-8">Questions fréquentes</h2>
+          <p className="prestige-eyebrow text-[var(--gold)] text-center mb-3">FAQ</p>
+          <h2 className="prestige-display text-2xl font-bold text-foreground text-center mb-8">Questions fréquentes</h2>
           <div className="space-y-4">
             {FAQ.map((item, i) => (
-              <details key={i} className="group border rounded-xl bg-background p-5">
-                <summary className="flex cursor-pointer items-center justify-between font-medium text-sm">
+              <details key={i} className="group border border-border rounded-xl bg-card p-5">
+                <summary className="flex cursor-pointer items-center justify-between font-medium text-sm text-foreground">
                   {item.question}
-                  <ArrowRight className="h-4 w-4 transition-transform group-open:rotate-90 shrink-0 ml-4" />
+                  <ArrowRight className="h-4 w-4 text-[var(--gold)] transition-transform group-open:rotate-90 shrink-0 ml-4" />
                 </summary>
                 <p className="pt-3 text-sm text-muted-foreground">{item.answer}</p>
               </details>
@@ -274,11 +276,12 @@ export default async function StylesIndexPage({ params }: { params: Promise<{ lo
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-primary text-primary-foreground">
+      <section className="py-16 bg-card border-t border-[var(--gold-line)]">
         <div className="container px-4 md:px-6 text-center">
-          <h2 className="text-2xl font-bold mb-4">Prêt à trouver votre style ?</h2>
-          <p className="mb-6 text-primary-foreground/80">Testez n&apos;importe quel style sur votre propre pièce. 3 crédits offerts.</p>
-          <Button size="lg" variant="secondary" className="rounded-full" asChild>
+          <p className="prestige-eyebrow text-[var(--gold)] mb-3">Votre intérieur vous attend</p>
+          <h2 className="prestige-display text-2xl font-bold text-foreground mb-4">Prêt à trouver votre style ?</h2>
+          <p className="prestige-body mb-6 text-muted-foreground">Testez n&apos;importe quel style sur votre propre pièce. 3 crédits offerts.</p>
+          <Button size="lg" className="rounded-full bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)]" asChild>
             <Link href="/generate">
               Essayer maintenant <ArrowRight className="ml-2 w-4 h-4" />
             </Link>

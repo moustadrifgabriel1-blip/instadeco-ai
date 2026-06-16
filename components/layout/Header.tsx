@@ -42,7 +42,8 @@ const NAV_KEYS = [
 
 export function Header() {
   const pathname = usePathname();
-  const prestige = pathname === '/';
+  // Tout le site public est désormais en DA prestige (nuit + or).
+  const prestige = true;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { user, credits, loading } = useAuth();

@@ -83,32 +83,32 @@ export function GalleryClient({ initialItems, initialTotal }: GalleryClientProps
   }, [fetchGallery]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#FFF8F5] via-[#FFFBF9] to-white">
+    <div className="min-h-screen bg-background">
       {/* Hero */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16 text-center">
-        <div className="inline-flex items-center gap-2 bg-[#FFF0EB] text-[#D4603C] px-4 py-2 rounded-full text-sm font-medium mb-6">
+        <div className="prestige-eyebrow inline-flex items-center gap-2 bg-[rgba(200,162,77,0.12)] text-[var(--gold)] px-4 py-2 rounded-full text-sm font-medium mb-6 border border-[var(--gold-line)]">
           <Eye className="w-4 h-4" />
           Galerie communautaire
         </div>
 
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight text-[#2D2D2D] leading-tight mb-4">
-          <span className="bg-gradient-to-r from-[#E07B54] to-[#D4603C] bg-clip-text text-transparent">
+        <h1 className="prestige-display text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight text-foreground leading-tight mb-4">
+          <span className="text-[var(--gold)]">
             {total.toLocaleString('fr-CH')}
           </span>{' '}
           pièces transformées par IA
         </h1>
-        <p className="text-lg text-[#6B6B6B] max-w-2xl mx-auto mb-8">
+        <p className="prestige-body text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
           Découvrez les créations de notre communauté. Chaque transformation a été réalisée par IA en moins de 30 secondes.
         </p>
 
         {/* Filters */}
         <div className="flex flex-wrap justify-center gap-3 mb-8">
           <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-[#636366]" />
+            <Filter className="w-4 h-4 text-muted-foreground" />
             <select
               value={styleFilter}
               onChange={(e) => setStyleFilter(e.target.value)}
-              className="px-3 py-2 rounded-xl border border-[#F0E8E4] text-sm bg-white focus:outline-none focus:border-[#E07B54]"
+              className="px-3 py-2 rounded-xl border border-border text-sm bg-card text-foreground focus:outline-none focus:border-[var(--gold)]"
             >
               <option value="">Tous les styles</option>
               {Object.entries(STYLE_LABELS).map(([key, label]) => (
@@ -119,7 +119,7 @@ export function GalleryClient({ initialItems, initialTotal }: GalleryClientProps
           <select
             value={roomFilter}
             onChange={(e) => setRoomFilter(e.target.value)}
-            className="px-3 py-2 rounded-xl border border-[#F0E8E4] text-sm bg-white focus:outline-none focus:border-[#E07B54]"
+            className="px-3 py-2 rounded-xl border border-border text-sm bg-card text-foreground focus:outline-none focus:border-[var(--gold)]"
           >
             <option value="">Toutes les pièces</option>
             {Object.entries(ROOM_LABELS).map(([key, label]) => (
@@ -134,16 +134,16 @@ export function GalleryClient({ initialItems, initialTotal }: GalleryClientProps
         {loading ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="aspect-[3/2] rounded-2xl bg-[#f5f5f7] animate-pulse" />
+              <div key={i} className="aspect-[3/2] rounded-2xl bg-[var(--stone-900)] animate-pulse" />
             ))}
           </div>
         ) : items.length === 0 ? (
           <div className="text-center py-16">
-            <Sparkles className="w-12 h-12 text-[#E07B54] mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-[#2D2D2D] mb-2">
+            <Sparkles className="w-12 h-12 text-[var(--gold)] mx-auto mb-4" />
+            <h3 className="prestige-display text-lg font-semibold text-foreground mb-2">
               Aucune transformation trouvée
             </h3>
-            <p className="text-[#6B6B6B] mb-6">
+            <p className="prestige-body text-muted-foreground mb-6">
               Soyez le premier à créer une transformation dans ce style !
             </p>
             <Button asChild>
@@ -158,12 +158,12 @@ export function GalleryClient({ initialItems, initialTotal }: GalleryClientProps
             {items.map((item) => (
               <div
                 key={item.id}
-                className="group relative aspect-[3/2] rounded-2xl overflow-hidden cursor-pointer border border-[#F0E8E4] shadow-sm hover:shadow-lg transition-all hover:scale-[1.02]"
+                className="group relative aspect-[3/2] rounded-2xl overflow-hidden cursor-pointer border border-[var(--gold-line)] shadow-sm hover:shadow-lg transition-all hover:scale-[1.02]"
               >
                 {/* Generated image */}
                 <OptimizedRemoteImage
                   src={item.output_image_url}
-                  alt={`${ROOM_LABELS[item.room_type_slug] || item.room_type_slug} style ${STYLE_LABELS[item.style_slug] || item.style_slug} — Décoration IA`}
+                  alt={`${ROOM_LABELS[item.room_type_slug] || item.room_type_slug} style ${STYLE_LABELS[item.style_slug] || item.style_slug}, Décoration IA`}
                   fill
                   sizePreset="gallery"
                   className="object-cover"
@@ -174,7 +174,7 @@ export function GalleryClient({ initialItems, initialTotal }: GalleryClientProps
 
                 {/* Badge IA */}
                 <div className="absolute top-3 left-3">
-                  <span className="px-3 py-1 rounded-full text-xs font-medium bg-[#E07B54]/90 text-white backdrop-blur-sm">
+                  <span className="prestige-eyebrow px-3 py-1 rounded-full text-xs font-medium bg-[var(--gold)]/90 text-[#0c0a09] backdrop-blur-sm">
                     IA ✨
                   </span>
                 </div>
@@ -199,10 +199,10 @@ export function GalleryClient({ initialItems, initialTotal }: GalleryClientProps
                   />
                   <Link
                     href={`/essai`}
-                    className="w-10 h-10 flex items-center justify-center rounded-full bg-[#E07B54]/90 backdrop-blur-md shadow-lg hover:bg-[#E07B54] transition-all duration-200 border border-white/20"
+                    className="w-10 h-10 flex items-center justify-center rounded-full bg-[var(--gold)]/90 backdrop-blur-md shadow-lg hover:bg-[var(--gold)] transition-all duration-200 border border-[var(--gold-line)]"
                     title="Essayer ce style"
                   >
-                    <Sparkles className="w-4 h-4 text-white" />
+                    <Sparkles className="w-4 h-4 text-[#0c0a09]" />
                   </Link>
                 </div>
               </div>
@@ -212,20 +212,20 @@ export function GalleryClient({ initialItems, initialTotal }: GalleryClientProps
 
         {/* CTA */}
         <div className="text-center mt-12">
-          <div className="bg-gradient-to-r from-[#FFF8F5] to-[#FFF0EB] rounded-2xl p-8 border border-[#F5D5C8]">
-            <h3 className="text-xl font-semibold text-[#2D2D2D] mb-2">
+          <div className="bg-card rounded-2xl p-8 border border-[var(--gold-line)]">
+            <h3 className="prestige-display text-xl font-semibold text-foreground mb-2">
               Envie de voir votre pièce transformée ?
             </h3>
-            <p className="text-[#6B6B6B] mb-4">
-              Un décorateur coûte 150 €/h. InstaDeco : <span className="font-bold text-[#E07B54]">0,99 € en 30 secondes</span>.
+            <p className="prestige-body text-muted-foreground mb-4">
+              Un décorateur coûte 150 €/h. InstaDeco : <span className="font-bold text-[var(--gold)]">0,99 € en 30 secondes</span>.
             </p>
-            <Button asChild size="lg" className="rounded-full bg-gradient-to-r from-[#E07B54] to-[#D4603C] hover:shadow-lg hover:shadow-[#E07B54]/30">
+            <Button asChild size="lg" className="rounded-full bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)] hover:shadow-lg hover:shadow-[var(--gold)]/20">
               <Link href="/generate">
                 Transformer ma pièce gratuitement
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Link>
             </Button>
-            <p className="text-xs text-[#636366] mt-3">3 crédits offerts à l&apos;inscription</p>
+            <p className="prestige-body text-xs text-muted-foreground mt-3">3 crédits offerts à l&apos;inscription</p>
           </div>
         </div>
       </div>

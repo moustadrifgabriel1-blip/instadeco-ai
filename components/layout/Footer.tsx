@@ -72,8 +72,8 @@ export function Footer() {
     return null;
   }
 
-  // Variante sombre prestige : home uniquement. Toutes les autres pages gardent le rendu clair actuel.
-  const prestige = pathname === '/';
+  // Tout le site public est désormais en DA prestige (nuit + or).
+  const prestige = true;
 
   return (
     <footer

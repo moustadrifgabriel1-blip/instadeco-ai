@@ -6,7 +6,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const path = '/pro';
 
   return {
-    title: 'InstaDeco Pro — Home Staging Virtuel pour Agents Immobiliers',
+    title: 'InstaDeco Pro, Home Staging Virtuel pour Agents Immobiliers',
     description: 'Transformez vos annonces immobilières avec le home staging virtuel par IA. Générations illimitées + HD pour 49€/mois. Vendez plus vite, à meilleur prix.',
     alternates: {
       canonical: getLocalizedCanonicalUrl(locale, path),
@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       },
     },
     openGraph: {
-      title: 'InstaDeco Pro — Home Staging Virtuel pour Agents Immobiliers',
+      title: 'InstaDeco Pro, Home Staging Virtuel pour Agents Immobiliers',
       description: 'Générations illimitées + qualité HD. Vendez plus vite avec le home staging virtuel par IA.',
       url: getLocalizedCanonicalUrl(locale, path),
       type: 'website',

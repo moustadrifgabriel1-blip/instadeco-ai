@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { cormorant, josefin } from '@/lib/fonts';
 
 export const metadata: Metadata = {
   robots: {
@@ -18,5 +19,9 @@ export default function AuthLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return (
+    <div className={`${cormorant.variable} ${josefin.variable} prestige-app min-h-screen`}>
+      {children}
+    </div>
+  );
 }
