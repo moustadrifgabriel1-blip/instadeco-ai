@@ -13,6 +13,7 @@ export interface Generation {
   readonly prompt: string | null;
   readonly stripeSessionId: string | null;
   readonly providerId?: string; // ID externe (Fal.ai, Replicate...)
+  readonly errorMessage?: string | null; // Cause de l'échec (persistée pour diagnostic)
   readonly createdAt: Date;
   readonly updatedAt: Date;
 }
@@ -53,4 +54,5 @@ export interface UpdateGenerationInput {
   outputImageUrl?: string;
   stripeSessionId?: string;
   providerId?: string;
+  errorMessage?: string | null;
 }

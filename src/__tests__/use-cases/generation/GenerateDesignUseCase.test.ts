@@ -109,7 +109,8 @@ describe('GenerateDesignUseCase', () => {
 
     expect(result.success).toBe(false);
     if (!result.success) expect(result.error).toBeInstanceOf(ImageGenerationError);
-    expect(generationRepo.update).toHaveBeenCalledWith(GENERATION_ID, { status: 'failed' });
+    // La cause d'échec est désormais persistée (diagnostic) en plus du statut.
+    expect(generationRepo.update).toHaveBeenCalledWith(GENERATION_ID, { status: 'failed', errorMessage: 'AI down' });
     // Le crédit déduit est remboursé (montant exact 1)
     expect(creditRepo.addCredits).toHaveBeenCalledWith(
       USER_ID, 1, expect.stringContaining('Remboursement'), undefined, 'refund',

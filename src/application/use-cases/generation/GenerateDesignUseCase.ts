@@ -258,8 +258,10 @@ export class GenerateDesignUseCase {
     });
 
     if (!genResult.success) {
-      // Marquer comme failed
-      await this.generationRepo.update(generation.id, { status: 'failed' });
+      // Marquer comme failed EN PERSISTANT la cause (sinon diagnostic aveugle :
+      // error_message restait NULL → impossible de savoir pourquoi en prod).
+      const failureReason = (genResult.error as Error)?.message?.slice(0, 2000) ?? 'Échec génération IA (cause inconnue)';
+      await this.generationRepo.update(generation.id, { status: 'failed', errorMessage: failureReason });
       
       // 🔴 REMBOURSEMENT — l'utilisateur ne doit JAMAIS perdre un crédit pour une génération ratée
       const refundResult = await this.creditRepo.addCredits(
