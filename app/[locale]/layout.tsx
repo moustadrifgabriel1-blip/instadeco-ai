@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter, Playfair_Display } from 'next/font/google';
+import { cormorant, josefin } from '@/lib/fonts';
 import { notFound } from 'next/navigation';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
@@ -175,7 +176,7 @@ export default async function LocaleLayout({
         />
       </head>
       <body
-        className={`${inter.variable} ${playfair.variable} font-sans min-h-screen bg-background text-foreground antialiased selection:bg-primary/20 overflow-x-hidden`}
+        className={`${inter.variable} ${playfair.variable} ${cormorant.variable} ${josefin.variable} font-sans min-h-screen bg-background text-foreground antialiased selection:bg-primary/20 overflow-x-hidden`}
       >
         <NextIntlClientProvider messages={messages}>
           <div className="min-h-screen flex flex-col">

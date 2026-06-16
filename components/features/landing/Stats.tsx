@@ -70,9 +70,9 @@ export function Stats() {
     locale === 'de' ? 'de-CH' : locale === 'en' ? 'en-US' : 'fr-CH';
 
   return (
-    <section ref={sectionRef} className="py-16 bg-[#2D2D2D]">
+    <section ref={sectionRef} className="py-16 bg-background">
       <div className="container px-4 md:px-6">
-        <p className="text-center text-white/50 text-sm mb-8 tracking-wide uppercase">
+        <p className="prestige-eyebrow text-center mb-8">
           {t('stats.headline')}
         </p>
 
@@ -87,25 +87,25 @@ export function Stats() {
                 }`}
                 style={{ transitionDelay: `${index * 100}ms` }}
               >
-                <div className="inline-flex items-center justify-center h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-[#E07B54]/20 mb-3 sm:mb-4 mx-auto">
-                  <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-[#E07B54]" />
+                <div className="inline-flex items-center justify-center h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-[rgba(200,162,77,0.12)] border border-[var(--gold-line)] mb-3 sm:mb-4 mx-auto">
+                  <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-[var(--gold)]" />
                 </div>
-                <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-1">
+                <div className="prestige-display text-2xl sm:text-3xl md:text-4xl font-semibold text-foreground mb-1">
                   {stat.highlight ? (
                     <>
-                      <span className="text-white/40 text-lg line-through">
+                      <span className="text-muted-foreground/60 text-lg line-through">
                         {animatedValues[index].toLocaleString(numberLocale)}
                       </span>{' '}
-                      <span className="text-[#E07B54]">{deal}</span>
+                      <span className="text-[var(--gold)]">{deal}</span>
                     </>
                   ) : (
                     <>
                       {animatedValues[index].toLocaleString(numberLocale)}
-                      <span className="text-[#E07B54]">{stat.suffix}</span>
+                      <span className="text-[var(--gold)]">{stat.suffix}</span>
                     </>
                   )}
                 </div>
-                <div className="text-sm text-white/60">{stat.label}</div>
+                <div className="text-sm text-muted-foreground">{stat.label}</div>
               </div>
             );
           })}

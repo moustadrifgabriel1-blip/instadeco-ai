@@ -42,6 +42,7 @@ const NAV_KEYS = [
 
 export function Header() {
   const pathname = usePathname();
+  const prestige = pathname === '/';
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { user, credits, loading } = useAuth();
@@ -72,7 +73,9 @@ export function Header() {
       className={cn(
         'sticky top-0 z-50 w-full transition-all duration-300',
         scrolled
-          ? 'bg-[--white]/95 backdrop-blur-md border-b border-[--border-color] shadow-soft'
+          ? prestige
+            ? 'bg-[#0c0a09]/85 backdrop-blur-md border-b border-[rgba(200,162,77,0.28)]'
+            : 'bg-[--white]/95 backdrop-blur-md border-b border-[--border-color] shadow-soft'
           : 'bg-transparent',
       )}
     >
@@ -87,8 +90,21 @@ export function Header() {
               className="h-8 w-8 rounded-lg group-hover:scale-105 transition-transform"
               priority
             />
-            <span className="hidden sm:inline text-[#2D2D2D]">InstaDeco</span>
-            <span className="text-gradient font-extrabold">AI</span>
+            <span
+              className={cn(
+                'hidden sm:inline',
+                prestige ? 'prestige-display text-[#faf8f4]' : 'text-[#2D2D2D]',
+              )}
+            >
+              InstaDeco
+            </span>
+            <span
+              className={cn(
+                prestige ? 'prestige-display text-[#c8a24d]' : 'text-gradient font-extrabold',
+              )}
+            >
+              AI
+            </span>
           </Link>
 
           <nav className="hidden lg:flex items-center gap-0.5">
@@ -98,9 +114,13 @@ export function Header() {
                 href={item.href}
                 className={cn(
                   'px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all duration-200 whitespace-nowrap',
-                  isActive(item.href)
-                    ? 'text-[#E07B54] bg-[#FFE4D9]'
-                    : 'text-[#6B6B6B] hover:text-[#2D2D2D] hover:bg-[#FFF8F5]',
+                  prestige
+                    ? isActive(item.href)
+                      ? 'text-[#c8a24d] bg-[rgba(200,162,77,0.12)]'
+                      : 'text-[rgba(250,248,244,0.62)] hover:text-[#faf8f4] hover:bg-[rgba(250,248,244,0.06)]'
+                    : isActive(item.href)
+                      ? 'text-[#E07B54] bg-[#FFE4D9]'
+                      : 'text-[#6B6B6B] hover:text-[#2D2D2D] hover:bg-[#FFF8F5]',
                 )}
               >
                 {t(item.key)}
@@ -111,15 +131,36 @@ export function Header() {
           <div className="hidden lg:flex items-center gap-2 shrink-0">
             <LanguageSwitcher />
             {loading ? (
-              <div className="h-9 w-24 bg-[#FFF8F5] animate-shimmer rounded-lg" />
+              <div
+                className={cn(
+                  'h-9 w-24 animate-shimmer rounded-lg',
+                  prestige ? 'bg-[#1c1917]' : 'bg-[#FFF8F5]',
+                )}
+              />
             ) : user ? (
               <>
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-[#FFE4D9] rounded-lg text-sm font-medium">
-                  <span className="font-bold text-[#E07B54]">{credits}</span>
-                  <span className="text-[#C95D3A] text-xs">{tCommon('credits')}</span>
+                <div
+                  className={cn(
+                    'flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium',
+                    prestige ? 'bg-[#1c1917]' : 'bg-[#FFE4D9]',
+                  )}
+                >
+                  <span className={cn('font-bold', prestige ? 'text-[#c8a24d]' : 'text-[#E07B54]')}>
+                    {credits}
+                  </span>
+                  <span
+                    className={cn('text-xs', prestige ? 'text-[rgba(250,248,244,0.62)]' : 'text-[#C95D3A]')}
+                  >
+                    {tCommon('credits')}
+                  </span>
                   <Link
                     href="/pricing"
-                    className="ml-1 p-1 rounded bg-white/50 hover:bg-white text-[#E07B54] transition-colors"
+                    className={cn(
+                      'ml-1 p-1 rounded transition-colors',
+                      prestige
+                        ? 'bg-[rgba(200,162,77,0.12)] hover:bg-[rgba(200,162,77,0.24)] text-[#c8a24d]'
+                        : 'bg-white/50 hover:bg-white text-[#E07B54]',
+                    )}
                   >
                     <Plus className="h-3.5 w-3.5" />
                   </Link>
@@ -128,7 +169,12 @@ export function Header() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="gap-2 rounded-lg text-[#2D2D2D] hover:bg-[#FFF8F5] hover:text-[#E07B54]"
+                    className={cn(
+                      'gap-2 rounded-lg',
+                      prestige
+                        ? 'text-[rgba(250,248,244,0.62)] hover:bg-[rgba(250,248,244,0.06)] hover:text-[#c8a24d]'
+                        : 'text-[#2D2D2D] hover:bg-[#FFF8F5] hover:text-[#E07B54]',
+                    )}
                   >
                     <UserIcon className="h-4 w-4" />
                     {t('account')}
@@ -141,13 +187,26 @@ export function Header() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="rounded-lg text-[#2D2D2D] hover:bg-[#FFF8F5] hover:text-[#E07B54]"
+                    className={cn(
+                      'rounded-lg',
+                      prestige
+                        ? 'text-[rgba(250,248,244,0.62)] hover:bg-[rgba(250,248,244,0.06)] hover:text-[#c8a24d]'
+                        : 'text-[#2D2D2D] hover:bg-[#FFF8F5] hover:text-[#E07B54]',
+                    )}
                   >
                     {t('login')}
                   </Button>
                 </Link>
                 <Link href="/essai">
-                  <Button size="sm" className="btn-primary rounded-lg">
+                  <Button
+                    size="sm"
+                    className={cn(
+                      'rounded-lg',
+                      prestige
+                        ? 'bg-[#c8a24d] text-[#0c0a09] hover:bg-[#d4b15f]'
+                        : 'btn-primary',
+                    )}
+                  >
                     {t('freeTrial')}
                   </Button>
                 </Link>
@@ -158,14 +217,17 @@ export function Header() {
           <div className="flex lg:hidden items-center gap-2">
             <LanguageSwitcher />
             <button
-              className="p-2 -mr-2 rounded-lg hover:bg-[#FFF8F5] transition-colors"
+              className={cn(
+                'p-2 -mr-2 rounded-lg transition-colors',
+                prestige ? 'hover:bg-[rgba(250,248,244,0.06)]' : 'hover:bg-[#FFF8F5]',
+              )}
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label={mobileMenuOpen ? t('closeMenu') : t('openMenu')}
             >
               {mobileMenuOpen ? (
-                <X className="h-6 w-6 text-[#2D2D2D]" />
+                <X className={cn('h-6 w-6', prestige ? 'text-[#faf8f4]' : 'text-[#2D2D2D]')} />
               ) : (
-                <Menu className="h-6 w-6 text-[#2D2D2D]" />
+                <Menu className={cn('h-6 w-6', prestige ? 'text-[#faf8f4]' : 'text-[#2D2D2D]')} />
               )}
             </button>
           </div>
@@ -177,16 +239,25 @@ export function Header() {
             mobileMenuOpen ? 'max-h-[560px] opacity-100' : 'max-h-0 opacity-0',
           )}
         >
-          <div className="border-t border-[#F0E6E0] py-4 bg-white">
+          <div
+            className={cn(
+              'border-t py-4',
+              prestige ? 'border-[rgba(200,162,77,0.28)] bg-[#0c0a09]' : 'border-[#F0E6E0] bg-white',
+            )}
+          >
             <nav className="flex flex-col gap-2">
               <Link
                 href="/"
                 onClick={() => setMobileMenuOpen(false)}
                 className={cn(
                   'flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all',
-                  pathname === '/'
-                    ? 'bg-[#FFE4D9] text-[#E07B54]'
-                    : 'text-[#6B6B6B] hover:text-[#2D2D2D] hover:bg-[#FFF8F5]',
+                  prestige
+                    ? pathname === '/'
+                      ? 'bg-[rgba(200,162,77,0.12)] text-[#c8a24d]'
+                      : 'text-[rgba(250,248,244,0.62)] hover:text-[#faf8f4] hover:bg-[rgba(250,248,244,0.06)]'
+                    : pathname === '/'
+                      ? 'bg-[#FFE4D9] text-[#E07B54]'
+                      : 'text-[#6B6B6B] hover:text-[#2D2D2D] hover:bg-[#FFF8F5]',
                 )}
               >
                 <Home className="h-5 w-5" />
@@ -199,24 +270,58 @@ export function Header() {
                   onClick={() => setMobileMenuOpen(false)}
                   className={cn(
                     'flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all',
-                    isActive(item.href)
-                      ? 'bg-[#FFE4D9] text-[#E07B54]'
-                      : 'text-[#6B6B6B] hover:text-[#2D2D2D] hover:bg-[#FFF8F5]',
+                    prestige
+                      ? isActive(item.href)
+                        ? 'bg-[rgba(200,162,77,0.12)] text-[#c8a24d]'
+                        : 'text-[rgba(250,248,244,0.62)] hover:text-[#faf8f4] hover:bg-[rgba(250,248,244,0.06)]'
+                      : isActive(item.href)
+                        ? 'bg-[#FFE4D9] text-[#E07B54]'
+                        : 'text-[#6B6B6B] hover:text-[#2D2D2D] hover:bg-[#FFF8F5]',
                   )}
                 >
                   <item.icon className="h-5 w-5" />
                   {t(item.key)}
                 </Link>
               ))}
-              <div className="border-t border-[#F0E6E0] my-2 pt-4 flex flex-col gap-2 px-4">
+              <div
+                className={cn(
+                  'border-t my-2 pt-4 flex flex-col gap-2 px-4',
+                  prestige ? 'border-[rgba(200,162,77,0.28)]' : 'border-[#F0E6E0]',
+                )}
+              >
                 {user ? (
                   <>
-                    <div className="flex items-center justify-between px-4 py-3 bg-[#FFE4D9] rounded-lg mb-2">
-                      <span className="text-sm text-[#6B6B6B]">{tCommon('creditsAvailable')}</span>
-                      <span className="font-bold text-[#E07B54]">{credits}</span>
+                    <div
+                      className={cn(
+                        'flex items-center justify-between px-4 py-3 rounded-lg mb-2',
+                        prestige ? 'bg-[#1c1917]' : 'bg-[#FFE4D9]',
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          'text-sm',
+                          prestige ? 'text-[rgba(250,248,244,0.62)]' : 'text-[#6B6B6B]',
+                        )}
+                      >
+                        {tCommon('creditsAvailable')}
+                      </span>
+                      <span
+                        className={cn('font-bold', prestige ? 'text-[#c8a24d]' : 'text-[#E07B54]')}
+                      >
+                        {credits}
+                      </span>
                     </div>
                     <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
-                      <Button className="w-full rounded-lg btn-primary">{t('account')}</Button>
+                      <Button
+                        className={cn(
+                          'w-full rounded-lg',
+                          prestige
+                            ? 'bg-[#c8a24d] text-[#0c0a09] hover:bg-[#d4b15f]'
+                            : 'btn-primary',
+                        )}
+                      >
+                        {t('account')}
+                      </Button>
                     </Link>
                   </>
                 ) : (
@@ -224,13 +329,27 @@ export function Header() {
                     <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
                       <Button
                         variant="outline"
-                        className="w-full rounded-lg border-[#F0E6E0] text-[#2D2D2D] hover:bg-[#FFF8F5]"
+                        className={cn(
+                          'w-full rounded-lg',
+                          prestige
+                            ? 'border-[rgba(200,162,77,0.28)] bg-transparent text-[#faf8f4] hover:bg-[rgba(250,248,244,0.06)] hover:text-[#c8a24d]'
+                            : 'border-[#F0E6E0] text-[#2D2D2D] hover:bg-[#FFF8F5]',
+                        )}
                       >
                         {t('login')}
                       </Button>
                     </Link>
                     <Link href="/essai" onClick={() => setMobileMenuOpen(false)}>
-                      <Button className="w-full rounded-lg btn-primary">{t('freeTrial')}</Button>
+                      <Button
+                        className={cn(
+                          'w-full rounded-lg',
+                          prestige
+                            ? 'bg-[#c8a24d] text-[#0c0a09] hover:bg-[#d4b15f]'
+                            : 'btn-primary',
+                        )}
+                      >
+                        {t('freeTrial')}
+                      </Button>
                     </Link>
                   </>
                 )}

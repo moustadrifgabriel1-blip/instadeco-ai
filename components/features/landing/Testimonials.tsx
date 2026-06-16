@@ -55,19 +55,20 @@ export function Testimonials() {
   if (cases.length === 0) return null;
 
   return (
-    <section ref={sectionRef} className="py-20 lg:py-28 bg-white overflow-hidden">
+    <section ref={sectionRef} className="py-20 lg:py-28 bg-background overflow-hidden">
       <div className="container px-4 md:px-6">
         <div
           className={`text-center max-w-2xl mx-auto mb-12 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
         >
-          <div className="badge-primary mx-auto mb-4">
+          <div className="prestige-eyebrow flex items-center justify-center gap-3 mb-4">
             <span>{t('testimonials.badgeEmoji')}</span>
             <span>{t('testimonials.badgeText')}</span>
           </div>
-          <h2 className="text-3xl md:text-4xl font-heading font-bold text-[#2D2D2D] mb-4">
+          <h2 className="prestige-display text-3xl md:text-4xl font-bold text-foreground mb-4">
             {t('testimonials.title')}
           </h2>
-          <p className="text-lg text-[#6B6B6B]">{t('testimonials.subtitle')}</p>
+          <div className="prestige-rule w-24 mx-auto mb-4" aria-hidden />
+          <p className="text-lg text-muted-foreground">{t('testimonials.subtitle')}</p>
         </div>
 
         <div
@@ -76,32 +77,32 @@ export function Testimonials() {
           <button
             type="button"
             onClick={goToPrev}
-            className="absolute left-2 sm:left-0 top-1/2 -translate-y-1/2 sm:-translate-x-4 md:-translate-x-12 z-10 h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-white border border-[#F0E6E0] shadow-soft hidden sm:flex items-center justify-center hover:border-[#E07B54] hover:shadow-warm transition-all"
+            className="absolute left-2 sm:left-0 top-1/2 -translate-y-1/2 sm:-translate-x-4 md:-translate-x-12 z-10 h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-card border border-[var(--gold-line)] hidden sm:flex items-center justify-center hover:border-[var(--gold)] hover:text-[var(--gold)] transition-all"
             aria-label={t('testimonials.prevAria')}
           >
-            <ChevronLeft className="h-5 w-5 text-[#2D2D2D]" />
+            <ChevronLeft className="h-5 w-5 text-foreground" />
           </button>
           <button
             type="button"
             onClick={goToNext}
-            className="absolute right-2 sm:right-0 top-1/2 -translate-y-1/2 sm:translate-x-4 md:translate-x-12 z-10 h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-white border border-[#F0E6E0] shadow-soft hidden sm:flex items-center justify-center hover:border-[#E07B54] hover:shadow-warm transition-all"
+            className="absolute right-2 sm:right-0 top-1/2 -translate-y-1/2 sm:translate-x-4 md:translate-x-12 z-10 h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-card border border-[var(--gold-line)] hidden sm:flex items-center justify-center hover:border-[var(--gold)] hover:text-[var(--gold)] transition-all"
             aria-label={t('testimonials.nextAria')}
           >
-            <ChevronRight className="h-5 w-5 text-[#2D2D2D]" />
+            <ChevronRight className="h-5 w-5 text-foreground" />
           </button>
 
-          <div className="bg-[#FFF8F5] rounded-3xl p-5 sm:p-8 md:p-12 text-center">
+          <div className="bg-card border border-[var(--gold-line)] rounded-3xl p-5 sm:p-8 md:p-12 text-center">
             <div className="mb-6">
               <span className="text-5xl">{cases[currentIndex].icon}</span>
             </div>
 
-            <p className="text-lg md:text-xl text-[#2D2D2D] mb-6 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-lg md:text-xl text-foreground mb-6 max-w-2xl mx-auto leading-relaxed">
               {cases[currentIndex].content}
             </p>
 
             <div>
-              <p className="font-semibold text-[#2D2D2D]">{cases[currentIndex].profile}</p>
-              <p className="text-sm text-[#6B6B6B]">{cases[currentIndex].role}</p>
+              <p className="prestige-display font-semibold text-[var(--gold)]">{cases[currentIndex].profile}</p>
+              <p className="text-sm text-muted-foreground">{cases[currentIndex].role}</p>
             </div>
           </div>
 
@@ -113,8 +114,8 @@ export function Testimonials() {
                 onClick={() => setCurrentIndex(index)}
                 className={`h-2 rounded-full transition-all ${
                   index === currentIndex
-                    ? 'w-8 bg-[#E07B54]'
-                    : 'w-2 bg-[#F0E6E0] hover:bg-[#FFE4D9]'
+                    ? 'w-8 bg-[var(--gold)]'
+                    : 'w-2 bg-[var(--gold-line)] hover:bg-[var(--gold-soft)]'
                 }`}
                 aria-label={t('testimonials.dotAria', { n: index + 1 })}
               />

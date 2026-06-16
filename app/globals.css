@@ -531,6 +531,17 @@ body:has([data-prestige-root]) {
   outline-offset: 4px;
 }
 
+/* Comparateur landing (react-compare-slider) : poignée et ligne en or.
+   La poignée par défaut hérite color: #fff ; les lignes et la flèche
+   utilisent currentColor, donc recolorer la racine suffit. Scopé à la
+   scène landing pour ne toucher aucun autre comparateur. */
+.prestige-ba-stage .__rcs-handle-root {
+  color: var(--gold);
+}
+.prestige-ba-stage .__rcs-handle-arrow {
+  filter: drop-shadow(0 0 6px var(--gold-soft));
+}
+
 /* prefers-reduced-motion : on coupe les entrées, état final immédiat */
 @media (prefers-reduced-motion: reduce) {
   .prestige-anim,

@@ -54,11 +54,11 @@ export function BeforeAfter() {
   return (
     <div className="relative w-full">
       <div className="text-center mb-4">
-        <h3 className="text-lg font-semibold text-[#2D2D2D]">{currentPair.title}</h3>
-        <p className="text-sm text-[#6B6B6B]">{currentPair.description}</p>
+        <h3 className="prestige-display text-xl font-semibold text-foreground">{currentPair.title}</h3>
+        <p className="prestige-body text-sm text-muted-foreground">{currentPair.description}</p>
       </div>
 
-      <div className="relative w-full aspect-[3/4] md:aspect-[4/3] rounded-xl overflow-hidden shadow-2xl border border-white/10">
+      <div className="prestige-ba-stage relative w-full aspect-[3/4] md:aspect-[4/3] rounded-xl overflow-hidden shadow-2xl border border-[var(--gold-line)]">
         <ReactCompareSlider
           itemOne={
             <div className="relative w-full h-full">
@@ -82,10 +82,10 @@ export function BeforeAfter() {
           position={50}
         />
 
-        <div className="absolute bottom-4 left-4 bg-black/60 backdrop-blur-md text-white px-3 py-1.5 rounded-full text-sm font-medium border border-white/20">
+        <div className="prestige-eyebrow absolute bottom-4 left-4 bg-[rgba(12,10,9,0.6)] backdrop-blur-md text-[var(--ivory)] px-3 py-1.5 rounded-full border border-[var(--gold-line)]">
           {t('beforeAfter.before')}
         </div>
-        <div className="absolute bottom-4 right-4 bg-gradient-to-r from-purple-600 to-blue-500 backdrop-blur-md text-white px-3 py-1.5 rounded-full text-sm font-medium border border-white/20">
+        <div className="prestige-eyebrow absolute bottom-4 right-4 bg-[var(--gold)] backdrop-blur-md text-[#0c0a09] px-3 py-1.5 rounded-full border border-[var(--gold)]">
           {t('beforeAfter.after')}
         </div>
 
@@ -94,7 +94,7 @@ export function BeforeAfter() {
             <button
               type="button"
               onClick={goToPrevious}
-              className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-black/70 transition-colors border border-white/20"
+              className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-[rgba(12,10,9,0.5)] backdrop-blur-md rounded-full flex items-center justify-center text-[var(--ivory)] hover:text-[var(--gold)] hover:bg-[rgba(12,10,9,0.72)] transition-colors border border-[var(--gold-line)]"
               aria-label={t('beforeAfter.prevAria')}
             >
               <ChevronLeft className="w-5 h-5" />
@@ -102,7 +102,7 @@ export function BeforeAfter() {
             <button
               type="button"
               onClick={goToNext}
-              className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-black/70 transition-colors border border-white/20"
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-[rgba(12,10,9,0.5)] backdrop-blur-md rounded-full flex items-center justify-center text-[var(--ivory)] hover:text-[var(--gold)] hover:bg-[rgba(12,10,9,0.72)] transition-colors border border-[var(--gold-line)]"
               aria-label={t('beforeAfter.nextAria')}
             >
               <ChevronRight className="w-5 h-5" />
@@ -115,7 +115,7 @@ export function BeforeAfter() {
                   key={index}
                   onClick={() => setCurrentIndex(index)}
                   className={`w-2 h-2 rounded-full transition-colors ${
-                    index === currentIndex ? 'bg-white' : 'bg-white/40'
+                    index === currentIndex ? 'bg-[var(--gold)]' : 'bg-[var(--gold-line)]'
                   }`}
                   aria-label={t('beforeAfter.dotAria', { n: index + 1 })}
                 />

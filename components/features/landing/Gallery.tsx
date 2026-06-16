@@ -37,7 +37,7 @@ function GalleryCard({
 
   return (
     <div
-      className={`group relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-500 ${
+      className={`group relative rounded-2xl overflow-hidden cursor-pointer border border-[var(--gold-line)] bg-card transition-all duration-500 hover:border-[var(--gold)] hover:shadow-[0_0_24px_2px_var(--gold-soft)] ${
         isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
       }`}
       style={{ transitionDelay: `${index * 100}ms` }}
@@ -60,12 +60,14 @@ function GalleryCard({
           className={`object-cover transition-opacity duration-500 ${showAfter ? 'opacity-100' : 'opacity-0'}`}
         />
 
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0c0a09]/70 via-transparent to-transparent" />
 
         <div className="absolute top-3 left-3">
           <span
-            className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
-              showAfter ? 'bg-[#E07B54] text-white' : 'bg-white/90 text-[#2D2D2D]'
+            className={`prestige-eyebrow px-3 py-1 rounded-full text-xs transition-all ${
+              showAfter
+                ? 'bg-[var(--gold)] text-[#0c0a09]'
+                : 'bg-[var(--stone-900)]/90 text-[var(--ivory)] border border-[var(--gold-line)]'
             }`}
           >
             {showAfter ? afterLabel : beforeLabel}
@@ -73,8 +75,8 @@ function GalleryCard({
         </div>
 
         <div className="absolute bottom-3 left-3 right-3">
-          <p className="text-white font-medium">{roomName}</p>
-          <p className="text-white/80 text-sm">{styleLine}</p>
+          <p className="prestige-display text-[var(--ivory)] font-medium">{roomName}</p>
+          <p className="prestige-body text-[var(--ivory)]/80 text-sm">{styleLine}</p>
         </div>
       </div>
     </div>
@@ -107,17 +109,18 @@ export function Gallery() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-20 lg:py-28 bg-[#FFF8F5]">
+    <section ref={sectionRef} className="py-20 lg:py-28 bg-background">
       <div className="container px-4 md:px-6">
         <div
           className={`text-center max-w-2xl mx-auto mb-12 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
         >
-          <div className="badge-primary mx-auto mb-4">
+          <div className="prestige-eyebrow mx-auto mb-4 flex items-center justify-center gap-2">
             <span>{t('gallery.badgeEmoji')}</span>
             <span>{t('gallery.badgeText')}</span>
           </div>
-          <h2 className="text-3xl md:text-4xl font-heading font-bold text-[#2D2D2D] mb-4">{t('gallery.title')}</h2>
-          <p className="text-lg text-[#6B6B6B]">{t('gallery.subtitle')}</p>
+          <h2 className="prestige-display text-3xl md:text-4xl font-bold text-foreground mb-4">{t('gallery.title')}</h2>
+          <div className="prestige-rule w-24 mx-auto mb-4" />
+          <p className="prestige-body text-lg text-muted-foreground">{t('gallery.subtitle')}</p>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -31,12 +31,12 @@ export function Hero() {
   }, [styleKeys.length]);
 
   return (
-    <section className="relative min-h-[90vh] flex items-center overflow-hidden gradient-hero">
+    <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-background">
       <div
-        className={`absolute top-20 left-[10%] w-72 h-72 rounded-full bg-[#FFE4D9] opacity-40 blur-3xl ${reduceMotion ? '' : 'animate-float'}`}
+        className={`absolute top-20 left-[10%] w-72 h-72 rounded-full bg-[var(--gold-soft)] opacity-[0.08] blur-3xl ${reduceMotion ? '' : 'animate-float'}`}
       />
       <div
-        className={`absolute bottom-20 right-[15%] w-64 h-64 rounded-full bg-[#FFE4D9] opacity-30 blur-3xl ${reduceMotion ? '' : 'animate-float'}`}
+        className={`absolute bottom-20 right-[15%] w-64 h-64 rounded-full bg-[var(--gold-soft)] opacity-[0.06] blur-3xl ${reduceMotion ? '' : 'animate-float'}`}
         style={reduceMotion ? undefined : { animationDelay: '2s' }}
       />
 
@@ -48,16 +48,19 @@ export function Hero() {
             initial="hidden"
             animate="visible"
           >
-            <motion.div variants={staggerItem} className="badge-primary w-fit">
-              <Sparkles className="h-4 w-4" />
-              <span>{t('badge')}</span>
+            <motion.div
+              variants={staggerItem}
+              className="w-fit inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[rgba(200,162,77,0.12)] border border-[var(--gold-line)]"
+            >
+              <Sparkles className="h-4 w-4 text-[var(--gold)]" />
+              <span className="prestige-eyebrow">{t('badge')}</span>
             </motion.div>
 
             {/* LCP : peint immédiatement (pas d'enter fade-in) pour ne pas retarder le Largest Contentful Paint. */}
             <div className="space-y-2">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold tracking-tight text-[#2D2D2D] leading-[1.1]">
+              <h1 className="prestige-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-[1.1]">
                 <span className="block">{t('titleLine1')}</span>
-                <span className="block mt-2 text-[#C95D3A] italic inline-grid overflow-visible px-2 min-h-[1.15em]">
+                <span className="block mt-2 text-[var(--gold)] italic inline-grid overflow-visible px-2 min-h-[1.15em]">
                   {styleKeys.map((key, index) => (
                     <span
                       key={key}
@@ -74,7 +77,7 @@ export function Hero() {
 
             <motion.p
               variants={staggerItem}
-              className="text-lg md:text-xl text-[#6B6B6B] max-w-xl leading-relaxed"
+              className="prestige-body text-lg md:text-xl text-muted-foreground max-w-xl leading-relaxed"
             >
               {t('description')}
             </motion.p>
@@ -82,7 +85,7 @@ export function Hero() {
             <motion.div variants={staggerItem} className="flex flex-col sm:flex-row gap-4">
               <Button
                 size="lg"
-                className="group h-12 px-6 text-base sm:h-14 sm:px-8 sm:text-lg rounded-xl btn-primary"
+                className="group h-12 px-6 text-base sm:h-14 sm:px-8 sm:text-lg rounded-xl bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] font-medium transition-colors hover:bg-transparent hover:text-[var(--gold)]"
                 asChild
               >
                 <Link href="/essai" className="flex items-center gap-2">
@@ -102,23 +105,23 @@ export function Hero() {
                       alt={t('avatarAlt', { n: i })}
                       width={40}
                       height={40}
-                      className="h-10 w-10 rounded-full border-2 border-white object-cover shadow-soft"
+                      className="h-10 w-10 rounded-full border-2 border-[var(--gold-line)] object-cover shadow-soft"
                     />
                   ))}
                 </div>
-                <div className="text-sm">
-                  <p className="font-semibold text-[#2D2D2D]">{t('photosCount')}</p>
-                  <p className="text-[#6B6B6B]">{t('photosSub')}</p>
+                <div className="text-sm prestige-body">
+                  <p className="font-semibold text-foreground">{t('photosCount')}</p>
+                  <p className="text-muted-foreground">{t('photosSub')}</p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-[#F0E6E0]">
+              <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-card border border-[var(--gold-line)]">
                 <div className="flex">
                   {[1, 2, 3, 4, 5].map((i) => (
-                    <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
+                    <Star key={i} className="h-4 w-4 fill-[var(--gold)] text-[var(--gold)]" />
                   ))}
                 </div>
-                <span className="text-sm font-medium text-[#2D2D2D]">{t('ratingLabel')}</span>
+                <span className="prestige-body text-sm font-medium text-foreground">{t('ratingLabel')}</span>
               </div>
             </motion.div>
           </motion.div>
@@ -129,21 +132,21 @@ export function Hero() {
             animate={visualEnter.animate}
             transition={visualEnter.transition}
           >
-            <div className="relative rounded-2xl overflow-hidden shadow-warm-lg border border-[#F0E6E0]">
+            <div className="relative rounded-2xl overflow-hidden border border-[var(--gold-line)] shadow-[0_8px_40px_rgba(0,0,0,0.45)]">
               <BeforeAfter />
             </div>
 
             <div
-              className={`absolute -bottom-2 -left-2 sm:-bottom-4 sm:-left-4 glass rounded-xl px-3 py-2 sm:px-4 sm:py-3 shadow-warm hidden sm:flex ${reduceMotion ? '' : 'animate-float'}`}
+              className={`absolute -bottom-2 -left-2 sm:-bottom-4 sm:-left-4 rounded-xl px-3 py-2 sm:px-4 sm:py-3 bg-card/90 backdrop-blur-md border border-[var(--gold-line)] shadow-[0_8px_32px_rgba(0,0,0,0.4)] hidden sm:flex ${reduceMotion ? '' : 'animate-float'}`}
               style={reduceMotion ? undefined : { animationDelay: '0.5s' }}
             >
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-lg bg-[#E07B54] flex items-center justify-center">
-                  <Sparkles className="h-5 w-5 text-white" />
+                <div className="h-10 w-10 rounded-lg bg-[rgba(200,162,77,0.12)] border border-[var(--gold-line)] flex items-center justify-center">
+                  <Sparkles className="h-5 w-5 text-[var(--gold)]" />
                 </div>
-                <div>
-                  <p className="font-semibold text-[#2D2D2D] text-sm">{t('floatTitle')}</p>
-                  <p className="text-xs text-[#6B6B6B]">{t('floatSubtitle')}</p>
+                <div className="prestige-body">
+                  <p className="font-semibold text-foreground text-sm">{t('floatTitle')}</p>
+                  <p className="text-xs text-muted-foreground">{t('floatSubtitle')}</p>
                 </div>
               </div>
             </div>

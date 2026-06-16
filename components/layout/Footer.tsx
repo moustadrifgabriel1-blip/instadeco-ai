@@ -72,8 +72,17 @@ export function Footer() {
     return null;
   }
 
+  // Variante sombre prestige : home uniquement. Toutes les autres pages gardent le rendu clair actuel.
+  const prestige = pathname === '/';
+
   return (
-    <footer className="border-t border-[#F0E6E0] bg-[#FFF8F5]">
+    <footer
+      className={
+        prestige
+          ? 'border-t border-[rgba(200,162,77,0.28)] bg-[#0c0a09]'
+          : 'border-t border-[#F0E6E0] bg-[#FFF8F5]'
+      }
+    >
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-8 gap-6 lg:gap-8 mb-12">
           <div className="col-span-2 sm:col-span-3 lg:col-span-2">
@@ -85,20 +94,29 @@ export function Footer() {
                 height={36}
                 className="h-9 w-9 rounded-lg group-hover:scale-105 transition-transform"
               />
-              <span className="text-[#2D2D2D]">InstaDeco</span>
-              <span className="text-gradient font-extrabold">AI</span>
+              {prestige ? (
+                <>
+                  <span className="prestige-display text-[#faf8f4]">InstaDeco</span>
+                  <span className="prestige-display text-[#c8a24d] font-extrabold">AI</span>
+                </>
+              ) : (
+                <>
+                  <span className="text-[#2D2D2D]">InstaDeco</span>
+                  <span className="text-gradient font-extrabold">AI</span>
+                </>
+              )}
             </Link>
-            <p className="text-sm text-[#6B6B6B] mb-4">{t('tagline')}</p>
+            <p className={prestige ? 'text-sm text-[rgba(250,248,244,0.62)] mb-4' : 'text-sm text-[#6B6B6B] mb-4'}>{t('tagline')}</p>
           </div>
 
           <div>
-            <h3 className="font-semibold mb-4 text-[#2D2D2D]">{t('productTitle')}</h3>
+            <h3 className={prestige ? 'prestige-display font-semibold mb-4 text-[#faf8f4]' : 'font-semibold mb-4 text-[#2D2D2D]'}>{t('productTitle')}</h3>
             <ul className="space-y-3">
               {PRODUCT_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-[#6B6B6B] hover:text-[#E07B54] transition-colors"
+                    className={prestige ? 'text-sm text-[rgba(250,248,244,0.62)] hover:text-[#c8a24d] transition-colors' : 'text-sm text-[#6B6B6B] hover:text-[#E07B54] transition-colors'}
                   >
                     {t(`links.${link.key}`)}
                   </Link>
@@ -108,13 +126,13 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="font-semibold mb-4 text-[#2D2D2D]">{t('cityTitle')}</h3>
+            <h3 className={prestige ? 'prestige-display font-semibold mb-4 text-[#faf8f4]' : 'font-semibold mb-4 text-[#2D2D2D]'}>{t('cityTitle')}</h3>
             <ul className="space-y-3">
               {SERVICE_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-[#6B6B6B] hover:text-[#E07B54] transition-colors"
+                    className={prestige ? 'text-sm text-[rgba(250,248,244,0.62)] hover:text-[#c8a24d] transition-colors' : 'text-sm text-[#6B6B6B] hover:text-[#E07B54] transition-colors'}
                   >
                     {t(`links.${link.key}`)}
                   </Link>
@@ -124,13 +142,13 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="font-semibold mb-4 text-[#2D2D2D]">{t('stylesTitle')}</h3>
+            <h3 className={prestige ? 'prestige-display font-semibold mb-4 text-[#faf8f4]' : 'font-semibold mb-4 text-[#2D2D2D]'}>{t('stylesTitle')}</h3>
             <ul className="space-y-3">
               {STYLE_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-[#6B6B6B] hover:text-[#E07B54] transition-colors"
+                    className={prestige ? 'text-sm text-[rgba(250,248,244,0.62)] hover:text-[#c8a24d] transition-colors' : 'text-sm text-[#6B6B6B] hover:text-[#E07B54] transition-colors'}
                   >
                     {t(`links.${link.key}`)}
                   </Link>
@@ -139,7 +157,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/styles"
-                  className="text-sm text-[#E07B54] hover:underline font-medium"
+                  className={prestige ? 'text-sm text-[#c8a24d] hover:underline font-medium' : 'text-sm text-[#E07B54] hover:underline font-medium'}
                 >
                   → {t('hubAllStyles')}
                 </Link>
@@ -148,13 +166,13 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="font-semibold mb-4 text-[#2D2D2D]">{t('solutionsTitle')}</h3>
+            <h3 className={prestige ? 'prestige-display font-semibold mb-4 text-[#faf8f4]' : 'font-semibold mb-4 text-[#2D2D2D]'}>{t('solutionsTitle')}</h3>
             <ul className="space-y-3">
               {SOLUTION_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-[#6B6B6B] hover:text-[#E07B54] transition-colors"
+                    className={prestige ? 'text-sm text-[rgba(250,248,244,0.62)] hover:text-[#c8a24d] transition-colors' : 'text-sm text-[#6B6B6B] hover:text-[#E07B54] transition-colors'}
                   >
                     {t(`links.${link.key}`)}
                   </Link>
@@ -164,7 +182,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-[#E07B54] hover:underline font-medium"
+                    className={prestige ? 'text-sm text-[#c8a24d] hover:underline font-medium' : 'text-sm text-[#E07B54] hover:underline font-medium'}
                   >
                     → {t(link.labelKey)}
                   </Link>
@@ -174,13 +192,13 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="font-semibold mb-4 text-[#2D2D2D]">{t('legalTitle')}</h3>
+            <h3 className={prestige ? 'prestige-display font-semibold mb-4 text-[#faf8f4]' : 'font-semibold mb-4 text-[#2D2D2D]'}>{t('legalTitle')}</h3>
             <ul className="space-y-3">
               {LEGAL_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-[#6B6B6B] hover:text-[#E07B54] transition-colors"
+                    className={prestige ? 'text-sm text-[rgba(250,248,244,0.62)] hover:text-[#c8a24d] transition-colors' : 'text-sm text-[#6B6B6B] hover:text-[#E07B54] transition-colors'}
                   >
                     {t(`links.${link.key}`)}
                   </Link>
@@ -190,7 +208,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="font-semibold mb-4 text-[#2D2D2D]">{t('followTitle')}</h3>
+            <h3 className={prestige ? 'prestige-display font-semibold mb-4 text-[#faf8f4]' : 'font-semibold mb-4 text-[#2D2D2D]'}>{t('followTitle')}</h3>
             <ul className="space-y-3">
               {SOCIAL_LINKS.map((link) => (
                 <li key={link.href}>
@@ -198,7 +216,7 @@ export function Footer() {
                     href={link.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-[#6B6B6B] hover:text-[#E07B54] transition-colors"
+                    className={prestige ? 'text-sm text-[rgba(250,248,244,0.62)] hover:text-[#c8a24d] transition-colors' : 'text-sm text-[#6B6B6B] hover:text-[#E07B54] transition-colors'}
                   >
                     {t(`links.${link.key}`)}
                   </a>
@@ -208,8 +226,8 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-[#F0E6E0] pt-6 mb-6">
-          <p className="text-xs text-[#9B9B9B] mb-3">{t('citySeoLine')}</p>
+        <div className={prestige ? 'border-t border-[rgba(200,162,77,0.28)] pt-6 mb-6' : 'border-t border-[#F0E6E0] pt-6 mb-6'}>
+          <p className={prestige ? 'text-xs text-[rgba(250,248,244,0.62)] mb-3' : 'text-xs text-[#9B9B9B] mb-3'}>{t('citySeoLine')}</p>
           <div className="flex flex-wrap gap-x-3 gap-y-1">
             {[
               'marseille',
@@ -234,7 +252,7 @@ export function Footer() {
               <Link
                 key={city}
                 href={`/architecte-interieur/${city}`}
-                className="text-xs text-[#9B9B9B] hover:text-[#E07B54] transition-colors capitalize"
+                className={prestige ? 'text-xs text-[rgba(250,248,244,0.62)] hover:text-[#c8a24d] transition-colors capitalize' : 'text-xs text-[#9B9B9B] hover:text-[#E07B54] transition-colors capitalize'}
               >
                 {city.replace(/-/g, ' ')}
               </Link>
@@ -242,9 +260,9 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-[#F0E6E0] pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-[#6B6B6B]">
+        <div className={prestige ? 'border-t border-[rgba(200,162,77,0.28)] pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-[rgba(250,248,244,0.62)]' : 'border-t border-[#F0E6E0] pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-[#6B6B6B]'}>
           <p className="flex items-center gap-1 flex-wrap justify-center">
-            {t('copyright', { year: currentYear })} <Heart className="h-4 w-4 text-[#E07B54] fill-current" />{' '}
+            {t('copyright', { year: currentYear })} <Heart className={prestige ? 'h-4 w-4 text-[#c8a24d] fill-current' : 'h-4 w-4 text-[#E07B54] fill-current'} />{' '}
             {t('copyrightEnd')}
           </p>
         </div>

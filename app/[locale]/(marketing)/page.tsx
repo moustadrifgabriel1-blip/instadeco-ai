@@ -81,7 +81,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const faqData = t.raw('faq') as { question: string; answer: string }[];
 
   return (
-    <main className="min-h-screen">
+    <main className="prestige-app min-h-screen">
       <JsonLd data={[generateFAQSchema(faqData)]} />
 
       <Hero />
@@ -94,7 +94,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
       <section className="py-16 bg-muted/20 border-t">
         <div className="container px-4 md:px-6">
-          <h2 className="text-2xl font-bold text-center mb-2">{t('stylesSectionTitle')}</h2>
+          <h2 className="prestige-display text-2xl font-bold text-center mb-2">{t('stylesSectionTitle')}</h2>
           <p className="text-muted-foreground text-center mb-10 max-w-2xl mx-auto">
             {t('stylesSectionSubtitle')}
           </p>
@@ -121,7 +121,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
       <section className="py-16 border-t">
         <div className="container px-4 md:px-6">
-          <h2 className="text-2xl font-bold text-center mb-2">{t('roomsSectionTitle')}</h2>
+          <h2 className="prestige-display text-2xl font-bold text-center mb-2">{t('roomsSectionTitle')}</h2>
           <p className="text-muted-foreground text-center mb-10 max-w-2xl mx-auto">
             {t('roomsSectionSubtitle')}
           </p>
@@ -147,7 +147,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
       <section className="py-16 bg-muted/20 border-t">
         <div className="container px-4 md:px-6">
-          <h2 className="text-2xl font-bold text-center mb-2">{t('solutionsSectionTitle')}</h2>
+          <h2 className="prestige-display text-2xl font-bold text-center mb-2">{t('solutionsSectionTitle')}</h2>
           <p className="text-muted-foreground text-center mb-10 max-w-2xl mx-auto">
             {t('solutionsSectionSubtitle')}
           </p>
@@ -186,7 +186,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
       <section className="py-16 border-t">
         <div className="container px-4 md:px-6 max-w-3xl mx-auto">
-          <h2 className="text-2xl font-bold text-center mb-10">{t('faqSectionTitle')}</h2>
+          <h2 className="prestige-display text-2xl font-bold text-center mb-10">{t('faqSectionTitle')}</h2>
           <div className="space-y-4">
             {faqData.map((item, i) => (
               <details key={i} className="group border rounded-xl bg-background p-5">
@@ -203,7 +203,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
       <section className="py-12 border-t bg-muted/10">
         <div className="container px-4 md:px-6 text-center">
-          <h2 className="text-xl font-bold mb-3">{t('blogSectionTitle')}</h2>
+          <h2 className="prestige-display text-xl font-bold mb-3">{t('blogSectionTitle')}</h2>
           <p className="text-sm text-muted-foreground mb-4 max-w-xl mx-auto">{t('blogSectionSubtitle')}</p>
           <Link href="/blog" className="text-sm text-primary hover:underline inline-flex items-center gap-1">
             {t('readArticles')} <ArrowRight className="w-3 h-3" />

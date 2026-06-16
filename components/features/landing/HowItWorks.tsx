@@ -33,22 +33,22 @@ export function HowItWorks() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-20 lg:py-28 bg-white relative overflow-hidden">
-      <div className="absolute top-20 right-[5%] w-32 h-32 bg-[#FFE4D9] rounded-full blur-3xl opacity-40" />
-      <div className="absolute bottom-20 left-[10%] w-24 h-24 bg-[#FFE4D9] rounded-full blur-2xl opacity-30" />
+    <section ref={sectionRef} className="py-20 lg:py-28 bg-background relative overflow-hidden">
+      <div className="absolute top-20 right-[5%] w-32 h-32 bg-[var(--gold-soft)] rounded-full blur-3xl opacity-[0.07]" />
+      <div className="absolute bottom-20 left-[10%] w-24 h-24 bg-[var(--gold-soft)] rounded-full blur-2xl opacity-[0.05]" />
 
       <div className="container px-4 md:px-6 relative z-10">
         <div
           className={`text-center max-w-2xl mx-auto mb-16 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
         >
-          <div className="badge-primary mx-auto mb-4">
+          <div className="prestige-eyebrow inline-flex items-center gap-2 mx-auto mb-4">
             <span>{t('howItWorks.badgeEmoji')}</span>
             <span>{t('howItWorks.badgeText')}</span>
           </div>
-          <h2 className="text-3xl md:text-4xl font-heading font-bold text-[#2D2D2D] mb-4">
+          <h2 className="prestige-display text-3xl md:text-4xl font-bold text-foreground mb-4">
             {t('howItWorks.title')}
           </h2>
-          <p className="text-lg text-[#6B6B6B]">{t('howItWorks.subtitle')}</p>
+          <p className="prestige-body text-lg text-muted-foreground">{t('howItWorks.subtitle')}</p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8 lg:gap-12 max-w-5xl mx-auto">
@@ -61,19 +61,19 @@ export function HowItWorks() {
               style={{ transitionDelay: `${index * 150}ms` }}
             >
               {index < steps.length - 1 && (
-                <div className="hidden md:block absolute top-16 left-[60%] w-[80%] h-0.5 bg-gradient-to-r from-[#E07B54] to-transparent opacity-30" />
+                <div className="hidden md:block absolute top-16 left-[60%] w-[80%] h-px bg-gradient-to-r from-[var(--gold)] via-[var(--gold-line)] to-transparent opacity-50" />
               )}
 
-              <div className="inline-flex items-center justify-center h-24 w-24 rounded-2xl bg-[#FFF8F5] border border-[#F0E6E0] text-4xl mb-6 mx-auto">
+              <div className="inline-flex items-center justify-center h-24 w-24 rounded-2xl bg-[var(--stone-900)] border border-[var(--gold-line)] text-4xl mb-6 mx-auto">
                 {step.icon}
               </div>
 
-              <div className="text-[#E07B54] font-bold text-sm mb-2">
+              <div className="prestige-eyebrow text-[var(--gold)] mb-2">
                 {t('howItWorks.stepPrefix', { number: step.number })}
               </div>
 
-              <h3 className="text-xl font-bold text-[#2D2D2D] mb-3">{step.title}</h3>
-              <p className="text-[#6B6B6B] leading-relaxed">{step.description}</p>
+              <h3 className="prestige-display text-xl font-bold text-foreground mb-3">{step.title}</h3>
+              <p className="prestige-body text-muted-foreground leading-relaxed">{step.description}</p>
             </div>
           ))}
         </div>
