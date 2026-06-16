@@ -405,6 +405,9 @@ export default async function CityPage({ params }: PageProps) {
                 <p className="text-sm text-muted-foreground">
                   Le Home Staging virtuel aide vos acheteurs à se projeter. Vendez plus vite à {city.name}.
                 </p>
+                <Link href="/pro" className="inline-flex items-center text-sm font-medium text-primary hover:underline">
+                  Offre Pro pour agences <ArrowRight className="ml-1 w-3.5 h-3.5" />
+                </Link>
               </CardContent>
             </Card>
             <Card className="bg-muted/50 border-none">
