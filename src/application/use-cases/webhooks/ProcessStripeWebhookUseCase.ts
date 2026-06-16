@@ -4,6 +4,7 @@ import { IProcessedEventRepository } from '@/src/domain/ports/repositories/IProc
 import { IPaymentService, PaymentWebhookEvent } from '@/src/domain/ports/services/IPaymentService';
 import { IGenerationRepository } from '@/src/domain/ports/repositories/IGenerationRepository';
 import { IUserRepository } from '@/src/domain/ports/repositories/IUserRepository';
+import { IOrganizationRepository } from '@/src/domain/ports/repositories/IOrganizationRepository';
 import { ILoggerService } from '@/src/domain/ports/services/ILoggerService';
 import { IAuthService } from '@/src/domain/ports/services/IAuthService';
 import type { ProPlan } from '@/src/domain/entities/User';
@@ -57,6 +58,8 @@ export class ProcessStripeWebhookUseCase {
     private readonly authService?: IAuthService,
     /** Optionnel : requis pour les abonnements (activation/renouvellement/annulation). */
     private readonly userRepo?: IUserRepository,
+    /** Optionnel : requis pour l'offre Agence (création/maj de l'organisation). */
+    private readonly orgRepo?: IOrganizationRepository,
   ) {}
 
   async execute(input: ProcessWebhookInput): Promise<Result<ProcessWebhookOutput, DomainError>> {
@@ -296,6 +299,32 @@ export class ProcessStripeWebhookUseCase {
       }
     }
 
+    // Agence : provisionner l'organisation (idempotent : une seule org par subscription).
+    if (cfg.proPlan === 'agence' && this.orgRepo && event.subscriptionId) {
+      const existing = await this.orgRepo.findBySubscriptionId(event.subscriptionId);
+      if (existing.success && !existing.data) {
+        let ownerEmail = event.customerEmail;
+        if (!ownerEmail && this.userRepo) {
+          const u = await this.userRepo.findById(userId);
+          ownerEmail = u.success && u.data ? u.data.email : '';
+        }
+        const created = await this.orgRepo.create({
+          ownerId: userId,
+          ownerEmail: ownerEmail || `${userId}@no-email.local`,
+          name: 'Mon agence',
+          seats: 3,
+          stripeCustomerId: event.customerId || null,
+          stripeSubscriptionId: event.subscriptionId,
+        });
+        if (!created.success) {
+          // L'abonnement reste actif ; non bloquant (org recréable au renouvellement).
+          this.logger.error('Agence: échec création organisation', created.error as Error, { userId });
+        } else {
+          this.logger.info('Organisation Agence créée', { userId, orgId: created.data.id });
+        }
+      }
+    }
+
     this.logger.info('Abonnement activé', { userId, plan: cfg.proPlan, unlimited: cfg.unlimited });
     return success({ processed: true, eventType: event.type, action: `subscription_activated_${cfg.proPlan}` });
   }
@@ -350,6 +379,14 @@ export class ProcessStripeWebhookUseCase {
       }
     }
 
+    // Agence : prolonger l'organisation (statut actif + date de renouvellement).
+    if (user.proPlan === 'agence' && this.orgRepo && event.subscriptionId) {
+      const org = await this.orgRepo.findBySubscriptionId(event.subscriptionId);
+      if (org.success && org.data) {
+        await this.orgRepo.update(org.data.id, { status: 'active', ...(renewsAt ? { renewsAt } : {}) });
+      }
+    }
+
     this.logger.info('Abonnement renouvelé', { userId: user.id, plan: user.proPlan, reason: event.billingReason });
     return success({ processed: true, eventType: event.type, action: `subscription_renewed_${user.proPlan}` });
   }
@@ -377,6 +414,14 @@ export class ProcessStripeWebhookUseCase {
     if (!upd.success) {
       this.logger.error('Échec annulation abonnement', upd.error as Error, { userId: found.data.id });
       return failure(new PaymentError('Échec de l\'annulation'));
+    }
+
+    // Agence : désactiver l'organisation (les membres perdent l'illimité).
+    if (this.orgRepo && event.subscriptionId) {
+      const org = await this.orgRepo.findBySubscriptionId(event.subscriptionId);
+      if (org.success && org.data) {
+        await this.orgRepo.update(org.data.id, { status: 'canceled' });
+      }
     }
 
     this.logger.info('Abonnement annulé', { userId: found.data.id });

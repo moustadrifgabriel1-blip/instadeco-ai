@@ -8,6 +8,8 @@
 // Repositories
 import { SupabaseGenerationRepository } from '../repositories/supabase/SupabaseGenerationRepository';
 import { SupabaseUserRepository } from '../repositories/supabase/SupabaseUserRepository';
+import { SupabaseOrganizationRepository } from '../repositories/supabase/SupabaseOrganizationRepository';
+import { IOrganizationRepository } from '@/src/domain/ports/repositories/IOrganizationRepository';
 import { SupabaseCreditRepository } from '../repositories/supabase/SupabaseCreditRepository';
 import { SupabaseStyleRepository } from '../repositories/supabase/SupabaseStyleRepository';
 import { SupabaseProcessedEventRepository } from '../repositories/supabase/SupabaseProcessedEventRepository';
@@ -52,6 +54,7 @@ import { AddCreditsUseCase } from '@/src/application/use-cases/credits/AddCredit
 import { GetUserCreditsUseCase } from '@/src/application/use-cases/credits/GetUserCreditsUseCase';
 import { GetCreditHistoryUseCase } from '@/src/application/use-cases/credits/GetCreditHistoryUseCase';
 import { ProcessStripeWebhookUseCase } from '@/src/application/use-cases/webhooks/ProcessStripeWebhookUseCase';
+import { GetOrganizationUseCase, InviteMemberUseCase, RemoveMemberUseCase } from '@/src/application/use-cases/organization/ManageOrganizationUseCases';
 import { TrialGenerateUseCase } from '@/src/application/use-cases/trial/TrialGenerateUseCase';
 import { RateGenerationUseCase } from '@/src/application/use-cases/ratings/RateGenerationUseCase';
 
@@ -75,6 +78,7 @@ class DIContainer {
   // Instances singleton des repositories
   private _generationRepo: IGenerationRepository | null = null;
   private _userRepo: IUserRepository | null = null;
+  private _orgRepo: IOrganizationRepository | null = null;
   private _creditRepo: ICreditRepository | null = null;
   private _styleRepo: IStyleRepository | null = null;
   private _processedEventRepo: IProcessedEventRepository | null = null;
@@ -106,6 +110,13 @@ class DIContainer {
       this._userRepo = new SupabaseUserRepository();
     }
     return this._userRepo;
+  }
+
+  get organizationRepository(): IOrganizationRepository {
+    if (!this._orgRepo) {
+      this._orgRepo = new SupabaseOrganizationRepository();
+    }
+    return this._orgRepo;
   }
 
   get creditRepository(): ICreditRepository {
@@ -198,6 +209,7 @@ class DIContainer {
       this.storageService,
       this.logger,
       this.userRepository,
+      this.organizationRepository,
     );
   }
 
@@ -329,6 +341,7 @@ class DIContainer {
       this.processedEventRepository,
       this.authService,
       this.userRepository,
+      this.organizationRepository,
     );
   }
 
@@ -349,6 +362,18 @@ class DIContainer {
       this.generationRepository,
       this.logger,
     );
+  }
+
+  get getOrganizationUseCase(): GetOrganizationUseCase {
+    return new GetOrganizationUseCase(this.organizationRepository);
+  }
+
+  get inviteMemberUseCase(): InviteMemberUseCase {
+    return new InviteMemberUseCase(this.organizationRepository, this.userRepository);
+  }
+
+  get removeMemberUseCase(): RemoveMemberUseCase {
+    return new RemoveMemberUseCase(this.organizationRepository);
   }
 
   // ============ TESTING ============
@@ -446,4 +471,7 @@ export const useCases = {
   get processStripeWebhook() { return container.processStripeWebhookUseCase; },
   get trialGenerate() { return container.trialGenerateUseCase; },
   get rateGeneration() { return container.rateGenerationUseCase; },
+  get getOrganization() { return container.getOrganizationUseCase; },
+  get inviteMember() { return container.inviteMemberUseCase; },
+  get removeMember() { return container.removeMemberUseCase; },
 };

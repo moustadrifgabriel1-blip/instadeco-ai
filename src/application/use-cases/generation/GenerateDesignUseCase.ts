@@ -29,6 +29,7 @@ import { ImageGenerationError } from '@/src/domain/errors/ImageGenerationError';
 import { DomainError } from '@/src/domain/errors/DomainError';
 import { CREDIT_COSTS } from '@/src/shared/constants/pricing';
 import { IUserRepository } from '@/src/domain/ports/repositories/IUserRepository';
+import { IOrganizationRepository } from '@/src/domain/ports/repositories/IOrganizationRepository';
 import { isUnlimitedPro } from '@/src/domain/entities/User';
 
 /**
@@ -137,6 +138,8 @@ export class GenerateDesignUseCase {
     private readonly logger: ILoggerService,
     /** Optionnel : permet de détecter un abonné Pro/Agence illimité (génération sans débit). */
     private readonly userRepo?: IUserRepository,
+    /** Optionnel : membre d'une org Agence active = illimité (sièges partagés). */
+    private readonly orgRepo?: IOrganizationRepository,
   ) {}
 
   async execute(input: GenerateDesignInput): Promise<Result<GenerateDesignOutput, DomainError>> {
@@ -160,6 +163,17 @@ export class GenerateDesignUseCase {
         this.logger.info('Abonné illimité — génération sans débit', {
           userId: input.userId,
           plan: userResult.data.proPlan,
+        });
+      }
+    }
+    // Membre d'une organisation Agence active → illimité (siège partagé).
+    if (chargesCredits && this.orgRepo) {
+      const org = await this.orgRepo.findActiveOrgByMember(input.userId);
+      if (org.success && org.data) {
+        chargesCredits = false;
+        this.logger.info('Membre Agence — génération sans débit', {
+          userId: input.userId,
+          orgId: org.data.id,
         });
       }
     }
