@@ -1,0 +1,157 @@
+'use client';
+
+import Image from 'next/image';
+import { useRef } from 'react';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
+import { prefersReducedMotion } from './use-prestige-scroll';
+
+gsap.registerPlugin(ScrollTrigger, useGSAP);
+
+/**
+ * HERO — « L'Entrée ».
+ *
+ * - LCP : le titre N'EST PAS opacity:0 figé jusqu'au JS. L'entrée est
+ *   100% CSS (classes .prestige-anim + --d). GSAP ne fait QUE le parallax
+ *   de scroll (et il est sauté si prefers-reduced-motion).
+ * - Aucun z-index négatif : couches de fond en flux normal (absolute
+ *   inset-0), contenu en relative z-10. Compatible Safari iOS.
+ */
+export function PrestigeHero() {
+  const root = useRef<HTMLElement>(null);
+
+  useGSAP(
+    () => {
+      if (prefersReducedMotion()) return;
+
+      // Parallax doux de l'image de fond au scroll (transform only).
+      const img = root.current?.querySelector('[data-hero-img]');
+      if (img) {
+        gsap.to(img, {
+          yPercent: 14,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: root.current,
+            start: 'top top',
+            end: 'bottom top',
+            scrub: 1,
+            invalidateOnRefresh: true,
+          },
+        });
+      }
+
+      // Le voile s'assombrit en sortant du hero (renforce la transition)
+      const veil = root.current?.querySelector('[data-hero-veil]');
+      if (veil) {
+        gsap.to(veil, {
+          opacity: 1,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: root.current,
+            start: 'center top',
+            end: 'bottom top',
+            scrub: true,
+            invalidateOnRefresh: true,
+          },
+        });
+      }
+    },
+    { scope: root }
+  );
+
+  return (
+    <section
+      ref={root}
+      className="relative h-[100svh] min-h-[640px] w-full overflow-hidden"
+      aria-label="L’entrée — bien d’exception"
+    >
+      {/* Couche image — flux normal, jamais z négatif */}
+      <div className="absolute inset-0">
+        <div data-hero-img className="prestige-hero-img absolute inset-0 will-change-transform">
+          <Image
+            src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=2400&q=80"
+            alt="Hall d’entrée et séjour d’une villa d’architecte au crépuscule"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center"
+          />
+        </div>
+        {/* Vignettage cinéma (gradient inline-safe via classe CSS) */}
+        <div className="prestige-vignette absolute inset-0" aria-hidden />
+        {/* Voile qui s'assombrit au scroll */}
+        <div
+          data-hero-veil
+          className="absolute inset-0 bg-[#0c0a09] opacity-0"
+          aria-hidden
+        />
+      </div>
+
+      {/* Contenu — relative z-10 au-dessus des couches de fond */}
+      <div className="relative z-10 mx-auto flex h-full max-w-6xl flex-col justify-end px-6 pb-[clamp(3rem,9vh,7rem)] sm:px-10">
+        {/* Sur-titre or */}
+        <div
+          className="prestige-anim prestige-eyebrow flex items-center gap-4"
+          style={{ ['--d' as string]: '150ms' }}
+        >
+          <span className="h-px w-10 bg-[var(--gold)]" aria-hidden />
+          Visite privée — Bien d’exception
+        </div>
+
+        {/* Titre Cormorant énorme, accent or */}
+        <h1
+          className="prestige-anim prestige-display mt-6 max-w-4xl text-balance text-[clamp(2.6rem,8.4vw,7rem)] leading-[0.96] tracking-tight"
+          style={{ ['--d' as string]: '320ms' }}
+        >
+          Faites visiter{' '}
+          <span className="italic text-[var(--gold)]">l’exceptionnel.</span>
+        </h1>
+
+        {/* Sous-titre court */}
+        <p
+          className="prestige-anim mt-7 max-w-xl text-[clamp(1rem,2.1vw,1.22rem)] font-light leading-relaxed text-[var(--mist)]"
+          style={{ ['--d' as string]: '520ms' }}
+        >
+          Home staging virtuel par IA pour les agences immobilières de
+          prestige. Chaque bien révélé sous son plus beau jour, en quelques
+          secondes.
+        </p>
+
+        {/* CTA fort + filet or */}
+        <div
+          className="prestige-anim mt-10 flex flex-col items-start gap-6 sm:flex-row sm:items-center"
+          style={{ ['--d' as string]: '720ms' }}
+        >
+          <a
+            href="#parcours"
+            className="group inline-flex min-h-[52px] items-center gap-3 rounded-full border border-[var(--gold)] bg-[var(--gold)] px-8 py-3.5 text-sm font-medium uppercase tracking-[0.18em] text-[#0c0a09] transition-[transform,background-color,color] duration-500 ease-[var(--ease-slow)] hover:bg-transparent hover:text-[var(--gold)] focus-visible:bg-transparent focus-visible:text-[var(--gold)]"
+          >
+            Commencer la visite
+            <span
+              aria-hidden
+              className="transition-transform duration-500 ease-[var(--ease-slow)] group-hover:translate-x-1"
+            >
+              →
+            </span>
+          </a>
+          <span className="text-xs font-light uppercase tracking-[0.32em] text-[var(--mist)]">
+            Villa contemporaine · 320 m²
+          </span>
+        </div>
+      </div>
+
+      {/* Indice de scroll, entrée CSS retardée */}
+      <div
+        className="prestige-anim-fade absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2"
+        style={{ ['--d' as string]: '1100ms' }}
+        aria-hidden
+      >
+        <span className="prestige-eyebrow !tracking-[0.3em] !text-[0.58rem] text-[var(--mist)]">
+          Descendre
+        </span>
+        <span className="h-10 w-px animate-pulse bg-[var(--gold-line)]" />
+      </div>
+    </section>
+  );
+}

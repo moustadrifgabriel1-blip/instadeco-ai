@@ -1,0 +1,180 @@
+/* ============================================================
+   PRESTIGE — Direction artistique « nuit cinématographique »
+   Styles scopés à la maquette /visite. N'affecte AUCUNE autre
+   page : tout est gardé sous .prestige-root (sauf le masquage
+   du header/footer global, ciblé via :has() pour cette route).
+   ============================================================ */
+
+/* --- Tokens de la DA validée (centralisés ici) --- */
+.prestige-root {
+  --ink: #0c0a09; /* noir profond */
+  --stone-900: #1c1917; /* surface pierre sombre */
+  --stone-700: #44403c; /* surface pierre */
+  --gold: #c8a24d; /* or champagne (accent) */
+  --gold-soft: rgba(200, 162, 77, 0.5);
+  --gold-line: rgba(200, 162, 77, 0.28); /* filets or 1px */
+  --ivory: #faf8f4; /* réservé — non utilisé dans le flagship */
+  --mist: rgba(250, 248, 244, 0.62); /* texte secondaire sur noir */
+
+  /* easing lent validé */
+  --ease-slow: cubic-bezier(0.22, 1, 0.36, 1);
+
+  background-color: var(--ink);
+  color: #faf8f4;
+  min-height: 100vh;
+}
+
+/* Le route group est imbriqué sous le layout marketing global.
+   On masque header/footer marketing UNIQUEMENT quand la maquette
+   prestige est montée (présence de [data-prestige-root]). Au
+   démontage, l'élément disparaît → le header/footer réapparaît.
+   Aucune modification des composants/layout globaux. */
+body:has([data-prestige-root]) > div > header,
+body:has([data-prestige-root]) > div > footer {
+  display: none !important;
+}
+/* Le <main> global garde son flux mais sans la min-height marketing */
+body:has([data-prestige-root]) {
+  background-color: var(--ink, #0c0a09);
+}
+
+/* --- Typo : variables fournies par next/font dans le layout --- */
+.prestige-display {
+  font-family: var(--font-display), 'Cormorant Garamond', Georgia, serif;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.prestige-body {
+  font-family: var(--font-body), 'Josefin Sans', system-ui, sans-serif;
+}
+
+/* Sur-titre / labels : Josefin Sans, capitales, tracking large */
+.prestige-eyebrow {
+  font-family: var(--font-body), 'Josefin Sans', system-ui, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.42em;
+  font-weight: 300;
+  font-size: clamp(0.62rem, 1.4vw, 0.78rem);
+  color: var(--gold);
+}
+
+/* Filet or 1px réutilisable */
+.prestige-rule {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--gold-line) 18%,
+    var(--gold) 50%,
+    var(--gold-line) 82%,
+    transparent 100%
+  );
+}
+
+/* --- Entrée HERO en CSS pur (pas d'attente d'hydratation) ---
+   Le titre/sous-titre/CTA partent légèrement décalés + flous puis
+   se posent. animation-delay crée le crescendo. Pas d'opacity:0 figé
+   jusqu'au JS : si JS échoue, le contenu apparaît quand même. */
+@keyframes prestige-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 26px, 0);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    filter: blur(0);
+  }
+}
+
+@keyframes prestige-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Léger dézoom de l'image de fond du hero, en CSS (le parallax JS
+   prend le relais ensuite via GSAP si dispo). */
+@keyframes prestige-settle {
+  from {
+    transform: scale(1.16);
+  }
+  to {
+    transform: scale(1.06);
+  }
+}
+
+.prestige-anim {
+  opacity: 0;
+  animation: prestige-rise 1.5s var(--ease-slow) forwards;
+  animation-delay: var(--d, 0ms);
+  will-change: transform, opacity;
+}
+.prestige-anim-fade {
+  opacity: 0;
+  animation: prestige-fade 1.8s var(--ease-slow) forwards;
+  animation-delay: var(--d, 0ms);
+}
+.prestige-hero-img {
+  animation: prestige-settle 2.6s var(--ease-slow) forwards;
+  will-change: transform;
+}
+
+/* Vignettage cinéma : assombrit les bords pour la lisibilité du texte.
+   Gradient inline-safe (stops pleins), pas de classe Tailwind arbitraire. */
+.prestige-vignette {
+  background: radial-gradient(
+      120% 90% at 50% 32%,
+      rgba(12, 10, 9, 0) 38%,
+      rgba(12, 10, 9, 0.55) 78%,
+      rgba(12, 10, 9, 0.92) 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(12, 10, 9, 0.6) 0%,
+      rgba(12, 10, 9, 0.15) 24%,
+      rgba(12, 10, 9, 0.2) 64%,
+      rgba(12, 10, 9, 0.95) 100%
+    );
+}
+
+/* Voile sur l'image « après » du parcours (lisibilité légende) */
+.prestige-room-veil {
+  background: linear-gradient(
+    180deg,
+    rgba(12, 10, 9, 0.05) 0%,
+    rgba(12, 10, 9, 0) 42%,
+    rgba(12, 10, 9, 0.78) 100%
+  );
+}
+
+/* Curseur de la ligne de révélation avant/après */
+.prestige-reveal-handle {
+  background: linear-gradient(180deg, transparent 0%, var(--gold) 50%, transparent 100%);
+  box-shadow: 0 0 24px 2px var(--gold-soft);
+}
+
+/* Focus visible global (accessibilité) */
+.prestige-root :focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+/* --- prefers-reduced-motion : on coupe TOUTES les entrées/anim,
+   on montre l'état final immédiatement. Le JS (pin/scrub/parallax)
+   est désactivé séparément côté composant. --- */
+@media (prefers-reduced-motion: reduce) {
+  .prestige-anim,
+  .prestige-anim-fade,
+  .prestige-hero-img {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}
