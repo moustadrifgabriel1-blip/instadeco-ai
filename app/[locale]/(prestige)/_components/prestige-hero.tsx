@@ -70,8 +70,8 @@ export function PrestigeHero() {
       <div className="absolute inset-0">
         <div data-hero-img className="prestige-hero-img absolute inset-0 will-change-transform">
           <Image
-            src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=2400&q=80"
-            alt="Hall d’entrée et séjour d’une villa d’architecte au crépuscule"
+            src="https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/output-images/f88c9b68-eda4-4d67-bfb4-f631d21b37c6/8cf082e3-f460-4d66-b76a-6a4741cfe8e2.jpg"
+            alt="Séjour contemporain mis en scène par home staging virtuel IA"
             fill
             priority
             sizes="100vw"
@@ -96,7 +96,7 @@ export function PrestigeHero() {
           style={{ ['--d' as string]: '150ms' }}
         >
           <span className="h-px w-10 bg-[var(--gold)]" aria-hidden />
-          Visite privée — Bien d’exception
+          Home staging virtuel par IA · Agences de prestige
         </div>
 
         {/* Titre Cormorant énorme, accent or */}
@@ -104,8 +104,8 @@ export function PrestigeHero() {
           className="prestige-anim prestige-display mt-6 max-w-4xl text-balance text-[clamp(2.6rem,8.4vw,7rem)] leading-[0.96] tracking-tight"
           style={{ ['--d' as string]: '320ms' }}
         >
-          Faites visiter{' '}
-          <span className="italic text-[var(--gold)]">l’exceptionnel.</span>
+          Vendez le rêve{' '}
+          <span className="italic text-[var(--gold)]">avant la visite.</span>
         </h1>
 
         {/* Sous-titre court */}
@@ -113,9 +113,10 @@ export function PrestigeHero() {
           className="prestige-anim mt-7 max-w-xl text-[clamp(1rem,2.1vw,1.22rem)] font-light leading-relaxed text-[var(--mist)]"
           style={{ ['--d' as string]: '520ms' }}
         >
-          Home staging virtuel par IA pour les agences immobilières de
-          prestige. Chaque bien révélé sous son plus beau jour, en quelques
-          secondes.
+          Le home staging virtuel par IA pensé pour les agences immobilières
+          de prestige. Vous envoyez la photo d&apos;une pièce, vous choisissez
+          la mise en scène, le bien apparaît habité, désirable, prêt à
+          déclencher le coup de cœur. En quelques secondes.
         </p>
 
         {/* CTA fort + filet or */}
@@ -127,7 +128,7 @@ export function PrestigeHero() {
             href="#parcours"
             className="group inline-flex min-h-[52px] items-center gap-3 rounded-full border border-[var(--gold)] bg-[var(--gold)] px-8 py-3.5 text-sm font-medium uppercase tracking-[0.18em] text-[#0c0a09] transition-[transform,background-color,color] duration-500 ease-[var(--ease-slow)] hover:bg-transparent hover:text-[var(--gold)] focus-visible:bg-transparent focus-visible:text-[var(--gold)]"
           >
-            Commencer la visite
+            Voir le service en action
             <span
               aria-hidden
               className="transition-transform duration-500 ease-[var(--ease-slow)] group-hover:translate-x-1"
@@ -136,7 +137,7 @@ export function PrestigeHero() {
             </span>
           </a>
           <span className="text-xs font-light uppercase tracking-[0.32em] text-[var(--mist)]">
-            Villa contemporaine · 320 m²
+            Rendu prêt en quelques secondes
           </span>
         </div>
       </div>
@@ -149,7 +150,7 @@ export function PrestigeHero() {
       >
         <span className="h-14 w-px bg-[var(--gold-line)]" />
         <span className="prestige-eyebrow !text-[0.6rem] !tracking-[0.46em] text-[var(--mist)] [writing-mode:vertical-rl]">
-          Édition privée · MMXXVI
+          InstaDeco · MMXXVI
         </span>
         <span className="h-14 w-px bg-[var(--gold-line)]" />
       </div>

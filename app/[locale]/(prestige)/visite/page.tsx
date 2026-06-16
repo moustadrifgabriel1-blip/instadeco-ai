@@ -28,35 +28,36 @@ export default function VisitePage() {
       {/* Chapitre I, le salon : révélation cinématique puis comparateur */}
       <PrestigeRoomReveal />
 
-      {/* Chapitre II, la cuisine : éditorial parallax */}
+      {/* Capacité du service, volet 1 : toutes les pièces, tous les styles */}
       <PrestigeEditorial
-        ariaLabel="Chapitre deux, la cuisine"
-        chapter="Chapitre II, la cuisine"
-        meta="La cuisine · 24 m²"
+        ariaLabel="Ce que le service couvre, toutes les pièces"
+        chapter="Ce que le service couvre"
+        meta="Toutes les pièces, un seul service"
         title={
           <>
-            Là où la maison <span className="italic text-[var(--gold)]">respire</span>.
+            Aucune pièce ne lui{' '}
+            <span className="italic text-[var(--gold)]">résiste</span>.
           </>
         }
-        body="Une cuisine nue laisse l'acheteur compter les défauts. Une cuisine habillée lui fait imaginer les dimanches matin. On ne montre plus un plan de travail, on raconte une vie."
-        image="https://images.unsplash.com/photo-1556909212-d5b604d0c90d?auto=format&fit=crop&w=1800&q=80"
-        alt="Cuisine contemporaine mise en scène, plan de travail et lumière chaude"
+        body="Séjour, cuisine, suite, salle de bain, terrasse : le service met en scène l'intégralité du bien dans le style qui parle à votre clientèle. Du contemporain feutré au classique parisien, vous habillez chaque volume à l'image de votre agence. Un seul outil pour transformer tout un portefeuille."
+        image="https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/output-images/400d05a5-0d19-4feb-a922-d555c9ea9f85/b9fd06a0-f082-4408-a4e7-328ae890b97d.jpg"
+        alt="Salle de bain transformée en espace spa par home staging virtuel IA"
       />
 
-      {/* Chapitre III, la chambre : éditorial inversé */}
+      {/* Capacité du service, volet 2 : vitesse et coût divisé */}
       <PrestigeEditorial
-        ariaLabel="Chapitre trois, la chambre"
-        chapter="Chapitre III, la chambre"
-        meta="La suite · 18 m²"
+        ariaLabel="Pourquoi le service est imbattable"
+        chapter="Pourquoi c'est imbattable"
+        meta="En quelques secondes"
         title={
           <>
-            L&apos;intime, mis en{' '}
-            <span className="italic text-[var(--gold)]">lumière</span>.
+            Le staging, divisé{' '}
+            <span className="italic text-[var(--gold)]">par cent</span>.
           </>
         }
-        body="C'est la pièce qui se vend en silence. Quelques tons justes, une matière douce, et la chambre cesse d'être un volume à meubler pour devenir un refuge à habiter."
-        image="https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=1800&q=80"
-        alt="Chambre élégante mise en scène, tête de lit et éclairage tamisé"
+        body="Le home staging classique, c'est des semaines, des camions, des milliers d'euros par bien. Ici, c'est une photo, un clic, et le rendu revient en quelques secondes. Vous mettez en scène autant de biens que vous voulez, autant de fois que vous voulez, pour une fraction du coût. La qualité d'une agence de luxe, à l'échelle."
+        image="https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/output-images/f88c9b68-eda4-4d67-bfb4-f631d21b37c6/a529f606-f9ed-4c0e-b757-9bf2bb53bbce.jpg"
+        alt="Chambre épurée mise en scène, rendu IA livré instantanément"
         reverse
       />
 

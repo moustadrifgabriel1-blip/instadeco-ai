@@ -58,7 +58,8 @@ export function PrestigeSignature() {
         >
           Mettez en valeur tout votre portefeuille, autant de fois que vous le
           souhaitez. Vos acquéreurs se projettent, vos biens partent plus vite,
-          votre vitrine inspire confiance.
+          votre vitrine inspire confiance. Rejoignez les agences qui vendent le
+          rêve avant même la première visite.
         </p>
 
         <div

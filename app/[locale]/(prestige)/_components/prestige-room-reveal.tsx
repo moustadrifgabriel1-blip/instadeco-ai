@@ -202,16 +202,17 @@ export function PrestigeRoomReveal() {
       <div className="mx-auto max-w-6xl px-6 pt-[clamp(4rem,12vh,9rem)] sm:px-10">
         <div className="prestige-eyebrow flex items-center gap-4">
           <span className="h-px w-10 bg-[var(--gold)]" aria-hidden />
-          Chapitre I, le salon
+          La démonstration
         </div>
         <h2 className="prestige-display mt-5 max-w-3xl text-[clamp(2rem,5.6vw,4.2rem)] leading-[1.02]">
-          Entrez. La pièce se{' '}
-          <span className="italic text-[var(--gold)]">révèle</span>.
+          Une vraie photo. Le service à l&apos;
+          <span className="italic text-[var(--gold)]">œuvre</span>.
         </h2>
         <p className="mt-5 max-w-xl text-[clamp(0.95rem,1.8vw,1.1rem)] font-light text-[var(--mist)]">
-          Déroulez pour transformer ce séjour brut en intérieur signé. Pas de
-          travaux, pas de meubles à porter, pas d&apos;attente. La projection
-          que vos acquéreurs garderont en tête.
+          Voici une pièce telle que votre client vous l&apos;envoie. Correcte,
+          mais sans relief, le genre qu&apos;on oublie sitôt la porte refermée.
+          Déroulez, et regardez le service la transformer. Aucun chantier, aucun
+          loueur de mobilier, aucune attente.
         </p>
         <div className="prestige-rule mt-10 w-full" aria-hidden />
       </div>
@@ -225,8 +226,8 @@ export function PrestigeRoomReveal() {
           {/* AVANT, pièce vide / datée (couche du dessous) */}
           <div className="absolute inset-0">
             <Image
-              src="https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=2200&q=80"
-              alt="Salon avant home staging, pièce vide aux murs nus"
+              src="https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/input-images/f88c9b68-eda4-4d67-bfb4-f631d21b37c6/1769793114162.jpg"
+              alt="Séjour banal et sans relief, photo envoyée par le client"
               fill
               sizes="(min-width: 1024px) 1152px, 100vw"
               className="object-cover object-center"
@@ -244,8 +245,8 @@ export function PrestigeRoomReveal() {
             style={{ clipPath: 'inset(0 100% 0 0)' }}
           >
             <Image
-              src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=2200&q=80"
-              alt="Salon après home staging virtuel, intérieur contemporain meublé et chaleureux"
+              src="https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/output-images/f88c9b68-eda4-4d67-bfb4-f631d21b37c6/1d5a7bb4-80dd-406e-85be-4226b553fbf6.jpg"
+              alt="Le même séjour mis en scène par le service, intérieur contemporain chaleureux"
               fill
               sizes="(min-width: 1024px) 1152px, 100vw"
               className="object-cover object-center"
@@ -289,9 +290,10 @@ export function PrestigeRoomReveal() {
             className="pointer-events-none absolute bottom-0 left-0 z-20 w-full p-6 sm:p-9"
             style={{ opacity: 0 }}
           >
-            <div className="prestige-eyebrow !text-[var(--gold)]">Le salon · 48 m²</div>
+            <div className="prestige-eyebrow !text-[var(--gold)]">Mise en scène appliquée</div>
             <p className="prestige-display mt-2 text-[clamp(1.4rem,3.4vw,2.4rem)] leading-tight">
-              Style appliqué : <span className="italic">contemporain chaleureux</span>
+              Contemporain chaleureux,{' '}
+              <span className="italic">livré en quelques secondes</span>
             </p>
           </div>
         </div>
@@ -302,7 +304,7 @@ export function PrestigeRoomReveal() {
             data-room-scrollhint
             className="absolute inset-x-0 text-[0.7rem] font-light uppercase tracking-[0.3em] text-[var(--mist)]"
           >
-            Continuez à dérouler, la pièce se meuble
+            Continuez à dérouler, le service opère
           </p>
           <p
             data-room-draghint

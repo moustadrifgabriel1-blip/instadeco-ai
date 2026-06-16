@@ -61,8 +61,8 @@ export function PrestigeClimax() {
       <div className="absolute inset-0">
         <div data-climax-img className="absolute inset-0 will-change-transform">
           <Image
-            src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=2400&q=80"
-            alt="Séjour d'exception avec grandes baies vitrées à l'heure dorée"
+            src="https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/output-images/f88c9b68-eda4-4d67-bfb4-f631d21b37c6/25b57a45-973e-4628-85ec-ad46b9cec7dd.jpg"
+            alt="Séjour mis en scène au crépuscule, ambiance chaleureuse et habitée"
             fill
             sizes="100vw"
             className="object-cover object-center"
@@ -74,7 +74,7 @@ export function PrestigeClimax() {
       {/* Phrase sommet */}
       <div className="relative z-10 mx-auto flex h-full max-w-5xl flex-col items-center justify-center px-6 text-center sm:px-10">
         <div data-climax-kicker className="prestige-eyebrow justify-center">
-          Le clou de la visite
+          Ce que ça change pour vous
         </div>
         <p className="prestige-display mt-7 text-[clamp(2.1rem,6.4vw,5.4rem)] leading-[1.02]">
           <span data-climax-line className="block">
@@ -91,8 +91,11 @@ export function PrestigeClimax() {
           data-climax-line
           className="mt-9 max-w-xl text-[clamp(0.98rem,1.8vw,1.18rem)] font-light leading-relaxed text-[var(--mist)]"
         >
-          Une pièce vide se visite. Une pièce habitée se désire. Tout se joue
-          dans cette bascule, et c&apos;est exactement ce que vous offrez.
+          Une pièce vide se visite. Une pièce habitée se désire. C&apos;est dans
+          cette bascule que se joue la vente, et c&apos;est précisément ce que
+          votre service déclenche. Des acquéreurs qui se projettent, des biens
+          qui partent plus vite, une vitrine qui inspire confiance dès la
+          première photo.
         </p>
       </div>
     </section>
