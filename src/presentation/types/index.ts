@@ -152,7 +152,9 @@ export type CreditPackId = 'pack_10' | 'pack_25' | 'pack_50' | 'pack_100';
 /**
  * Plans d'abonnement disponibles
  */
-export type SubscriptionPlanId = 'sub_essentiel' | 'sub_pro' | 'sub_business';
+export type SubscriptionPlanId =
+  | 'sub_essentiel' | 'sub_pro' | 'sub_business' // legacy (page /pricing)
+  | 'solo' | 'pro' | 'agence';                    // offre immobilier (page /pro)
 export type BillingInterval = 'monthly' | 'annual';
 
 /**

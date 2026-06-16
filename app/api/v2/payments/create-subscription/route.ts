@@ -9,7 +9,7 @@ import { InvalidSubscriptionPlanError } from '@/src/application/use-cases/paymen
  * Schéma de validation pour la souscription à un abonnement
  */
 const subscriptionRequestSchema = z.object({
-  planId: z.enum(['sub_essentiel', 'sub_pro', 'sub_business']),
+  planId: z.enum(['sub_essentiel', 'sub_pro', 'sub_business', 'solo', 'pro', 'agence']),
   interval: z.enum(['monthly', 'annual']).default('monthly'),
   successUrl: z.string().url().optional(),
   cancelUrl: z.string().url().optional(),

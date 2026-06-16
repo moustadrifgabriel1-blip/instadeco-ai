@@ -2,74 +2,110 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { 
-  Building2, Camera, Zap, TrendingUp, Check, ArrowRight, 
-  Shield, Clock, CreditCard, ChevronDown, Home,
-  Users, BarChart3, Sparkles, Download, Palette, Award
+import { useLocale } from 'next-intl';
+import { useAuth } from '@/hooks/use-auth';
+import { useRouter } from '@/i18n/navigation';
+import { createSubscriptionSession } from '@/src/presentation/api/client';
+import {
+  Building2, Camera, Check, ArrowRight,
+  Shield, ChevronDown, Home,
+  Users, BarChart3, Sparkles, Download, Palette, Award, Loader2,
 } from 'lucide-react';
 
 // ============================================
-// DONNÉES
+// DONNÉES — offre immobilier (Solo / Pro illimité / Agence)
 // ============================================
 
-const PRO_PLANS = [
+type PlanId = 'solo' | 'pro' | 'agence';
+
+interface ProPlan {
+  id: PlanId;
+  name: string;
+  tagline: string;
+  monthly: number;       // €/mois en facturation mensuelle
+  annual: number;        // €/mois équivalent en facturation annuelle (−30%)
+  annualBilled: string;  // libellé "Facturé X€/an"
+  features: string[];
+  popular: boolean;
+}
+
+const PRO_PLANS: ProPlan[] = [
   {
-    id: 'pro_monthly',
-    name: 'Pro Mensuel',
-    price: 49,
-    period: '/mois',
+    id: 'solo',
+    name: 'Solo',
+    tagline: 'Pour se lancer',
+    monthly: 19,
+    annual: 13.3,
+    annualBilled: 'Facturé 160€/an',
+    features: [
+      '40 images / mois',
+      '1 utilisateur',
+      'Qualité HD',
+      'Tous les styles',
+      'Licence commerciale incluse',
+    ],
+    popular: false,
+  },
+  {
+    id: 'pro',
+    name: 'Pro',
+    tagline: 'Le plus choisi',
+    monthly: 49,
+    annual: 34,
+    annualBilled: 'Facturé 408€/an',
+    features: [
+      'Générations ILLIMITÉES (fair-use)',
+      '1 utilisateur',
+      'Qualité HD',
+      'Export « pièce vide »',
+      'Tous les styles',
+      'Support prioritaire',
+      'Sans engagement — annulez en 1 clic',
+    ],
+    popular: true,
+  },
+  {
+    id: 'agence',
+    name: 'Agence',
+    tagline: 'Pour les équipes',
+    monthly: 99,
+    annual: 69,
+    annualBilled: 'Facturé 828€/an',
     features: [
       'Générations illimitées',
-      'Qualité HD incluse',
-      '12 styles de décoration',
-      'Téléchargement immédiat',
-      'Support prioritaire',
-      'Sans engagement — annulez à tout moment',
+      "Jusqu'à 3 sièges inclus",
+      'Facturation centralisée',
+      'Support dédié',
+      'API (bientôt)',
     ],
-    cta: 'Démarrer l\'essai gratuit',
-    popular: true,
-    savings: null,
-  },
-  {
-    id: 'pro_yearly',
-    name: 'Pro Annuel',
-    price: 39,
-    period: '/mois',
-    billedAs: 'Facturé 468€/an',
-    features: [
-      'Tout le plan Pro Mensuel',
-      'Économisez 120€/an',
-      'Accès anticipé aux nouvelles fonctionnalités',
-      'API access (bientôt)',
-      'Compte multi-utilisateurs (bientôt)',
-      'Formation home staging offerte',
-    ],
-    cta: 'Économiser 20%',
     popular: false,
-    savings: 20,
   },
 ];
+
+function formatPrice(n: number): string {
+  return Number.isInteger(n) ? String(n) : n.toFixed(2).replace('.', ',');
+}
 
 const PRO_USE_CASES = [
   {
     profile: 'Agents immobiliers',
     role: 'Home staging virtuel',
-    useCase: 'Meublez virtuellement vos biens vides pour aider les acquéreurs à se projeter. Complément rapide et économique au home staging physique.',
-    benefit: 'Projection immédiate',
+    useCase: 'Meublez virtuellement vos biens vides (ou restylez une pièce occupée) pour aider les acquéreurs à se projeter. Un bien meublé se vend nettement plus vite.',
+    benefit: 'Vendez plus vite',
     icon: '🏢',
   },
   {
     profile: 'Home stagers',
     role: 'Validation rapide',
     useCase: 'Montrez un rendu IA à vos clients pour valider la direction déco avant de réaliser le staging physique. Réduisez les allers-retours.',
-    benefit: 'Moins d\'allers-retours',
+    benefit: "Moins d'allers-retours",
     icon: '🎨',
   },
   {
     profile: 'Agences & promoteurs',
-    role: 'À l\'échelle',
-    useCase: 'Équipez vos équipes pour ajouter une version "meublée virtuellement" à chaque annonce. 12 styles disponibles, résultat en ~30 secondes.',
-    benefit: '12 styles disponibles',
+    role: "À l'échelle",
+    useCase: 'Équipez vos équipes pour ajouter une version « meublée virtuellement » à chaque annonce. Illimité, résultat en ~30 secondes, facturation centralisée.',
+    benefit: 'Illimité, multi-sièges',
     icon: '🏗️',
   },
 ];
@@ -77,15 +113,15 @@ const PRO_USE_CASES = [
 const ROI_COMPARISONS = [
   { label: 'Home staging physique', price: '2 000 - 5 000 €', time: '1-2 semaines', quality: 'Excellent mais limité à 1 style', icon: Home },
   { label: 'Photographe 3D', price: '500 - 1 500 €/bien', time: '3-5 jours', quality: 'Bon mais coûteux à l\'échelle', icon: Camera },
-  { label: 'InstaDeco Pro', price: '49 €/mois illimité', time: '10 secondes', quality: '12 styles, illimité, HD', icon: Sparkles, highlight: true },
+  { label: 'InstaDeco Pro', price: '49 €/mois illimité', time: '10 secondes', quality: 'Illimité, tous styles, HD', icon: Sparkles, highlight: true },
 ];
 
 const USE_CASES = [
   {
     icon: Building2,
     title: 'Agents immobiliers',
-    description: 'Meublez virtuellement vos biens vides. Aidez les acquéreurs à se projeter dans un espace aménagé.',
-    stat: '12 styles disponibles instantanément',
+    description: 'Meublez virtuellement vos biens vides. Aidez les acquéreurs à se projeter dans un espace aménagé — et vendez plus vite.',
+    stat: 'Tous les styles, illimité',
   },
   {
     icon: Palette,
@@ -109,28 +145,28 @@ const USE_CASES = [
 
 const FAQ = [
   {
-    q: 'Est-ce que les images générées sont utilisables commercialement ?',
-    a: 'Oui, toutes les images générées avec InstaDeco Pro vous appartiennent. Vous pouvez les utiliser dans vos annonces immobilières, sur votre site web, dans vos présentations clients, sur les réseaux sociaux, etc.',
+    q: 'Que signifie « illimité » exactement ?',
+    a: 'Les plans Pro et Agence permettent de générer autant d\'images que nécessaire pour votre activité, sans quota mensuel. Une politique d\'usage équitable (fair-use) s\'applique pour prévenir les abus (revente, automatisation non autorisée). Le plan Solo, lui, inclut 40 images/mois.',
   },
   {
-    q: 'Que signifie "générations illimitées" ?',
-    a: 'Avec le plan Pro, vous pouvez générer autant d\'images que vous voulez, sans quota ni limite mensuelle. Chaque génération inclut la qualité HD. Parfait pour les agences qui gèrent plusieurs biens.',
+    q: 'Les images générées sont-elles utilisables commercialement ?',
+    a: 'Oui, la licence commerciale est incluse : utilisez les rendus dans vos annonces, votre site, vos présentations clients et sur les réseaux. Un filigrane « visuel virtuel » et l\'export d\'une version non meublée sont disponibles pour rester conforme à la déontologie immobilière.',
   },
   {
     q: 'Comment ça marche concrètement ?',
-    a: '1) Prenez une photo de la pièce vide ou à redécorer. 2) Uploadez-la sur InstaDeco. 3) Choisissez un style (moderne, scandinave, etc.). 4) En 10 secondes, téléchargez le rendu meublé en HD. C\'est tout.',
+    a: '1) Prenez une photo de la pièce (vide ou occupée). 2) Uploadez-la sur InstaDeco. 3) Choisissez un style. 4) En ~10 secondes, téléchargez le rendu meublé en HD. C\'est tout.',
   },
   {
     q: 'Est-ce que ça remplace un vrai home staging ?',
-    a: 'Non, c\'est complémentaire. Le home staging virtuel est idéal pour les annonces en ligne (où 95% des acheteurs commencent leur recherche). Pour les visites physiques, un staging réel reste pertinent. Beaucoup de nos clients Pro utilisent InstaDeco pour le digital et un home stager pour les visites clés.',
+    a: 'C\'est complémentaire. Le home staging virtuel est idéal pour les annonces en ligne (où la majorité des acheteurs commencent leur recherche). Pour les visites physiques, un staging réel reste pertinent.',
   },
   {
     q: 'Puis-je annuler à tout moment ?',
-    a: 'Oui, le plan Pro Mensuel est sans engagement. Annulez en 1 clic depuis votre espace client. Vous conservez l\'accès jusqu\'à la fin de la période payée.',
+    a: 'Oui, sans engagement. Annulez en 1 clic depuis votre espace client ; vous conservez l\'accès jusqu\'à la fin de la période payée.',
   },
   {
-    q: 'Proposez-vous des tarifs pour les grandes agences ?',
-    a: 'Oui ! Pour les agences de plus de 10 utilisateurs, contactez-nous à contact@instadeco.app pour un tarif sur mesure avec facturation centralisée.',
+    q: 'Et pour une grande agence (plus de 3 sièges) ?',
+    a: 'Le plan Agence inclut 3 sièges. Au-delà, contactez-nous à contact@instadeco.app pour un tarif sur mesure avec facturation centralisée.',
   },
 ];
 
@@ -140,35 +176,67 @@ const FAQ = [
 
 export default function ProPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
+  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annual'>('monthly');
+  const [loadingPlan, setLoadingPlan] = useState<PlanId | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const { user } = useAuth();
+  const router = useRouter();
+  const locale = useLocale();
+
+  const handleSubscribe = async (planId: PlanId) => {
+    // Non connecté → inscription, puis retour au checkout du plan choisi.
+    if (!user || !user.email) {
+      router.push(`/signup?plan=${planId}&redirect=checkout`);
+      return;
+    }
+
+    setLoadingPlan(planId);
+    setError(null);
+    try {
+      const res = await createSubscriptionSession({
+        planId,
+        interval: billingPeriod,
+        successUrl: `${window.location.origin}/${locale}/dashboard?subscription=success`,
+        cancelUrl: `${window.location.origin}/${locale}/pro?subscription=cancelled`,
+      });
+      if (res.checkoutUrl) {
+        window.location.href = res.checkoutUrl;
+      } else {
+        setError('Impossible de démarrer le paiement. Réessayez.');
+        setLoadingPlan(null);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Une erreur est survenue. Réessayez.');
+      setLoadingPlan(null);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white">
       {/* ===== HERO ===== */}
       <section className="relative overflow-hidden bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#334155] text-white">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDE4YzEuNjU2IDAgMy0xLjM0NCAzLTNzLTEuMzQ0LTMtMy0zLTMgMS4zNDQtMyAzIDEuMzQ0IDMgMyAzem0wIDZjMS42NTYgMCAzLTEuMzQ0IDMtM3MtMS4zNDQtMy0zLTMtMyAxLjM0NC0zIDMgMS4zNDQgMyAzIDN6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-50" />
-        
+
         <div className="relative max-w-6xl mx-auto px-6 py-20 lg:py-28">
           <div className="text-center max-w-4xl mx-auto">
-            {/* Badge */}
             <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2 mb-8">
               <Building2 className="w-4 h-4 text-[#E07B54]" />
-              <span className="text-sm font-medium">Solution professionnelle</span>
+              <span className="text-sm font-medium">Solution professionnelle — immobilier</span>
             </div>
 
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
-              Home Staging Virtuel par IA
+              Vendez vos biens plus vite,
               <br />
-              <span className="text-[#E07B54]">pour les professionnels de l&apos;immobilier</span>
+              <span className="text-[#E07B54]">sans dépenser 2 000 € de home staging</span>
             </h1>
 
             <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-10 leading-relaxed">
-              Meublez virtuellement n&apos;importe quelle pièce en 10 secondes. 
-              Générations illimitées, qualité HD, 12 styles.
-              <strong className="text-white"> Vendez plus vite, à meilleur prix.</strong>
+              Meublez n&apos;importe quelle pièce (vide ou occupée) en 10 secondes par IA.
+              Rendu HD prêt pour votre annonce.
+              <strong className="text-white"> Home staging virtuel illimité pour les pros de l&apos;immobilier.</strong>
             </p>
 
-            {/* CTA */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
               <Link
                 href="#plans"
@@ -180,13 +248,12 @@ export default function ProPage() {
                 href="/generate"
                 className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 text-white px-8 py-4 rounded-full text-lg font-medium transition-all"
               >
-                Tester gratuitement
+                Testez gratuitement sur votre photo
               </Link>
             </div>
 
-            {/* Trust signals */}
             <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-400">
-              <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-400" /> Essai gratuit</span>
+              <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-400" /> Essai gratuit, sans CB</span>
               <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-400" /> Sans engagement</span>
               <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-400" /> Résultat en 10 secondes</span>
             </div>
@@ -199,22 +266,21 @@ export default function ProPage() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Un bien vide se vend <span className="text-red-500">2x moins vite</span>
+              Un bien meublé se vend <span className="text-[#E07B54]">jusqu&apos;à 73% plus vite</span>
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              90% des acheteurs commencent leur recherche en ligne. Sans mise en scène, 
+              La majorité des acheteurs commencent leur recherche en ligne. Sans mise en scène,
               votre bien passe inaperçu parmi des milliers d&apos;annonces.
             </p>
           </div>
 
-          {/* Comparaison ROI */}
           <div className="grid md:grid-cols-3 gap-6 mb-12">
             {ROI_COMPARISONS.map((item) => (
               <div
                 key={item.label}
                 className={`rounded-xl p-6 ${
-                  item.highlight 
-                    ? 'bg-[#E07B54] text-white ring-2 ring-[#E07B54] ring-offset-4 shadow-xl scale-105' 
+                  item.highlight
+                    ? 'bg-[#E07B54] text-white ring-2 ring-[#E07B54] ring-offset-4 shadow-xl scale-105'
                     : 'bg-white border border-gray-200'
                 }`}
               >
@@ -240,10 +306,9 @@ export default function ProPage() {
             ))}
           </div>
 
-          {/* Stats clés */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { value: '12', label: 'styles de décoration disponibles' },
+              { value: '−95%', label: 'vs un home staging physique' },
               { value: '~30s', label: 'pour transformer une pièce' },
               { value: '8', label: 'types de pièces supportés' },
               { value: 'HD+', label: 'jusqu\'à 2048px inclus' },
@@ -299,8 +364,8 @@ export default function ProPage() {
 
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              { step: 1, icon: Camera, title: 'Photographiez la pièce', desc: 'Prenez une photo de la pièce vide ou à redécorer. Smartphone ou appareil pro.' },
-              { step: 2, icon: Palette, title: 'Choisissez un style', desc: 'Moderne, scandinave, industriel... 12 styles pour s\'adapter à chaque bien et chaque cible.' },
+              { step: 1, icon: Camera, title: 'Photographiez la pièce', desc: 'Prenez une photo de la pièce vide ou occupée. Smartphone ou appareil pro.' },
+              { step: 2, icon: Palette, title: 'Choisissez un style', desc: 'Moderne, scandinave, industriel... un style pour chaque bien et chaque cible.' },
               { step: 3, icon: Download, title: 'Téléchargez en HD', desc: 'En 10 secondes, obtenez le rendu meublé en haute définition. Prêt pour vos annonces.' },
             ].map((item) => (
               <div key={item.step} className="text-center">
@@ -343,10 +408,10 @@ export default function ProPage() {
 
       {/* ===== PLANS PRO ===== */}
       <section id="plans" className="py-20 bg-gradient-to-b from-gray-50 to-white">
-        <div className="max-w-4xl mx-auto px-6">
+        <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Choisissez votre plan Pro
+              Choisissez votre plan
             </h2>
             <p className="text-lg text-gray-600 mb-8">
               Rentabilisé dès le premier bien vendu plus vite.
@@ -363,73 +428,83 @@ export default function ProPage() {
                 Mensuel
               </button>
               <button
-                onClick={() => setBillingPeriod('yearly')}
+                onClick={() => setBillingPeriod('annual')}
                 className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
-                  billingPeriod === 'yearly' ? 'bg-white shadow text-gray-900' : 'text-gray-500'
+                  billingPeriod === 'annual' ? 'bg-white shadow text-gray-900' : 'text-gray-500'
                 }`}
               >
-                Annuel <span className="text-[#E07B54] font-bold">-20%</span>
+                Annuel <span className="text-[#E07B54] font-bold">−30%</span>
               </button>
             </div>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8">
+          {error && (
+            <div className="max-w-md mx-auto mb-8 text-center bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3">
+              {error}
+            </div>
+          )}
+
+          <div className="grid md:grid-cols-3 gap-8 items-start">
             {PRO_PLANS.map((plan) => {
-              const isActive = (billingPeriod === 'monthly' && plan.id === 'pro_monthly') ||
-                               (billingPeriod === 'yearly' && plan.id === 'pro_yearly');
+              const price = billingPeriod === 'monthly' ? plan.monthly : plan.annual;
+              const isLoading = loadingPlan === plan.id;
               return (
                 <div
                   key={plan.id}
                   className={`rounded-2xl p-8 transition-all ${
-                    isActive
-                      ? 'bg-[#0f172a] text-white ring-2 ring-[#E07B54] shadow-2xl scale-105'
-                      : 'bg-white border border-gray-200 opacity-60'
+                    plan.popular
+                      ? 'bg-[#0f172a] text-white ring-2 ring-[#E07B54] shadow-2xl md:scale-105'
+                      : 'bg-white border border-gray-200'
                   }`}
                 >
-                  {plan.popular && (
+                  {plan.popular ? (
                     <div className="inline-block bg-[#E07B54] text-white text-xs font-bold px-3 py-1 rounded-full mb-4">
-                      RECOMMANDÉ
+                      {plan.tagline.toUpperCase()}
                     </div>
-                  )}
-                  {plan.savings && (
-                    <div className="inline-block bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-4">
-                      -{plan.savings}% ÉCONOMIE
+                  ) : (
+                    <div className="inline-block bg-gray-100 text-gray-600 text-xs font-bold px-3 py-1 rounded-full mb-4">
+                      {plan.tagline.toUpperCase()}
                     </div>
                   )}
 
-                  <h3 className={`text-2xl font-bold mb-2 ${isActive ? 'text-white' : 'text-gray-900'}`}>
+                  <h3 className={`text-2xl font-bold mb-2 ${plan.popular ? 'text-white' : 'text-gray-900'}`}>
                     {plan.name}
                   </h3>
 
-                  <div className="flex items-baseline gap-2 mb-2">
-                    <span className={`text-5xl font-bold ${isActive ? 'text-[#E07B54]' : 'text-gray-900'}`}>
-                      {plan.price}€
+                  <div className="flex items-baseline gap-2 mb-1">
+                    <span className={`text-5xl font-bold ${plan.popular ? 'text-[#E07B54]' : 'text-gray-900'}`}>
+                      {formatPrice(price)}€
                     </span>
-                    <span className={isActive ? 'text-gray-400' : 'text-gray-500'}>{plan.period}</span>
+                    <span className={plan.popular ? 'text-gray-400' : 'text-gray-500'}>/mois</span>
                   </div>
-                  {plan.billedAs && (
-                    <p className={`text-sm mb-6 ${isActive ? 'text-gray-400' : 'text-gray-500'}`}>{plan.billedAs}</p>
-                  )}
+                  <p className={`text-sm mb-6 h-5 ${plan.popular ? 'text-gray-400' : 'text-gray-500'}`}>
+                    {billingPeriod === 'annual' ? plan.annualBilled : ' '}
+                  </p>
 
                   <ul className="space-y-3 mb-8">
                     {plan.features.map((feature) => (
                       <li key={feature} className="flex items-start gap-3">
-                        <Check className={`w-5 h-5 flex-shrink-0 mt-0.5 ${isActive ? 'text-green-400' : 'text-green-500'}`} />
-                        <span className={`text-sm ${isActive ? 'text-gray-300' : 'text-gray-600'}`}>{feature}</span>
+                        <Check className={`w-5 h-5 flex-shrink-0 mt-0.5 ${plan.popular ? 'text-green-400' : 'text-green-500'}`} />
+                        <span className={`text-sm ${plan.popular ? 'text-gray-300' : 'text-gray-600'}`}>{feature}</span>
                       </li>
                     ))}
                   </ul>
 
-                  <Link
-                    href="/signup"
-                    className={`block w-full text-center py-4 rounded-full text-base font-semibold transition-all ${
-                      isActive
+                  <button
+                    onClick={() => handleSubscribe(plan.id)}
+                    disabled={isLoading}
+                    className={`flex items-center justify-center gap-2 w-full text-center py-4 rounded-full text-base font-semibold transition-all disabled:opacity-70 ${
+                      plan.popular
                         ? 'bg-[#E07B54] hover:bg-[#D4603C] text-white shadow-lg'
-                        : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        : 'bg-gray-900 hover:bg-gray-800 text-white'
                     }`}
                   >
-                    {plan.cta}
-                  </Link>
+                    {isLoading ? (
+                      <><Loader2 className="w-5 h-5 animate-spin" /> Redirection…</>
+                    ) : (
+                      <>S&apos;abonner <ArrowRight className="w-4 h-4" /></>
+                    )}
+                  </button>
                 </div>
               );
             })}
@@ -440,7 +515,7 @@ export default function ProPage() {
             <div className="inline-flex items-center gap-3 bg-green-50 border border-green-200 rounded-xl px-6 py-3">
               <Shield className="w-5 h-5 text-green-600" />
               <span className="text-sm text-green-800">
-                <strong>Garantie 30 jours</strong> — Pas satisfait ? Remboursé intégralement, sans question.
+                <strong>Sans engagement</strong> — annulez en 1 clic. Essai gratuit sans carte bancaire.
               </span>
             </div>
           </div>
@@ -456,15 +531,15 @@ export default function ProPage() {
             <div className="grid md:grid-cols-3 gap-8 mt-8">
               <div>
                 <p className="text-4xl font-bold text-[#E07B54]">49€</p>
-                <p className="text-gray-400 mt-2">Coût mensuel InstaDeco Pro</p>
+                <p className="text-gray-400 mt-2">par mois, générations illimitées</p>
               </div>
               <div>
                 <p className="text-4xl font-bold text-green-400">1 bien</p>
-                <p className="text-gray-400 mt-2">vendu plus vite par mois suffit à le rentabiliser</p>
+                <p className="text-gray-400 mt-2">vendu plus vite suffit à rentabiliser l&apos;année</p>
               </div>
               <div>
-                <p className="text-4xl font-bold text-yellow-400">x40</p>
-                <p className="text-gray-400 mt-2">moins cher qu&apos;un home staging physique</p>
+                <p className="text-4xl font-bold text-yellow-400">−95%</p>
+                <p className="text-gray-400 mt-2">vs un home staging physique</p>
               </div>
             </div>
             <Link
@@ -517,20 +592,20 @@ export default function ProPage() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
-              href="/signup"
+              href="#plans"
               className="inline-flex items-center gap-2 bg-[#E07B54] hover:bg-[#D4603C] text-white px-10 py-4 rounded-full text-lg font-semibold transition-all shadow-lg shadow-[#E07B54]/25"
             >
-              Essai gratuit <ArrowRight className="w-5 h-5" />
+              Voir les plans <ArrowRight className="w-5 h-5" />
             </Link>
             <a
-              href="mailto:contact@instadeco.app?subject=Demande%20offre%20Pro%20sur%20mesure"
+              href="mailto:contact@instadeco.app?subject=Demande%20offre%20Agence%20sur%20mesure"
               className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-lg"
             >
-              Ou contactez-nous pour un devis agence
+              Plus de 3 sièges ? Contactez-nous
             </a>
           </div>
           <p className="text-sm text-gray-500 mt-6">
-            Essai gratuit - Sans engagement - Remboursé sous 30 jours
+            Essai gratuit · Sans engagement · Annulez en 1 clic
           </p>
         </div>
       </section>

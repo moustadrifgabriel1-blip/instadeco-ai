@@ -238,7 +238,7 @@ export async function createCheckoutSession(
 // ========================
 
 export interface CreateSubscriptionRequest {
-  planId: 'sub_essentiel' | 'sub_pro' | 'sub_business';
+  planId: 'sub_essentiel' | 'sub_pro' | 'sub_business' | 'solo' | 'pro' | 'agence';
   interval: 'monthly' | 'annual';
   successUrl?: string;
   cancelUrl?: string;
