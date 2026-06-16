@@ -152,10 +152,88 @@ body:has([data-prestige-root]) {
   );
 }
 
-/* Curseur de la ligne de révélation avant/après */
-.prestige-reveal-handle {
-  background: linear-gradient(180deg, transparent 0%, var(--gold) 50%, transparent 100%);
+/* Voile léger sur les images éditoriales (intègre le cadre à la nuit) */
+.prestige-edito-veil {
+  background: linear-gradient(
+    180deg,
+    rgba(12, 10, 9, 0) 45%,
+    rgba(12, 10, 9, 0.55) 100%
+  );
+}
+
+/* Voile du clou : assez sombre pour porter la phrase sommet */
+.prestige-climax-veil {
+  background: radial-gradient(
+      120% 90% at 50% 50%,
+      rgba(12, 10, 9, 0.35) 30%,
+      rgba(12, 10, 9, 0.72) 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(12, 10, 9, 0.82) 0%,
+      rgba(12, 10, 9, 0.45) 35%,
+      rgba(12, 10, 9, 0.55) 70%,
+      rgba(12, 10, 9, 0.92) 100%
+    );
+}
+
+/* --- Comparateur avant/après : scène, poignée, ligne, knob --- */
+.prestige-compare-stage[data-interactive='true'] {
+  cursor: ew-resize;
+}
+
+/* La poignée est centrée sur la couture (translateX -50 %). */
+.prestige-compare-handle {
+  width: 0;
+  transform: translateX(-50%);
+}
+
+/* Ligne or pleine hauteur, halo doux */
+.prestige-compare-line {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  height: 100%;
+  width: 2px;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, transparent 0%, var(--gold) 18%, var(--gold) 82%, transparent 100%);
   box-shadow: 0 0 24px 2px var(--gold-soft);
+}
+
+/* Pastille ronde centrée, avec les deux chevrons */
+.prestige-compare-knob {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  height: 46px;
+  width: 46px;
+  align-items: center;
+  justify-content: center;
+  transform: translate(-50%, -50%);
+  border-radius: 9999px;
+  border: 1px solid var(--gold);
+  background: rgba(12, 10, 9, 0.72);
+  color: var(--gold);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 0 0 6px rgba(12, 10, 9, 0.25), 0 8px 30px rgba(0, 0, 0, 0.45);
+  transition: transform 0.45s var(--ease-slow), background-color 0.45s var(--ease-slow);
+}
+
+/* La pastille n'apparaît franchement qu'une fois le comparateur actif */
+.prestige-compare-stage[data-interactive='true'] .prestige-compare-knob {
+  background: rgba(12, 10, 9, 0.85);
+}
+.prestige-compare-stage[data-interactive='true'] .prestige-compare-handle:hover .prestige-compare-knob,
+.prestige-compare-stage[data-interactive='true'] .prestige-compare-handle:focus-visible .prestige-compare-knob {
+  transform: translate(-50%, -50%) scale(1.08);
+}
+.prestige-compare-handle:focus-visible {
+  outline: none;
+}
+.prestige-compare-handle:focus-visible .prestige-compare-knob {
+  outline: 2px solid var(--gold);
+  outline-offset: 4px;
 }
 
 /* Focus visible global (accessibilité) */

@@ -141,16 +141,29 @@ export function PrestigeHero() {
         </div>
       </div>
 
-      {/* Indice de scroll, entrée CSS retardée */}
+      {/* Méta verticale à droite, équilibre la composition et habille le vide */}
       <div
-        className="prestige-anim-fade absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2"
+        className="prestige-anim-fade pointer-events-none absolute right-5 top-1/2 z-10 hidden -translate-y-1/2 flex-col items-center gap-6 sm:right-9 lg:flex"
+        style={{ ['--d' as string]: '950ms' }}
+        aria-hidden
+      >
+        <span className="h-14 w-px bg-[var(--gold-line)]" />
+        <span className="prestige-eyebrow !text-[0.6rem] !tracking-[0.46em] text-[var(--mist)] [writing-mode:vertical-rl]">
+          Édition privée · MMXXVI
+        </span>
+        <span className="h-14 w-px bg-[var(--gold-line)]" />
+      </div>
+
+      {/* Indice de scroll, coin bas droit pour ne pas chevaucher le contenu */}
+      <div
+        className="prestige-anim-fade absolute bottom-7 right-6 z-10 flex flex-col items-center gap-3 sm:right-9"
         style={{ ['--d' as string]: '1100ms' }}
         aria-hidden
       >
-        <span className="prestige-eyebrow !tracking-[0.3em] !text-[0.58rem] text-[var(--mist)]">
+        <span className="prestige-eyebrow !text-[0.56rem] !tracking-[0.34em] text-[var(--mist)] [writing-mode:vertical-rl]">
           Descendre
         </span>
-        <span className="h-10 w-px animate-pulse bg-[var(--gold-line)]" />
+        <span className="h-12 w-px animate-pulse bg-[var(--gold-line)]" />
       </div>
     </section>
   );
