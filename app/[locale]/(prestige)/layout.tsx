@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Cormorant_Garamond, Josefin_Sans } from 'next/font/google';
+import { cormorant, josefin } from '@/lib/fonts';
 import './prestige.css';
 
 /**
@@ -13,27 +13,10 @@ import './prestige.css';
  * modification du layout global.
  */
 
-const cormorant = Cormorant_Garamond({
-  subsets: ['latin'],
-  weight: ['400', '500', '600'],
-  style: ['normal', 'italic'],
-  variable: '--font-display',
-  display: 'swap',
-  preload: true,
-});
-
-const josefin = Josefin_Sans({
-  subsets: ['latin'],
-  weight: ['300', '400', '500'],
-  variable: '--font-body',
-  display: 'swap',
-  preload: true,
-});
-
 export const metadata: Metadata = {
-  title: 'Visite privée — Bien d’exception | InstaDeco',
+  title: 'Visite privée · Home staging virtuel IA | InstaDeco',
   description:
-    'Home staging virtuel par IA pour les agences immobilières de prestige. Faites visiter l’exceptionnel.',
+    'Home staging virtuel par IA pour les agences immobilières de prestige. Vendez le rêve avant la visite.',
   // Maquette interne en cours de validation : on ne l'indexe pas.
   robots: { index: false, follow: false },
 };

@@ -5,24 +5,11 @@
    du header/footer global, ciblé via :has() pour cette route).
    ============================================================ */
 
-/* --- Tokens de la DA validée (centralisés ici) --- */
-.prestige-root {
-  --ink: #0c0a09; /* noir profond */
-  --stone-900: #1c1917; /* surface pierre sombre */
-  --stone-700: #44403c; /* surface pierre */
-  --gold: #c8a24d; /* or champagne (accent) */
-  --gold-soft: rgba(200, 162, 77, 0.5);
-  --gold-line: rgba(200, 162, 77, 0.28); /* filets or 1px */
-  --ivory: #faf8f4; /* réservé — non utilisé dans le flagship */
-  --mist: rgba(250, 248, 244, 0.62); /* texte secondaire sur noir */
-
-  /* easing lent validé */
-  --ease-slow: cubic-bezier(0.22, 1, 0.36, 1);
-
-  background-color: var(--ink);
-  color: #faf8f4;
-  min-height: 100vh;
-}
+/* Tokens DA, utilitaires (.prestige-display/.prestige-body/.prestige-eyebrow/
+   .prestige-rule) et focus visible vivent désormais dans app/globals.css
+   (scope .prestige-root, .prestige-app) pour être réutilisables sur tout le
+   site. Ce fichier ne garde que le spécifique au flagship /visite : masquage
+   header/footer, entrées scroll, voiles, comparateur. */
 
 /* Le route group est imbriqué sous le layout marketing global.
    On masque header/footer marketing UNIQUEMENT quand la maquette
@@ -36,39 +23,6 @@ body:has([data-prestige-root]) > div > footer {
 /* Le <main> global garde son flux mais sans la min-height marketing */
 body:has([data-prestige-root]) {
   background-color: var(--ink, #0c0a09);
-}
-
-/* --- Typo : variables fournies par next/font dans le layout --- */
-.prestige-display {
-  font-family: var(--font-display), 'Cormorant Garamond', Georgia, serif;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-}
-.prestige-body {
-  font-family: var(--font-body), 'Josefin Sans', system-ui, sans-serif;
-}
-
-/* Sur-titre / labels : Josefin Sans, capitales, tracking large */
-.prestige-eyebrow {
-  font-family: var(--font-body), 'Josefin Sans', system-ui, sans-serif;
-  text-transform: uppercase;
-  letter-spacing: 0.42em;
-  font-weight: 300;
-  font-size: clamp(0.62rem, 1.4vw, 0.78rem);
-  color: var(--gold);
-}
-
-/* Filet or 1px réutilisable */
-.prestige-rule {
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    var(--gold-line) 18%,
-    var(--gold) 50%,
-    var(--gold-line) 82%,
-    transparent 100%
-  );
 }
 
 /* --- Entrée HERO en CSS pur (pas d'attente d'hydratation) ---
@@ -234,13 +188,6 @@ body:has([data-prestige-root]) {
 .prestige-compare-handle:focus-visible .prestige-compare-knob {
   outline: 2px solid var(--gold);
   outline-offset: 4px;
-}
-
-/* Focus visible global (accessibilité) */
-.prestige-root :focus-visible {
-  outline: 2px solid var(--gold);
-  outline-offset: 4px;
-  border-radius: 2px;
 }
 
 /* --- prefers-reduced-motion : on coupe TOUTES les entrées/anim,
