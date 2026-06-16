@@ -20,7 +20,7 @@ import { useReferral } from '@/components/features/dashboard/useReferral';
 import type { ActiveTab } from '@/components/features/dashboard/types';
 
 /**
- * Page Dashboard — pur orchestrateur.
+ * Page Dashboard : pur orchestrateur.
  *
  * Toute la logique vit dans des hooks (useReferral, useProfileSettings,
  * usePasswordChange, useAccountActions) et le rendu dans des sous-composants
@@ -73,10 +73,10 @@ export default function DashboardPageV2() {
 
   if (authLoading || generationsState.isLoading) {
     return (
-      <div className="min-h-screen bg-[#fbfbfd] flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin text-[#1d1d1f] mx-auto" />
-          <p className="mt-4 text-[#636366]">Chargement...</p>
+          <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto" />
+          <p className="mt-4 text-muted-foreground prestige-eyebrow">Chargement...</p>
         </div>
       </div>
     );
@@ -87,7 +87,7 @@ export default function DashboardPageV2() {
   }
 
   return (
-    <div className="min-h-screen bg-[#fbfbfd]">
+    <div className="min-h-screen bg-background">
       <DashboardHeader
         credits={credits}
         creditsLoading={creditsState.isLoading}

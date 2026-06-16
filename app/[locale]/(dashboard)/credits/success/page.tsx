@@ -38,15 +38,15 @@ function PaymentSuccessContent() {
 
   if (isVerifying) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-amber-50">
-        <Card className="w-full max-w-md">
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Card className="w-full max-w-md bg-card border border-border">
           <CardContent className="pt-6">
             <div className="flex flex-col items-center space-y-4">
-              <Loader2 className="h-12 w-12 animate-spin text-[#E07B54]" />
-              <p className="text-lg font-medium text-gray-700">
+              <Loader2 className="h-12 w-12 animate-spin text-primary" />
+              <p className="prestige-display text-lg font-medium text-foreground">
                 Vérification du paiement...
               </p>
-              <p className="text-sm text-gray-500 text-center">
+              <p className="text-sm text-muted-foreground text-center">
                 Vos crédits seront ajoutés dans quelques secondes
               </p>
             </div>
@@ -57,29 +57,29 @@ function PaymentSuccessContent() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-blue-50 p-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <Card className="w-full max-w-md bg-card border border-border">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <CheckCircle className="h-16 w-16 text-green-500" />
+            <CheckCircle className="h-16 w-16 text-emerald-400" />
           </div>
-          <CardTitle className="text-2xl">Paiement réussi !</CardTitle>
-          <CardDescription>
+          <CardTitle className="prestige-display text-2xl text-foreground">Paiement réussi !</CardTitle>
+          <CardDescription className="text-muted-foreground">
             Vos crédits ont été ajoutés à votre compte
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-            <p className="text-sm text-green-800 text-center">
+          <div className="bg-muted border border-[var(--gold-line)] rounded-lg p-4">
+            <p className="text-sm text-emerald-400 text-center">
               ✅ Transaction complétée avec succès
             </p>
             {credits !== null && (
-              <p className="text-lg font-bold text-green-700 text-center mt-2">
+              <p className="prestige-display text-lg font-bold text-primary text-center mt-2">
                 Vous avez maintenant {credits} crédit{credits > 1 ? 's' : ''}
               </p>
             )}
             {sessionId && (
-              <p className="text-xs text-green-600 text-center mt-2">
+              <p className="text-xs text-muted-foreground text-center mt-2">
                 ID: {sessionId.slice(0, 20)}...
               </p>
             )}
@@ -109,12 +109,12 @@ function PaymentSuccessContent() {
 
 function LoadingFallback() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-amber-50">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <Card className="w-full max-w-md bg-card border border-border">
         <CardContent className="pt-6">
           <div className="flex flex-col items-center space-y-4">
-            <Loader2 className="h-12 w-12 animate-spin text-[#E07B54]" />
-            <p className="text-lg font-medium text-gray-700">
+            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+            <p className="prestige-display text-lg font-medium text-foreground">
               Chargement...
             </p>
           </div>

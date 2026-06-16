@@ -48,13 +48,13 @@ export function GenerationsTab({ generations, refetchGenerations, referralCode }
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold text-[#1d1d1f]">Mes créations</h1>
+        <h1 className="prestige-display text-2xl font-semibold text-foreground">Mes créations</h1>
         <div className="flex items-center gap-2">
-          <Filter className="w-4 h-4 text-[#636366]" />
+          <Filter className="w-4 h-4 text-muted-foreground" />
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value as FilterStatus)}
-            className="bg-[#f5f5f7] border-none rounded-lg px-3 py-2 text-sm text-[#1d1d1f]"
+            className="bg-muted border border-border rounded-lg px-3 py-2 text-sm text-foreground"
           >
             <option value="all">Toutes</option>
             <option value="completed">Terminées</option>
@@ -67,11 +67,11 @@ export function GenerationsTab({ generations, refetchGenerations, referralCode }
       {filteredGenerations.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
-            <ImageIcon className="w-12 h-12 text-[#d2d2d7] mx-auto mb-4" />
-            <p className="text-[#636366]">Aucune création pour le moment</p>
+            <ImageIcon className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+            <p className="text-muted-foreground">Aucune création pour le moment</p>
             <Link
               href="/generate"
-              className="inline-flex items-center gap-2 mt-4 px-6 py-2 bg-[#1d1d1f] text-white rounded-full hover:bg-black transition-colors"
+              className="inline-flex items-center gap-2 mt-4 px-6 py-2 bg-primary text-primary-foreground rounded-full hover:opacity-90 transition-opacity"
             >
               <Sparkles className="w-4 h-4" />
               Créer ma première image

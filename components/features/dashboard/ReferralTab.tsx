@@ -53,18 +53,18 @@ export function ReferralTab({ referralCode, referralStats }: ReferralTabProps) {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-[#1d1d1f] mb-6">Parrainage</h1>
+      <h1 className="prestige-display text-2xl font-semibold text-foreground mb-6">Parrainage</h1>
 
       {/* Referral value prop */}
-      <div className="bg-gradient-to-r from-[#FFF8F5] to-[#FFF0EB] rounded-2xl p-6 border border-[#F5D5C8] mb-6">
+      <div className="bg-card rounded-2xl p-6 border border-[var(--gold-line)] mb-6">
         <div className="flex items-start gap-3 sm:gap-4">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#E07B54] flex items-center justify-center flex-shrink-0">
-            <Gift className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-primary flex items-center justify-center flex-shrink-0">
+            <Gift className="w-5 h-5 sm:w-6 sm:h-6 text-primary-foreground" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-[#1d1d1f] mb-1">Invitez vos amis, gagnez des crédits</h2>
-            <p className="text-sm text-[#6B6B6B]">
-              Pour chaque ami qui s&apos;inscrit avec votre code, vous recevez tous les deux <span className="font-bold text-[#E07B54]">5 crédits gratuits</span>.
+            <h2 className="prestige-display text-lg font-semibold text-foreground mb-1">Invitez vos amis, gagnez des crédits</h2>
+            <p className="text-sm text-muted-foreground">
+              Pour chaque ami qui s&apos;inscrit avec votre code, vous recevez tous les deux <span className="font-bold text-primary">5 crédits gratuits</span>.
               Plus vous parrainez, plus vous créez !
             </p>
           </div>
@@ -74,21 +74,21 @@ export function ReferralTab({ referralCode, referralStats }: ReferralTabProps) {
       {/* Referral Code */}
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Share2 className="w-5 h-5 text-[#E07B54]" />
+          <CardTitle className="prestige-display flex items-center gap-2">
+            <Share2 className="w-5 h-5 text-primary" />
             Votre code de parrainage
           </CardTitle>
           <CardDescription>Partagez ce code avec vos amis pour qu&apos;ils l&apos;utilisent lors de leur inscription</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-            <div className="flex-1 bg-[#f5f5f7] rounded-xl px-4 py-3 font-mono text-base sm:text-lg font-bold text-[#1d1d1f] tracking-widest text-center">
+            <div className="flex-1 bg-muted rounded-xl px-4 py-3 font-mono text-base sm:text-lg font-bold text-foreground tracking-widest text-center">
               {referralCode || '...'}
             </div>
             <Button variant="outline" onClick={copyCode} className="flex items-center gap-2">
               {referralCopied ? (
                 <>
-                  <CheckCircle2 className="w-4 h-4 text-green-500" />
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                   Copié !
                 </>
               ) : (
@@ -118,18 +118,18 @@ export function ReferralTab({ referralCode, referralStats }: ReferralTabProps) {
         <Card>
           <CardContent className="pt-6">
             <div className="text-center">
-              <Users className="w-8 h-8 text-[#E07B54] mx-auto mb-2" />
-              <div className="text-3xl font-bold text-[#1d1d1f]">{referralStats.totalReferred}</div>
-              <p className="text-sm text-[#636366]">Amis parrainés</p>
+              <Users className="w-8 h-8 text-primary mx-auto mb-2" />
+              <div className="prestige-display text-3xl font-bold text-foreground">{referralStats.totalReferred}</div>
+              <p className="text-sm text-muted-foreground">Amis parrainés</p>
             </div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
             <div className="text-center">
-              <Sparkles className="w-8 h-8 text-[#E07B54] mx-auto mb-2" />
-              <div className="text-3xl font-bold text-[#1d1d1f]">{referralStats.totalCreditsEarned}</div>
-              <p className="text-sm text-[#636366]">Crédits gagnés</p>
+              <Sparkles className="w-8 h-8 text-primary mx-auto mb-2" />
+              <div className="prestige-display text-3xl font-bold text-foreground">{referralStats.totalCreditsEarned}</div>
+              <p className="text-sm text-muted-foreground">Crédits gagnés</p>
             </div>
           </CardContent>
         </Card>
@@ -138,18 +138,18 @@ export function ReferralTab({ referralCode, referralStats }: ReferralTabProps) {
       {/* How it works */}
       <Card>
         <CardHeader>
-          <CardTitle>Comment ça marche ?</CardTitle>
+          <CardTitle className="prestige-display">Comment ça marche ?</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             {HOW_IT_WORKS.map((item) => (
               <div key={item.step} className="flex items-start gap-4">
-                <div className="w-8 h-8 rounded-full bg-[#E07B54] text-white flex items-center justify-center flex-shrink-0 text-sm font-bold">
+                <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center flex-shrink-0 text-sm font-bold">
                   {item.step}
                 </div>
                 <div>
-                  <h4 className="font-medium text-[#1d1d1f]">{item.title}</h4>
-                  <p className="text-sm text-[#636366]">{item.desc}</p>
+                  <h4 className="font-medium text-foreground">{item.title}</h4>
+                  <p className="text-sm text-muted-foreground">{item.desc}</p>
                 </div>
               </div>
             ))}

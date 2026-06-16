@@ -84,7 +84,7 @@ export function TeamTab() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-6 h-6 animate-spin text-[#1d1d1f]" />
+        <Loader2 className="w-6 h-6 animate-spin text-primary" />
       </div>
     );
   }
@@ -92,18 +92,18 @@ export function TeamTab() {
   // Pas d'organisation → l'utilisateur n'a pas l'offre Agence.
   if (!data || !data.organization) {
     return (
-      <div className="bg-white rounded-2xl border border-[#e5e5e7] p-10 text-center">
-        <div className="w-14 h-14 rounded-2xl bg-[#E07B54]/10 flex items-center justify-center mx-auto mb-5">
-          <Building2 className="w-7 h-7 text-[#E07B54]" />
+      <div className="bg-card rounded-2xl border border-border p-10 text-center">
+        <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-5">
+          <Building2 className="w-7 h-7 text-primary" />
         </div>
-        <h2 className="text-xl font-bold text-[#1d1d1f] mb-2">Gérez votre équipe avec l&apos;offre Agence</h2>
-        <p className="text-[#636366] max-w-md mx-auto mb-6">
+        <h2 className="prestige-display text-xl font-bold text-foreground mb-2">Gérez votre équipe avec l&apos;offre Agence</h2>
+        <p className="text-muted-foreground max-w-md mx-auto mb-6">
           Invitez jusqu&apos;à 3 collaborateurs, partagez les générations illimitées et
           centralisez la facturation.
         </p>
         <Link
           href="/pro"
-          className="inline-flex items-center gap-2 bg-[#E07B54] hover:bg-[#D4603C] text-white px-6 py-3 rounded-full font-semibold transition-colors"
+          className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-full font-semibold transition-colors"
         >
           Découvrir l&apos;offre Agence <ArrowRight className="w-4 h-4" />
         </Link>
@@ -115,51 +115,51 @@ export function TeamTab() {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-2xl border border-[#e5e5e7] p-6">
+      <div className="bg-card rounded-2xl border border-border p-6">
         <div className="flex items-center justify-between mb-1">
-          <h2 className="text-xl font-bold text-[#1d1d1f] flex items-center gap-2">
-            <Users className="w-5 h-5" /> {data.organization.name}
+          <h2 className="prestige-display text-xl font-bold text-foreground flex items-center gap-2">
+            <Users className="w-5 h-5 text-primary" /> {data.organization.name}
           </h2>
-          <span className="text-sm text-[#636366]">
+          <span className="text-sm text-muted-foreground">
             {data.seatsUsed}/{data.seatsTotal} sièges utilisés
           </span>
         </div>
-        <p className="text-sm text-[#636366]">
+        <p className="text-sm text-muted-foreground">
           Les membres partagent les générations illimitées de l&apos;abonnement Agence.
         </p>
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3">{error}</div>
+        <div className="bg-destructive/10 border border-destructive/30 text-destructive text-sm rounded-xl px-4 py-3">{error}</div>
       )}
 
       {/* Inviter */}
-      <form onSubmit={handleInvite} className="bg-white rounded-2xl border border-[#e5e5e7] p-6">
-        <label className="block text-sm font-medium text-[#1d1d1f] mb-2">Inviter un membre</label>
+      <form onSubmit={handleInvite} className="bg-card rounded-2xl border border-border p-6">
+        <label className="prestige-eyebrow block text-sm font-medium text-muted-foreground mb-2">Inviter un membre</label>
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
-            <Mail className="w-4 h-4 text-[#8e8e93] absolute left-3 top-1/2 -translate-y-1/2" />
+            <Mail className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="email"
               value={inviteEmail}
               onChange={(e) => setInviteEmail(e.target.value)}
               placeholder="email@agence.com"
               disabled={seatsFull || busy}
-              className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-[#e5e5e7] focus:border-[#1d1d1f] outline-none disabled:bg-[#f5f5f7]"
+              className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:border-[var(--gold-line)] outline-none disabled:bg-muted"
             />
           </div>
           <button
             type="submit"
             disabled={seatsFull || busy || !inviteEmail.trim()}
-            className="inline-flex items-center justify-center gap-2 bg-[#1d1d1f] hover:bg-black text-white px-5 py-2.5 rounded-xl font-medium transition-colors disabled:opacity-50"
+            className="inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-5 py-2.5 rounded-xl font-medium transition-colors disabled:opacity-50"
           >
             {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Inviter'}
           </button>
         </div>
         {seatsFull && (
-          <p className="text-sm text-[#636366] mt-2">
+          <p className="text-sm text-muted-foreground mt-2">
             Tous les sièges sont occupés. Retirez un membre, ou{' '}
-            <a href="mailto:contact@instadeco.app?subject=Sièges%20supplémentaires" className="text-[#E07B54] underline">
+            <a href="mailto:contact@instadeco.app?subject=Sièges%20supplémentaires" className="text-primary underline">
               demandez des sièges supplémentaires
             </a>.
           </p>
@@ -167,12 +167,12 @@ export function TeamTab() {
       </form>
 
       {/* Membres */}
-      <div className="bg-white rounded-2xl border border-[#e5e5e7] divide-y divide-[#f0f0f2]">
+      <div className="bg-card rounded-2xl border border-border divide-y divide-border">
         {data.members.map((m) => (
           <div key={m.id} className="flex items-center justify-between px-6 py-4">
             <div>
-              <p className="text-[#1d1d1f] font-medium">{m.email}</p>
-              <p className="text-xs text-[#8e8e93]">
+              <p className="text-foreground font-medium">{m.email}</p>
+              <p className="text-xs text-muted-foreground">
                 {m.role === 'owner' ? 'Propriétaire' : 'Membre'}
                 {m.status === 'pending' && ' · invitation en attente'}
               </p>
@@ -181,7 +181,7 @@ export function TeamTab() {
               <button
                 onClick={() => handleRemove(m.id)}
                 disabled={busy}
-                className="text-[#8e8e93] hover:text-red-600 transition-colors disabled:opacity-50"
+                className="text-muted-foreground hover:text-destructive transition-colors disabled:opacity-50"
                 aria-label="Retirer le membre"
               >
                 <Trash2 className="w-4 h-4" />

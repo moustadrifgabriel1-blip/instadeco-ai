@@ -24,7 +24,7 @@ export function AccountTab({ user, supabase, credits, generationsCount, onAccoun
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold text-[#1d1d1f] mb-6">Mon compte</h1>
+      <h1 className="prestige-display text-2xl font-semibold text-foreground mb-6">Mon compte</h1>
 
       {/* Profil Card */}
       <Card>
@@ -52,13 +52,13 @@ export function AccountTab({ user, supabase, credits, generationsCount, onAccoun
         </CardHeader>
         <CardContent className="space-y-4">
           {profile.profileSuccess && (
-            <div className="flex items-center gap-2 text-sm text-green-600 bg-green-50 px-3 py-2 rounded-lg">
+            <div className="flex items-center gap-2 text-sm text-emerald-400 bg-emerald-500/10 px-3 py-2 rounded-lg">
               <CheckCircle2 className="w-4 h-4" />
               {profile.profileSuccess}
             </div>
           )}
           {profile.profileError && (
-            <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">
+            <div className="flex items-center gap-2 text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-lg">
               <XCircle className="w-4 h-4" />
               {profile.profileError}
             </div>
@@ -66,7 +66,7 @@ export function AccountTab({ user, supabase, credits, generationsCount, onAccoun
 
           <div className="grid gap-4">
             <div>
-              <label className="text-sm font-medium text-[#636366] mb-1 block">Nom d&apos;affichage</label>
+              <label className="text-sm font-medium text-muted-foreground mb-1 block">Nom d&apos;affichage</label>
               {profile.isEditingProfile ? (
                 <Input
                   value={profile.displayName}
@@ -75,16 +75,16 @@ export function AccountTab({ user, supabase, credits, generationsCount, onAccoun
                   className="max-w-sm"
                 />
               ) : (
-                <p className="text-[#1d1d1f]">
+                <p className="text-foreground">
                   {user?.user_metadata?.display_name || user?.user_metadata?.full_name || (
-                    <span className="text-[#636366] italic">Non renseigné</span>
+                    <span className="text-muted-foreground italic">Non renseigné</span>
                   )}
                 </p>
               )}
             </div>
             <div>
-              <label className="text-sm font-medium text-[#636366] mb-1 block">Email</label>
-              <p className="text-[#1d1d1f]">{user?.email}</p>
+              <label className="text-sm font-medium text-muted-foreground mb-1 block">Email</label>
+              <p className="text-foreground">{user?.email}</p>
             </div>
           </div>
         </CardContent>
@@ -98,13 +98,13 @@ export function AccountTab({ user, supabase, credits, generationsCount, onAccoun
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 gap-4">
-            <div className="bg-gradient-to-br from-[#FFF8F5] to-[#FFF0EB] rounded-xl p-4 text-center">
-              <div className="text-2xl font-bold text-[#E07B54]">{credits}</div>
-              <div className="text-sm text-[#6B6B6B] mt-1">Crédits disponibles</div>
+            <div className="bg-muted border border-[var(--gold-line)] rounded-xl p-4 text-center">
+              <div className="prestige-display text-2xl font-bold text-primary">{credits}</div>
+              <div className="text-sm text-muted-foreground mt-1">Crédits disponibles</div>
             </div>
-            <div className="bg-gradient-to-br from-[#F0F7FF] to-[#E8F0FE] rounded-xl p-4 text-center">
-              <div className="text-2xl font-bold text-[#0071e3]">{generationsCount}</div>
-              <div className="text-sm text-[#6B6B6B] mt-1">Créations</div>
+            <div className="bg-muted border border-border rounded-xl p-4 text-center">
+              <div className="prestige-display text-2xl font-bold text-foreground">{generationsCount}</div>
+              <div className="text-sm text-muted-foreground mt-1">Créations</div>
             </div>
           </div>
         </CardContent>
@@ -114,7 +114,7 @@ export function AccountTab({ user, supabase, credits, generationsCount, onAccoun
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <FileDown className="w-5 h-5 text-[#0071e3]" />
+            <FileDown className="w-5 h-5 text-primary" />
             Mes données personnelles
           </CardTitle>
           <CardDescription>Conformément au RGPD, vous pouvez exporter ou supprimer vos données</CardDescription>
@@ -128,13 +128,13 @@ export function AccountTab({ user, supabase, credits, generationsCount, onAccoun
             <Button
               variant="outline"
               onClick={() => account.setShowDeleteModal(true)}
-              className="flex-1 gap-2 text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
+              className="flex-1 gap-2 text-destructive border-destructive/40 hover:bg-destructive/10 hover:text-destructive"
             >
               <Trash2 className="w-4 h-4" />
               Supprimer mon compte
             </Button>
           </div>
-          <p className="text-xs text-[#636366]">
+          <p className="text-xs text-muted-foreground">
             L&apos;export contient toutes vos données personnelles au format JSON.
           </p>
         </CardContent>
@@ -150,26 +150,26 @@ export function AccountTab({ user, supabase, credits, generationsCount, onAccoun
             role="dialog"
             aria-modal="true"
             aria-labelledby="delete-modal-title"
-            className="bg-white rounded-2xl p-4 sm:p-6 max-w-md w-full shadow-xl"
+            className="bg-card border border-border rounded-2xl p-4 sm:p-6 max-w-md w-full shadow-xl"
             onClick={(e) => e.stopPropagation()}
             onKeyDown={(e) => { if (e.key === 'Escape') { account.setShowDeleteModal(false); account.setDeleteConfirmText(''); } }}
           >
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
-                <AlertTriangle className="w-5 h-5 text-red-600" />
+              <div className="w-10 h-10 rounded-full bg-destructive/15 flex items-center justify-center">
+                <AlertTriangle className="w-5 h-5 text-destructive" />
               </div>
-              <h3 id="delete-modal-title" className="text-lg font-semibold text-[#1d1d1f]">Supprimer mon compte</h3>
+              <h3 id="delete-modal-title" className="prestige-display text-lg font-semibold text-foreground">Supprimer mon compte</h3>
             </div>
-            <p className="text-sm text-[#6B6B6B] mb-4">
-              Cette action est <strong className="text-red-600">irréversible</strong>. Toutes vos données seront définitivement supprimées :
+            <p className="text-sm text-muted-foreground mb-4">
+              Cette action est <strong className="text-destructive">irréversible</strong>. Toutes vos données seront définitivement supprimées :
             </p>
-            <ul className="text-sm text-[#6B6B6B] mb-4 space-y-1 list-disc pl-5">
+            <ul className="text-sm text-muted-foreground mb-4 space-y-1 list-disc pl-5">
               <li>Votre profil et informations personnelles</li>
               <li>Toutes vos générations et images</li>
               <li>Votre historique de crédits et transactions</li>
             </ul>
-            <p className="text-sm text-[#1d1d1f] font-medium mb-2">
-              Tapez <code className="bg-red-50 text-red-600 px-1.5 py-0.5 rounded text-xs">SUPPRIMER MON COMPTE</code> pour confirmer :
+            <p className="text-sm text-foreground font-medium mb-2">
+              Tapez <code className="bg-destructive/10 text-destructive px-1.5 py-0.5 rounded text-xs">SUPPRIMER MON COMPTE</code> pour confirmer :
             </p>
             <Input
               value={account.deleteConfirmText}
@@ -188,7 +188,7 @@ export function AccountTab({ user, supabase, credits, generationsCount, onAccoun
               <Button
                 onClick={account.handleDeleteAccount}
                 disabled={account.deleteConfirmText !== 'SUPPRIMER MON COMPTE' || account.isDeleting}
-                className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                className="flex-1 bg-destructive hover:bg-destructive/90 text-destructive-foreground"
               >
                 {account.isDeleting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Trash2 className="w-4 h-4 mr-2" />}
                 Supprimer

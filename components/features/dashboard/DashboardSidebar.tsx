@@ -12,7 +12,7 @@ interface DashboardSidebarProps {
 
 const baseBtn = 'w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-colors';
 function tabClass(active: boolean) {
-  return `${baseBtn} ${active ? 'bg-[#1d1d1f] text-white' : 'text-[#1d1d1f] hover:bg-[#f5f5f7]'}`;
+  return `${baseBtn} ${active ? 'bg-primary text-primary-foreground' : 'text-foreground hover:bg-muted'}`;
 }
 
 export function DashboardSidebar({ activeTab, setActiveTab, referredCount }: DashboardSidebarProps) {
@@ -39,14 +39,14 @@ export function DashboardSidebar({ activeTab, setActiveTab, referredCount }: Das
           <Gift className="w-5 h-5" />
           Parrainage
           {referredCount > 0 && (
-            <span className="ml-auto bg-[#E07B54] text-white text-xs px-2 py-0.5 rounded-full">
+            <span className="ml-auto bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded-full">
               {referredCount}
             </span>
           )}
         </button>
         <Link
           href="/pricing"
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left text-[#1d1d1f] hover:bg-[#f5f5f7] transition-colors"
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left text-foreground hover:bg-muted transition-colors"
         >
           <CreditCard className="w-5 h-5" />
           Acheter des crédits

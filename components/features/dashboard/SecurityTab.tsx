@@ -19,11 +19,11 @@ export function SecurityTab({ user, supabase }: SecurityTabProps) {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-[#1d1d1f] mb-6">Sécurité</h1>
+      <h1 className="prestige-display text-2xl font-semibold text-foreground mb-6">Sécurité</h1>
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Shield className="w-5 h-5 text-[#E07B54]" />
+          <CardTitle className="prestige-display flex items-center gap-2">
+            <Shield className="w-5 h-5 text-primary" />
             Changer le mot de passe
           </CardTitle>
           <CardDescription>Choisissez un mot de passe fort pour protéger votre compte</CardDescription>
@@ -32,7 +32,7 @@ export function SecurityTab({ user, supabase }: SecurityTabProps) {
           <form onSubmit={pwd.handleChangePassword} className="space-y-5">
             {/* New password */}
             <div>
-              <label htmlFor="new-password" className="block text-sm font-medium text-[#636366] mb-1.5">
+              <label htmlFor="new-password" className="block text-sm font-medium text-muted-foreground mb-1.5">
                 Nouveau mot de passe
               </label>
               <div className="relative">
@@ -47,7 +47,7 @@ export function SecurityTab({ user, supabase }: SecurityTabProps) {
                 <button
                   type="button"
                   onClick={() => pwd.setShowNewPassword(!pwd.showNewPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#636366] hover:text-[#1d1d1f] transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 >
                   {pwd.showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -61,36 +61,36 @@ export function SecurityTab({ user, supabase }: SecurityTabProps) {
                       <div
                         key={level}
                         className={`h-1.5 flex-1 rounded-full transition-all ${
-                          strength.score >= level ? strength.color : 'bg-gray-200'
+                          strength.score >= level ? strength.color : 'bg-muted'
                         }`}
                       />
                     ))}
                   </div>
                   <p className={`text-xs font-medium ${
-                    strength.score === 1 ? 'text-red-500' : strength.score === 2 ? 'text-amber-500' : 'text-green-500'
+                    strength.score === 1 ? 'text-destructive' : strength.score === 2 ? 'text-amber-400' : 'text-emerald-400'
                   }`}>
                     Force : {strength.label}
                   </p>
 
                   {/* Critères */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-xs">
-                    <div className={`flex items-center gap-1.5 ${newPassword.length >= 8 ? 'text-green-600' : 'text-[#636366]'}`}>
+                    <div className={`flex items-center gap-1.5 ${newPassword.length >= 8 ? 'text-emerald-400' : 'text-muted-foreground'}`}>
                       {newPassword.length >= 8 ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
                       8 caractères min.
                     </div>
-                    <div className={`flex items-center gap-1.5 ${/[A-Z]/.test(newPassword) ? 'text-green-600' : 'text-[#636366]'}`}>
+                    <div className={`flex items-center gap-1.5 ${/[A-Z]/.test(newPassword) ? 'text-emerald-400' : 'text-muted-foreground'}`}>
                       {/[A-Z]/.test(newPassword) ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
                       1 majuscule
                     </div>
-                    <div className={`flex items-center gap-1.5 ${/[a-z]/.test(newPassword) ? 'text-green-600' : 'text-[#636366]'}`}>
+                    <div className={`flex items-center gap-1.5 ${/[a-z]/.test(newPassword) ? 'text-emerald-400' : 'text-muted-foreground'}`}>
                       {/[a-z]/.test(newPassword) ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
                       1 minuscule
                     </div>
-                    <div className={`flex items-center gap-1.5 ${/[0-9]/.test(newPassword) ? 'text-green-600' : 'text-[#636366]'}`}>
+                    <div className={`flex items-center gap-1.5 ${/[0-9]/.test(newPassword) ? 'text-emerald-400' : 'text-muted-foreground'}`}>
                       {/[0-9]/.test(newPassword) ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
                       1 chiffre
                     </div>
-                    <div className={`flex items-center gap-1.5 ${/[!@#$%^&*(),.?":{}|<>]/.test(newPassword) ? 'text-green-600' : 'text-[#636366]'}`}>
+                    <div className={`flex items-center gap-1.5 ${/[!@#$%^&*(),.?":{}|<>]/.test(newPassword) ? 'text-emerald-400' : 'text-muted-foreground'}`}>
                       {/[!@#$%^&*(),.?":{}|<>]/.test(newPassword) ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
                       1 caractère spécial
                     </div>
@@ -101,7 +101,7 @@ export function SecurityTab({ user, supabase }: SecurityTabProps) {
 
             {/* Confirm password */}
             <div>
-              <label htmlFor="confirm-password" className="block text-sm font-medium text-[#636366] mb-1.5">
+              <label htmlFor="confirm-password" className="block text-sm font-medium text-muted-foreground mb-1.5">
                 Confirmer le mot de passe
               </label>
               <div className="relative">
@@ -116,19 +116,19 @@ export function SecurityTab({ user, supabase }: SecurityTabProps) {
                 <button
                   type="button"
                   onClick={() => pwd.setShowConfirmPassword(!pwd.showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#636366] hover:text-[#1d1d1f] transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 >
                   {pwd.showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
               {confirmPassword.length > 0 && newPassword !== confirmPassword && (
-                <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                <p className="text-xs text-destructive mt-1 flex items-center gap-1">
                   <XCircle className="w-3 h-3" />
                   Les mots de passe ne correspondent pas
                 </p>
               )}
               {confirmPassword.length > 0 && newPassword === confirmPassword && (
-                <p className="text-xs text-green-500 mt-1 flex items-center gap-1">
+                <p className="text-xs text-emerald-400 mt-1 flex items-center gap-1">
                   <CheckCircle2 className="w-3 h-3" />
                   Les mots de passe correspondent
                 </p>
@@ -136,13 +136,13 @@ export function SecurityTab({ user, supabase }: SecurityTabProps) {
             </div>
 
             {pwd.passwordError && (
-              <div role="alert" className="flex items-center gap-2 text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">
+              <div role="alert" className="flex items-center gap-2 text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-lg">
                 <XCircle className="w-4 h-4 flex-shrink-0" />
                 {pwd.passwordError}
               </div>
             )}
             {pwd.passwordSuccess && (
-              <div className="flex items-center gap-2 text-sm text-green-600 bg-green-50 px-3 py-2 rounded-lg">
+              <div className="flex items-center gap-2 text-sm text-emerald-400 bg-emerald-400/10 px-3 py-2 rounded-lg">
                 <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
                 {pwd.passwordSuccess}
               </div>
