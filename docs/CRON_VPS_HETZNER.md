@@ -49,3 +49,87 @@ Réutilise le même VPS. Pour chaque projet :
 ## Sécurité
 - `CRON_SECRET` jamais commité (fichier `/etc/*-cron.env`, chmod 600).
 - Les routes refusent tout appel sans `Authorization: Bearer ${CRON_SECRET}` (jamais de confiance à un header de plateforme seul — cf. CLAUDE.md).
+
+---
+
+# Moteur SEO autonome sur le VPS (au lieu de GitHub Actions)
+
+> Le moteur `.claude/seo-engine/` (scripts Python qui collectent GSC, rangs, drift,
+> citations LLM) tournait via `.github/workflows/seo-engine.yml`. On le bascule sur le
+> **même VPS** que les crons app. Raison : GitHub Actions retarde les crons planifiés et
+> **coupe les workflows après 60 jours sans commit** (un moteur « autonome » qui s'éteint
+> tout seul). Le VPS est déjà payé → coût marginal nul, horaires fiables, tout centralisé.
+
+## Prérequis qui ne disparaissent PAS (peu importe où ça tourne)
+1. **Compte de service Google** (lecture Search Console). C'est l'identifiant, pas le
+   planificateur. Clic-par-clic ci-dessous.
+2. **Renvoyer les rapports dans le repo** : les agents `seo-chief` lisent
+   `.claude/seo-engine/reports/` et `.claude/seo-memory/`. Le runner fait `git commit && push`
+   si `PUSH_REPORTS=1` → le VPS a donc besoin d'un accès git en écriture (deploy key SSH ou
+   token avec scope `repo`).
+
+## Compte de service Google (clic-par-clic)
+**Console Cloud** (https://console.cloud.google.com)
+1. Sélecteur de projet (en haut) → **Nouveau projet** `instadeco-seo` → **Créer** → sélectionne-le.
+2. ☰ → **APIs et services** → **Bibliothèque** → cherche **Google Search Console API** → **Activer**.
+   (optionnel : active aussi **PageSpeed Insights API** et **Google Analytics Data API**.)
+3. ☰ → **APIs et services** → **Identifiants** → **+ Créer des identifiants** → **Compte de service**.
+4. Nom `seo-engine` → **Créer et continuer** → rôle vide → **OK**.
+5. Clique le compte `seo-engine@...` → onglet **Clés** → **Ajouter une clé** → **Créer** → **JSON**.
+   Un `.json` se télécharge. Note l'e-mail `seo-engine@instadeco-seo.iam.gserviceaccount.com`.
+
+**Search Console** (https://search.google.com/search-console)
+6. Propriété **instadeco.app** → **Paramètres** → **Utilisateurs et autorisations** →
+   **Ajouter un utilisateur** → colle l'e-mail du compte de service → autorisation **Complète** → **Ajouter**.
+
+## Installation sur le VPS (une fois)
+```bash
+# 1. Cloner le repo (lecture seule suffit si PUSH_REPORTS=0)
+sudo mkdir -p /opt/instadeco
+sudo git clone https://github.com/moustadrifgabriel1-blip/instadeco-ai.git /opt/instadeco/instadeco-ai
+
+# 2. venv Python + dépendances
+python3 -m venv /opt/instadeco/seo-venv
+/opt/instadeco/seo-venv/bin/pip install -r /opt/instadeco/instadeco-ai/.claude/seo-engine/requirements.txt
+
+# 3. Déposer la clé du compte de service (le .json téléchargé) + le runner
+sudo cp ~/seo-engine-xxxx.json /etc/instadeco-gsc.json   # le JSON Google
+sudo chmod 600 /etc/instadeco-gsc.json
+sudo cp /opt/instadeco/instadeco-ai/scripts/seo-engine/run-seo-engine.sh /opt/instadeco/run-seo-engine.sh
+sudo chmod +x /opt/instadeco/run-seo-engine.sh
+
+# 4. Fichier d'env (NON commité, root only)
+sudo tee /etc/instadeco-seo.env >/dev/null <<'EOF'
+REPO_DIR=/opt/instadeco/instadeco-ai
+VENV_DIR=/opt/instadeco/seo-venv
+GOOGLE_APPLICATION_CREDENTIALS=/etc/instadeco-gsc.json
+GSC_SITE_URL=https://instadeco.app
+GA4_PROPERTY_ID=
+PAGESPEED_API_KEY=
+OPENAI_API_KEY=
+PERPLEXITY_API_KEY=
+USD_CHF_RATE=0.88
+PUSH_REPORTS=0
+EOF
+sudo chmod 600 /etc/instadeco-seo.env
+
+# 5. Test manuel (doit finir par "OK")
+/opt/instadeco/run-seo-engine.sh gsc_daily
+```
+
+## Activer les rapports poussés dans le repo (PUSH_REPORTS=1)
+Une fois le run vert, pour que `seo-chief` lise les chiffres réels :
+1. Donner au VPS un accès git en écriture : deploy key SSH (repo → Settings → Deploy keys,
+   case « Allow write access ») ou un token, et `git remote set-url` en SSH dans `REPO_DIR`.
+2. Passer `PUSH_REPORTS=1` dans `/etc/instadeco-seo.env`.
+
+## Planifier (crontab)
+```bash
+crontab scripts/seo-engine/seo-engine.crontab.example   # adapte les chemins si ≠ /opt/instadeco
+crontab -l   # vérifier
+```
+
+## Bascule finale (après validation des runs VPS)
+1. Confirmer plusieurs runs verts + rapports poussés.
+2. Dans `.github/workflows/seo-engine.yml` : laisser le `workflow_dispatch` (filet de secours
+   manuel), garder le `schedule:` commenté → GitHub ne planifie rien, le VPS est seul maître.
