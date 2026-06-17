@@ -157,9 +157,9 @@ function ArticleGrid({ articles }: { articles: Array<{
 }> }) {
   if (articles.length === 0) {
     return (
-      <div className="text-center py-12">
-        <Newspaper className="h-16 w-16 mx-auto text-muted-foreground/50 mb-4" />
-        <h2 className="text-xl font-semibold mb-2">Aucun article trouvé</h2>
+      <div className="prestige-reveal text-center py-12">
+        <Newspaper className="h-16 w-16 mx-auto text-[var(--gold)]/50 mb-4" />
+        <h2 className="prestige-display text-xl font-semibold mb-2">Aucun article trouvé</h2>
         <p className="text-muted-foreground">
           Revenez bientôt pour découvrir nos prochains articles !
         </p>
@@ -170,11 +170,16 @@ function ArticleGrid({ articles }: { articles: Array<{
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {articles.map((article, index) => (
-        <ArticleCard
+        <div
           key={article.id}
-          {...article}
-          featured={index === 0}
-        />
+          className="prestige-reveal"
+          style={{ ['--reveal-d' as string]: `${Math.min(index, 5) * 120}ms` }}
+        >
+          <ArticleCard
+            {...article}
+            featured={index === 0}
+          />
+        </div>
       ))}
     </div>
   );
@@ -215,24 +220,28 @@ export default async function BlogPage({ params, searchParams }: BlogPageProps) 
     <div className="container mx-auto px-4 py-8">
       {/* Header */}
       <header className="text-center mb-12">
-        <h1 className="text-4xl font-bold mb-4">
-          Blog Décoration Intérieure
+        <span className="prestige-eyebrow inline-block mb-5">
+          Le journal InstaDeco
+        </span>
+        <h1 className="prestige-display text-4xl font-bold mb-4">
+          Blog <span className="text-[var(--gold)] italic">Décoration</span> Intérieure
         </h1>
+        <div className="prestige-rule w-24 mx-auto mb-6" aria-hidden="true" />
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-          Conseils d&apos;experts, tendances 2026 et inspirations pour transformer 
+          Conseils d&apos;experts, tendances 2026 et inspirations pour transformer
           votre intérieur en Suisse, France et Belgique.
         </p>
       </header>
 
       {/* Filtre actif */}
       {tag && (
-        <div className="mb-6 flex items-center gap-2">
+        <div className="prestige-reveal mb-6 flex items-center gap-2">
           <span className="text-muted-foreground">Filtré par :</span>
-          <span className="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
+          <span className="inline-flex items-center rounded-full bg-[rgba(200,162,77,0.12)] border border-[var(--gold-line)] px-3 py-1 text-sm font-medium text-[var(--gold)]">
             {tag}
             <Link
               href="/blog"
-              className="ml-2 text-primary/70 hover:text-primary"
+              className="ml-2 text-[var(--gold)]/70 hover:text-[var(--gold)] transition-colors duration-300"
               aria-label="Supprimer le filtre"
             >
               ×
@@ -251,7 +260,7 @@ export default async function BlogPage({ params, searchParams }: BlogPageProps) 
 
           {/* Pagination */}
           {pagination.totalPages > 1 && (
-            <div className="mt-8">
+            <div className="prestige-reveal mt-8">
               <Suspense fallback={null}>
                 <Pagination
                   currentPage={pagination.page}
@@ -264,7 +273,7 @@ export default async function BlogPage({ params, searchParams }: BlogPageProps) 
         </main>
 
         {/* Sidebar */}
-        <div className="lg:col-span-1">
+        <div className="prestige-reveal lg:col-span-1" style={{ ['--reveal-d' as string]: '120ms' }}>
           <BlogSidebar
             popularTags={popularTags}
             recentArticles={recentArticles}

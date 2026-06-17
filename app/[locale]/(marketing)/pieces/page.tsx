@@ -141,13 +141,15 @@ export default async function PiecesIndexPage({ params }: { params: Promise<{ lo
       {/* HERO */}
       <section className="pt-16 pb-12">
         <div className="container px-4 md:px-6 text-center max-w-3xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
-            Décorez chaque <span className="text-primary">pièce</span> de votre intérieur
+          <p className="prestige-eyebrow mb-5">Décoration par pièce</p>
+          <h1 className="prestige-display text-4xl md:text-5xl font-bold tracking-tight mb-4">
+            Décorez chaque <span className="text-[var(--gold)] italic">pièce</span> de votre intérieur
           </h1>
+          <div className="prestige-rule w-24 mx-auto mb-6" />
           <p className="text-lg text-muted-foreground mb-8">
             Salon, chambre, cuisine, bureau : notre IA s&apos;adapte à chaque espace. Cliquez sur une pièce pour découvrir les styles recommandés et visualiser votre transformation.
           </p>
-          <Button size="lg" className="rounded-full" asChild>
+          <Button size="lg" className="rounded-full bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)] transition duration-300 ease" asChild>
             <Link href="/generate">
               <Home className="w-4 h-4 mr-2" />
               Décorer ma pièce maintenant
@@ -160,18 +162,22 @@ export default async function PiecesIndexPage({ params }: { params: Promise<{ lo
       <section className="pb-20">
         <div className="container px-4 md:px-6">
           <div className="grid md:grid-cols-2 gap-6">
-            {ROOMS.map((room) => {
+            {ROOMS.map((room, i) => {
               const Icon = room.icon;
               return (
-                <Card key={room.slug} className="group hover:shadow-lg transition-shadow">
+                <Card
+                  key={room.slug}
+                  className="prestige-reveal group bg-card border border-[var(--gold-line)] hover:shadow-lg hover:border-[var(--gold)] transition duration-500 ease"
+                  style={{ ['--reveal-d' as string]: `${(i % 2) * 120}ms` }}
+                >
                   <CardContent className="p-6">
                     <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                        <Icon className="w-6 h-6 text-primary" />
+                      <div className="w-12 h-12 rounded-xl bg-[var(--gold)]/10 border border-[var(--gold-line)] flex items-center justify-center shrink-0">
+                        <Icon className="w-6 h-6 text-[var(--gold)]" />
                       </div>
                       <div className="flex-1">
                         <Link href={`/piece/${room.slug}`}>
-                          <h2 className="text-xl font-bold group-hover:text-primary transition-colors mb-2">
+                          <h2 className="prestige-display text-xl font-bold group-hover:text-[var(--gold)] transition-colors duration-300 ease mb-2">
                             {room.name}
                           </h2>
                         </Link>
@@ -183,7 +189,7 @@ export default async function PiecesIndexPage({ params }: { params: Promise<{ lo
                             <Link
                               key={style}
                               href={`/deco/${style}/${room.slug}`}
-                              className="text-xs bg-primary/5 text-primary hover:bg-primary/10 px-2 py-0.5 rounded-full transition-colors capitalize"
+                              className="text-xs border border-[var(--gold-line)] text-[var(--gold)] hover:bg-[var(--gold)]/10 px-2 py-0.5 rounded-full transition-colors duration-300 ease capitalize"
                             >
                               {style.replace(/-/g, ' ')}
                             </Link>
@@ -191,7 +197,7 @@ export default async function PiecesIndexPage({ params }: { params: Promise<{ lo
                         </div>
                         <Link
                           href={`/piece/${room.slug}`}
-                          className="text-sm text-primary hover:underline inline-flex items-center gap-1"
+                          className="text-sm text-[var(--gold)] hover:underline inline-flex items-center gap-1 transition-colors duration-300 ease"
                         >
                           Voir les idées {room.name.toLowerCase()} <ArrowRight className="w-3 h-3" />
                         </Link>
@@ -206,31 +212,38 @@ export default async function PiecesIndexPage({ params }: { params: Promise<{ lo
       </section>
 
       {/* TEXTE SEO */}
-      <section className="py-16 bg-muted/20 border-t">
+      <section className="prestige-reveal py-16 bg-muted/20 border-t border-[var(--gold-line)]">
         <div className="container px-4 md:px-6 max-w-3xl mx-auto prose prose-sm">
-          <h2 className="text-2xl font-bold">Comment bien décorer chaque pièce de sa maison ?</h2>
+          <h2 className="prestige-display text-2xl font-bold">Comment bien décorer chaque pièce de sa maison ?</h2>
+          <div className="prestige-rule w-20 not-prose mt-3 mb-6" />
           <p>
-            Chaque pièce a ses contraintes et ses opportunités. Le <Link href="/piece/salon" className="text-primary hover:underline">salon</Link> doit être accueillant et fonctionnel, la <Link href="/piece/chambre" className="text-primary hover:underline">chambre</Link> reposante, la <Link href="/piece/cuisine" className="text-primary hover:underline">cuisine</Link> pratique et esthétique.
+            Chaque pièce a ses contraintes et ses opportunités. Le <Link href="/piece/salon" className="text-[var(--gold)] hover:underline">salon</Link> doit être accueillant et fonctionnel, la <Link href="/piece/chambre" className="text-[var(--gold)] hover:underline">chambre</Link> reposante, la <Link href="/piece/cuisine" className="text-[var(--gold)] hover:underline">cuisine</Link> pratique et esthétique.
           </p>
           <p>
-            Avec InstaDeco AI, vous pouvez tester tous les <Link href="/styles" className="text-primary hover:underline">styles de décoration</Link> sur n&apos;importe quelle de vos pièces. Prenez une photo avec votre smartphone, choisissez un style, et découvrez le résultat en 30 secondes. C&apos;est la façon la plus rapide de trouver la bonne direction déco avant de dépenser le moindre euro.
+            Avec InstaDeco AI, vous pouvez tester tous les <Link href="/styles" className="text-[var(--gold)] hover:underline">styles de décoration</Link> sur n&apos;importe quelle de vos pièces. Prenez une photo avec votre smartphone, choisissez un style, et découvrez le résultat en 30 secondes. C&apos;est la façon la plus rapide de trouver la bonne direction déco avant de dépenser le moindre euro.
           </p>
           <p>
-            Pour les professionnels de l&apos;immobilier, notre <Link href="/solution/home-staging-virtuel" className="text-primary hover:underline">solution de home staging virtuel</Link> permet de meubler virtuellement chaque pièce pour déclencher plus de visites.
+            Pour les professionnels de l&apos;immobilier, notre <Link href="/solution/home-staging-virtuel" className="text-[var(--gold)] hover:underline">solution de home staging virtuel</Link> permet de meubler virtuellement chaque pièce pour déclencher plus de visites.
           </p>
         </div>
       </section>
 
       {/* FAQ */}
-      <section className="py-16 border-t">
+      <section className="prestige-reveal py-16 border-t border-[var(--gold-line)]">
         <div className="container px-4 md:px-6 max-w-3xl mx-auto">
-          <h2 className="text-2xl font-bold text-center mb-8">Questions fréquentes</h2>
+          <p className="prestige-eyebrow text-center mb-3">Bon à savoir</p>
+          <h2 className="prestige-display text-2xl font-bold text-center mb-4">Questions fréquentes</h2>
+          <div className="prestige-rule w-20 mx-auto mb-8" />
           <div className="space-y-4">
             {FAQ.map((item, i) => (
-              <details key={i} className="group border rounded-xl bg-background p-5">
+              <details
+                key={i}
+                className="prestige-reveal group border border-[var(--gold-line)] rounded-xl bg-card p-5 transition-colors duration-300 ease hover:border-[var(--gold)]"
+                style={{ ['--reveal-d' as string]: `${i * 120}ms` }}
+              >
                 <summary className="flex cursor-pointer items-center justify-between font-medium text-sm">
                   {item.question}
-                  <ArrowRight className="h-4 w-4 transition-transform group-open:rotate-90 shrink-0 ml-4" />
+                  <ArrowRight className="h-4 w-4 text-[var(--gold)] transition-transform group-open:rotate-90 shrink-0 ml-4" />
                 </summary>
                 <p className="pt-3 text-sm text-muted-foreground">{item.answer}</p>
               </details>
@@ -240,11 +253,12 @@ export default async function PiecesIndexPage({ params }: { params: Promise<{ lo
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-primary text-primary-foreground">
+      <section className="prestige-reveal py-16 bg-primary text-primary-foreground border-t border-[var(--gold-line)]">
         <div className="container px-4 md:px-6 text-center">
-          <h2 className="text-2xl font-bold mb-4">Quelle pièce allez-vous transformer ?</h2>
+          <p className="prestige-eyebrow mb-3">Votre transformation commence ici</p>
+          <h2 className="prestige-display text-2xl font-bold mb-4">Quelle pièce allez-vous <span className="text-[var(--gold)] italic">transformer</span> ?</h2>
           <p className="mb-6 text-primary-foreground/80">Prenez votre smartphone, choisissez votre pièce, et admirez le résultat.</p>
-          <Button size="lg" variant="secondary" className="rounded-full" asChild>
+          <Button size="lg" className="rounded-full bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)] transition duration-300 ease" asChild>
             <Link href="/generate">
               Commencer maintenant <ArrowRight className="ml-2 w-4 h-4" />
             </Link>

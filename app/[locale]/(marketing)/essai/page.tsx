@@ -284,7 +284,7 @@ export default function EssaiPage() {
             <div
               {...getRootProps()}
               className={`
-                relative rounded-[28px] border-2 border-dashed transition-all duration-300 cursor-pointer
+                prestige-reveal relative rounded-[28px] border-2 border-dashed transition-all duration-300 cursor-pointer
                 ${isDragActive
                   ? 'border-[var(--gold)] bg-[rgba(200,162,77,0.12)]'
                   : 'border-border hover:border-[var(--gold)] bg-card'
@@ -315,7 +315,7 @@ export default function EssaiPage() {
           {step === 'options' && imagePreview && (
             <div className="space-y-8">
               {/* Aperçu de l'image */}
-              <div className="relative rounded-[20px] overflow-hidden bg-card border border-border shadow-sm">
+              <div className="prestige-reveal relative rounded-[20px] overflow-hidden bg-card border border-[var(--gold-line)] shadow-sm">
                 <Image
                   src={imagePreview}
                   alt="Votre pièce, aperçu avant transformation"
@@ -334,7 +334,7 @@ export default function EssaiPage() {
               </div>
 
               {/* Type de pièce */}
-              <div className="text-center">
+              <div className="prestige-reveal text-center" style={{ ['--reveal-d' as string]: '120ms' }}>
                 <label className="prestige-eyebrow block mb-3">
                   Type de pièce
                 </label>
@@ -358,7 +358,7 @@ export default function EssaiPage() {
               </div>
 
               {/* Style */}
-              <div className="text-center">
+              <div className="prestige-reveal text-center" style={{ ['--reveal-d' as string]: '240ms' }}>
                 <label className="prestige-eyebrow block mb-3">
                   Style de décoration
                 </label>
@@ -393,7 +393,7 @@ export default function EssaiPage() {
               )}
 
               {/* Bouton Générer */}
-              <div className="flex flex-col items-center pt-2 gap-3">
+              <div className="prestige-reveal flex flex-col items-center pt-2 gap-3" style={{ ['--reveal-d' as string]: '360ms' }}>
                 <button
                   onClick={handleGenerate}
                   className="group inline-flex items-center gap-2 bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] px-8 py-4 rounded-full text-[17px] font-semibold hover:bg-transparent hover:text-[var(--gold)] transition-all duration-200 shadow-lg shadow-[var(--gold-soft)]/20 active:scale-95"
@@ -447,7 +447,7 @@ export default function EssaiPage() {
           {step === 'result' && generatedImage && imagePreview && (
             <div ref={resultRef} className="space-y-8 scroll-mt-4">
               {/* Bandeau wow moment */}
-              <div className="text-center">
+              <div className="prestige-reveal text-center">
                 <div className="prestige-eyebrow inline-flex items-center gap-2 px-4 py-1.5 bg-[rgba(200,162,77,0.12)] border border-[var(--gold-line)] rounded-full">
                   <Sparkles className="w-4 h-4" />
                   Voici votre transformation !
@@ -455,7 +455,7 @@ export default function EssaiPage() {
               </div>
 
               {/* Avant / Après */}
-              <div className="grid md:grid-cols-2 gap-4">
+              <div className="prestige-reveal grid md:grid-cols-2 gap-4" style={{ ['--reveal-d' as string]: '120ms' }}>
                 <div className="space-y-2">
                   <span className="prestige-eyebrow block">
                     Avant
@@ -470,6 +470,8 @@ export default function EssaiPage() {
                   </span>
                   <div className="relative rounded-[16px] overflow-hidden bg-card border border-[var(--gold-line)]">
                     <Image src={generatedImage} alt="Résultat après transformation IA" width={600} height={400} className="w-full h-auto" sizes="(max-width: 768px) 100vw, 50vw" />
+                    {/* Scrim de lisibilité sous le filigrane */}
+                    <div className="absolute inset-0 prestige-text-scrim pointer-events-none" aria-hidden="true" />
                     {/* Filigrane */}
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                       <span
@@ -485,7 +487,7 @@ export default function EssaiPage() {
 
               {/* Nouvel essai si quota restant (sans recharger la page) */}
               {remainingTrials > 0 && (
-                <div className="text-center">
+                <div className="prestige-reveal text-center">
                   <button
                     onClick={() => {
                       setGeneratedImage(null);
@@ -503,10 +505,10 @@ export default function EssaiPage() {
 
               {/* Email OPTIONNEL, débloque le HD sans filigrane (pas un gate) */}
               {!emailUnlocked ? (
-                <div className="bg-card rounded-[20px] border border-border p-5 sm:p-6 shadow-sm">
+                <div className="prestige-reveal bg-card rounded-[20px] border border-[var(--gold-line)] p-5 sm:p-6 shadow-sm">
                   <div className="flex items-center justify-center gap-2 mb-1.5">
                     <Mail className="w-4 h-4 text-[var(--gold)]" />
-                    <span className="prestige-display text-[15px] font-semibold text-foreground">Recevez votre image en HD, sans filigrane</span>
+                    <span className="prestige-display text-[15px] font-semibold text-foreground">Recevez votre image en <span className="text-[var(--gold)]">HD</span>, sans filigrane</span>
                   </div>
                   <p className="text-[13px] text-muted-foreground text-center mb-4">
                     Entrez votre email pour télécharger la version haute définition (optionnel) et recevez <span className="font-semibold text-[var(--gold)]">3 crédits offerts</span>.
@@ -571,7 +573,7 @@ export default function EssaiPage() {
                   </p>
                 </div>
               ) : (
-                <div className="bg-[rgba(16,185,129,0.10)] rounded-[20px] border border-emerald-500/30 p-4 text-center">
+                <div className="prestige-reveal bg-[rgba(16,185,129,0.10)] rounded-[20px] border border-emerald-500/30 p-4 text-center">
                   <p className="text-[14px] font-semibold text-emerald-400 flex items-center justify-center gap-2">
                     <Check className="w-4 h-4" />
                     Version HD envoyée, vérifiez votre boîte mail.
@@ -580,7 +582,7 @@ export default function EssaiPage() {
               )}
 
               {/* Partage, Encourager la viralité */}
-              <div className="bg-card rounded-[20px] border border-border p-5 text-center shadow-sm">
+              <div className="prestige-reveal bg-card rounded-[20px] border border-[var(--gold-line)] p-5 text-center shadow-sm">
                 <div className="flex items-center justify-center gap-2 mb-3">
                   <Share2 className="w-4 h-4 text-[var(--gold)]" />
                   <span className="prestige-display text-[14px] font-semibold text-foreground">Montrez votre transformation à vos proches</span>

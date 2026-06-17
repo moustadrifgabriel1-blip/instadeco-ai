@@ -285,26 +285,31 @@ function PricingPage() {
           <>
             {/* Credit Packs - Desktop */}
             <div className="hidden md:grid md:grid-cols-3 gap-6">
-              {PRICING_PLANS.map((plan) => (
-                <PricingCard 
-                  key={plan.id} 
-                  plan={plan} 
-                  onSelect={() => handleSelectPlan(plan.id)}
-                  isLoading={isAnyLoading}
-                />
+              {PRICING_PLANS.map((plan, idx) => (
+                <div
+                  key={plan.id}
+                  className="prestige-reveal"
+                  style={{ ['--reveal-d' as string]: `${idx * 120}ms` }}
+                >
+                  <PricingCard
+                    plan={plan}
+                    onSelect={() => handleSelectPlan(plan.id)}
+                    isLoading={isAnyLoading}
+                  />
+                </div>
               ))}
             </div>
             {/* Credit Packs - Mobile */}
-            <div className="md:hidden">
-              <MobileCarousel 
-                plans={PRICING_PLANS} 
+            <div className="md:hidden prestige-reveal">
+              <MobileCarousel
+                plans={PRICING_PLANS}
                 onSelect={handleSelectPlan}
                 isLoading={isAnyLoading}
               />
             </div>
 
             {/* Upsell banner credits → abonnement */}
-            <div className="mt-8 bg-[rgba(200,162,77,0.08)] rounded-2xl p-6 border border-[var(--gold-line)] text-center">
+            <div className="prestige-reveal mt-8 bg-[rgba(200,162,77,0.08)] rounded-2xl p-6 border border-[var(--gold-line)] text-center">
               <p className="text-foreground font-medium mb-1 whitespace-pre-line">
                 {t('upsellTitle')}
               </p>
@@ -323,18 +328,23 @@ function PricingPage() {
           <>
             {/* Subscription Plans - Desktop */}
             <div className="hidden md:grid md:grid-cols-3 gap-6">
-              {SUBSCRIPTION_PLANS.map((plan) => (
-                <SubscriptionCard
+              {SUBSCRIPTION_PLANS.map((plan, idx) => (
+                <div
                   key={plan.id}
-                  plan={plan}
-                  interval={billingInterval}
-                  onSelect={() => handleSelectSubscription(plan.id)}
-                  isLoading={isAnyLoading}
-                />
+                  className="prestige-reveal"
+                  style={{ ['--reveal-d' as string]: `${idx * 120}ms` }}
+                >
+                  <SubscriptionCard
+                    plan={plan}
+                    interval={billingInterval}
+                    onSelect={() => handleSelectSubscription(plan.id)}
+                    isLoading={isAnyLoading}
+                  />
+                </div>
               ))}
             </div>
             {/* Subscription Plans - Mobile */}
-            <div className="md:hidden">
+            <div className="md:hidden prestige-reveal">
               <MobileSubscriptionCarousel
                 plans={SUBSCRIPTION_PLANS}
                 interval={billingInterval}
@@ -346,7 +356,7 @@ function PricingPage() {
         )}
 
         {/* Trust Badges */}
-        <div className="flex flex-wrap justify-center gap-x-8 gap-y-3 mt-10">
+        <div className="prestige-reveal flex flex-wrap justify-center gap-x-8 gap-y-3 mt-10">
           {trustBadges.map((row) => {
             const Icon = TRUST_ICON_MAP[row.key] ?? Shield;
             return (
@@ -361,7 +371,7 @@ function PricingPage() {
         </div>
 
         {/* Payment logos */}
-        <div className="flex flex-wrap items-center justify-center gap-4 mt-6 opacity-60">
+        <div className="prestige-reveal flex flex-wrap items-center justify-center gap-4 mt-6 opacity-60">
           <span className="text-xs text-muted-foreground">{t('paymentBy')}</span>
           <span className="text-sm font-semibold text-foreground">stripe</span>
           <span className="text-xs text-muted-foreground">•</span>
@@ -376,7 +386,7 @@ function PricingPage() {
       {/* How it works - Convert doubters */}
       <div className="bg-card py-16 sm:py-20 border-t border-[var(--gold-line)]">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-12">
+          <div className="prestige-reveal text-center mb-12">
             <div className="inline-flex items-center gap-2 bg-[rgba(200,162,77,0.12)] border border-[var(--gold-line)] text-[var(--gold)] px-4 py-2 rounded-full text-sm font-medium mb-4 prestige-eyebrow">
               <Zap className="w-4 h-4" />
               {t('howItWorksBadge')}
@@ -384,10 +394,15 @@ function PricingPage() {
             <h2 className="prestige-display text-2xl sm:text-3xl md:text-[36px] font-semibold text-foreground mb-3">
               {t('howItWorksTitle')}
             </h2>
+            <div className="prestige-rule w-24 mx-auto mt-5" />
           </div>
           <div className="grid sm:grid-cols-3 gap-8">
-            {howItWorksSteps.map((item) => (
-              <div key={item.step} className="text-center">
+            {howItWorksSteps.map((item, idx) => (
+              <div
+                key={item.step}
+                className="prestige-reveal text-center"
+                style={{ ['--reveal-d' as string]: `${idx * 120}ms` }}
+              >
                 <div className="text-4xl mb-4">{item.emoji}</div>
                 <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[var(--gold)] text-[#0c0a09] text-sm font-bold mb-3">
                   {item.step}
@@ -397,10 +412,10 @@ function PricingPage() {
               </div>
             ))}
           </div>
-          <div className="text-center mt-10">
+          <div className="prestige-reveal text-center mt-10">
             <Link
               href="/essai"
-              className="inline-flex items-center gap-2 bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] px-8 py-3.5 rounded-full text-base font-medium hover:bg-transparent hover:text-[var(--gold)] transition-all active:scale-95"
+              className="inline-flex items-center gap-2 bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] px-8 py-3.5 rounded-full text-base font-medium hover:bg-transparent hover:text-[var(--gold)] transition-all duration-300 ease-out active:scale-95"
             >
               {t('tryNow')}
               <ArrowRight className="w-4 h-4" />
@@ -412,7 +427,7 @@ function PricingPage() {
       {/* Cas d'usage : profils réels sans faux témoignages */}
       <div className="bg-background py-16 sm:py-20">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-12">
+          <div className="prestige-reveal text-center mb-12">
             <div className="inline-flex items-center gap-2 bg-[rgba(200,162,77,0.12)] border border-[var(--gold-line)] text-[var(--gold)] px-4 py-2 rounded-full text-sm font-medium mb-4 prestige-eyebrow">
               <Users className="w-4 h-4" />
               {t('whoForBadge')}
@@ -420,10 +435,15 @@ function PricingPage() {
             <h2 className="prestige-display text-2xl sm:text-3xl md:text-[36px] font-semibold text-foreground">
               {t('whoForTitle')}
             </h2>
+            <div className="prestige-rule w-24 mx-auto mt-5" />
           </div>
           <div className="grid sm:grid-cols-3 gap-6">
             {USE_CASE_HIGHLIGHTS.map((useCase, idx) => (
-              <div key={idx} className="bg-card rounded-2xl p-6 border border-border shadow-sm hover:border-[var(--gold-line)] transition-colors">
+              <div
+                key={idx}
+                className="prestige-reveal bg-card rounded-2xl p-6 border border-[var(--gold-line)] shadow-sm hover:border-[var(--gold)] transition-colors duration-300 ease-out"
+                style={{ ['--reveal-d' as string]: `${idx * 120}ms` }}
+              >
                 <div className="text-3xl mb-3">{useCase.icon}</div>
                 <h3 className="prestige-display font-semibold text-foreground mb-2">{useCase.profile}</h3>
                 <p className="text-muted-foreground text-sm leading-relaxed mb-4">
@@ -441,7 +461,7 @@ function PricingPage() {
       {/* Comparison table - Remove objections */}
       <div className="bg-card py-16 sm:py-20 border-t border-[var(--gold-line)]">
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-10">
+          <div className="prestige-reveal text-center mb-10">
             <div className="inline-flex items-center gap-2 bg-[rgba(200,162,77,0.12)] border border-[var(--gold-line)] text-[var(--gold)] px-4 py-2 rounded-full text-sm font-medium mb-4 prestige-eyebrow">
               <TrendingUp className="w-4 h-4" />
               {t('compareBadge')}
@@ -449,8 +469,9 @@ function PricingPage() {
             <h2 className="prestige-display text-2xl sm:text-3xl font-semibold text-foreground mb-2">
               {t('compareTitle')}
             </h2>
+            <div className="prestige-rule w-24 mx-auto mt-5" />
           </div>
-          <div className="rounded-2xl border border-border overflow-hidden">
+          <div className="prestige-reveal rounded-2xl border border-[var(--gold-line)] overflow-hidden">
             <div className="overflow-x-auto">
             <table className="w-full text-sm min-w-[480px]">
               <thead>
@@ -483,7 +504,7 @@ function PricingPage() {
       {/* Why Subscribe - Conversion section */}
       <div className="bg-background py-16 sm:py-20 border-t border-[var(--gold-line)]">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-10">
+          <div className="prestige-reveal text-center mb-10">
             <div className="inline-flex items-center gap-2 bg-[rgba(200,162,77,0.12)] border border-[var(--gold-line)] text-[var(--gold)] px-4 py-2 rounded-full text-sm font-medium mb-4 prestige-eyebrow">
               <Crown className="w-4 h-4" />
               {t('creditsVsSubBadge')}
@@ -491,6 +512,7 @@ function PricingPage() {
             <h2 className="prestige-display text-2xl sm:text-3xl font-semibold text-foreground mb-3">
               {t('creditsVsSubTitle')}
             </h2>
+            <div className="prestige-rule w-24 mx-auto mb-4" />
             <p className="text-muted-foreground max-w-xl mx-auto">
               {t('creditsVsSubSubtitle')}
             </p>
@@ -498,7 +520,7 @@ function PricingPage() {
 
           <div className="grid sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
             {/* Credit packs */}
-            <div className="rounded-2xl border border-border bg-card p-6">
+            <div className="prestige-reveal rounded-2xl border border-[var(--gold-line)] bg-card p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-xl bg-[rgba(200,162,77,0.12)] border border-[var(--gold-line)] flex items-center justify-center">
                   <CreditCard className="w-5 h-5 text-[var(--gold)]" />
@@ -524,7 +546,10 @@ function PricingPage() {
             </div>
 
             {/* Subscription - highlighted */}
-            <div className="rounded-2xl border-2 border-[var(--gold)] bg-[rgba(200,162,77,0.06)] p-6 relative">
+            <div
+              className="prestige-reveal rounded-2xl border-2 border-[var(--gold)] bg-[rgba(200,162,77,0.06)] p-6 relative"
+              style={{ ['--reveal-d' as string]: '120ms' }}
+            >
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[var(--gold)] text-[#0c0a09] text-[11px] font-bold px-3 py-1 rounded-full">
                 {t('bestValue')}
               </div>
@@ -558,7 +583,7 @@ function PricingPage() {
       {/* FAQ */}
       <div className="bg-card py-16 sm:py-20">
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-12">
+          <div className="prestige-reveal text-center mb-12">
             <div className="inline-flex items-center gap-2 bg-[rgba(200,162,77,0.12)] border border-[var(--gold-line)] text-[var(--gold)] px-4 py-2 rounded-full text-sm font-medium mb-4 prestige-eyebrow">
               <HelpCircle className="w-4 h-4" />
               {t('faqBadge')}
@@ -566,6 +591,7 @@ function PricingPage() {
             <h2 className="prestige-display text-2xl sm:text-3xl md:text-[36px] font-semibold text-foreground mb-3">
               {t('faqTitle')}
             </h2>
+            <div className="prestige-rule w-24 mx-auto mb-4" />
             <p className="text-muted-foreground">
               {t('faqSubtitle')}
             </p>
@@ -575,7 +601,7 @@ function PricingPage() {
             {FAQ_ITEMS.map((item, index) => (
               <div
                 key={index}
-                className={`rounded-2xl border transition-all overflow-hidden ${
+                className={`prestige-reveal rounded-2xl border transition-all overflow-hidden ${
                   openFaq === index
                     ? 'bg-[rgba(200,162,77,0.08)] border-[var(--gold-line)] shadow-sm'
                     : 'bg-background border-border hover:border-[var(--gold-line)]'
@@ -609,7 +635,7 @@ function PricingPage() {
             ))}
           </div>
 
-          <div className="mt-10 text-center p-6 bg-[rgba(200,162,77,0.08)] rounded-2xl border border-[var(--gold-line)]">
+          <div className="prestige-reveal mt-10 text-center p-6 bg-[rgba(200,162,77,0.08)] rounded-2xl border border-[var(--gold-line)]">
             <p className="text-foreground mb-2">
               {t('faqCtaTitle')}
             </p>
@@ -625,17 +651,18 @@ function PricingPage() {
 
       {/* Final CTA */}
       <div className="bg-[var(--stone-900)] border-t border-[var(--gold-line)] py-16 sm:py-20">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
+        <div className="prestige-reveal max-w-3xl mx-auto px-4 sm:px-6 text-center">
           <h2 className="prestige-display text-2xl sm:text-3xl md:text-4xl font-semibold text-[var(--ivory)] mb-4">
             {t('finalCtaTitle')}
           </h2>
+          <div className="prestige-rule w-24 mx-auto mb-6" />
           <p className="text-muted-foreground text-lg mb-8 max-w-xl mx-auto">
             {t('finalCtaSubtitle')}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href="/essai"
-              className="inline-flex items-center gap-2 bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] px-8 py-3.5 rounded-full text-base font-semibold hover:bg-transparent hover:text-[var(--gold)] transition-all active:scale-95 shadow-lg"
+              className="inline-flex items-center gap-2 bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] px-8 py-3.5 rounded-full text-base font-semibold hover:bg-transparent hover:text-[var(--gold)] transition-all duration-300 ease-out active:scale-95 shadow-lg"
             >
               {t('finalCtaButton')}
               <ArrowRight className="w-4 h-4" />

@@ -126,13 +126,15 @@ export default async function SolutionsIndexPage({ params }: { params: Promise<{
       {/* HERO */}
       <section className="pt-16 pb-12">
         <div className="container px-4 md:px-6 text-center max-w-3xl mx-auto">
+          <p className="prestige-eyebrow mb-5">L&apos;intérieur, sublimé par l&apos;IA</p>
           <h1 className="prestige-display text-4xl md:text-5xl font-bold tracking-tight mb-4">
-            Solutions de <span className="text-[var(--gold)]">Décoration par IA</span>
+            Solutions de <span className="text-[var(--gold)] italic">Décoration par IA</span>
           </h1>
+          <div className="prestige-rule w-24 mx-auto mb-6" aria-hidden="true" />
           <p className="prestige-body text-lg text-muted-foreground mb-8">
             Que vous soyez propriétaire, agent immobilier, décorateur ou simplement en quête d&apos;inspiration, InstaDeco a la solution qu&apos;il vous faut.
           </p>
-          <Button size="lg" className="rounded-full bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)]" asChild>
+          <Button size="lg" className="rounded-full bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)] transition duration-300 ease-out" asChild>
             <Link href="/generate">
               Essayer gratuitement <ArrowRight className="ml-2 w-4 h-4" />
             </Link>
@@ -141,13 +143,17 @@ export default async function SolutionsIndexPage({ params }: { params: Promise<{
       </section>
 
       {/* GRILLE DES SOLUTIONS */}
-      <section className="pb-20">
+      <section className="pb-20 prestige-reveal">
         <div className="container px-4 md:px-6">
           <div className="grid md:grid-cols-2 gap-6">
-            {SOLUTIONS.map((sol) => {
+            {SOLUTIONS.map((sol, idx) => {
               const Icon = sol.icon;
               return (
-                <Card key={sol.slug} className="group bg-card border border-border hover:border-[var(--gold-line)] transition-colors">
+                <Card
+                  key={sol.slug}
+                  className="group prestige-reveal bg-card border border-[var(--gold-line)] hover:border-[var(--gold)] transition-colors duration-500 ease-out"
+                  style={{ ['--reveal-d' as string]: `${idx * 90}ms` }}
+                >
                   <CardContent className="p-6">
                     <div className="flex items-start gap-4">
                       <div className="w-12 h-12 rounded-xl bg-[rgba(200,162,77,0.12)] border border-[var(--gold-line)] flex items-center justify-center shrink-0">
@@ -168,9 +174,9 @@ export default async function SolutionsIndexPage({ params }: { params: Promise<{
                         </div>
                         <Link
                           href={`/solution/${sol.slug}`}
-                          className="text-sm text-[var(--gold)] hover:underline inline-flex items-center gap-1"
+                          className="text-sm text-[var(--gold)] hover:underline inline-flex items-center gap-1 transition-colors duration-300 ease-out"
                         >
-                          En savoir plus <ArrowRight className="w-3 h-3" />
+                          En savoir plus <ArrowRight className="w-3 h-3 transition-transform duration-300 ease-out group-hover:translate-x-0.5" />
                         </Link>
                       </div>
                     </div>
@@ -183,9 +189,11 @@ export default async function SolutionsIndexPage({ params }: { params: Promise<{
       </section>
 
       {/* TEXTE SEO */}
-      <section className="py-16 bg-muted/20 border-t border-[var(--gold-line)]">
+      <section className="py-16 bg-muted/20 border-t border-[var(--gold-line)] prestige-reveal">
         <div className="container px-4 md:px-6 max-w-3xl mx-auto prose prose-sm prose-invert">
+          <p className="prestige-eyebrow">La déco, autrement</p>
           <h2 className="prestige-display text-2xl font-bold text-foreground">Pourquoi utiliser l&apos;IA pour la décoration intérieure ?</h2>
+          <div className="prestige-rule w-16 mb-8 not-prose" aria-hidden="true" />
           <p className="prestige-body text-muted-foreground">
             L&apos;intelligence artificielle révolutionne la décoration d&apos;intérieur en la rendant accessible à tous. Plus besoin de maîtriser un logiciel 3D complexe ou de faire appel à un architecte d&apos;intérieur pour visualiser votre projet.
           </p>
@@ -204,17 +212,19 @@ export default async function SolutionsIndexPage({ params }: { params: Promise<{
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-card border-y border-[var(--gold-line)] text-foreground">
+      <section className="py-16 bg-card border-y border-[var(--gold-line)] text-foreground prestige-reveal">
         <div className="container px-4 md:px-6 text-center">
-          <h2 className="prestige-display text-2xl font-bold mb-4">Quelle solution vous correspond ?</h2>
+          <p className="prestige-eyebrow mb-4">Passez à l&apos;action</p>
+          <h2 className="prestige-display text-2xl font-bold mb-4">Quelle solution vous <span className="text-[var(--gold)] italic">correspond</span> ?</h2>
+          <div className="prestige-rule w-16 mx-auto mb-6" aria-hidden="true" />
           <p className="prestige-body mb-6 text-muted-foreground">Testez InstaDeco gratuitement. 3 crédits offerts à l&apos;inscription.</p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Button size="lg" className="rounded-full bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)]" asChild>
+            <Button size="lg" className="rounded-full bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)] transition duration-300 ease-out" asChild>
               <Link href="/generate">
                 Essayer maintenant <ArrowRight className="ml-2 w-4 h-4" />
               </Link>
             </Button>
-            <Button size="lg" variant="outline" className="rounded-full border-[var(--gold-line)] text-[var(--gold)] hover:bg-[rgba(200,162,77,0.12)]" asChild>
+            <Button size="lg" variant="outline" className="rounded-full border-[var(--gold-line)] text-[var(--gold)] hover:bg-[rgba(200,162,77,0.12)] hover:border-[var(--gold)] transition duration-300 ease-out" asChild>
               <Link href="/pricing">
                 Voir les tarifs
               </Link>

@@ -1,4 +1,5 @@
 import { cormorant, josefin } from '@/lib/fonts';
+import { PrestigeRevealObserver } from '@/components/prestige/prestige-reveal-observer';
 
 /**
  * Layout du groupe (marketing) : applique la DA prestige (nuit + or) à toutes
@@ -19,6 +20,7 @@ export default function MarketingLayout({
   return (
     <div className={`${cormorant.variable} ${josefin.variable} prestige-app min-h-screen`}>
       {children}
+      <PrestigeRevealObserver />
     </div>
   );
 }

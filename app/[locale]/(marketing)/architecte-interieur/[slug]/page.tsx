@@ -259,7 +259,7 @@ export default async function CityPage({ params }: PageProps) {
       <section className="py-20 bg-[var(--stone-900)]">
         <div className="container px-4 md:px-6">
           <div className="grid md:grid-cols-3 gap-8">
-            <Card className="bg-card border border-[var(--gold-line)] shadow-lg">
+            <Card className="prestige-reveal bg-card border border-[var(--gold-line)] shadow-lg transition duration-300 ease" style={{ ['--reveal-d' as string]: '120ms' }}>
               <CardContent className="pt-6 space-y-4">
                 <div className="w-12 h-12 rounded-full bg-[rgba(200,162,77,0.12)] flex items-center justify-center text-[var(--gold)]">
                   <Building className="w-6 h-6" />
@@ -269,7 +269,7 @@ export default async function CityPage({ params }: PageProps) {
               </CardContent>
             </Card>
 
-            <Card className="bg-card border border-[var(--gold-line)] shadow-lg">
+            <Card className="prestige-reveal bg-card border border-[var(--gold-line)] shadow-lg transition duration-300 ease" style={{ ['--reveal-d' as string]: '240ms' }}>
               <CardContent className="pt-6 space-y-4">
                 <div className="w-12 h-12 rounded-full bg-[rgba(200,162,77,0.12)] flex items-center justify-center text-[var(--gold)]">
                   <Zap className="w-6 h-6" />
@@ -281,7 +281,7 @@ export default async function CityPage({ params }: PageProps) {
               </CardContent>
             </Card>
 
-            <Card className="bg-card border border-[var(--gold-line)] shadow-lg">
+            <Card className="prestige-reveal bg-card border border-[var(--gold-line)] shadow-lg transition duration-300 ease" style={{ ['--reveal-d' as string]: '360ms' }}>
               <CardContent className="pt-6 space-y-4">
                 <div className="w-12 h-12 rounded-full bg-[rgba(200,162,77,0.12)] flex items-center justify-center text-[var(--gold)]">
                   <Home className="w-6 h-6" />
@@ -299,8 +299,10 @@ export default async function CityPage({ params }: PageProps) {
       {/* --- INSPIRATION GALLERY --- */}
       <section id="exemples" className="py-24">
         <div className="container px-4 md:px-6 space-y-12">
-          <div className="text-center max-w-2xl mx-auto space-y-4">
+          <div className="prestige-reveal text-center max-w-2xl mx-auto space-y-4">
+            <div className="prestige-eyebrow">Galerie d&apos;inspirations</div>
             <h2 className="prestige-display text-3xl font-bold tracking-tight">Inspirations pour votre intérieur à {city.name}</h2>
+            <div className="prestige-rule mx-auto w-24" />
             <p className="text-muted-foreground">
               Ces styles sont particulièrement populaires dans la région {city.region}.
               Cliquez pour les appliquer à VOTRE pièce.
@@ -313,11 +315,12 @@ export default async function CityPage({ params }: PageProps) {
               { name: 'Industriel', slug: 'industriel' },
               { name: 'Bohème', slug: 'boheme' },
               { name: 'Minimaliste', slug: 'minimaliste' },
-            ].map((style) => (
-              <Link key={style.slug} href={`/style/${style.slug}`} className="group relative aspect-[3/4] rounded-xl overflow-hidden border border-border hover:border-[var(--gold-line)] transition-colors">
+            ].map((style, i) => (
+              <Link key={style.slug} href={`/style/${style.slug}`} className="prestige-reveal group relative aspect-[3/4] rounded-xl overflow-hidden border border-[var(--gold-line)] hover:border-[var(--gold)] transition duration-300 ease" style={{ ['--reveal-d' as string]: `${i * 120}ms` }}>
                 <div className="absolute inset-0 bg-card" />
+                <div className="absolute inset-0 prestige-edito-veil" />
                 <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center">
-                  <Palette className="w-8 h-8 text-[var(--gold)] mb-3 group-hover:scale-110 transition-transform" />
+                  <Palette className="w-8 h-8 text-[var(--gold)] mb-3 group-hover:scale-110 transition-transform duration-300 ease" />
                   <div className="prestige-eyebrow text-xs font-medium uppercase tracking-wider text-[var(--gold)] mb-1">Style</div>
                   <div className="prestige-display text-xl font-bold text-foreground">{style.name}</div>
                   <p className="text-sm text-muted-foreground mt-2">Découvrir ce style →</p>
@@ -332,8 +335,10 @@ export default async function CityPage({ params }: PageProps) {
       <section className="py-24 bg-[var(--ink)] text-foreground border-y border-[var(--gold-line)]">
         <div className="container px-4 md:px-6">
           <div className="grid md:grid-cols-2 gap-16 items-center">
-            <div className="space-y-8">
-              <h2 className="prestige-display text-3xl font-bold">Comment ça marche ?</h2>
+            <div className="prestige-reveal space-y-8">
+              <div className="prestige-eyebrow">En trois gestes</div>
+              <h2 className="prestige-display text-3xl font-bold">Comment ça <span className="text-[var(--gold)] italic">marche</span> ?</h2>
+              <div className="prestige-rule w-24" />
               <div className="space-y-6">
                 <div className="flex gap-4">
                   <div className="w-10 h-10 rounded-full bg-[rgba(200,162,77,0.12)] border border-[var(--gold-line)] text-[var(--gold)] flex items-center justify-center font-bold text-xl">1</div>
@@ -361,7 +366,7 @@ export default async function CityPage({ params }: PageProps) {
                 <Link href="/generate">C&apos;est parti <ArrowRight className="ml-2 w-4 h-4"/></Link>
               </Button>
             </div>
-            <div className="relative aspect-square rounded-3xl bg-card backdrop-blur-sm border border-[var(--gold-line)] p-8 flex items-center justify-center">
+            <div className="prestige-reveal relative aspect-square rounded-3xl bg-card backdrop-blur-sm border border-[var(--gold-line)] p-8 flex items-center justify-center transition duration-300 ease" style={{ ['--reveal-d' as string]: '160ms' }}>
                <div className="text-center space-y-4">
                  <Camera className="w-20 h-20 mx-auto text-[var(--gold)] opacity-60" />
                  <p className="prestige-display text-xl font-medium text-foreground">Zone de démonstration</p>
@@ -375,9 +380,13 @@ export default async function CityPage({ params }: PageProps) {
       {/* --- CAS D'USAGE --- */}
       <section className="py-24 bg-background">
         <div className="container px-4 md:px-6 space-y-12">
-          <h2 className="prestige-display text-3xl font-bold text-center">Idéal pour vos projets à {city.name}</h2>
+          <div className="prestige-reveal text-center space-y-4">
+            <div className="prestige-eyebrow">Pour qui</div>
+            <h2 className="prestige-display text-3xl font-bold">Idéal pour vos <span className="text-[var(--gold)] italic">projets</span> à {city.name}</h2>
+            <div className="prestige-rule mx-auto w-24" />
+          </div>
           <div className="grid md:grid-cols-3 gap-8">
-            <Card className="bg-card border border-[var(--gold-line)]">
+            <Card className="prestige-reveal bg-card border border-[var(--gold-line)] transition duration-300 ease" style={{ ['--reveal-d' as string]: '120ms' }}>
               <CardContent className="pt-6 space-y-4">
                 <div className="w-10 h-10 rounded-full bg-[rgba(200,162,77,0.12)] flex items-center justify-center">
                   <Home className="w-5 h-5 text-[var(--gold)]" />
@@ -388,7 +397,7 @@ export default async function CityPage({ params }: PageProps) {
                 </p>
               </CardContent>
             </Card>
-            <Card className="bg-card border border-[var(--gold-line)]">
+            <Card className="prestige-reveal bg-card border border-[var(--gold-line)] transition duration-300 ease" style={{ ['--reveal-d' as string]: '240ms' }}>
               <CardContent className="pt-6 space-y-4">
                 <div className="w-10 h-10 rounded-full bg-[rgba(200,162,77,0.12)] flex items-center justify-center">
                   <Building className="w-5 h-5 text-[var(--gold)]" />
@@ -402,7 +411,7 @@ export default async function CityPage({ params }: PageProps) {
                 </Link>
               </CardContent>
             </Card>
-            <Card className="bg-card border border-[var(--gold-line)]">
+            <Card className="prestige-reveal bg-card border border-[var(--gold-line)] transition duration-300 ease" style={{ ['--reveal-d' as string]: '360ms' }}>
               <CardContent className="pt-6 space-y-4">
                 <div className="w-10 h-10 rounded-full bg-[rgba(200,162,77,0.12)] flex items-center justify-center">
                   <Palette className="w-5 h-5 text-[var(--gold)]" />
@@ -420,9 +429,13 @@ export default async function CityPage({ params }: PageProps) {
       {/* --- FAQ SECTION --- */}
       <section className="py-20 bg-[var(--stone-900)] border-t border-[var(--gold-line)]">
         <div className="container px-4 md:px-6 max-w-3xl mx-auto space-y-8">
-          <h2 className="prestige-display text-3xl font-bold text-center">Questions fréquentes</h2>
+          <div className="prestige-reveal text-center space-y-4">
+            <div className="prestige-eyebrow">Bon à savoir</div>
+            <h2 className="prestige-display text-3xl font-bold">Questions fréquentes</h2>
+            <div className="prestige-rule mx-auto w-24" />
+          </div>
           <div className="space-y-4">
-            <details className="group border border-[var(--gold-line)] rounded-xl bg-card p-6">
+            <details className="prestige-reveal group border border-[var(--gold-line)] rounded-xl bg-card p-6 transition duration-300 ease" style={{ ['--reveal-d' as string]: '120ms' }}>
               <summary className="flex cursor-pointer items-center justify-between font-medium text-foreground">
                 Est-ce vraiment moins cher qu&apos;un architecte à {city.name} ?
                 <ArrowRight className="h-4 w-4 text-[var(--gold)] transition-transform group-open:rotate-90" />
@@ -432,7 +445,7 @@ export default async function CityPage({ params }: PageProps) {
                 Notre IA réalise le même travail de visualisation pour quelques euros, instantanément.
               </div>
             </details>
-            <details className="group border border-[var(--gold-line)] rounded-xl bg-card p-6">
+            <details className="prestige-reveal group border border-[var(--gold-line)] rounded-xl bg-card p-6 transition duration-300 ease" style={{ ['--reveal-d' as string]: '240ms' }}>
               <summary className="flex cursor-pointer items-center justify-between font-medium text-foreground">
                 Puis-je l&apos;utiliser pour vendre mon bien immobilier ?
                 <ArrowRight className="h-4 w-4 text-[var(--gold)] transition-transform group-open:rotate-90" />
@@ -447,8 +460,8 @@ export default async function CityPage({ params }: PageProps) {
 
       {/* --- FOOTER SEO LINKS --- */}
       <section className="py-12 border-t border-[var(--gold-line)] text-sm bg-background">
-        <div className="container px-4 md:px-6">
-          <div className="text-muted-foreground mb-4">Villes à proximité :</div>
+        <div className="prestige-reveal container px-4 md:px-6">
+          <div className="prestige-eyebrow mb-4">Villes à proximité</div>
           <div className="flex flex-wrap gap-x-4 gap-y-2">
             {CITIES
                .filter(c => c.region === city.region && c.slug !== city.slug)

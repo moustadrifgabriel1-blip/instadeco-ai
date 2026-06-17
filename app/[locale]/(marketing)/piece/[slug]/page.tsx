@@ -97,24 +97,34 @@ export default async function RoomPage({ params }: PageProps) {
       {/* Hero */}
       <section className="pt-20 pb-16 bg-gradient-to-b from-primary/5 to-background">
         <div className="container px-4 md:px-6 max-w-4xl mx-auto text-center space-y-6">
-          <Badge variant="outline" className="px-4 py-1.5">
-            <Home className="w-3 h-3 mr-2" />
-            Décoration par pièce
+          <Badge variant="outline" className="px-4 py-1.5 border-[var(--gold-line)]">
+            <Home className="w-3 h-3 mr-2 text-[var(--gold)]" />
+            <span className="prestige-eyebrow">Décoration par pièce</span>
           </Badge>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight">
+          <h1 className="prestige-display text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight">
             Décoration {room.name}
           </h1>
+          <div className="prestige-rule mx-auto w-24" />
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             {room.hero}
           </p>
           <div className="flex flex-wrap justify-center gap-4 pt-4">
-            <Button size="lg" className="rounded-full" asChild>
+            <Button
+              size="lg"
+              className="rounded-full bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)] transition duration-300 ease"
+              asChild
+            >
               <Link href="/generate">
                 <Sparkles className="mr-2 w-4 h-4" />
                 Transformer mon {room.name.toLowerCase()}
               </Link>
             </Button>
-            <Button size="lg" variant="outline" className="rounded-full" asChild>
+            <Button
+              size="lg"
+              variant="outline"
+              className="rounded-full border-[var(--gold)] text-[var(--gold)] bg-transparent hover:bg-[var(--gold)] hover:text-[#0c0a09] transition duration-300 ease"
+              asChild
+            >
               <Link href="/exemples">
                 Voir des exemples
               </Link>
@@ -127,22 +137,25 @@ export default async function RoomPage({ params }: PageProps) {
       <section className="py-16">
         <div className="container px-4 md:px-6 max-w-4xl mx-auto">
           <div className="grid md:grid-cols-2 gap-12">
-            <div>
-              <h2 className="text-3xl font-bold mb-6">Aménager votre {room.name.toLowerCase()}</h2>
+            <div className="prestige-reveal" style={{ ['--reveal-d' as string]: '120ms' }}>
+              <h2 className="prestige-display text-3xl font-bold mb-6">
+                Aménager votre <span className="text-[var(--gold)] italic">{room.name.toLowerCase()}</span>
+              </h2>
+              <div className="prestige-rule w-24 mb-6" />
               <p className="text-muted-foreground text-lg leading-relaxed">
                 {room.longDescription}
               </p>
             </div>
-            <Card className="bg-primary/5 border-none">
+            <Card className="prestige-reveal bg-card border border-[var(--gold-line)] transition duration-300 ease" style={{ ['--reveal-d' as string]: '240ms' }}>
               <CardContent className="pt-6 space-y-4">
-                <h3 className="font-bold text-lg flex items-center gap-2">
-                  <Lightbulb className="w-5 h-5 text-primary" />
+                <h3 className="prestige-display font-bold text-lg flex items-center gap-2">
+                  <Lightbulb className="w-5 h-5 text-[var(--gold)]" />
                   Conseils d&apos;expert
                 </h3>
                 <ul className="space-y-3">
                   {room.tips.map((tip, i) => (
                     <li key={i} className="flex items-start gap-3 text-sm">
-                      <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <Check className="w-4 h-4 text-[var(--gold)] mt-0.5 flex-shrink-0" />
                       {tip}
                     </li>
                   ))}
@@ -156,15 +169,23 @@ export default async function RoomPage({ params }: PageProps) {
       {/* Styles recommandés */}
       <section className="py-16 bg-muted/30">
         <div className="container px-4 md:px-6 max-w-4xl mx-auto space-y-8">
-          <h2 className="text-3xl font-bold text-center">
-            Meilleurs styles pour votre {room.name.toLowerCase()}
-          </h2>
+          <div className="prestige-reveal text-center">
+            <h2 className="prestige-display text-3xl font-bold">
+              Meilleurs styles pour votre {room.name.toLowerCase()}
+            </h2>
+            <div className="prestige-rule mx-auto w-24 mt-6" />
+          </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {recommendedStyles.map((style) => style && (
-              <Link key={style.slug} href={`/style/${style.slug}`} className="group">
-                <Card className="h-full hover:border-primary transition-colors">
+            {recommendedStyles.map((style, i) => style && (
+              <Link
+                key={style.slug}
+                href={`/style/${style.slug}`}
+                className="group prestige-reveal"
+                style={{ ['--reveal-d' as string]: `${120 * (i + 1)}ms` }}
+              >
+                <Card className="h-full bg-card border border-[var(--gold-line)] hover:border-[var(--gold)] transition duration-300 ease">
                   <CardContent className="pt-6 space-y-3">
-                    <h3 className="font-bold text-lg group-hover:text-primary transition-colors">
+                    <h3 className="prestige-display font-bold text-lg group-hover:text-[var(--gold)] transition duration-300 ease">
                       {style.name}
                     </h3>
                     <p className="text-sm text-muted-foreground">{style.hero}</p>
@@ -186,14 +207,18 @@ export default async function RoomPage({ params }: PageProps) {
 
       {/* CTA */}
       <section className="py-16 bg-primary text-primary-foreground">
-        <div className="container px-4 md:px-6 max-w-3xl mx-auto text-center space-y-6">
-          <h2 className="text-3xl font-bold">
-            Prêt à transformer votre {room.name.toLowerCase()} ?
+        <div className="prestige-reveal container px-4 md:px-6 max-w-3xl mx-auto text-center space-y-6">
+          <h2 className="prestige-display text-3xl font-bold">
+            Prêt à transformer votre <span className="text-[var(--gold)] italic">{room.name.toLowerCase()}</span> ?
           </h2>
           <p className="text-primary-foreground/80 text-lg">
             Uploadez une photo de votre {room.name.toLowerCase()} actuel(le) et obtenez un rendu professionnel en 10 secondes.
           </p>
-          <Button size="lg" variant="secondary" className="rounded-full px-8" asChild>
+          <Button
+            size="lg"
+            className="rounded-full px-8 bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)] transition duration-300 ease"
+            asChild
+          >
             <Link href="/generate">
               Commencer maintenant
               <ArrowRight className="ml-2 w-4 h-4" />
@@ -205,12 +230,15 @@ export default async function RoomPage({ params }: PageProps) {
       {/* FAQ */}
       <section className="py-16 bg-muted/20">
         <div className="container px-4 md:px-6 max-w-3xl mx-auto space-y-8">
-          <h2 className="text-3xl font-bold text-center">
-            Questions fréquentes sur la décoration {room.name.toLowerCase()}
-          </h2>
-          <div className="space-y-4">
+          <div className="prestige-reveal text-center">
+            <h2 className="prestige-display text-3xl font-bold">
+              Questions fréquentes sur la décoration {room.name.toLowerCase()}
+            </h2>
+            <div className="prestige-rule mx-auto w-24 mt-6" />
+          </div>
+          <div className="prestige-reveal space-y-4" style={{ ['--reveal-d' as string]: '120ms' }}>
             {room.faq.map((item, i) => (
-              <details key={i} className="group border rounded-xl bg-background p-6">
+              <details key={i} className="group border border-[var(--gold-line)] rounded-xl bg-background p-6">
                 <summary className="flex cursor-pointer items-center justify-between font-medium">
                   {item.question}
                   <ArrowRight className="h-4 w-4 transition-transform group-open:rotate-90" />
@@ -228,14 +256,15 @@ export default async function RoomPage({ params }: PageProps) {
       <section className="py-12 border-t">
         <div className="container px-4 md:px-6 max-w-4xl mx-auto space-y-8">
           {/* Autres pièces */}
-          <div>
-            <h3 className="text-xl font-bold mb-4">Décorer d&apos;autres pièces</h3>
+          <div className="prestige-reveal">
+            <h3 className="prestige-display text-xl font-bold mb-4">Décorer d&apos;autres pièces</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {otherRooms.map((r) => (
+              {otherRooms.map((r, i) => (
                 <Link
                   key={r.slug}
                   href={`/piece/${r.slug}`}
-                  className="block p-4 border rounded-lg hover:border-primary transition-colors bg-card"
+                  className="block p-4 border border-[var(--gold-line)] rounded-lg hover:border-[var(--gold)] transition duration-300 ease bg-card prestige-reveal"
+                  style={{ ['--reveal-d' as string]: `${120 * (i + 1)}ms` }}
                 >
                   <p className="font-medium">Décoration {r.name}</p>
                 </Link>
@@ -244,8 +273,8 @@ export default async function RoomPage({ params }: PageProps) {
           </div>
 
           {/* Villes */}
-          <div>
-            <h3 className="text-xl font-bold mb-4">
+          <div className="prestige-reveal">
+            <h3 className="prestige-display text-xl font-bold mb-4">
               Décoration {room.name.toLowerCase()} par ville
             </h3>
             <div className="flex flex-wrap gap-3">
@@ -253,7 +282,7 @@ export default async function RoomPage({ params }: PageProps) {
                 <Link
                   key={city.slug}
                   href={`/architecte-interieur/${city.slug}`}
-                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                  className="text-sm text-muted-foreground hover:text-[var(--gold)] transition duration-300 ease"
                 >
                   {room.name} à {city.name}
                 </Link>

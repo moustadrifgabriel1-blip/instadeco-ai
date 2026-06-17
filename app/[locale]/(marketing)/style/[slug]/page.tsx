@@ -94,24 +94,34 @@ export default async function StylePage({ params }: PageProps) {
       {/* Hero */}
       <section className="pt-20 pb-16 bg-gradient-to-b from-primary/5 to-background">
         <div className="container px-4 md:px-6 max-w-4xl mx-auto text-center space-y-6">
-          <Badge variant="outline" className="px-4 py-1.5">
-            <Palette className="w-3 h-3 mr-2" />
-            Style de décoration
+          <Badge variant="outline" className="px-4 py-1.5 border-[var(--gold-line)]">
+            <Palette className="w-3 h-3 mr-2 text-[var(--gold)]" />
+            <span className="prestige-eyebrow">Style de décoration</span>
           </Badge>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight">
+          <h1 className="prestige-display text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight">
             {style.title}
           </h1>
+          <div className="prestige-rule mx-auto w-24" />
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             {style.hero}
           </p>
           <div className="flex flex-wrap justify-center gap-4 pt-4">
-            <Button size="lg" className="rounded-full" asChild>
+            <Button
+              size="lg"
+              className="rounded-full bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)] transition duration-300 ease"
+              asChild
+            >
               <Link href="/generate">
                 <Sparkles className="mr-2 w-4 h-4" />
                 Essayer le style {style.name}
               </Link>
             </Button>
-            <Button size="lg" variant="outline" className="rounded-full" asChild>
+            <Button
+              size="lg"
+              variant="outline"
+              className="rounded-full border-[var(--gold)] text-[var(--gold)] bg-transparent hover:bg-[var(--gold)] hover:text-[#0c0a09] transition duration-300 ease"
+              asChild
+            >
               <Link href="/exemples">
                 Voir des exemples
               </Link>
@@ -123,8 +133,11 @@ export default async function StylePage({ params }: PageProps) {
       {/* Description détaillée */}
       <section className="py-16">
         <div className="container px-4 md:px-6 max-w-4xl mx-auto">
-          <div className="prose prose-lg max-w-none">
-            <h2 className="text-3xl font-bold mb-6">Qu&apos;est-ce que le style {style.name} ?</h2>
+          <div className="prestige-reveal prose prose-lg max-w-none">
+            <h2 className="prestige-display text-3xl font-bold mb-6">
+              Qu&apos;est-ce que le style <span className="text-[var(--gold)] italic">{style.name}</span> ?
+            </h2>
+            <div className="prestige-rule w-24 mb-6 not-prose" />
             <p className="text-muted-foreground text-lg leading-relaxed">
               {style.longDescription}
             </p>
@@ -132,9 +145,9 @@ export default async function StylePage({ params }: PageProps) {
 
           {/* Caractéristiques */}
           <div className="grid md:grid-cols-3 gap-6 mt-12">
-            <Card>
+            <Card className="prestige-reveal bg-card border border-[var(--gold-line)] transition duration-300 ease" style={{ ['--reveal-d' as string]: '120ms' }}>
               <CardContent className="pt-6 space-y-3">
-                <h3 className="font-bold text-lg">Couleurs clés</h3>
+                <h3 className="prestige-display font-bold text-lg">Couleurs clés</h3>
                 <div className="flex flex-wrap gap-2">
                   {style.colors.map((color) => (
                     <Badge key={color} variant="secondary">{color}</Badge>
@@ -142,9 +155,9 @@ export default async function StylePage({ params }: PageProps) {
                 </div>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="prestige-reveal bg-card border border-[var(--gold-line)] transition duration-300 ease" style={{ ['--reveal-d' as string]: '240ms' }}>
               <CardContent className="pt-6 space-y-3">
-                <h3 className="font-bold text-lg">Matériaux</h3>
+                <h3 className="prestige-display font-bold text-lg">Matériaux</h3>
                 <div className="flex flex-wrap gap-2">
                   {style.materials.map((mat) => (
                     <Badge key={mat} variant="secondary">{mat}</Badge>
@@ -152,13 +165,13 @@ export default async function StylePage({ params }: PageProps) {
                 </div>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="prestige-reveal bg-card border border-[var(--gold-line)] transition duration-300 ease" style={{ ['--reveal-d' as string]: '360ms' }}>
               <CardContent className="pt-6 space-y-3">
-                <h3 className="font-bold text-lg">Idéal pour</h3>
+                <h3 className="prestige-display font-bold text-lg">Idéal pour</h3>
                 <ul className="space-y-2">
                   {style.idealFor.map((use) => (
                     <li key={use} className="flex items-center gap-2 text-sm">
-                      <Check className="w-4 h-4 text-green-500" />
+                      <Check className="w-4 h-4 text-[var(--gold)]" />
                       {use}
                     </li>
                   ))}
@@ -168,14 +181,14 @@ export default async function StylePage({ params }: PageProps) {
           </div>
 
           {/* Budget & Difficulté */}
-          <div className="flex flex-wrap gap-6 mt-8 justify-center">
+          <div className="prestige-reveal flex flex-wrap gap-6 mt-8 justify-center">
             <div className="text-center">
-              <p className="text-sm text-muted-foreground">Budget estimé</p>
-              <p className="text-2xl font-bold">{style.priceRange}</p>
+              <p className="prestige-eyebrow">Budget estimé</p>
+              <p className="prestige-display text-2xl font-bold mt-2">{style.priceRange}</p>
             </div>
             <div className="text-center">
-              <p className="text-sm text-muted-foreground">Difficulté</p>
-              <p className="text-2xl font-bold">{style.difficulty}</p>
+              <p className="prestige-eyebrow">Difficulté</p>
+              <p className="prestige-display text-2xl font-bold mt-2">{style.difficulty}</p>
             </div>
           </div>
         </div>
@@ -183,14 +196,18 @@ export default async function StylePage({ params }: PageProps) {
 
       {/* CTA */}
       <section className="py-16 bg-primary text-primary-foreground">
-        <div className="container px-4 md:px-6 max-w-3xl mx-auto text-center space-y-6">
-          <h2 className="text-3xl font-bold">
-            Visualisez le style {style.name} dans VOTRE pièce
+        <div className="prestige-reveal container px-4 md:px-6 max-w-3xl mx-auto text-center space-y-6">
+          <h2 className="prestige-display text-3xl font-bold">
+            Visualisez le style {style.name} dans <span className="text-[var(--gold)] italic">VOTRE</span> pièce
           </h2>
           <p className="text-primary-foreground/80 text-lg">
             Uploadez une photo de votre pièce actuelle et obtenez un rendu en style {style.name} en 10 secondes.
           </p>
-          <Button size="lg" variant="secondary" className="rounded-full px-8" asChild>
+          <Button
+            size="lg"
+            className="rounded-full px-8 bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)] transition duration-300 ease"
+            asChild
+          >
             <Link href="/generate">
               Commencer la transformation
               <ArrowRight className="ml-2 w-4 h-4" />
@@ -202,13 +219,20 @@ export default async function StylePage({ params }: PageProps) {
       {/* FAQ */}
       <section className="py-16 bg-muted/20">
         <div className="container px-4 md:px-6 max-w-3xl mx-auto space-y-8">
-          <h2 className="text-3xl font-bold text-center">Questions fréquentes sur le style {style.name}</h2>
+          <div className="prestige-reveal text-center space-y-4">
+            <h2 className="prestige-display text-3xl font-bold">Questions fréquentes sur le style {style.name}</h2>
+            <div className="prestige-rule mx-auto w-24" />
+          </div>
           <div className="space-y-4">
             {style.faq.map((item, i) => (
-              <details key={i} className="group border rounded-xl bg-background p-6">
+              <details
+                key={i}
+                className="prestige-reveal group border border-[var(--gold-line)] rounded-xl bg-card p-6 transition duration-300 ease"
+                style={{ ['--reveal-d' as string]: `${Math.min(i, 4) * 80}ms` }}
+              >
                 <summary className="flex cursor-pointer items-center justify-between font-medium">
                   {item.question}
-                  <ArrowRight className="h-4 w-4 transition-transform group-open:rotate-90" />
+                  <ArrowRight className="h-4 w-4 text-[var(--gold)] transition-transform group-open:rotate-90" />
                 </summary>
                 <div className="pt-4 text-muted-foreground">
                   {item.answer}
@@ -220,25 +244,26 @@ export default async function StylePage({ params }: PageProps) {
       </section>
 
       {/* Maillage interne: Styles connexes */}
-      <section className="py-12 border-t">
+      <section className="py-12 border-t border-[var(--gold-line)]">
         <div className="container px-4 md:px-6 max-w-4xl mx-auto">
-          <h3 className="text-xl font-bold mb-6">Découvrez aussi ces styles</h3>
+          <h3 className="prestige-reveal prestige-display text-xl font-bold mb-6">Découvrez aussi ces styles</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {relatedStyles.map((rs) => (
+            {relatedStyles.map((rs, i) => (
               <Link
                 key={rs.slug}
                 href={`/style/${rs.slug}`}
-                className="block p-4 border rounded-lg hover:border-primary transition-colors bg-card"
+                className="prestige-reveal block p-4 border border-[var(--gold-line)] rounded-lg hover:border-[var(--gold)] transition duration-300 ease bg-card"
+                style={{ ['--reveal-d' as string]: `${i * 100}ms` }}
               >
-                <p className="font-medium">{rs.name}</p>
+                <p className="prestige-display font-medium">{rs.name}</p>
                 <p className="text-xs text-muted-foreground mt-1">{rs.difficulty} • {rs.priceRange}</p>
               </Link>
             ))}
           </div>
 
           {/* Maillage villes */}
-          <div className="mt-8">
-            <h3 className="text-xl font-bold mb-4">
+          <div className="prestige-reveal mt-8">
+            <h3 className="prestige-display text-xl font-bold mb-4">
               Décoration {style.name} par ville
             </h3>
             <div className="flex flex-wrap gap-3">
@@ -246,7 +271,7 @@ export default async function StylePage({ params }: PageProps) {
                 <Link
                   key={city.slug}
                   href={`/architecte-interieur/${city.slug}`}
-                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                  className="text-sm text-muted-foreground hover:text-[var(--gold)] transition duration-300 ease"
                 >
                   {style.name} à {city.name}
                 </Link>

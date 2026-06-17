@@ -327,11 +327,11 @@ function GenerateContent() {
           <h1 className="prestige-display text-[30px] sm:text-[42px] md:text-[50px] lg:text-[54px] font-semibold tracking-[-0.03em] text-foreground leading-[1.06]">
             Une planche déco digne d&apos;un cabinet <span className="text-[var(--gold)]">premium</span>.
           </h1>
-          <p className="prestige-body mt-4 text-[16px] sm:text-[18px] md:text-[19px] text-muted-foreground font-normal leading-[1.45] tracking-[0.01em] max-w-xl mx-auto">
+          <p className="prestige-reveal prestige-body mt-4 text-[16px] sm:text-[18px] md:text-[19px] text-muted-foreground font-normal leading-[1.45] tracking-[0.01em] max-w-xl mx-auto" style={{ ['--reveal-d' as string]: '120ms' }}>
             Importez une photo, choisissez une direction artistique : notre moteur compose un rendu photoréaliste, prêt à être partagé ou présenté.
           </p>
           {/* Mini galerie avant/après */}
-          <div className="mt-6 flex items-center justify-center gap-3 flex-wrap text-[12px] text-muted-foreground">
+          <div className="prestige-reveal mt-6 flex items-center justify-center gap-3 flex-wrap text-[12px] text-muted-foreground" style={{ ['--reveal-d' as string]: '240ms' }}>
             <span className="flex items-center gap-1.5"><Eye className="w-3.5 h-3.5 text-[var(--gold)]" /> 20+ styles de déco</span>
             <span className="text-[var(--gold-line)]">•</span>
             <span className="flex items-center gap-1.5"><Zap className="w-3.5 h-3.5 text-[var(--gold)]" /> Résultat en 30s</span>
@@ -350,7 +350,7 @@ function GenerateContent() {
             <div
               {...getRootProps()}
               className={`
-                relative rounded-[28px] border-2 border-dashed transition-all duration-300 cursor-pointer
+                prestige-reveal relative rounded-[28px] border-2 border-dashed transition-all duration-300 cursor-pointer
                 ${isDragActive
                   ? 'border-[var(--gold)] bg-[rgba(200,162,77,0.08)]'
                   : 'border-[var(--gold-line)] hover:border-[var(--gold)] bg-card'
@@ -402,12 +402,12 @@ function GenerateContent() {
               {/* Options */}
               <div className="space-y-8">
                 {/* Transform Mode */}
-                <div className="text-center">
+                <div className="text-center prestige-reveal">
                   <label className="block prestige-eyebrow text-[12px] text-[var(--gold)] mb-4">
                     Ambition du projet
                   </label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                    {TRANSFORM_MODES.map((mode) => {
+                    {TRANSFORM_MODES.map((mode, modeIndex) => {
                       const ModeIcon = mode.Icon;
                       const isSelected = selectedMode === mode.id;
                       return (
@@ -415,8 +415,9 @@ function GenerateContent() {
                         key={mode.id}
                         type="button"
                         onClick={() => setSelectedMode(mode.id)}
+                        style={{ ['--reveal-d' as string]: `${modeIndex * 90}ms` }}
                         className={`
-                          relative px-4 py-3.5 rounded-2xl text-left transition-all duration-200 w-full
+                          prestige-reveal relative px-4 py-3.5 rounded-2xl text-left transition-all duration-300 w-full
                           ${isSelected
                             ? 'bg-[var(--gold)] text-[#0c0a09] ring-2 ring-[var(--gold)] ring-offset-2 ring-offset-[var(--ink)] shadow-lg shadow-[rgba(200,162,77,0.2)]'
                             : mode.highlight
@@ -447,7 +448,7 @@ function GenerateContent() {
                 </div>
 
                 {/* Room Type */}
-                <div className="text-center">
+                <div className="text-center prestige-reveal">
                   <label className="block prestige-eyebrow text-[12px] text-[var(--gold)] mb-4">
                     Type de pièce
                   </label>
@@ -457,7 +458,7 @@ function GenerateContent() {
                         key={room.id}
                         onClick={() => setSelectedRoomType(room.id)}
                         className={`
-                          px-5 py-2.5 rounded-full text-[14px] font-medium transition-all duration-200
+                          px-5 py-2.5 rounded-full text-[14px] font-medium transition-all duration-300
                           ${selectedRoomType === room.id
                             ? 'bg-[var(--gold)] text-[#0c0a09]'
                             : 'bg-card text-foreground border border-border hover:border-[var(--gold-line)] hover:bg-[rgba(200,162,77,0.06)]'
@@ -471,7 +472,7 @@ function GenerateContent() {
                 </div>
 
                 {/* Style - Organisé par catégories */}
-                <div>
+                <div className="prestige-reveal">
                   <label className="block prestige-eyebrow text-[12px] text-[var(--gold)] mb-4 text-center">
                     Style de décoration
                   </label>
@@ -489,10 +490,11 @@ function GenerateContent() {
 
                   {/* Grille de catégories */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
-                    {STYLE_CATEGORIES_WITH_STYLES.map((category) => (
+                    {STYLE_CATEGORIES_WITH_STYLES.map((category, categoryIndex) => (
                       <div
                         key={category.category}
-                        className="bg-card rounded-2xl border border-border overflow-hidden"
+                        style={{ ['--reveal-d' as string]: `${categoryIndex * 80}ms` }}
+                        className="prestige-reveal bg-card rounded-2xl border border-[var(--gold-line)] overflow-hidden transition-all duration-300"
                       >
                         <div className="px-4 py-2 bg-[rgba(200,162,77,0.08)] border-b border-[var(--gold-line)]">
                           <h3 className="prestige-eyebrow text-[12px] text-[var(--gold)]">
@@ -527,7 +529,7 @@ function GenerateContent() {
 
               {/* Generate Button */}
               {!isGenerating && !showAuthPrompt && (
-                <div className="flex flex-col items-center pt-2 gap-3">
+                <div className="prestige-reveal flex flex-col items-center pt-2 gap-3">
                   <button
                     onClick={handleGenerate}
                     disabled={user ? (credits ?? 0) < 1 : false}
@@ -658,20 +660,21 @@ function GenerateContent() {
           {/* Result */}
           {generatedImage && imagePreview && (
             <div ref={resultRef} className="space-y-10 scroll-mt-4">
-              <div className="text-center max-w-2xl mx-auto">
+              <div className="text-center max-w-2xl mx-auto prestige-reveal">
                 <p className="prestige-eyebrow text-[11px] text-[var(--gold)] mb-2">
                   Planche livrée
                 </p>
                 <h2 className="prestige-display text-[26px] sm:text-[32px] font-semibold text-foreground tracking-[-0.02em] leading-tight">
-                  Voici votre rendu. Prêt à être <span className="text-[var(--gold)]">partagé</span>
+                  Voici votre rendu. Prêt à être <span className="text-[var(--gold)] italic">partagé</span>
                 </h2>
-                <p className="mt-2 text-[14px] text-muted-foreground">
+                <div className="prestige-rule mx-auto mt-4" aria-hidden />
+                <p className="mt-4 text-[14px] text-muted-foreground">
                   Comparez l&apos;avant / après et téléchargez votre image en haute définition.
                 </p>
               </div>
               {/* Before/After */}
               <div className="grid md:grid-cols-2 gap-5 md:gap-6">
-                <div className="space-y-3">
+                <div className="space-y-3 prestige-reveal" style={{ ['--reveal-d' as string]: '60ms' }}>
                   <span className="block prestige-eyebrow text-[12px] text-muted-foreground">
                     Référence. Avant
                   </span>
@@ -688,7 +691,7 @@ function GenerateContent() {
                   </div>
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-3 prestige-reveal" style={{ ['--reveal-d' as string]: '180ms' }}>
                   <span className="block prestige-eyebrow text-[12px] text-[var(--gold)]">
                     Rendu. {selectedStyleInfo?.name}
                   </span>
@@ -706,7 +709,7 @@ function GenerateContent() {
               </div>
 
               {/* Options sélectionnées */}
-              <div className="max-w-2xl mx-auto">
+              <div className="max-w-2xl mx-auto prestige-reveal">
                 <div className="flex flex-wrap justify-center gap-2.5">
                   {/* Style */}
                   <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-card border border-[var(--gold-line)]">
@@ -762,11 +765,11 @@ function GenerateContent() {
               </div>
 
               {/* Actions */}
-              <div className="max-w-lg mx-auto">
+              <div className="max-w-lg mx-auto prestige-reveal">
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                   <button
                     onClick={handleDownload}
-                    className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-[15px] font-semibold text-[#0c0a09] bg-[var(--gold)] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)] transition-all shadow-lg active:scale-[0.98]"
+                    className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-[15px] font-semibold text-[#0c0a09] bg-[var(--gold)] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)] transition-all duration-300 shadow-lg active:scale-[0.98]"
                   >
                     <Download className="w-4 h-4" strokeWidth={2} />
                     Télécharger en haute définition

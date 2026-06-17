@@ -70,9 +70,10 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
       </section>
 
       {/* NOTRE HISTOIRE */}
-      <section className="py-16 bg-card border-t border-[var(--gold-line)]">
+      <section className="prestige-reveal py-16 bg-card border-t border-[var(--gold-line)]">
         <div className="container px-4 md:px-6 max-w-3xl mx-auto">
-          <h2 className="prestige-display text-2xl font-bold mb-8 text-foreground">Notre histoire</h2>
+          <h2 className="prestige-display text-2xl font-bold mb-4 text-foreground">Notre histoire</h2>
+          <div className="prestige-rule w-16 mb-8" aria-hidden="true" />
           <div className="prestige-body prose prose-lg max-w-none text-muted-foreground space-y-6">
             <p>
               Tout a commencé dans notre appartement en Suisse. Ma femme, passionnée de décoration intérieure, passait des heures sur Pinterest et Instagram à chercher l&apos;inspiration pour notre salon. Moi, développeur et fan de technologie, je trouvais fascinant ce que l&apos;intelligence artificielle pouvait faire avec les images.
@@ -91,11 +92,12 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
       </section>
 
       {/* NOS VALEURS */}
-      <section className="py-16 border-t border-[var(--gold-line)]">
+      <section className="prestige-reveal py-16 border-t border-[var(--gold-line)]">
         <div className="container px-4 md:px-6 max-w-4xl mx-auto">
-          <h2 className="prestige-display text-2xl font-bold mb-10 text-center text-foreground">Ce qui nous guide</h2>
+          <h2 className="prestige-display text-2xl font-bold mb-4 text-center text-foreground">Ce qui nous guide</h2>
+          <div className="prestige-rule w-16 mx-auto mb-10" aria-hidden="true" />
           <div className="grid md:grid-cols-3 gap-6">
-            <Card className="bg-card border border-border">
+            <Card className="prestige-reveal bg-card border border-[var(--gold-line)] transition-all duration-500 ease-out hover:-translate-y-1 hover:border-[var(--gold)]">
               <CardContent className="pt-6 space-y-3">
                 <div className="w-12 h-12 rounded-xl bg-[rgba(200,162,77,0.12)] border border-[var(--gold-line)] flex items-center justify-center">
                   <Heart className="w-6 h-6 text-[var(--gold)]" />
@@ -106,7 +108,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
                 </p>
               </CardContent>
             </Card>
-            <Card className="bg-card border border-border">
+            <Card className="prestige-reveal bg-card border border-[var(--gold-line)] transition-all duration-500 ease-out hover:-translate-y-1 hover:border-[var(--gold)]" style={{ ['--reveal-d' as string]: '120ms' }}>
               <CardContent className="pt-6 space-y-3">
                 <div className="w-12 h-12 rounded-xl bg-[rgba(200,162,77,0.12)] border border-[var(--gold-line)] flex items-center justify-center">
                   <Code className="w-6 h-6 text-[var(--gold)]" />
@@ -117,7 +119,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
                 </p>
               </CardContent>
             </Card>
-            <Card className="bg-card border border-border">
+            <Card className="prestige-reveal bg-card border border-[var(--gold-line)] transition-all duration-500 ease-out hover:-translate-y-1 hover:border-[var(--gold)]" style={{ ['--reveal-d' as string]: '240ms' }}>
               <CardContent className="pt-6 space-y-3">
                 <div className="w-12 h-12 rounded-xl bg-[rgba(200,162,77,0.12)] border border-[var(--gold-line)] flex items-center justify-center">
                   <Shield className="w-6 h-6 text-[var(--gold)]" />
@@ -133,23 +135,24 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
       </section>
 
       {/* EN CHIFFRES */}
-      <section className="py-16 bg-card border-t border-[var(--gold-line)]">
+      <section className="prestige-reveal py-16 bg-card border-t border-[var(--gold-line)]">
         <div className="container px-4 md:px-6 max-w-4xl mx-auto">
-          <h2 className="prestige-display text-2xl font-bold mb-10 text-center text-foreground">InstaDeco en chiffres</h2>
+          <h2 className="prestige-display text-2xl font-bold mb-4 text-center text-foreground">InstaDeco en chiffres</h2>
+          <div className="prestige-rule w-16 mx-auto mb-10" aria-hidden="true" />
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            <div>
+            <div className="prestige-reveal">
               <div className="prestige-display text-3xl font-bold text-[var(--gold)]">12</div>
               <div className="text-sm text-muted-foreground mt-1">Styles de décoration</div>
             </div>
-            <div>
+            <div className="prestige-reveal" style={{ ['--reveal-d' as string]: '120ms' }}>
               <div className="prestige-display text-3xl font-bold text-[var(--gold)]">8</div>
               <div className="text-sm text-muted-foreground mt-1">Types de pièces</div>
             </div>
-            <div>
+            <div className="prestige-reveal" style={{ ['--reveal-d' as string]: '240ms' }}>
               <div className="prestige-display text-3xl font-bold text-[var(--gold)]">30s</div>
               <div className="text-sm text-muted-foreground mt-1">Par génération</div>
             </div>
-            <div>
+            <div className="prestige-reveal" style={{ ['--reveal-d' as string]: '360ms' }}>
               <div className="prestige-display text-3xl font-bold text-[var(--gold)]">3</div>
               <div className="text-sm text-muted-foreground mt-1">Pays (FR, CH, BE)</div>
             </div>
@@ -158,29 +161,30 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
       </section>
 
       {/* POUR QUI */}
-      <section className="py-16 border-t border-[var(--gold-line)]">
+      <section className="prestige-reveal py-16 border-t border-[var(--gold-line)]">
         <div className="container px-4 md:px-6 max-w-3xl mx-auto">
-          <h2 className="prestige-display text-2xl font-bold mb-8 text-foreground">Pour qui est fait InstaDeco ?</h2>
+          <h2 className="prestige-display text-2xl font-bold mb-4 text-foreground">Pour qui est fait InstaDeco ?</h2>
+          <div className="prestige-rule w-16 mb-8" aria-hidden="true" />
           <div className="space-y-6 text-muted-foreground">
-            <div className="flex gap-4 items-start">
+            <div className="prestige-reveal flex gap-4 items-start">
               <Users className="w-5 h-5 text-[var(--gold)] mt-1 shrink-0" />
               <div>
                 <strong className="text-foreground">Propriétaires et locataires.</strong> Vous avez envie de changer mais vous hésitez entre plusieurs styles ? Testez-les tous sur votre propre photo avant de dépenser le moindre euro.
               </div>
             </div>
-            <div className="flex gap-4 items-start">
+            <div className="prestige-reveal flex gap-4 items-start" style={{ ['--reveal-d' as string]: '120ms' }}>
               <Users className="w-5 h-5 text-[var(--gold)] mt-1 shrink-0" />
               <div>
                 <strong className="text-foreground">Agents immobiliers.</strong> Le <Link href="/solution/home-staging-virtuel" className="text-[var(--gold)] hover:underline">home staging virtuel</Link> meuble virtuellement vos biens vides et aide les acheteurs à se projeter. Plus de visites, plus de ventes.
               </div>
             </div>
-            <div className="flex gap-4 items-start">
+            <div className="prestige-reveal flex gap-4 items-start" style={{ ['--reveal-d' as string]: '240ms' }}>
               <Users className="w-5 h-5 text-[var(--gold)] mt-1 shrink-0" />
               <div>
                 <strong className="text-foreground">Architectes et décorateurs.</strong> Montrez un avant/après instantané à vos clients pour valider une direction déco avant de réaliser le projet complet. Consultez nos <Link href="/pro" className="text-[var(--gold)] hover:underline">offres Pro</Link>.
               </div>
             </div>
-            <div className="flex gap-4 items-start">
+            <div className="prestige-reveal flex gap-4 items-start" style={{ ['--reveal-d' as string]: '360ms' }}>
               <Users className="w-5 h-5 text-[var(--gold)] mt-1 shrink-0" />
               <div>
                 <strong className="text-foreground">Couples comme nous.</strong> Fini les débats interminables &quot;tu verras bien quand ce sera posé&quot;. Montrez le résultat avant de commencer les travaux. Paix conjugale garantie.
@@ -191,9 +195,10 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
       </section>
 
       {/* TECHNOLOGIE */}
-      <section className="py-16 bg-card border-t border-[var(--gold-line)]">
+      <section className="prestige-reveal py-16 bg-card border-t border-[var(--gold-line)]">
         <div className="container px-4 md:px-6 max-w-3xl mx-auto">
-          <h2 className="prestige-display text-2xl font-bold mb-8 text-foreground">Notre technologie</h2>
+          <h2 className="prestige-display text-2xl font-bold mb-4 text-foreground">Notre technologie</h2>
+          <div className="prestige-rule w-16 mb-8" aria-hidden="true" />
           <div className="prestige-body prose prose-sm max-w-none text-muted-foreground space-y-4">
             <p>
               InstaDeco utilise <strong>Flux.1</strong>, l&apos;un des modèles d&apos;IA générative les plus avancés, couplé à <strong>ControlNet</strong> pour respecter la structure réelle de votre pièce. Contrairement aux outils qui génèrent des images &quot;à partir de rien&quot;, notre technologie analyse vos murs, fenêtres, portes et volumes pour appliquer le style choisi en conservant la géométrie exacte de votre espace.

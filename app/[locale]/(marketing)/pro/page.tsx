@@ -277,12 +277,13 @@ export default function ProPage() {
       </section>
 
       {/* ===== PROBLÈME / SOLUTION ===== */}
-      <section className="py-20 bg-card">
+      <section className="py-20 bg-card prestige-reveal">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="prestige-display text-3xl md:text-4xl font-bold text-foreground mb-4">
               Un bien meublé se vend <span className="text-[var(--gold)]">jusqu&apos;à 73% plus vite</span>
             </h2>
+            <div className="prestige-rule w-24 mx-auto mb-6" />
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               La majorité des acheteurs commencent leur recherche en ligne. Sans mise en scène,
               votre bien passe inaperçu parmi des milliers d&apos;annonces.
@@ -290,10 +291,11 @@ export default function ProPage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-6 mb-12">
-            {ROI_COMPARISONS.map((item) => (
+            {ROI_COMPARISONS.map((item, i) => (
               <div
                 key={item.label}
-                className={`rounded-xl p-6 ${
+                style={{ ['--reveal-d' as string]: `${i * 120}ms` }}
+                className={`prestige-reveal rounded-xl p-6 ${
                   item.highlight
                     ? 'bg-[rgba(200,162,77,0.12)] text-foreground ring-2 ring-[var(--gold)] ring-offset-4 ring-offset-background shadow-xl scale-105'
                     : 'bg-background border border-border'
@@ -327,8 +329,12 @@ export default function ProPage() {
               { value: '~30s', label: 'pour transformer une pièce' },
               { value: '8', label: 'types de pièces supportés' },
               { value: 'HD+', label: 'jusqu\'à 2048px inclus' },
-            ].map((stat) => (
-              <div key={stat.label} className="text-center p-4 bg-background rounded-xl border border-border">
+            ].map((stat, i) => (
+              <div
+                key={stat.label}
+                style={{ ['--reveal-d' as string]: `${i * 90}ms` }}
+                className="prestige-reveal text-center p-4 bg-background rounded-xl border border-border"
+              >
                 <p className="prestige-display text-3xl font-bold text-[var(--gold)]">{stat.value}</p>
                 <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
               </div>
@@ -338,20 +344,25 @@ export default function ProPage() {
       </section>
 
       {/* ===== CAS D'USAGE ===== */}
-      <section className="py-20">
+      <section className="py-20 prestige-reveal">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="prestige-display text-3xl md:text-4xl font-bold text-foreground mb-4">
               Qui utilise InstaDeco Pro ?
             </h2>
+            <div className="prestige-rule w-24 mx-auto mb-6" />
             <p className="text-lg text-muted-foreground">
               Des professionnels de l&apos;immobilier et du design dans toute la francophonie.
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8">
-            {USE_CASES.map((useCase) => (
-              <div key={useCase.title} className="bg-card border border-border rounded-2xl p-8 hover:border-[var(--gold-line)] transition-colors">
+            {USE_CASES.map((useCase, i) => (
+              <div
+                key={useCase.title}
+                style={{ ['--reveal-d' as string]: `${i * 120}ms` }}
+                className="prestige-reveal bg-card border border-border rounded-2xl p-8 hover:border-[var(--gold-line)] transition-colors duration-300"
+              >
                 <div className="flex items-start gap-4">
                   <div className="flex-shrink-0 p-3 bg-[rgba(200,162,77,0.12)] border border-[var(--gold-line)] rounded-xl">
                     <useCase.icon className="w-6 h-6 text-[var(--gold)]" />
@@ -369,12 +380,13 @@ export default function ProPage() {
       </section>
 
       {/* ===== COMMENT ÇA MARCHE ===== */}
-      <section className="py-20 bg-card">
+      <section className="py-20 bg-card prestige-reveal">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="prestige-display text-3xl md:text-4xl font-bold text-foreground mb-4">
               3 étapes, 10 secondes
             </h2>
+            <div className="prestige-rule w-24 mx-auto mt-6" />
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -382,8 +394,12 @@ export default function ProPage() {
               { step: 1, icon: Camera, title: 'Photographiez la pièce', desc: 'Prenez une photo de la pièce vide ou occupée. Smartphone ou appareil pro.' },
               { step: 2, icon: Palette, title: 'Choisissez un style', desc: 'Moderne, scandinave, industriel... un style pour chaque bien et chaque cible.' },
               { step: 3, icon: Download, title: 'Téléchargez en HD', desc: 'En 10 secondes, obtenez le rendu meublé en haute définition. Prêt pour vos annonces.' },
-            ].map((item) => (
-              <div key={item.step} className="text-center">
+            ].map((item, i) => (
+              <div
+                key={item.step}
+                style={{ ['--reveal-d' as string]: `${i * 120}ms` }}
+                className="prestige-reveal text-center"
+              >
                 <div className="prestige-display w-16 h-16 rounded-full bg-[var(--gold)] text-[#0c0a09] text-2xl font-bold flex items-center justify-center mx-auto mb-6">
                   {item.step}
                 </div>
@@ -397,17 +413,22 @@ export default function ProPage() {
       </section>
 
       {/* ===== CAS D'USAGE PROS ===== */}
-      <section className="py-20">
+      <section className="py-20 prestige-reveal">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="prestige-display text-3xl md:text-4xl font-bold text-foreground mb-4">
               Comment les pros utilisent InstaDeco
             </h2>
+            <div className="prestige-rule w-24 mx-auto mt-6" />
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {PRO_USE_CASES.map((t) => (
-              <div key={t.profile} className="bg-card rounded-2xl p-8 border border-border">
+            {PRO_USE_CASES.map((t, i) => (
+              <div
+                key={t.profile}
+                style={{ ['--reveal-d' as string]: `${i * 120}ms` }}
+                className="prestige-reveal bg-card rounded-2xl p-8 border border-[var(--gold-line)]"
+              >
                 <div className="text-4xl mb-4">{t.icon}</div>
                 <h3 className="prestige-display font-semibold text-foreground text-lg mb-2">{t.profile}</h3>
                 <p className="prestige-eyebrow mb-4">{t.role}</p>
@@ -422,12 +443,13 @@ export default function ProPage() {
       </section>
 
       {/* ===== PLANS PRO ===== */}
-      <section id="plans" className="py-20 bg-card">
+      <section id="plans" className="py-20 bg-card prestige-reveal">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="prestige-display text-3xl md:text-4xl font-bold text-foreground mb-4">
               Choisissez votre plan
             </h2>
+            <div className="prestige-rule w-24 mx-auto mb-6" />
             <p className="text-lg text-muted-foreground mb-8">
               Rentabilisé dès le premier bien vendu plus vite.
             </p>
@@ -460,13 +482,14 @@ export default function ProPage() {
           )}
 
           <div className="grid md:grid-cols-3 gap-8 items-start">
-            {PRO_PLANS.map((plan) => {
+            {PRO_PLANS.map((plan, i) => {
               const price = billingPeriod === 'monthly' ? plan.monthly : plan.annual;
               const isLoading = loadingPlan === plan.id;
               return (
                 <div
                   key={plan.id}
-                  className={`rounded-2xl p-8 transition-all ${
+                  style={{ ['--reveal-d' as string]: `${i * 120}ms` }}
+                  className={`prestige-reveal rounded-2xl p-8 transition-all ${
                     plan.popular
                       ? 'bg-[var(--ink)] text-[var(--ivory)] ring-2 ring-[var(--gold)] shadow-2xl md:scale-105'
                       : 'bg-background border border-border'
@@ -522,7 +545,7 @@ export default function ProPage() {
           </div>
 
           {/* Garantie */}
-          <div className="text-center mt-12">
+          <div className="text-center mt-12 prestige-reveal">
             <div className="inline-flex items-center gap-3 bg-[rgba(200,162,77,0.10)] border border-[var(--gold-line)] rounded-xl px-6 py-3">
               <Shield className="w-5 h-5 text-[var(--gold)]" />
               <span className="text-sm text-foreground">
@@ -534,22 +557,23 @@ export default function ProPage() {
       </section>
 
       {/* ===== CALCULATEUR ROI ===== */}
-      <section className="py-20">
+      <section className="py-20 prestige-reveal">
         <div className="max-w-4xl mx-auto px-6">
           <div className="relative overflow-hidden bg-[var(--ink)] border border-[var(--gold-line)] rounded-3xl p-10 text-[var(--ivory)] text-center">
             <div className="pointer-events-none absolute -top-20 left-1/2 -translate-x-1/2 h-64 w-64 rounded-full bg-[var(--gold-soft)] opacity-15 blur-3xl" />
             <Award className="relative w-12 h-12 text-[var(--gold)] mx-auto mb-6" />
             <h2 className="prestige-display relative text-3xl font-bold mb-4">Le calcul est simple</h2>
+            <div className="prestige-rule relative w-24 mx-auto mb-2" />
             <div className="relative grid md:grid-cols-3 gap-8 mt-8">
-              <div>
+              <div style={{ ['--reveal-d' as string]: '0ms' }} className="prestige-reveal">
                 <p className="prestige-display text-4xl font-bold text-[var(--gold)]">49€</p>
                 <p className="text-[var(--mist)] mt-2">par mois, générations illimitées</p>
               </div>
-              <div>
+              <div style={{ ['--reveal-d' as string]: '120ms' }} className="prestige-reveal">
                 <p className="prestige-display text-4xl font-bold text-emerald-400">1 bien</p>
                 <p className="text-[var(--mist)] mt-2">vendu plus vite suffit à rentabiliser l&apos;année</p>
               </div>
-              <div>
+              <div style={{ ['--reveal-d' as string]: '240ms' }} className="prestige-reveal">
                 <p className="prestige-display text-4xl font-bold text-[var(--gold)]">−95%</p>
                 <p className="text-[var(--mist)] mt-2">vs un home staging physique</p>
               </div>
@@ -565,15 +589,20 @@ export default function ProPage() {
       </section>
 
       {/* ===== FAQ ===== */}
-      <section className="py-20 bg-card">
+      <section className="py-20 bg-card prestige-reveal">
         <div className="max-w-3xl mx-auto px-6">
-          <h2 className="prestige-display text-3xl font-bold text-center text-foreground mb-12">
+          <h2 className="prestige-display text-3xl font-bold text-center text-foreground mb-4">
             Questions fréquentes
           </h2>
+          <div className="prestige-rule w-24 mx-auto mb-12" />
 
           <div className="space-y-3">
             {FAQ.map((item, i) => (
-              <div key={i} className="bg-background rounded-xl border border-border overflow-hidden">
+              <div
+                key={i}
+                style={{ ['--reveal-d' as string]: `${i * 70}ms` }}
+                className="prestige-reveal bg-background rounded-xl border border-border overflow-hidden"
+              >
                 <button
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
                   className="w-full flex items-center justify-between p-5 text-left"
@@ -593,11 +622,11 @@ export default function ProPage() {
       </section>
 
       {/* ===== CTA FINAL ===== */}
-      <section className="relative overflow-hidden py-20 bg-[var(--ink)] text-[var(--ivory)] text-center">
+      <section className="relative overflow-hidden py-20 bg-[var(--ink)] text-[var(--ivory)] text-center prestige-reveal">
         <div className="pointer-events-none absolute -bottom-24 left-1/2 -translate-x-1/2 h-80 w-80 rounded-full bg-[var(--gold-soft)] opacity-15 blur-3xl" />
         <div className="relative max-w-3xl mx-auto px-6">
           <h2 className="prestige-display text-3xl md:text-4xl font-bold mb-6">
-            Prêt à vendre plus vite ?
+            Prêt à vendre plus <span className="text-[var(--gold)] italic">vite</span> ?
           </h2>
           <p className="text-lg text-[var(--mist)] mb-10">
             Rejoignez les professionnels qui utilisent déjà

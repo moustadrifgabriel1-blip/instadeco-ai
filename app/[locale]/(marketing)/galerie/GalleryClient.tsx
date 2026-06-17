@@ -97,12 +97,13 @@ export function GalleryClient({ initialItems, initialTotal }: GalleryClientProps
           </span>{' '}
           pièces transformées par IA
         </h1>
+        <div className="prestige-rule w-24 mx-auto mb-6" aria-hidden="true" />
         <p className="prestige-body text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-          Découvrez les créations de notre communauté. Chaque transformation a été réalisée par IA en moins de 30 secondes.
+          Découvrez les créations de notre communauté. Chaque transformation a été réalisée par IA en <span className="text-[var(--gold)]">moins de 30 secondes</span>.
         </p>
 
         {/* Filters */}
-        <div className="flex flex-wrap justify-center gap-3 mb-8">
+        <div className="prestige-reveal flex flex-wrap justify-center gap-3 mb-8">
           <div className="flex items-center gap-2">
             <Filter className="w-4 h-4 text-muted-foreground" />
             <select
@@ -138,7 +139,7 @@ export function GalleryClient({ initialItems, initialTotal }: GalleryClientProps
             ))}
           </div>
         ) : items.length === 0 ? (
-          <div className="text-center py-16">
+          <div className="prestige-reveal text-center py-16">
             <Sparkles className="w-12 h-12 text-[var(--gold)] mx-auto mb-4" />
             <h3 className="prestige-display text-lg font-semibold text-foreground mb-2">
               Aucune transformation trouvée
@@ -146,7 +147,7 @@ export function GalleryClient({ initialItems, initialTotal }: GalleryClientProps
             <p className="prestige-body text-muted-foreground mb-6">
               Soyez le premier à créer une transformation dans ce style !
             </p>
-            <Button asChild>
+            <Button asChild className="rounded-full bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)] transition duration-300">
               <Link href="/generate">
                 Créer ma première transformation
                 <ArrowRight className="w-4 h-4 ml-2" />
@@ -155,10 +156,11 @@ export function GalleryClient({ initialItems, initialTotal }: GalleryClientProps
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {items.map((item) => (
+            {items.map((item, index) => (
               <div
                 key={item.id}
-                className="group relative aspect-[3/2] rounded-2xl overflow-hidden cursor-pointer border border-[var(--gold-line)] shadow-sm hover:shadow-lg transition-all hover:scale-[1.02]"
+                className="prestige-reveal group relative aspect-[3/2] rounded-2xl overflow-hidden cursor-pointer border border-[var(--gold-line)] shadow-sm hover:shadow-lg transition-all duration-500 ease hover:scale-[1.02]"
+                style={{ ['--reveal-d' as string]: `${(index % 4) * 120}ms` }}
               >
                 {/* Generated image */}
                 <OptimizedRemoteImage
@@ -166,11 +168,11 @@ export function GalleryClient({ initialItems, initialTotal }: GalleryClientProps
                   alt={`${ROOM_LABELS[item.room_type_slug] || item.room_type_slug} style ${STYLE_LABELS[item.style_slug] || item.style_slug}, Décoration IA`}
                   fill
                   sizePreset="gallery"
-                  className="object-cover"
+                  className="object-cover transition-transform duration-500 ease group-hover:scale-105"
                 />
 
-                {/* Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                {/* Scrim de lisibilité sous les labels */}
+                <div className="prestige-edito-veil absolute inset-0" aria-hidden="true" />
 
                 {/* Badge IA */}
                 <div className="absolute top-3 left-3">
@@ -181,10 +183,10 @@ export function GalleryClient({ initialItems, initialTotal }: GalleryClientProps
 
                 {/* Info */}
                 <div className="absolute bottom-3 left-3 right-3">
-                  <p className="text-white font-medium text-sm capitalize">
+                  <p className="prestige-display text-white font-semibold text-base capitalize">
                     {ROOM_LABELS[item.room_type_slug] || item.room_type_slug}
                   </p>
-                  <p className="text-white/80 text-xs">
+                  <p className="prestige-body text-white/80 text-xs">
                     Style {STYLE_LABELS[item.style_slug] || item.style_slug}
                   </p>
                 </div>
@@ -211,15 +213,17 @@ export function GalleryClient({ initialItems, initialTotal }: GalleryClientProps
         )}
 
         {/* CTA */}
-        <div className="text-center mt-12">
+        <div className="prestige-reveal text-center mt-12">
           <div className="bg-card rounded-2xl p-8 border border-[var(--gold-line)]">
+            <p className="prestige-eyebrow mb-3">Votre intérieur, sublimé</p>
             <h3 className="prestige-display text-xl font-semibold text-foreground mb-2">
               Envie de voir votre pièce transformée ?
             </h3>
+            <div className="prestige-rule w-20 mx-auto mb-4" aria-hidden="true" />
             <p className="prestige-body text-muted-foreground mb-4">
               Un décorateur coûte 150 €/h. InstaDeco : <span className="font-bold text-[var(--gold)]">0,99 € en 30 secondes</span>.
             </p>
-            <Button asChild size="lg" className="rounded-full bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)] hover:shadow-lg hover:shadow-[var(--gold)]/20">
+            <Button asChild size="lg" className="rounded-full bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)] transition duration-300 hover:shadow-lg hover:shadow-[var(--gold)]/20">
               <Link href="/generate">
                 Transformer ma pièce gratuitement
                 <ArrowRight className="w-4 h-4 ml-2" />

@@ -423,6 +423,7 @@ export default async function DecoStylePiecePage({ params }: PageProps) {
           sizes="100vw"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-[#0c0a09]/40" />
+        <div className="absolute inset-0 prestige-text-scrim" />
 
         <div className="absolute bottom-0 left-0 w-full z-10">
           <div className="container mx-auto px-4 pb-10">
@@ -450,7 +451,7 @@ export default async function DecoStylePiecePage({ params }: PageProps) {
             </div>
 
             <h1 className="prestige-display text-3xl md:text-5xl font-bold text-[var(--ivory)] tracking-tight [text-shadow:_0_2px_10px_rgb(0_0_0_/_40%)]">
-              {room.name} style {style.name}
+              {room.name} style <span className="italic text-[var(--gold)]">{style.name}</span>
             </h1>
             <p className="text-[var(--mist)] text-lg mt-3 max-w-2xl">
               {content.intro}
@@ -460,7 +461,7 @@ export default async function DecoStylePiecePage({ params }: PageProps) {
       </section>
 
       {/* CTA rapide */}
-      <section className="py-8 border-b border-[var(--gold-line)] bg-[rgba(200,162,77,0.06)]">
+      <section className="prestige-reveal py-8 border-b border-[var(--gold-line)] bg-[rgba(200,162,77,0.06)]">
         <div className="container mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Sparkles className="h-5 w-5 text-[var(--gold)]" />
@@ -469,7 +470,7 @@ export default async function DecoStylePiecePage({ params }: PageProps) {
             </p>
           </div>
           <Link href="/essai">
-            <Button className="rounded-full px-6 bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)]">
+            <Button className="rounded-full px-6 bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)] transition duration-300 ease">
               Essayer gratuitement
               <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
@@ -481,17 +482,18 @@ export default async function DecoStylePiecePage({ params }: PageProps) {
       <section className="py-16">
         <div className="container mx-auto px-4 max-w-4xl">
           {/* Pourquoi ce style pour cette pièce */}
-          <div className="mb-16">
-            <h2 className="prestige-display text-2xl font-bold mb-6 text-foreground">
-              Pourquoi le style {style.name} pour {room.name === 'Entrée' || room.name === 'Terrasse' || room.name === 'Cuisine' || room.name === 'Salle de bain' || room.name === 'Salle à manger' || room.name === 'Chambre' ? 'la' : 'le'} {room.name.toLowerCase()} ?
+          <div className="prestige-reveal mb-16">
+            <h2 className="prestige-display text-2xl font-bold mb-4 text-foreground">
+              Pourquoi le style <span className="italic text-[var(--gold)]">{style.name}</span> pour {room.name === 'Entrée' || room.name === 'Terrasse' || room.name === 'Cuisine' || room.name === 'Salle de bain' || room.name === 'Salle à manger' || room.name === 'Chambre' ? 'la' : 'le'} {room.name.toLowerCase()} ?
             </h2>
+            <div className="prestige-rule w-24 mb-6" />
             <p className="text-muted-foreground text-lg leading-relaxed mb-8">
               {content.why}
             </p>
 
             {/* Palette & Matériaux */}
             <div className="grid md:grid-cols-2 gap-6">
-              <Card className="bg-card border border-border">
+              <Card className="prestige-reveal bg-card border border-[var(--gold-line)] transition duration-300 ease" style={{ ['--reveal-d' as string]: '120ms' }}>
                 <CardContent className="p-6">
                   <h3 className="font-semibold mb-4 flex items-center gap-2 text-foreground">
                     <Palette className="h-4 w-4 text-[var(--gold)]" />
@@ -506,7 +508,7 @@ export default async function DecoStylePiecePage({ params }: PageProps) {
                   </div>
                 </CardContent>
               </Card>
-              <Card className="bg-card border border-border">
+              <Card className="prestige-reveal bg-card border border-[var(--gold-line)] transition duration-300 ease" style={{ ['--reveal-d' as string]: '240ms' }}>
                 <CardContent className="p-6">
                   <h3 className="font-semibold mb-4 flex items-center gap-2 text-foreground">
                     <Star className="h-4 w-4 text-[var(--gold)]" />
@@ -525,13 +527,18 @@ export default async function DecoStylePiecePage({ params }: PageProps) {
           </div>
 
           {/* Comment faire */}
-          <div className="mb-16">
-            <h2 className="prestige-display text-2xl font-bold mb-6 text-foreground">
-              Comment décorer {room.name === 'Entrée' || room.name === 'Terrasse' || room.name === 'Chambre' ? 'une' : 'un'} {room.name.toLowerCase()} en style {style.name}
+          <div className="prestige-reveal mb-16">
+            <h2 className="prestige-display text-2xl font-bold mb-4 text-foreground">
+              Comment décorer {room.name === 'Entrée' || room.name === 'Terrasse' || room.name === 'Chambre' ? 'une' : 'un'} {room.name.toLowerCase()} en style <span className="italic text-[var(--gold)]">{style.name}</span>
             </h2>
+            <div className="prestige-rule w-24 mb-6" />
             <div className="space-y-4">
               {content.steps.map((step, i) => (
-                <div key={i} className="flex items-start gap-4 p-4 rounded-xl bg-card border border-border">
+                <div
+                  key={i}
+                  className="prestige-reveal flex items-start gap-4 p-4 rounded-xl bg-card border border-[var(--gold-line)] transition duration-300 ease"
+                  style={{ ['--reveal-d' as string]: `${Math.min(i, 4) * 90}ms` }}
+                >
                   <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[rgba(200,162,77,0.12)] text-[var(--gold)] font-bold flex items-center justify-center text-sm">
                     {i + 1}
                   </div>
@@ -542,10 +549,10 @@ export default async function DecoStylePiecePage({ params }: PageProps) {
           </div>
 
           {/* Conseil de pro */}
-          <div className="mb-16">
+          <div className="prestige-reveal mb-16">
             <h2 className="prestige-display text-2xl font-bold mb-6 flex items-center gap-2 text-foreground">
               <Lightbulb className="h-5 w-5 text-[var(--gold)]" />
-              Conseil de pro
+              Conseil de <span className="italic text-[var(--gold)]">pro</span>
             </h2>
             <div className="flex items-start gap-3 p-5 rounded-xl bg-[rgba(200,162,77,0.08)] border border-[var(--gold-line)]">
               <Lightbulb className="h-5 w-5 text-[var(--gold)] flex-shrink-0 mt-0.5" />
@@ -554,19 +561,19 @@ export default async function DecoStylePiecePage({ params }: PageProps) {
           </div>
 
           {/* CTA central */}
-          <div className="mb-16 bg-card rounded-2xl p-10 text-center border border-[var(--gold-line)]">
+          <div className="prestige-reveal mb-16 bg-card rounded-2xl p-10 text-center border border-[var(--gold-line)]">
             <div className="prestige-eyebrow inline-flex items-center gap-2 bg-[rgba(200,162,77,0.12)] text-[var(--gold)] text-sm font-medium px-4 py-1.5 rounded-full mb-4">
               <Sparkles className="h-4 w-4" />
               Essai gratuit
             </div>
             <h2 className="prestige-display text-2xl font-bold mb-3 text-foreground">
-              Voyez le résultat avant d&apos;acheter
+              Voyez le <span className="italic text-[var(--gold)]">résultat</span> avant d&apos;acheter
             </h2>
             <p className="text-muted-foreground max-w-lg mx-auto mb-6">
               Uploadez une photo de votre {room.name.toLowerCase()} et découvrez-{room.name === 'Entrée' || room.name === 'Terrasse' || room.name === 'Cuisine' || room.name === 'Salle de bain' || room.name === 'Salle à manger' || room.name === 'Chambre' ? 'la' : 'le'} transformé{room.name === 'Entrée' || room.name === 'Terrasse' || room.name === 'Cuisine' || room.name === 'Salle de bain' || room.name === 'Salle à manger' || room.name === 'Chambre' ? 'e' : ''} en style {style.name} en 30 secondes.
             </p>
             <Link href="/essai">
-              <Button size="lg" className="rounded-full px-8 bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)] hover:scale-105 transition-transform">
+              <Button size="lg" className="rounded-full px-8 bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)] hover:scale-105 transition duration-300 ease">
                 Transformer ma pièce maintenant
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
@@ -574,11 +581,16 @@ export default async function DecoStylePiecePage({ params }: PageProps) {
           </div>
 
           {/* FAQ */}
-          <div className="mb-16">
-            <h2 className="prestige-display text-2xl font-bold mb-6 text-foreground">Questions fréquentes</h2>
+          <div className="prestige-reveal mb-16">
+            <h2 className="prestige-display text-2xl font-bold mb-4 text-foreground">Questions <span className="italic text-[var(--gold)]">fréquentes</span></h2>
+            <div className="prestige-rule w-24 mb-6" />
             <div className="space-y-4">
               {faq.map((item, i) => (
-                <details key={i} className="group border border-border rounded-xl bg-card p-6">
+                <details
+                  key={i}
+                  className="prestige-reveal group border border-[var(--gold-line)] rounded-xl bg-card p-6 transition duration-300 ease"
+                  style={{ ['--reveal-d' as string]: `${Math.min(i, 4) * 80}ms` }}
+                >
                   <summary className="flex cursor-pointer items-center justify-between font-medium text-foreground">
                     {item.question}
                     <ChevronRight className="h-4 w-4 text-[var(--gold)] transition-transform group-open:rotate-90" />
@@ -598,16 +610,17 @@ export default async function DecoStylePiecePage({ params }: PageProps) {
         <div className="container mx-auto px-4 max-w-4xl">
           {/* Autres styles pour cette pièce */}
           {otherStylesForRoom.length > 0 && (
-            <div className="mb-10">
+            <div className="prestige-reveal mb-10">
               <h3 className="prestige-display text-xl font-bold mb-4 text-foreground">
                 Autres styles pour votre {room.name.toLowerCase()}
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {otherStylesForRoom.map(s => (
+                {otherStylesForRoom.map((s, i) => (
                   <Link
                     key={s.slug}
                     href={`/deco/${s.slug}/${room.slug}`}
-                    className="block p-4 border border-border rounded-xl bg-card hover:border-[var(--gold-line)] transition-all hover:shadow-md"
+                    className="prestige-reveal block p-4 border border-[var(--gold-line)] rounded-xl bg-card hover:border-[var(--gold)] transition duration-300 ease hover:shadow-md"
+                    style={{ ['--reveal-d' as string]: `${Math.min(i, 4) * 80}ms` }}
                   >
                     <p className="font-semibold text-sm text-foreground">{room.name} {s.name}</p>
                     <p className="text-xs text-muted-foreground mt-1">{s.difficulty} • {s.priceRange}</p>
@@ -618,16 +631,17 @@ export default async function DecoStylePiecePage({ params }: PageProps) {
           )}
 
           {/* Autres pièces pour ce style */}
-          <div className="mb-10">
+          <div className="prestige-reveal mb-10">
             <h3 className="prestige-display text-xl font-bold mb-4 text-foreground">
-              Le style {style.name} dans d&apos;autres pièces
+              Le style <span className="italic text-[var(--gold)]">{style.name}</span> dans d&apos;autres pièces
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {otherRoomsForStyle.map(r => (
+              {otherRoomsForStyle.map((r, i) => (
                 <Link
                   key={r.slug}
                   href={`/deco/${style.slug}/${r.slug}`}
-                  className="block p-4 border border-border rounded-xl bg-card hover:border-[var(--gold-line)] transition-all hover:shadow-md"
+                  className="prestige-reveal block p-4 border border-[var(--gold-line)] rounded-xl bg-card hover:border-[var(--gold)] transition duration-300 ease hover:shadow-md"
+                  style={{ ['--reveal-d' as string]: `${Math.min(i, 4) * 80}ms` }}
                 >
                   <p className="font-semibold text-sm text-foreground">{r.name} {style.name}</p>
                   <p className="text-xs text-muted-foreground mt-1">Voir le guide</p>
@@ -637,7 +651,7 @@ export default async function DecoStylePiecePage({ params }: PageProps) {
           </div>
 
           {/* Liens principaux */}
-          <div className="flex flex-wrap gap-4 text-sm">
+          <div className="prestige-reveal flex flex-wrap gap-4 text-sm">
             <Link href={`/style/${style.slug}`} className="text-[var(--gold)] hover:underline">
               Guide complet : Style {style.name} →
             </Link>
