@@ -2,8 +2,11 @@
 # Installe : voir docs/CRON_VPS_HETZNER.md (section moteur SEO).
 # Horaires en UTC (regler le fuseau du VPS si besoin). m h dom mon dow  commande
 #
-0 6  * * *   /opt/instadeco/run-seo-engine.sh gsc_daily
-30 6 * * *   /opt/instadeco/run-seo-engine.sh drift_check
-0 7  * * 1   /opt/instadeco/run-seo-engine.sh rank_tracker
-0 7  * * 0   /opt/instadeco/run-seo-engine.sh competitor_diff
-0 8  1 * *   /opt/instadeco/run-seo-engine.sh citation_batch
+# --- Jobs FONCTIONNELS (implementes + testes) ---
+0 6  * * *   /opt/instadeco/run-seo-engine.sh gsc_daily      # KPIs Search Console (quotidien)
+30 6 * * *   /opt/instadeco/run-seo-engine.sh drift_check    # regressions on-page (quotidien)
+0 7  * * 1   /opt/instadeco/run-seo-engine.sh rank_tracker   # positions via GSC (hebdo lundi)
+#
+# --- Jobs PAS ENCORE PRETS (squelettes) : decommenter quand implementes ---
+# 0 7  * * 0   /opt/instadeco/run-seo-engine.sh competitor_diff   # veille concurrents
+# 0 8  1 * *   /opt/instadeco/run-seo-engine.sh citation_batch    # GEO, monitoring LLM (payant, phase 3)
