@@ -27,18 +27,31 @@ from __future__ import annotations
 
 import datetime as _dt
 import json
+import os
 from pathlib import Path
 
 _ENGINE_ROOT = Path(__file__).resolve().parent.parent
 _REPORTS_DIR = _ENGINE_ROOT / "reports"
 _BASELINES_DIR = _ENGINE_ROOT / "data" / "baselines"
 
-# Pages clés à surveiller (chemins relatifs au domaine instadeco.app).
-# TODO: compléter avec les vraies money pages / pages localisées.
+_BASE_URL = os.environ.get("GSC_SITE_URL", "").replace("sc-domain:", "").strip().rstrip("/")
+if not _BASE_URL.startswith("http"):
+    _BASE_URL = "https://instadeco.app"
+_TIMEOUT = 20
+_UA = "Mozilla/5.0 (compatible; InstaDecoSEO/1.0; +https://instadeco.app)"
+
+# Pages clés surveillées (money pages + hubs). Chemins relatifs au domaine.
 PAGES: tuple[str, ...] = (
     "/fr",
     "/en",
     "/de",
+    "/fr/essai",
+    "/fr/pricing",
+    "/fr/pro",
+    "/fr/quiz",
+    "/fr/galerie",
+    "/fr/blog",
+    "/fr/solution/avant-apres-decoration",
 )
 
 # Champs SEO-critiques comparés à la baseline.
@@ -63,13 +76,60 @@ def _baseline_path(page: str) -> Path:
 
 def _extract_seo_fields(page: str) -> dict[str, str]:
     """Récupère et extrait les champs SEO d'une page. Lève si indisponible."""
-    # TODO: fetch + extract — récupérer https://instadeco.app{page},
-    #   vérifier le status (sinon PageFetchError), parser via BeautifulSoup/lxml
-    #   pour extraire TRACKED_FIELDS. Toujours via un fetch sûr (timeout).
-    raise NotImplementedError(
-        f"drift_check: extraction non branchée pour {page} (cf. TODO). "
-        "Refus de comparer sans données réelles."
+    try:
+        import requests
+        from bs4 import BeautifulSoup
+    except ImportError as exc:  # pragma: no cover
+        raise SystemExit(
+            "[drift_check] Dépendances absentes. "
+            "pip install -r .claude/seo-engine/requirements.txt"
+        ) from exc
+
+    url = f"{_BASE_URL}{page}"
+    try:
+        resp = requests.get(url, timeout=_TIMEOUT, headers={"User-Agent": _UA})
+    except requests.RequestException as exc:
+        raise PageFetchError(f"{url} injoignable: {exc}") from exc
+    if resp.status_code != 200:
+        raise PageFetchError(f"{url} a renvoyé HTTP {resp.status_code}")
+
+    soup = BeautifulSoup(resp.text, "lxml")
+
+    def _meta(name: str, attr: str = "name") -> str:
+        tag = soup.find("meta", attrs={attr: name})
+        return (tag.get("content") or "").strip() if tag else ""
+
+    title = (soup.title.string or "").strip() if soup.title else ""
+    h1 = soup.find("h1")
+    canonical = soup.find("link", rel="canonical")
+
+    # hreflang : ensemble trié "lang=url" pour un diff stable.
+    hreflangs = sorted(
+        f"{l.get('hreflang')}={l.get('href')}"
+        for l in soup.find_all("link", rel="alternate")
+        if l.get("hreflang")
     )
+
+    # schema : types @type de tous les blocs JSON-LD, triés.
+    schema_types: list[str] = []
+    for script in soup.find_all("script", type="application/ld+json"):
+        try:
+            data = json.loads(script.string or "")
+        except (ValueError, TypeError):
+            continue
+        for node in data if isinstance(data, list) else [data]:
+            if isinstance(node, dict) and node.get("@type"):
+                t = node["@type"]
+                schema_types.extend(t if isinstance(t, list) else [t])
+
+    return {
+        "title": title,
+        "meta_description": _meta("description"),
+        "h1": h1.get_text(strip=True) if h1 else "",
+        "canonical": (canonical.get("href") or "").strip() if canonical else "",
+        "hreflang": " | ".join(hreflangs),
+        "schema": ", ".join(sorted(schema_types)),
+    }
 
 
 def _diff_fields(baseline: dict[str, str], current: dict[str, str]) -> list[str]:
@@ -92,13 +152,24 @@ def _write_report(sections: list[str]) -> Path:
     return path
 
 
-def run() -> Path:
-    """Compare chaque page à sa baseline et écrit le rapport. Lève si indispo."""
+def run() -> tuple[Path, int]:
+    """Compare chaque page à sa baseline et écrit le rapport.
+
+    Résilient : une page indisponible est SIGNALÉE (c'est un drift) sans tuer
+    le run. Retourne (chemin du rapport, nombre de pages en anomalie).
+    """
     _BASELINES_DIR.mkdir(parents=True, exist_ok=True)
     sections: list[str] = []
+    anomalies = 0
 
     for page in PAGES:
-        current = _extract_seo_fields(page)  # lève tant que non branché
+        try:
+            current = _extract_seo_fields(page)
+        except PageFetchError as exc:
+            anomalies += 1
+            sections.append(f"## {page} — INDISPONIBLE\n- {exc}\n")
+            continue
+
         bpath = _baseline_path(page)
         if not bpath.exists():
             bpath.write_text(json.dumps(current, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -107,20 +178,26 @@ def run() -> Path:
         baseline = json.loads(bpath.read_text(encoding="utf-8"))
         diffs = _diff_fields(baseline, current)
         if diffs:
+            anomalies += 1
             sections.append(f"## {page} — RÉGRESSIONS DÉTECTÉES\n" + "\n".join(diffs) + "\n")
         else:
             sections.append(f"## {page}\nAucun changement.\n")
 
-    return _write_report(sections)
+    header = (
+        f"{anomalies} page(s) en anomalie sur {len(PAGES)} surveillées.\n"
+        if anomalies
+        else f"Aucune anomalie sur {len(PAGES)} pages surveillées.\n"
+    )
+    return _write_report([header] + sections), anomalies
 
 
 def main() -> None:
     """Entrée CLI : run quotidien du drift check."""
     try:
-        report = run()
-    except (PageFetchError, RuntimeError, NotImplementedError) as exc:
+        report, anomalies = run()
+    except (RuntimeError, NotImplementedError) as exc:
         raise SystemExit(f"[drift_check] ÉCHEC: {exc}")
-    print(f"[drift_check] Rapport écrit: {report}")
+    print(f"[drift_check] OK. {anomalies} anomalie(s). Rapport: {report}")
 
 
 if __name__ == "__main__":

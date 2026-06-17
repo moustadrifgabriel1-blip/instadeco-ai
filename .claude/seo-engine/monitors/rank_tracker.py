@@ -1,120 +1,126 @@
 #!/usr/bin/env python3
-"""rank_tracker.py — Suivi hebdomadaire des positions mots-clés (seo-engine).
+"""rank_tracker.py — Suivi hebdomadaire des positions (seo-engine).
 
 Rôle
 ----
-Suivre les positions des mots-clés cibles listés dans
-`.claude/seo-memory/serp-targets.md`, en utilisant `scrapers/serp_scraper.py`.
-Écrit un rapport `reports/rank_YYYY-MM-DD.md` et un snapshot dans
-`data/ranks/`. Fréquence : hebdomadaire (lundi).
+Suivre l'évolution des positions des requêtes pour lesquelles InstaDeco
+apparaît, à partir des snapshots **GSC** produits par `gsc_daily.py`
+(`data/gsc_*.json`). Pas de scraping Google : la position moyenne vient
+directement de Search Console, gratuitement et fiablement.
+
+Écrit `reports/rank_YYYY-MM-DD.md` (positions + évolution depuis le dernier
+suivi) et un snapshot `data/ranks/rank_YYYY-MM-DD.json`.
 
 Règles
 ------
-- Les mots-clés viennent du VRAI fichier serp-targets.md (pas de liste codée
-  en dur ; si le fichier est absent ou ne contient aucun mot-clé -> erreur).
-- Toute position provient de serp_scraper (vraie SERP). Si le scraper lève
-  (blocage/captcha) -> erreur explicite, sortie non-zéro. Jamais de rang inventé.
-
-TODO (points d'intégration)
----------------------------
-- Affiner le parsing de serp-targets.md (table markdown) au point `# TODO: parse`.
-- Brancher la résolution de position d'InstaDeco dans les résultats SERP.
+- Aucune position inventée : tout vient des snapshots GSC réels.
+- Si aucun snapshot GSC n'existe -> erreur explicite (lancer gsc_daily d'abord).
 """
 
 from __future__ import annotations
 
 import datetime as _dt
+import json
 from pathlib import Path
 
-# Import de la brique SERP partagée (même paquet seo-engine).
-import sys
-
 _ENGINE_ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(_ENGINE_ROOT))
-
-from scrapers.serp_scraper import (  # noqa: E402
-    SerpBlockedError,
-    fetch_serp,
-)
-
 _REPORTS_DIR = _ENGINE_ROOT / "reports"
-_RANKS_DIR = _ENGINE_ROOT / "data" / "ranks"
-_SERP_TARGETS = _ENGINE_ROOT.parent / "seo-memory" / "serp-targets.md"
+_DATA_DIR = _ENGINE_ROOT / "data"
+_RANKS_DIR = _DATA_DIR / "ranks"
 
-# Domaine dont on cherche la position dans la SERP.
-_OWN_DOMAIN = "instadeco.app"
+# Seuil d'évolution notable (en positions) pour le résumé des mouvements.
+_MOVE_THRESHOLD = 3.0
 
 
-def _load_keywords() -> list[tuple[str, str]]:
-    """Lit les (mot-clé, marché) depuis serp-targets.md. Lève si vide/absent."""
-    if not _SERP_TARGETS.is_file():
+def _latest_gsc_snapshot() -> dict:
+    """Charge le snapshot GSC le plus récent. Lève si aucun."""
+    snaps = sorted(_DATA_DIR.glob("gsc_*.json"))
+    if not snaps:
         raise SystemExit(
-            f"[rank_tracker] serp-targets.md introuvable: {_SERP_TARGETS}. "
-            "Aucun mot-clé à suivre — refus de continuer."
+            "[rank_tracker] Aucun snapshot GSC (data/gsc_*.json). "
+            "Lancer gsc_daily d'abord."
         )
-    text = _SERP_TARGETS.read_text(encoding="utf-8")
-    keywords: list[tuple[str, str]] = []
-    # TODO: parse — extraire les lignes du tableau "Mots-clés cibles" :
-    #   | # | mot-clé | marché | intent | volume | position | priorité |
-    #   Ignorer l'en-tête, le séparateur, et les lignes placeholder ("…").
-    for line in text.splitlines():
-        if not line.startswith("|"):
+    return json.loads(snaps[-1].read_text(encoding="utf-8"))
+
+
+def _positions_from_snapshot(snap: dict) -> dict[str, dict]:
+    """{requête: {position, clicks, impressions}} depuis un snapshot GSC."""
+    out: dict[str, dict] = {}
+    for row in snap.get("top_queries", []):
+        key = (row.get("keys") or [None])[0]
+        if not key:
             continue
-        cells = [c.strip() for c in line.strip().strip("|").split("|")]
-        if len(cells) < 3:
-            continue
-        kw, market = cells[1], cells[2]
-        if not kw or kw in {"mot-clé", "…"} or set(kw) <= {"-"}:
-            continue
-        keywords.append((kw, market))
-
-    if not keywords:
-        raise SystemExit(
-            "[rank_tracker] Aucun mot-clé valide trouvé dans serp-targets.md."
-        )
-    return keywords
+        out[key] = {
+            "position": round(row.get("position", 0.0), 1),
+            "clicks": int(row.get("clicks", 0)),
+            "impressions": int(row.get("impressions", 0)),
+        }
+    return out
 
 
-def _find_position(keyword: str, market: str) -> int | None:
-    """Retourne la position d'InstaDeco pour un mot-clé, ou None si absent.
-
-    Propage SerpBlockedError/RuntimeError : on n'invente jamais de position.
-    """
-    results = fetch_serp(keyword, market)
-    for r in results:
-        if _OWN_DOMAIN in r.url:
-            return r.position
-    return None  # absent du top scrapé = vraie info (pas un fake)
+def _previous_ranks(today: str) -> dict[str, dict] | None:
+    """Charge le dernier snapshot de ranks antérieur à aujourd'hui (pour deltas)."""
+    prev = [p for p in sorted(_RANKS_DIR.glob("rank_*.json")) if today not in p.name]
+    if not prev:
+        return None
+    return json.loads(prev[-1].read_text(encoding="utf-8")).get("positions", {})
 
 
-def _write_report(rows: list[tuple[str, str, int | None]]) -> Path:
+def _write_report(current: dict[str, dict], previous: dict[str, dict] | None) -> Path:
     _REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+    _RANKS_DIR.mkdir(parents=True, exist_ok=True)
     today = _dt.date.today().isoformat()
+
+    # Snapshot machine.
+    (_RANKS_DIR / f"rank_{today}.json").write_text(
+        json.dumps({"date": today, "positions": current}, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+
+    # Tri par impressions décroissantes (les requêtes qui comptent en premier).
+    ordered = sorted(current.items(), key=lambda kv: -kv[1]["impressions"])
+
+    movers: list[str] = []
+    rows: list[str] = ["| requête | position | évolution | clics | impressions |", "|---|---:|:--:|---:|---:|"]
+    for kw, cur in ordered:
+        delta_txt = "nouveau"
+        if previous and kw in previous:
+            delta = previous[kw]["position"] - cur["position"]  # + = monte
+            if abs(delta) < 0.1:
+                delta_txt = "="
+            else:
+                arrow = "▲" if delta > 0 else "▼"
+                delta_txt = f"{arrow} {abs(delta):.1f}"
+                if abs(delta) >= _MOVE_THRESHOLD:
+                    sens = "gagne" if delta > 0 else "perd"
+                    movers.append(f"- `{kw}` {sens} {abs(delta):.1f} (pos {cur['position']})")
+        rows.append(
+            f"| {kw} | {cur['position']} | {delta_txt} | {cur['clicks']} | {cur['impressions']} |"
+        )
+
+    lines = [f"# Positions (via GSC), {today}", ""]
+    if previous:
+        lines.append("## Mouvements notables (≥ 3 positions)")
+        lines += movers if movers else ["_Aucun mouvement notable depuis le dernier suivi._"]
+        lines.append("")
+    else:
+        lines += ["_Premier suivi : pas encore d'historique pour comparer._", ""]
+    lines.append("## Toutes les requêtes suivies")
+    lines += rows
     path = _REPORTS_DIR / f"rank_{today}.md"
-    lines = [f"# Positions mots-clés — {today}", "", "| mot-clé | marché | position |", "|---|---|---|"]
-    for kw, market, pos in rows:
-        lines.append(f"| {kw} | {market} | {pos if pos is not None else 'hors top'} |")
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
     return path
 
 
-def run() -> Path:
-    """Suit toutes les positions et écrit le rapport. Lève si SERP indispo."""
-    keywords = _load_keywords()
-    rows: list[tuple[str, str, int | None]] = []
-    for kw, market in keywords:
-        pos = _find_position(kw, market)  # peut lever (blocage) -> on propage
-        rows.append((kw, market, pos))
-    return _write_report(rows)
-
-
 def main() -> None:
-    """Entrée CLI : run hebdomadaire du rank tracker."""
-    try:
-        report = run()
-    except (SerpBlockedError, RuntimeError, NotImplementedError) as exc:
-        raise SystemExit(f"[rank_tracker] ÉCHEC: {exc}")
-    print(f"[rank_tracker] Rapport écrit: {report}")
+    """Entrée CLI : suivi hebdomadaire des positions depuis GSC."""
+    snap = _latest_gsc_snapshot()
+    current = _positions_from_snapshot(snap)
+    if not current:
+        raise SystemExit("[rank_tracker] Snapshot GSC sans requêtes exploitables.")
+    today = _dt.date.today().isoformat()
+    report = _write_report(current, _previous_ranks(today))
+    print(f"[rank_tracker] OK. {len(current)} requêtes suivies. Rapport: {report}")
 
 
 if __name__ == "__main__":
