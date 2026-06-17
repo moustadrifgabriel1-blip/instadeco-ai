@@ -3,6 +3,7 @@ import { Link } from '@/i18n/navigation';
 import { getTranslations } from 'next-intl/server';
 import { getLocalizedCanonicalUrl } from '@/lib/seo/config';
 import { LegalFrenchBodyNotice } from '@/components/legal/LegalFrenchBodyNotice';
+import { Check, AlertTriangle, ArrowRight } from 'lucide-react';
 
 export async function generateMetadata({
   params,
@@ -258,42 +259,42 @@ export default function PrivacyPolicyPage() {
 
           <div className="space-y-3">
             <div className="flex items-start">
-              <span className="text-[var(--gold)] mr-2">✓</span>
+              <Check className="w-5 h-5 text-[var(--gold)] mr-2 shrink-0" aria-hidden="true" />
               <div>
                 <strong className="text-foreground">Droit d&apos;accès</strong>
                 <p className="text-muted-foreground text-sm">Obtenir une copie de vos données personnelles</p>
               </div>
             </div>
             <div className="flex items-start">
-              <span className="text-[var(--gold)] mr-2">✓</span>
+              <Check className="w-5 h-5 text-[var(--gold)] mr-2 shrink-0" aria-hidden="true" />
               <div>
                 <strong className="text-foreground">Droit de rectification</strong>
                 <p className="text-muted-foreground text-sm">Corriger vos données inexactes ou incomplètes</p>
               </div>
             </div>
             <div className="flex items-start">
-              <span className="text-[var(--gold)] mr-2">✓</span>
+              <Check className="w-5 h-5 text-[var(--gold)] mr-2 shrink-0" aria-hidden="true" />
               <div>
                 <strong className="text-foreground">Droit à l&apos;effacement (&quot;droit à l&apos;oubli&quot;)</strong>
                 <p className="text-muted-foreground text-sm">Demander la suppression de vos données</p>
               </div>
             </div>
             <div className="flex items-start">
-              <span className="text-[var(--gold)] mr-2">✓</span>
+              <Check className="w-5 h-5 text-[var(--gold)] mr-2 shrink-0" aria-hidden="true" />
               <div>
                 <strong className="text-foreground">Droit à la portabilité</strong>
                 <p className="text-muted-foreground text-sm">Recevoir vos données dans un format structuré et réutilisable</p>
               </div>
             </div>
             <div className="flex items-start">
-              <span className="text-[var(--gold)] mr-2">✓</span>
+              <Check className="w-5 h-5 text-[var(--gold)] mr-2 shrink-0" aria-hidden="true" />
               <div>
                 <strong className="text-foreground">Droit d&apos;opposition</strong>
                 <p className="text-muted-foreground text-sm">Vous opposer au traitement dans certains cas</p>
               </div>
             </div>
             <div className="flex items-start">
-              <span className="text-[var(--gold)] mr-2">✓</span>
+              <Check className="w-5 h-5 text-[var(--gold)] mr-2 shrink-0" aria-hidden="true" />
               <div>
                 <strong className="text-foreground">Droit à la limitation</strong>
                 <p className="text-muted-foreground text-sm">Limiter le traitement de vos données</p>

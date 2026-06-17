@@ -1,6 +1,22 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { Palette, ArrowRight } from 'lucide-react';
+import {
+  Palette,
+  ArrowRight,
+  Building2,
+  TreePine,
+  Factory,
+  Leaf,
+  Sprout,
+  Square,
+  Sparkles,
+  LayoutGrid,
+  TreeDeciduous,
+  Waves,
+  Armchair,
+  Gem,
+  type LucideIcon,
+} from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Breadcrumbs } from '@/components/ui/breadcrumbs';
@@ -44,11 +60,18 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   };
 }
 
-const STYLES = [
+const STYLES: {
+  slug: string;
+  name: string;
+  icon: LucideIcon;
+  description: string;
+  keywords: string[];
+  rooms: string[];
+}[] = [
   {
     slug: 'moderne',
     name: 'Moderne',
-    emoji: '🏢',
+    icon: Building2,
     description: 'Lignes épurées, matériaux nobles et palette de couleurs neutres. Le style moderne mise sur l\'élégance minimaliste avec des meubles aux formes géométriques et des espaces ouverts.',
     keywords: ['lignes épurées', 'matériaux nobles', 'palette neutre'],
     rooms: ['salon', 'cuisine', 'salle-de-bain'],
@@ -56,7 +79,7 @@ const STYLES = [
   {
     slug: 'scandinave',
     name: 'Scandinave',
-    emoji: '🌲',
+    icon: TreePine,
     description: 'Bois clair, blanc dominant et textiles chaleureux. Le style scandinave ou nordique apporte luminosité et fonctionnalité, avec un mobilier simple et des touches de hygge.',
     keywords: ['bois clair', 'blanc', 'hygge', 'fonctionnel'],
     rooms: ['salon', 'chambre', 'bureau'],
@@ -64,7 +87,7 @@ const STYLES = [
   {
     slug: 'industriel',
     name: 'Industriel',
-    emoji: '🏭',
+    icon: Factory,
     description: 'Métal brut, brique apparente et esprit loft new-yorkais. Le style industriel célèbre les matériaux authentiques et les structures visibles pour un intérieur au caractère affirmé.',
     keywords: ['métal brut', 'brique', 'loft', 'caractère'],
     rooms: ['salon', 'cuisine', 'bureau'],
@@ -72,7 +95,7 @@ const STYLES = [
   {
     slug: 'boheme',
     name: 'Bohème',
-    emoji: '🌿',
+    icon: Leaf,
     description: 'Mix de textures, couleurs terracotta et collections voyageuses. Le style bohème invite à l\'évasion avec des tapis berbères, du macramé et une profusion de plantes vertes.',
     keywords: ['textures', 'terracotta', 'plantes', 'évasion'],
     rooms: ['salon', 'chambre'],
@@ -80,7 +103,7 @@ const STYLES = [
   {
     slug: 'japandi',
     name: 'Japandi',
-    emoji: '🎋',
+    icon: Sprout,
     description: 'Fusion parfaite entre minimalisme japonais et chaleur scandinave. Le Japandi privilégie les formes organiques, le bois et une palette de tons naturels apaisants.',
     keywords: ['japonais', 'scandinave', 'wabi-sabi', 'formes organiques'],
     rooms: ['chambre', 'salle-de-bain', 'salon'],
@@ -88,7 +111,7 @@ const STYLES = [
   {
     slug: 'minimaliste',
     name: 'Minimaliste',
-    emoji: '⬜',
+    icon: Square,
     description: 'L\'essentiel, rien de plus. Le style minimaliste élimine le superflu pour ne garder que le nécessaire. Chaque objet a sa raison d\'être dans un espace épuré et serein.',
     keywords: ['épuré', 'essentiel', 'espace', 'serein'],
     rooms: ['chambre', 'bureau'],
@@ -96,7 +119,7 @@ const STYLES = [
   {
     slug: 'art-deco',
     name: 'Art Déco',
-    emoji: '✨',
+    icon: Sparkles,
     description: 'Glamour des années 20, dorures et motifs géométriques. L\'Art Déco mêle luxe et modernité avec des matières nobles comme le velours, le laiton et le marbre.',
     keywords: ['glamour', 'dorures', 'velours', 'années 20'],
     rooms: ['salon', 'chambre'],
@@ -104,7 +127,7 @@ const STYLES = [
   {
     slug: 'contemporain',
     name: 'Contemporain',
-    emoji: '🔲',
+    icon: LayoutGrid,
     description: 'Tendances actuelles et design d\'aujourd\'hui. Le style contemporain est en constante évolution, intégrant les dernières innovations en matière de design et de matériaux.',
     keywords: ['tendance', 'actuel', 'design', 'innovation'],
     rooms: ['salon', 'cuisine'],
@@ -112,7 +135,7 @@ const STYLES = [
   {
     slug: 'rustique',
     name: 'Rustique',
-    emoji: '🪵',
+    icon: TreeDeciduous,
     description: 'Bois massif, pierre naturelle et charme campagnard. Le style rustique crée une atmosphère authentique et enveloppante, parfaite pour les maisons de caractère.',
     keywords: ['bois massif', 'pierre', 'campagne', 'authentique'],
     rooms: ['cuisine', 'salle-a-manger'],
@@ -120,7 +143,7 @@ const STYLES = [
   {
     slug: 'coastal',
     name: 'Coastal',
-    emoji: '🌊',
+    icon: Waves,
     description: 'Bleu océan, blanc immaculé et matériaux naturels. Le style Coastal apporte la fraîcheur du bord de mer dans votre intérieur avec du rotin, du lin et des coquillages.',
     keywords: ['bord de mer', 'bleu', 'blanc', 'naturel'],
     rooms: ['salon', 'chambre'],
@@ -128,7 +151,7 @@ const STYLES = [
   {
     slug: 'mid-century',
     name: 'Mid-Century Modern',
-    emoji: '🪑',
+    icon: Armchair,
     description: 'Design iconique des années 50-60. Le Mid-Century Modern se caractérise par des pieds fuselés, des formes organiques et des couleurs vives ponctuelles sur fond bois.',
     keywords: ['années 50', 'pieds fuselés', 'formes organiques', 'iconique'],
     rooms: ['salon', 'bureau'],
@@ -136,7 +159,7 @@ const STYLES = [
   {
     slug: 'luxe',
     name: 'Luxe',
-    emoji: '💎',
+    icon: Gem,
     description: 'Matériaux haut de gamme, finitions impeccables et détails raffinés. Le style Luxe ne fait aucun compromis sur la qualité, avec du marbre, des boiseries et de la soie.',
     keywords: ['haut de gamme', 'marbre', 'raffiné', 'prestige'],
     rooms: ['salon', 'chambre', 'salle-de-bain'],
@@ -198,7 +221,9 @@ export default async function StylesIndexPage({ params }: { params: Promise<{ lo
               <Card key={style.slug} style={{ ['--reveal-d' as string]: `${(idx % 3) * 120}ms` }} className="prestige-reveal group bg-card border border-[var(--gold-line)] hover:border-[var(--gold)] hover:shadow-lg transition-all duration-500 ease">
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4">
-                    <span className="text-3xl">{style.emoji}</span>
+                    <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[rgba(200,162,77,0.12)] border border-[var(--gold-line)]">
+                      <style.icon className="w-6 h-6 text-[var(--gold)]" />
+                    </span>
                     <div className="flex-1">
                       <Link href={`/style/${style.slug}`} className="block">
                         <h2 className="prestige-display text-xl font-bold text-foreground group-hover:text-[var(--gold)] transition-colors mb-2">

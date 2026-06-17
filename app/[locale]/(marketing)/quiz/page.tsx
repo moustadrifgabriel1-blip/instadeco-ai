@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react';
 import { OptimizedRemoteImage } from '@/components/ui/optimized-image';
 import Link from 'next/link';
-import { ArrowRight, ArrowLeft, Sparkles, Check, Gift, Star, Share2, ChevronRight, Home } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Sparkles, Check, Star, Share2, ChevronRight, Home, Lightbulb, Gem, Palette, Leaf, Building2, Trees, LayoutGrid, Landmark, Armchair, Waves, Sun, type LucideIcon } from 'lucide-react';
 import { ShareButtons } from '@/components/features/share-buttons';
 
 // ============================================
@@ -28,7 +28,7 @@ interface QuizQuestion {
 interface StyleResult {
   slug: string;
   name: string;
-  emoji: string;
+  icon: LucideIcon;
   headline: string;
   description: string;
   colors: string[];
@@ -45,7 +45,7 @@ const STYLE_RESULTS: Record<string, StyleResult> = {
   moderne: {
     slug: 'moderne',
     name: 'Moderne',
-    emoji: '✨',
+    icon: Sparkles,
     headline: 'Vous êtes Style Moderne',
     description: 'Vous aimez les lignes épurées, les espaces lumineux et l\'élégance fonctionnelle. Pour vous, chaque objet a sa place et chaque détail compte. Vous privilégiez la qualité sur la quantité.',
     colors: ['#FFFFFF', '#E5E5E5', '#333333', '#C9A87C'],
@@ -56,7 +56,7 @@ const STYLE_RESULTS: Record<string, StyleResult> = {
   scandinave: {
     slug: 'scandinave',
     name: 'Scandinave',
-    emoji: '🪵',
+    icon: Trees,
     headline: 'Vous êtes Style Scandinave',
     description: 'Le hygge est votre philosophie de vie. Vous recherchez le confort, la chaleur du bois naturel et la lumière. Votre intérieur est un cocon douillet qui respire la sérénité.',
     colors: ['#FAF5F0', '#D4B89C', '#87CEEB', '#F5CEC7'],
@@ -67,7 +67,7 @@ const STYLE_RESULTS: Record<string, StyleResult> = {
   industriel: {
     slug: 'industriel',
     name: 'Industriel',
-    emoji: '🏭',
+    icon: Building2,
     headline: 'Vous êtes Style Industriel',
     description: 'Vous aimez le caractère brut et authentique. Les matériaux bruts vous parlent : métal, briques, béton. Vous préférez un intérieur avec du vécu et de la personnalité.',
     colors: ['#8B8680', '#333333', '#B7410E', '#6B4423'],
@@ -78,7 +78,7 @@ const STYLE_RESULTS: Record<string, StyleResult> = {
   boheme: {
     slug: 'boheme',
     name: 'Bohème',
-    emoji: '🌿',
+    icon: Leaf,
     headline: 'Vous êtes Style Bohème',
     description: 'Créatif et libre, vous aimez mélanger les cultures, les textures et les couleurs. Votre intérieur raconte une histoire et chaque objet a sa signification.',
     colors: ['#CC5B3B', '#C89832', '#6B8E6B', '#FFFFF0'],
@@ -89,7 +89,7 @@ const STYLE_RESULTS: Record<string, StyleResult> = {
   japandi: {
     slug: 'japandi',
     name: 'Japandi',
-    emoji: '🎋',
+    icon: Sun,
     headline: 'Vous êtes Style Japandi',
     description: 'La fusion parfaite entre zen japonais et confort nordique. Vous appréciez l\'imperfection du wabi-sabi et la sérénité des espaces épurés.',
     colors: ['#C2B280', '#8B8378', '#2F4F4F', '#6B8E6B'],
@@ -100,7 +100,7 @@ const STYLE_RESULTS: Record<string, StyleResult> = {
   minimaliste: {
     slug: 'minimaliste',
     name: 'Minimaliste',
-    emoji: '⬜',
+    icon: LayoutGrid,
     headline: 'Vous êtes Style Minimaliste',
     description: 'Less is more. Vous trouvez la beauté dans la simplicité et chaque objet dans votre espace a une raison d\'être. L\'ordre et la clarté vous apaisent.',
     colors: ['#FFFFFF', '#000000', '#D3D3D3', '#DEB887'],
@@ -111,7 +111,7 @@ const STYLE_RESULTS: Record<string, StyleResult> = {
   'art-deco': {
     slug: 'art-deco',
     name: 'Art Déco',
-    emoji: '🏛️',
+    icon: Landmark,
     headline: 'Vous êtes Style Art Déco',
     description: 'Le glamour des années folles vous inspire. Vous aimez les matériaux nobles, les formes géométriques audacieuses et une certaine opulence maîtrisée.',
     colors: ['#191970', '#FFD700', '#50C878', '#000000'],
@@ -122,7 +122,7 @@ const STYLE_RESULTS: Record<string, StyleResult> = {
   contemporain: {
     slug: 'contemporain',
     name: 'Contemporain',
-    emoji: '🎨',
+    icon: Palette,
     headline: 'Vous êtes Style Contemporain',
     description: 'Toujours à l\'affût des tendances, vous aimez un intérieur frais et actuel. Vous n\'avez pas peur de mixer les influences et d\'expérimenter.',
     colors: ['#F5F5DC', '#808000', '#CC5B3B', '#002FA7'],
@@ -133,7 +133,7 @@ const STYLE_RESULTS: Record<string, StyleResult> = {
   rustique: {
     slug: 'rustique',
     name: 'Rustique',
-    emoji: '🏡',
+    icon: Home,
     headline: 'Vous êtes Style Rustique',
     description: 'La campagne vous appelle. Vous aimez l\'authenticité, le bois massif et la chaleur d\'un intérieur accueillant aux matériaux naturels.',
     colors: ['#8B4513', '#FFFDD0', '#228B22', '#A52A2A'],
@@ -144,7 +144,7 @@ const STYLE_RESULTS: Record<string, StyleResult> = {
   coastal: {
     slug: 'coastal',
     name: 'Coastal',
-    emoji: '🏖️',
+    icon: Waves,
     headline: 'Vous êtes Style Coastal',
     description: 'L\'esprit vacances toute l\'année ! Vous aimez les bleus apaisants, le blanc lumineux et les matières naturelles qui évoquent la plage.',
     colors: ['#000080', '#FFFFFF', '#C2B280', '#FF7F50'],
@@ -155,7 +155,7 @@ const STYLE_RESULTS: Record<string, StyleResult> = {
   'mid-century': {
     slug: 'mid-century',
     name: 'Mid-Century Modern',
-    emoji: '🪑',
+    icon: Armchair,
     headline: 'Vous êtes Style Mid-Century',
     description: 'Fan de design iconique, vous appréciez les lignes organiques des années 50-60, les pieds compas et les couleurs audacieuses.',
     colors: ['#FFDB58', '#008080', '#CC5500', '#654321'],
@@ -166,7 +166,7 @@ const STYLE_RESULTS: Record<string, StyleResult> = {
   luxe: {
     slug: 'luxe',
     name: 'Luxe',
-    emoji: '💎',
+    icon: Gem,
     headline: 'Vous êtes Style Luxe',
     description: 'Vous avez un goût prononcé pour le raffinement et les matériaux nobles. Marbre, soie, cristal : votre intérieur est une expérience sensorielle.',
     colors: ['#FFD700', '#1A1A2E', '#FFFDD0', '#800020'],
@@ -553,13 +553,16 @@ export default function QuizPage() {
 
   // ── RÉSULTAT ──
   if (step === 'result' && resultStyle) {
+    const ResultIcon = resultStyle.icon;
     return (
       <div className="min-h-screen bg-background">
         <section className="pt-8 pb-20 px-6">
           <div className="max-w-[640px] mx-auto">
             {/* Résultat principal */}
             <div className="text-center mb-8">
-              <div className="text-[56px] mb-3">{resultStyle.emoji}</div>
+              <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-[rgba(200,162,77,0.12)] border border-[var(--gold-line)] flex items-center justify-center">
+                <ResultIcon className="w-8 h-8 text-[var(--gold)]" />
+              </div>
               <h1 className="prestige-display text-[32px] sm:text-[40px] font-bold tracking-[-0.03em] text-foreground leading-[1.1] mb-3">
                 {resultStyle.headline}
               </h1>
@@ -621,8 +624,9 @@ export default function QuizPage() {
 
             {/* Conseil pro */}
             <div className="bg-[rgba(200,162,77,0.08)] rounded-[24px] border border-[var(--gold-line)] p-6 mb-6">
-              <h3 className="text-[13px] font-semibold text-[var(--gold)] uppercase tracking-wider mb-2">
-                💡 Conseil de pro
+              <h3 className="flex items-center gap-2 text-[13px] font-semibold text-[var(--gold)] uppercase tracking-wider mb-2">
+                <Lightbulb className="w-4 h-4" />
+                Conseil de pro
               </h3>
               <p className="text-[15px] text-foreground leading-relaxed">
                 {resultStyle.tip}
@@ -637,7 +641,7 @@ export default function QuizPage() {
               </div>
               <ShareButtons
                 url="https://instadeco.app/quiz"
-                title={`Je suis style ${resultStyle.name} ${resultStyle.emoji} ! Et vous, quel est votre style de décoration ? Faites le quiz :`}
+                title={`Je suis style ${resultStyle.name} ! Et vous, quel est votre style de décoration ? Faites le quiz :`}
                 description={`J'ai découvert que mon style déco est ${resultStyle.name}. Faites le quiz pour découvrir le vôtre !`}
                 variant="inline"
               />

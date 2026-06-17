@@ -12,6 +12,7 @@ import {
   Building2, Camera, Check, ArrowRight,
   Shield, ChevronDown, Home,
   Users, BarChart3, Sparkles, Download, Palette, Award, Loader2,
+  Building, type LucideIcon,
 } from 'lucide-react';
 
 // ============================================

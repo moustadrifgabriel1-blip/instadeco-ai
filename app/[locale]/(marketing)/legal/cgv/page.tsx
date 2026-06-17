@@ -3,6 +3,7 @@ import { Link } from '@/i18n/navigation';
 import { getTranslations } from 'next-intl/server';
 import { getLocalizedCanonicalUrl } from '@/lib/seo/config';
 import { LegalFrenchBodyNotice } from '@/components/legal/LegalFrenchBodyNotice';
+import { AlertTriangle, Check, ArrowRight } from 'lucide-react';
 
 export async function generateMetadata({
   params,
@@ -110,8 +111,9 @@ export default function CGVPage() {
 
           <h3 className="prestige-display text-lg font-medium text-foreground mt-4 mb-2">3.2 Capacité juridique</h3>
           <div className="bg-destructive/10 border border-destructive/40 p-4 rounded-lg mb-4">
-            <p className="text-muted-foreground">
-              <strong className="text-destructive">⚠️ SERVICE RÉSERVÉ AUX PERSONNES MAJEURES (18 ANS ET PLUS)</strong>
+            <p className="text-muted-foreground flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-destructive shrink-0" aria-hidden="true" />
+              <strong className="text-destructive">SERVICE RÉSERVÉ AUX PERSONNES MAJEURES (18 ANS ET PLUS)</strong>
             </p>
             <p className="text-muted-foreground mt-2">
               L&apos;Utilisateur doit avoir la capacité juridique de contracter. En créant un compte et en utilisant
@@ -214,7 +216,8 @@ export default function CGVPage() {
           <h3 className="prestige-display text-lg font-medium text-foreground mt-4 mb-2">5.2 Validité des crédits</h3>
           <div className="bg-emerald-500/10 border border-emerald-500/30 p-4 rounded-lg">
             <p className="text-muted-foreground">
-              <strong className="text-emerald-400">✓ Les crédits n&apos;expirent pas.</strong> Ils restent disponibles sur votre compte
+              <Check className="w-5 h-5 text-emerald-400 shrink-0 inline-block align-text-bottom mr-1" aria-hidden="true" />
+              <strong className="text-emerald-400">Les crédits n&apos;expirent pas.</strong> Ils restent disponibles sur votre compte
               sans limite de durée tant que le compte reste actif.
             </p>
           </div>
@@ -453,8 +456,9 @@ export default function CGVPage() {
           <h2 className="prestige-display text-2xl font-semibold text-foreground mb-4">Documents complémentaires</h2>
           <ul className="space-y-2">
             <li>
-              <Link href="/legal/mentions-legales" className="text-[var(--gold)] hover:underline">
-                → Mentions Légales
+              <Link href="/legal/mentions-legales" className="text-[var(--gold)] hover:underline inline-flex items-center gap-2">
+                <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                Mentions Légales
               </Link>
             </li>
             <li>

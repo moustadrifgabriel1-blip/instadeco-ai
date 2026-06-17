@@ -12,10 +12,10 @@ import {
 } from '@/components/ui/select';
 import { Globe } from 'lucide-react';
 
-const FLAGS: Record<string, string> = {
-  fr: '🇫🇷',
-  en: '🇬🇧',
-  de: '🇩🇪',
+const LOCALE_CODES: Record<string, string> = {
+  fr: 'FR',
+  en: 'EN',
+  de: 'DE',
 };
 
 export function LanguageSwitcher() {
@@ -34,16 +34,16 @@ export function LanguageSwitcher() {
       }}
     >
       <SelectTrigger
-        className="h-9 w-[100px] sm:w-[120px] border-[#F0E6E0] bg-white/80 text-[#2D2D2D] gap-1"
+        className="h-9 w-[100px] sm:w-[120px] border-[rgba(200,162,77,0.28)] bg-[#0c0a09]/30 text-[#faf8f4] gap-1"
         aria-label={t('label')}
       >
         <Globe className="h-4 w-4 shrink-0 opacity-70" />
         <SelectValue />
       </SelectTrigger>
-      <SelectContent align="end">
+      <SelectContent align="end" className="prestige-app">
         {routing.locales.map((loc) => (
           <SelectItem key={loc} value={loc}>
-            {FLAGS[loc]} {t(loc as 'fr' | 'en' | 'de')}
+            {LOCALE_CODES[loc]} {t(loc as 'fr' | 'en' | 'de')}
           </SelectItem>
         ))}
       </SelectContent>
