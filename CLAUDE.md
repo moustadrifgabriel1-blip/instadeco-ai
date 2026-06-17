@@ -1,6 +1,15 @@
-# CLAUDE.md — InstaDeco AI
+# CLAUDE.md, InstaDeco AI
 
 Guide pour Claude Code sur ce projet. Lis-le avant toute modification.
+
+## RÈGLE PRIORITAIRE, écriture anti détection IA (NON NÉGOCIABLE)
+
+Le copy du site ne doit JAMAIS ressembler à du texte généré par IA. C'est une priorité MAJEURE produit : la détection IA nuit à la crédibilité auprès des agences. Deux interdits absolus, partout (UI, copy, i18n fr/en/de, commits, commentaires, docs) :
+
+1. **Zéro tiret de séparation.** Jamais de tiret cadratin (—) ni demi cadratin (–). Jamais de tiret d'union décoratif pour relier des bouts de phrase. On remplace TOUJOURS par une vraie ponctuation : point, virgule, deux points, point d'exclamation, parenthèses, ou barre oblique (« avant/après »). Les traits d'union d'orthographe figée (peut être, rendez vous) restent corrects mais dans le doute on reformule. C'est le marqueur numéro 1 d'écriture IA.
+2. **Zéro emoji dans le copy du site.** Aucun emoji décoratif dans les textes visibles. Là où un emoji servait d'icône, utiliser une icône vectorielle (lucide-react, déjà installé ; Simple Icons pour les marques), jamais un emoji.
+
+Le texte doit toujours être travaillé : phrases de longueurs variées, ton humain et direct, zéro tournure générique d'IA, zéro remplissage.
 
 ## Projet
 SaaS B2C de **décoration d'intérieur par IA** : l'utilisateur upload une photo de pièce, choisit un style, et reçoit un rendu "avant/après". Modèle freemium (essai gratuit → crédits payants Stripe). Objectif : 2000.-/mois de revenu. Domaine : instadeco.app.

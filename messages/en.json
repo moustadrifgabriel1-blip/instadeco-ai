@@ -1,6 +1,6 @@
 {
   "Meta": {
-    "titleDefault": "InstaDeco AI – AI interior design & virtual staging",
+    "titleDefault": "InstaDeco AI, AI interior design & virtual staging",
     "descriptionDefault": "Turn any room into a pro décor render in seconds with AI. Virtual staging, inspiration, and before/after previews.",
     "keywords": [
       "AI interior design",
@@ -11,8 +11,8 @@
       "Scandinavian style",
       "modern decor"
     ],
-    "ogImageAlt": "InstaDeco AI – AI interior design",
-    "twitterTitle": "InstaDeco AI – AI interior design",
+    "ogImageAlt": "InstaDeco AI, AI interior design",
+    "twitterTitle": "InstaDeco AI, AI interior design",
     "twitterDescription": "Pro‑quality décor renders in seconds with AI."
   },
   "Common": {
@@ -87,7 +87,7 @@
     }
   },
   "Home": {
-    "metaTitle": "InstaDeco AI – AI interior design in ~30 seconds",
+    "metaTitle": "InstaDeco AI, AI interior design in ~30 seconds",
     "metaDescription": "Transform any room with AI from €0.99. 20+ styles, photorealistic results in ~30s. Virtual staging and before/after previews. Free trial.",
     "faq": [
       {
@@ -104,7 +104,7 @@
       },
       {
         "question": "Can I use InstaDeco for virtual home staging?",
-        "answer": "Yes! Virtual staging is a core use case. Agents and owners use InstaDeco to furnish empty listings so buyers can project themselves—boosting visits and speeding sales."
+        "answer": "Yes! Virtual staging is a core use case. Agents and owners use InstaDeco to furnish empty listings so buyers can project themselves, boosting visits and speeding sales."
       },
       {
         "question": "Are the generated images realistic?",
@@ -115,10 +115,10 @@
     "stylesSectionSubtitle": "Every home deserves a style that fits. Browse 20+ curated looks and find yours.",
     "viewAllStyles": "See all styles",
     "roomsSectionTitle": "Design every room",
-    "roomsSectionSubtitle": "Living room, bedroom, kitchen or office—our AI adapts to each space.",
+    "roomsSectionSubtitle": "Living room, bedroom, kitchen or office, our AI adapts to each space.",
     "allRooms": "All room types",
     "solutionsSectionTitle": "AI décor solutions",
-    "solutionsSectionSubtitle": "Selling, renovating, or just exploring ideas—InstaDeco has you covered.",
+    "solutionsSectionSubtitle": "Selling, renovating, or just exploring ideas, InstaDeco has you covered.",
     "solStagingTitle": "Virtual home staging",
     "solStagingDesc": "Virtually furnish listings to sell faster",
     "solSimTitle": "Décor simulator",
@@ -162,11 +162,11 @@
     "frenchBodyNotice": "The legal texts below are provided in French (authoritative version). A full translation will be published soon."
   },
   "PricingMeta": {
-    "title": "Pricing & credits – AI décor without a subscription | InstaDeco AI",
+    "title": "Pricing & credits, AI décor without a subscription | InstaDeco AI",
     "description": "Buy credits with no subscription to transform rooms with AI. From €9.90 for 10 HD generations. Credits never expire. Secure Stripe payments.",
-    "ogTitle": "InstaDeco AI pricing – AI décor from €9.90",
-    "ogDescription": "No subscription surprises—buy credits and generate whenever you want.",
-    "twitterTitle": "InstaDeco AI pricing – from €9.90",
+    "ogTitle": "InstaDeco AI pricing, AI décor from €9.90",
+    "ogDescription": "No subscription surprises, buy credits and generate whenever you want.",
+    "twitterTitle": "InstaDeco AI pricing, from €9.90",
     "twitterDescription": "Credits without a subscription. Secure payments.",
     "breadcrumb": "Pricing",
     "breadcrumbHome": "Home"
@@ -180,7 +180,7 @@
         "price": 9.9,
         "pricePerCredit": 0.99,
         "popular": false,
-        "emoji": "🌱",
+        "emoji": "",
         "description": "Perfect to try it out",
         "savings": null,
         "cta": "Get started"
@@ -192,7 +192,7 @@
         "price": 19.9,
         "pricePerCredit": 0.8,
         "popular": true,
-        "emoji": "✨",
+        "emoji": "",
         "description": "Most popular",
         "savings": 20,
         "cta": "Choose Creative"
@@ -204,7 +204,7 @@
         "price": 34.9,
         "pricePerCredit": 0.7,
         "popular": false,
-        "emoji": "🚀",
+        "emoji": "",
         "description": "Best value",
         "savings": 30,
         "cta": "Go Pro"
@@ -219,7 +219,7 @@
         "annualPrice": 15,
         "annualTotal": 180,
         "popular": false,
-        "emoji": "🏠",
+        "emoji": "",
         "description": "For décor enthusiasts",
         "pricePerCredit": {
           "monthly": 0.63,
@@ -242,7 +242,7 @@
         "annualPrice": 31,
         "annualTotal": 372,
         "popular": true,
-        "emoji": "⭐",
+        "emoji": "",
         "description": "For professionals",
         "pricePerCredit": {
           "monthly": 0.49,
@@ -266,7 +266,7 @@
         "annualPrice": 63,
         "annualTotal": 756,
         "popular": false,
-        "emoji": "🏢",
+        "emoji": "",
         "description": "For agencies & teams",
         "pricePerCredit": {
           "monthly": 0.4,
@@ -292,17 +292,17 @@
       {
         "category": "credits",
         "question": "Do my credits expire?",
-        "answer": "Never! Your credits stay on your account indefinitely. Use them whenever you want, at your own pace—no pressure, no deadline."
+        "answer": "Never! Your credits stay on your account indefinitely. Use them whenever you want, at your own pace, no pressure, no deadline."
       },
       {
         "category": "quality",
         "question": "What is the quality of generated images?",
-        "answer": "All images are high definition (1024×1024 px). You can also unlock HD+ (2048×2048) for just €4.99 per image—great for large prints!"
+        "answer": "All images are high definition (1024×1024 px). You can also unlock HD+ (2048×2048) for just €4.99 per image, great for large prints!"
       },
       {
         "category": "usage",
         "question": "Can I use the images for my business?",
-        "answer": "Absolutely! You own every image you generate. Use them for personal projects, your portfolio, clients, social media—no commercial restrictions."
+        "answer": "Absolutely! You own every image you generate. Use them for personal projects, your portfolio, clients, social media, no commercial restrictions."
       },
       {
         "category": "quality",
@@ -312,7 +312,7 @@
       {
         "category": "usage",
         "question": "How do I download my creations?",
-        "answer": "Easy! Once an image is generated, click ‘Download’—it saves to your device. You’ll also find everything in your dashboard history."
+        "answer": "Easy! Once an image is generated, click ‘Download’, it saves to your device. You’ll also find everything in your dashboard history."
       },
       {
         "category": "payment",
@@ -322,17 +322,17 @@
       {
         "category": "payment",
         "question": "Can I get a refund?",
-        "answer": "Yes! If you have not used your credits, you can request a full refund within 14 days of purchase—just email us. Used credits are non‑refundable."
+        "answer": "Yes! If you have not used your credits, you can request a full refund within 14 days of purchase, just email us. Used credits are non‑refundable."
       },
       {
         "category": "subscription",
         "question": "How does the subscription work?",
-        "answer": "Credits are added automatically every month—fully transparent. Cancel anytime from your account, no fees. The annual plan saves an extra 20%."
+        "answer": "Credits are added automatically every month, fully transparent. Cancel anytime from your account, no fees. The annual plan saves an extra 20%."
       },
       {
         "category": "subscription",
         "question": "Do unused credits roll over?",
-        "answer": "Yes—with Pro and Business, unused credits roll to the next month (up to 2 months). Nothing is wasted!"
+        "answer": "Yes, with Pro and Business, unused credits roll to the next month (up to 2 months). Nothing is wasted!"
       },
       {
         "category": "quality",
@@ -347,25 +347,25 @@
     ],
     "useCases": [
       {
-        "icon": "🏠",
+        "icon": "",
         "profile": "Homeowners",
         "text": "Try multiple styles on your own photo before committing to work. Compare modern, Scandinavian or Japandi in seconds.",
         "pack": "Discovery"
       },
       {
-        "icon": "🏢",
+        "icon": "",
         "profile": "Real estate agents",
-        "text": "Virtually furnish empty listings so buyers can project themselves—fast, affordable complement to physical staging.",
+        "text": "Virtually furnish empty listings so buyers can project themselves, fast, affordable complement to physical staging.",
         "pack": "Pro"
       },
       {
-        "icon": "🎨",
+        "icon": "",
         "profile": "Interior designers",
-        "text": "Show clients instant before/after to validate the creative direction before execution—ideal in the proposal phase.",
+        "text": "Show clients instant before/after to validate the creative direction before execution, ideal in the proposal phase.",
         "pack": "Creative"
       }
     ],
-    "popularBadge": "⭐ Most chosen",
+    "popularBadge": "Most chosen",
     "loading": "Loading...",
     "creditsPerImage": "{credits} credits • €{price}/image",
     "savingsVsUnit": "You save €{amount} vs pay‑as‑you‑go",
@@ -382,7 +382,7 @@
     "creditsPerMonthShort": "{credits} credits/mo • €{price}/image",
     "billedAnnually": "Billed €{total}/yr (instead of €{full})",
     "subFooter": "No commitment • Cancel anytime",
-    "swipeHint": "← Swipe to see plans →",
+    "swipeHint": "Swipe to see plans",
     "paymentBy": "Pay with",
     "trustBadges": [
       {
@@ -402,8 +402,8 @@
         "label": "Result in ~10 seconds"
       }
     ],
-    "annualSavingsBanner": "💰 Save up to €192/year with annual billing",
-    "monthlySavingsBanner": "✨ Up to 60% cheaper than credit packs",
+    "annualSavingsBanner": "Save up to €192/year with annual billing",
+    "monthlySavingsBanner": "Up to 60% cheaper than credit packs",
     "upsellTitle": "Regular use? Subscriptions are up to 60% cheaper",
     "upsellSubtitle": "From €0.32/image with a subscription vs €0.70 pay‑as‑you‑go",
     "upsellCta": "See subscriptions",
@@ -412,19 +412,19 @@
     "howItWorksSteps": [
       {
         "step": "1",
-        "emoji": "📸",
+        "emoji": "",
         "title": "Take a photo",
         "desc": "Snap your room with your phone. That’s it."
       },
       {
         "step": "2",
-        "emoji": "🎨",
+        "emoji": "",
         "title": "Pick a style",
         "desc": "12 styles: Modern, Scandinavian, Japandi, Bohemian…"
       },
       {
         "step": "3",
-        "emoji": "✨",
+        "emoji": "",
         "title": "Love the result",
         "desc": "In ~10 seconds, see your room transformed by AI."
       }
@@ -439,17 +439,17 @@
       {
         "label": "Price per concept",
         "us": "From €0.70",
-        "them": "€200 – €500"
+        "them": "€200, €500"
       },
       {
         "label": "Turnaround",
         "us": "~10 seconds",
-        "them": "1 – 3 weeks"
+        "them": "1, 3 weeks"
       },
       {
         "label": "Number of styles",
         "us": "12 unlimited styles",
-        "them": "2 – 3 concepts"
+        "them": "2, 3 concepts"
       },
       {
         "label": "Availability",
@@ -487,7 +487,7 @@
     "faqTitle": "FAQ",
     "faqSubtitle": "Clear answers so you can create with confidence",
     "faqCtaTitle": "Still have a question?",
-    "faqCtaLink": "Email us—we reply within 24h 💌",
+    "faqCtaLink": "Email us, we reply within 24h",
     "finalCtaTitle": "Ready to transform your space?",
     "finalCtaSubtitle": "Join thousands who already redesigned their interiors with InstaDeco AI.",
     "finalCtaButton": "Try for free",
@@ -515,7 +515,7 @@
   "Hero": {
     "badge": "Your interior stylist from €0.99",
     "titleLine1": "Redesign your space in style",
-    "description": "A decorator costs €150/h. InstaDeco: €0.99 in 30 seconds. Designer‑level looks—no renovation, no appointment.",
+    "description": "A decorator costs €150/h. InstaDeco: €0.99 in 30 seconds. Designer‑level looks, no renovation, no appointment.",
     "cta": "Redesign my room for free",
     "photosCount": "10,000+ photos",
     "photosSub": "already transformed",
@@ -533,15 +533,15 @@
   },
   "LegalMeta": {
     "mentionsTitle": "Legal notice | InstaDeco AI",
-    "mentionsDescription": "Legal information about InstaDeco AI — publisher, hosting and terms of use.",
+    "mentionsDescription": "Legal information about InstaDeco AI, publisher, hosting and terms of use.",
     "privacyTitle": "Privacy policy | InstaDeco AI",
-    "privacyDescription": "How InstaDeco AI protects your personal data — aligned with Swiss nFADP and EU GDPR.",
+    "privacyDescription": "How InstaDeco AI protects your personal data, aligned with Swiss nFADP and EU GDPR.",
     "cgvTitle": "Terms of sale (GTC) | InstaDeco AI",
-    "cgvDescription": "General terms of sale for InstaDeco AI — credits, payments, withdrawal and use of the service."
+    "cgvDescription": "General terms of sale for InstaDeco AI, credits, payments, withdrawal and use of the service."
   },
   "HomeLanding": {
     "howItWorks": {
-      "badgeEmoji": "🚀",
+      "badgeEmoji": "",
       "badgeText": "How it works",
       "title": "3 simple steps",
       "subtitle": "Transform any room in a few clicks",
@@ -551,32 +551,32 @@
           "number": "01",
           "title": "Take a photo",
           "description": "Snap your room or upload an existing image. The AI works with any space.",
-          "icon": "📸"
+          "icon": ""
         },
         {
           "number": "02",
           "title": "Pick a style",
           "description": "Choose from 20+ décor styles: Modern, Scandinavian, Japandi, Bohemian, Industrial…",
-          "icon": "🎨"
+          "icon": ""
         },
         {
           "number": "03",
           "title": "Let the magic run",
           "description": "Our AI redesigns your room in under 30 seconds. Download the result in HD!",
-          "icon": "✨"
+          "icon": ""
         }
       ]
     },
     "gallery": {
-      "badgeEmoji": "🖼️",
+      "badgeEmoji": "",
       "badgeText": "Gallery",
       "title": "Stunning before / after",
       "subtitle": "Hover the images to see the transformation",
       "before": "Before",
       "after": "After",
       "styleLine": "{style} style",
-      "altBefore": "{room} — before",
-      "altAfter": "{room} after — {style} style",
+      "altBefore": "{room}, before",
+      "altAfter": "{room} after, {style} style",
       "items": [
         {
           "id": 1,
@@ -623,19 +623,19 @@
       ]
     },
     "features": {
-      "badgeEmoji": "✨",
+      "badgeEmoji": "",
       "badgeText": "Why choose us",
-      "titleStart": "An experience designed for ",
+      "titleStart": "An experience designed for",
       "titleHighlight": "you",
       "subtitle": "Cutting-edge technology at the service of your creativity.",
       "items": [
         {
           "title": "30 seconds flat",
-          "description": "A decorator needs two weeks. You get a photorealistic render in 30 seconds—comparable quality, roughly 150× faster."
+          "description": "A decorator needs two weeks. You get a photorealistic render in 30 seconds, comparable quality, roughly 150× faster."
         },
         {
           "title": "Your room, not a template",
-          "description": "The AI reads YOUR space (walls, windows, volumes) for a tailored result—not a generic catalogue look."
+          "description": "The AI reads YOUR space (walls, windows, volumes) for a tailored result, not a generic catalogue look."
         },
         {
           "title": "€0.99 instead of €150/h",
@@ -646,7 +646,7 @@
           "description": "Scandinavian, Japandi, Haussmann, Alpine chalet… try every look in one click. With a decorator, you get three moodboards max."
         },
         {
-          "title": "Photo → result. That’s it.",
+          "title": "Photo result. That’s it.",
           "description": "No complex 3D software. Take a photo, pick a style, enjoy. Your grandmother could do it."
         },
         {
@@ -657,7 +657,7 @@
     },
     "stats": {
       "headline": "Interior-designer results • coffee-shop pricing",
-      "deal": "→ €0.99",
+      "deal": "€0.99",
       "rows": [
         {
           "target": 12,
@@ -687,7 +687,7 @@
       ]
     },
     "testimonials": {
-      "badgeEmoji": "💡",
+      "badgeEmoji": "",
       "badgeText": "Use cases",
       "title": "Who is InstaDeco for?",
       "subtitle": "See how every profile uses AI décor",
@@ -696,19 +696,19 @@
       "dotAria": "Go to use case {n}",
       "cases": [
         {
-          "icon": "🏠",
+          "icon": "",
           "profile": "Homeowners",
           "role": "Visualise before renovating",
           "content": "Compare several styles on your own photo before committing to work. Modern, Scandinavian, Japandi… see results in ~30 seconds."
         },
         {
-          "icon": "🏢",
+          "icon": "",
           "profile": "Real-estate agents",
           "role": "Virtual home staging",
-          "content": "Virtually furnish empty listings so buyers can project themselves—a fast, affordable complement to physical staging."
+          "content": "Virtually furnish empty listings so buyers can project themselves, a fast, affordable complement to physical staging."
         },
         {
-          "icon": "🎨",
+          "icon": "",
           "profile": "Interior designers",
           "role": "Quick proposals",
           "content": "Show clients an instant before/after to validate the creative direction before you execute the full project."
@@ -721,7 +721,7 @@
       "line1": "A decorator bills ~€150/h and needs two weeks.",
       "line2": "InstaDeco gives you a comparable result in 30 seconds.",
       "cta": "Redesign my room for free",
-      "footnote": "✨ 3 free credits on signup • No card required • Results in ~30 seconds"
+      "footnote": "3 free credits on signup • No card required • Results in ~30 seconds"
     },
     "beforeAfter": {
       "slides": [
@@ -729,12 +729,12 @@
           "id": "chambre-boheme",
           "before": "/images/before-chambre-1.jpg",
           "after": "/images/after-chambre-1.jpg",
-          "title": "Bedroom → modern Bohemian style",
+          "title": "Bedroom modern Bohemian style",
           "description": "Floor, furniture and décor transformed by our AI"
         }
       ],
       "before": "Before",
-      "after": "After AI ✨",
+      "after": "After AI",
       "altBefore": "Before décor",
       "altAfter": "After AI décor",
       "prevAria": "Previous",

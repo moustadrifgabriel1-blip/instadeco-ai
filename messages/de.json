@@ -1,6 +1,6 @@
 {
   "Meta": {
-    "titleDefault": "InstaDeco AI – Innenarchitektur & virtuelles Staging mit KI",
+    "titleDefault": "InstaDeco AI, Innenarchitektur & virtuelles Staging mit KI",
     "descriptionDefault": "Verwandeln Sie Ihre Räume in sekundenfertige, professionelle KI-Renderings. Virtuelles Staging, Inspiration und Vorher/Nachher.",
     "keywords": [
       "KI Innenarchitektur",
@@ -11,8 +11,8 @@
       "skandinavischer Stil",
       "moderne Deko"
     ],
-    "ogImageAlt": "InstaDeco AI – KI-Innenarchitektur",
-    "twitterTitle": "InstaDeco AI – KI-Innenarchitektur",
+    "ogImageAlt": "InstaDeco AI, KI-Innenarchitektur",
+    "twitterTitle": "InstaDeco AI, KI-Innenarchitektur",
     "twitterDescription": "Profi-Deko-Renderings in Sekunden mit KI."
   },
   "Common": {
@@ -87,16 +87,16 @@
     }
   },
   "Home": {
-    "metaTitle": "InstaDeco AI – KI-Innenarchitektur in ~30 Sekunden",
+    "metaTitle": "InstaDeco AI, KI-Innenarchitektur in ~30 Sekunden",
     "metaDescription": "Verwandeln Sie jeden Raum mit KI ab 0,99 €. 20+ Stile, fotorealistisch in ~30 s. Virtuelles Staging und Vorher/Nachher. Kostenlos testen.",
     "faq": [
       {
         "question": "Wie funktioniert InstaDeco mit KI-Deko?",
-        "answer": "Foto aufnehmen, einen von 20+ Stilen wählen (Modern, Skandinavisch, Japandi, Boho …) und unsere KI liefert in ~30 Sekunden ein fotorealistisches Redesign – Struktur (Wände, Fenster, Volumen) bleibt erhalten."
+        "answer": "Foto aufnehmen, einen von 20+ Stilen wählen (Modern, Skandinavisch, Japandi, Boho …) und unsere KI liefert in ~30 Sekunden ein fotorealistisches Redesign, Struktur (Wände, Fenster, Volumen) bleibt erhalten."
       },
       {
         "question": "Was kostet InstaDeco im Vergleich zu einem Innenarchitekten?",
-        "answer": "Innenarchitekten verrechnen oft ca. 150 €/h. Mit InstaDeco starten Generierungen ab 0,99 € – vergleichbares Ergebnis in 30 Sekunden statt zwei Wochen."
+        "answer": "Innenarchitekten verrechnen oft ca. 150 €/h. Mit InstaDeco starten Generierungen ab 0,99 €, vergleichbares Ergebnis in 30 Sekunden statt zwei Wochen."
       },
       {
         "question": "Welche Deko-Stile gibt es?",
@@ -104,7 +104,7 @@
       },
       {
         "question": "Virtuelles Home Staging?",
-        "answer": "Ja! Makler und Eigentümer möblieren leere Objekte virtuell, damit Käufer sich besser vorstellen können – mehr Besuche, schnellere Verkäufe."
+        "answer": "Ja! Makler und Eigentümer möblieren leere Objekte virtuell, damit Käufer sich besser vorstellen können, mehr Besuche, schnellere Verkäufe."
       },
       {
         "question": "Sind die Bilder realistisch?",
@@ -112,13 +112,13 @@
       }
     ],
     "stylesSectionTitle": "Unsere Deko-Stile entdecken",
-    "stylesSectionSubtitle": "Jedes Zuhause verdient den passenden Stil. Über 20 Looks – finden Sie Ihren.",
+    "stylesSectionSubtitle": "Jedes Zuhause verdient den passenden Stil. Über 20 Looks, finden Sie Ihren.",
     "viewAllStyles": "Alle Stile",
     "roomsSectionTitle": "Jeden Raum gestalten",
-    "roomsSectionSubtitle": "Wohnzimmer, Schlafzimmer, Küche oder Büro – unsere KI passt sich an.",
+    "roomsSectionSubtitle": "Wohnzimmer, Schlafzimmer, Küche oder Büro, unsere KI passt sich an.",
     "allRooms": "Alle Raumtypen",
     "solutionsSectionTitle": "KI-Deko-Lösungen",
-    "solutionsSectionSubtitle": "Verkauf, Renovierung oder Inspiration – InstaDeco hilft.",
+    "solutionsSectionSubtitle": "Verkauf, Renovierung oder Inspiration, InstaDeco hilft.",
     "solStagingTitle": "Virtuelles Home Staging",
     "solStagingDesc": "Leere Objekte virtuell möblieren",
     "solSimTitle": "Deko-Simulator",
@@ -162,11 +162,11 @@
     "frenchBodyNotice": "Die folgenden Rechtstexte sind auf Französisch (maßgebende Fassung). Eine vollständige Übersetzung folgt in Kürze."
   },
   "PricingMeta": {
-    "title": "Preise & Credits – KI-Deko ohne Abo | InstaDeco AI",
+    "title": "Preise & Credits, KI-Deko ohne Abo | InstaDeco AI",
     "description": "Credits ohne Abo kaufen und Räume per KI gestalten. Ab 9,90 € für 10 HD-Generierungen. Credits verfallen nicht. Sichere Stripe-Zahlung.",
-    "ogTitle": "InstaDeco AI Preise – KI-Deko ab 9,90 €",
-    "ogDescription": "Kein Abo-Zwang – Credits kaufen und jederzeit generieren.",
-    "twitterTitle": "InstaDeco AI Preise – ab 9,90 €",
+    "ogTitle": "InstaDeco AI Preise, KI-Deko ab 9,90 €",
+    "ogDescription": "Kein Abo-Zwang, Credits kaufen und jederzeit generieren.",
+    "twitterTitle": "InstaDeco AI Preise, ab 9,90 €",
     "twitterDescription": "Credits ohne Abo. Sichere Zahlung.",
     "breadcrumb": "Preise",
     "breadcrumbHome": "Start"
@@ -180,7 +180,7 @@
         "price": 9.9,
         "pricePerCredit": 0.99,
         "popular": false,
-        "emoji": "🌱",
+        "emoji": "",
         "description": "Ideal zum Testen",
         "savings": null,
         "cta": "Jetzt starten"
@@ -192,7 +192,7 @@
         "price": 19.9,
         "pricePerCredit": 0.8,
         "popular": true,
-        "emoji": "✨",
+        "emoji": "",
         "description": "Am beliebtesten",
         "savings": 20,
         "cta": "Kreativ wählen"
@@ -204,7 +204,7 @@
         "price": 34.9,
         "pricePerCredit": 0.7,
         "popular": false,
-        "emoji": "🚀",
+        "emoji": "",
         "description": "Bestes Preis-Leistungs-Verhältnis",
         "savings": 30,
         "cta": "Pro werden"
@@ -219,7 +219,7 @@
         "annualPrice": 15,
         "annualTotal": 180,
         "popular": false,
-        "emoji": "🏠",
+        "emoji": "",
         "description": "Für Deko-Enthusiasten",
         "pricePerCredit": {
           "monthly": 0.63,
@@ -242,7 +242,7 @@
         "annualPrice": 31,
         "annualTotal": 372,
         "popular": true,
-        "emoji": "⭐",
+        "emoji": "",
         "description": "Für Profis",
         "pricePerCredit": {
           "monthly": 0.49,
@@ -266,7 +266,7 @@
         "annualPrice": 63,
         "annualTotal": 756,
         "popular": false,
-        "emoji": "🏢",
+        "emoji": "",
         "description": "Für Agenturen & Unternehmen",
         "pricePerCredit": {
           "monthly": 0.4,
@@ -292,17 +292,17 @@
       {
         "category": "credits",
         "question": "Verfallen meine Credits?",
-        "answer": "Nie! Ihre Credits bleiben unbegrenzt gültig – in Ihrem Tempo, ohne Druck."
+        "answer": "Nie! Ihre Credits bleiben unbegrenzt gültig, in Ihrem Tempo, ohne Druck."
       },
       {
         "category": "quality",
         "question": "Welche Bildqualität erhalte ich?",
-        "answer": "Alle Bilder sind HD (1024×1024 px). Optional HD+ (2048×2048) für nur 4,99 € pro Bild – ideal für große Drucke."
+        "answer": "Alle Bilder sind HD (1024×1024 px). Optional HD+ (2048×2048) für nur 4,99 € pro Bild, ideal für große Drucke."
       },
       {
         "category": "usage",
         "question": "Darf ich die Bilder kommerziell nutzen?",
-        "answer": "Ja! Sie besitzen Ihre Generierungen. Nutzung für Projekte, Portfolio, Kunden, Social Media – ohne kommerzielle Einschränkung."
+        "answer": "Ja! Sie besitzen Ihre Generierungen. Nutzung für Projekte, Portfolio, Kunden, Social Media, ohne kommerzielle Einschränkung."
       },
       {
         "category": "quality",
@@ -312,7 +312,7 @@
       {
         "category": "usage",
         "question": "Wie lade ich Ergebnisse herunter?",
-        "answer": "Einfach: Nach der Generierung auf „Herunterladen“ klicken – fertig. Alles finden Sie auch in Ihrem Dashboard."
+        "answer": "Einfach: Nach der Generierung auf „Herunterladen“ klicken, fertig. Alles finden Sie auch in Ihrem Dashboard."
       },
       {
         "category": "payment",
@@ -322,7 +322,7 @@
       {
         "category": "payment",
         "question": "Gibt es eine Rückerstattung?",
-        "answer": "Ja! Ungenutzte Credits innerhalb von 14 Tagen nach Kauf – per E-Mail. Verbrauchte Credits sind nicht erstattungsfähig."
+        "answer": "Ja! Ungenutzte Credits innerhalb von 14 Tagen nach Kauf, per E-Mail. Verbrauchte Credits sind nicht erstattungsfähig."
       },
       {
         "category": "subscription",
@@ -332,12 +332,12 @@
       {
         "category": "subscription",
         "question": "Werden ungenutzte Credits übertragen?",
-        "answer": "Ja – bei Pro und Business werden Credits übernommen (bis zu 2 Monate). Nichts geht verloren."
+        "answer": "Ja, bei Pro und Business werden Credits übernommen (bis zu 2 Monate). Nichts geht verloren."
       },
       {
         "category": "quality",
         "question": "Was, wenn mir das Ergebnis nicht gefällt?",
-        "answer": "Einfach erneut generieren oder Stil/Intensität anpassen – die KI liefert neue Vorschläge."
+        "answer": "Einfach erneut generieren oder Stil/Intensität anpassen, die KI liefert neue Vorschläge."
       },
       {
         "category": "usage",
@@ -347,25 +347,25 @@
     ],
     "useCases": [
       {
-        "icon": "🏠",
+        "icon": "",
         "profile": "Eigentümer",
         "text": "Testen Sie mehrere Stile auf Ihrem eigenen Foto, bevor Sie in Umbauten investieren. Vergleichen Sie modern, skandinavisch oder Japandi in Sekunden.",
         "pack": "Entdeckerpaket"
       },
       {
-        "icon": "🏢",
+        "icon": "",
         "profile": "Immobilienmakler",
-        "text": "Möblieren Sie leere Objekte virtuell, damit Käufer sich besser vorstellen können – schnell und günstig ergänzend zum physischen Staging.",
+        "text": "Möblieren Sie leere Objekte virtuell, damit Käufer sich besser vorstellen können, schnell und günstig ergänzend zum physischen Staging.",
         "pack": "Pro"
       },
       {
-        "icon": "🎨",
+        "icon": "",
         "profile": "Innenarchitekten",
-        "text": "Zeigen Sie Kunden sofort Vorher/Nachher, um die Richtung vor der Umsetzung abzustimmen – ideal in der Angebotsphase.",
+        "text": "Zeigen Sie Kunden sofort Vorher/Nachher, um die Richtung vor der Umsetzung abzustimmen, ideal in der Angebotsphase.",
         "pack": "Kreativ"
       }
     ],
-    "popularBadge": "⭐ Am häufigsten gewählt",
+    "popularBadge": "Am häufigsten gewählt",
     "loading": "Wird geladen...",
     "creditsPerImage": "{credits} Credits • {price} €/Bild",
     "savingsVsUnit": "Sie sparen {amount} € gegenüber Einzelkauf",
@@ -382,7 +382,7 @@
     "creditsPerMonthShort": "{credits} Credits/Mon. • {price} €/Bild",
     "billedAnnually": "Abrechnung {total} €/Jahr (statt {full} €)",
     "subFooter": "Ohne Bindung • Jederzeit kündbar",
-    "swipeHint": "← Wischen, um Angebote zu sehen →",
+    "swipeHint": "Wischen, um Angebote zu sehen",
     "paymentBy": "Zahlung per",
     "trustBadges": [
       {
@@ -402,8 +402,8 @@
         "label": "Ergebnis in ~10 Sekunden"
       }
     ],
-    "annualSavingsBanner": "💰 Bis zu 192 €/Jahr mit Jahresabo sparen",
-    "monthlySavingsBanner": "✨ Bis zu 60 % günstiger als Credit-Pakete",
+    "annualSavingsBanner": "Bis zu 192 €/Jahr mit Jahresabo sparen",
+    "monthlySavingsBanner": "Bis zu 60 % günstiger als Credit-Pakete",
     "upsellTitle": "Regelmäßiger Bedarf? Abos sind bis zu 60 % günstiger",
     "upsellSubtitle": "Ab 0,32 €/Bild mit Abo vs. 0,70 € pro Bild",
     "upsellCta": "Abos ansehen",
@@ -412,19 +412,19 @@
     "howItWorksSteps": [
       {
         "step": "1",
-        "emoji": "📸",
+        "emoji": "",
         "title": "Foto machen",
         "desc": "Fotografieren Sie den Raum mit dem Smartphone."
       },
       {
         "step": "2",
-        "emoji": "🎨",
+        "emoji": "",
         "title": "Stil wählen",
         "desc": "12 Stile: Modern, Skandinavisch, Japandi, Boho…"
       },
       {
         "step": "3",
-        "emoji": "✨",
+        "emoji": "",
         "title": "Ergebnis genießen",
         "desc": "In ~10 Sekunden sehen Sie die KI-Transformation."
       }
@@ -439,17 +439,17 @@
       {
         "label": "Preis pro Vorschlag",
         "us": "Ab 0,70 €",
-        "them": "200 – 500 €"
+        "them": "200, 500 €"
       },
       {
         "label": "Dauer",
         "us": "~10 Sekunden",
-        "them": "1 – 3 Wochen"
+        "them": "1, 3 Wochen"
       },
       {
         "label": "Anzahl Stile",
         "us": "12 unbegrenzte Stile",
-        "them": "2 – 3 Vorschläge"
+        "them": "2, 3 Vorschläge"
       },
       {
         "label": "Verfügbarkeit",
@@ -487,7 +487,7 @@
     "faqTitle": "FAQ",
     "faqSubtitle": "Antworten, damit Sie entspannt loslegen",
     "faqCtaTitle": "Noch eine Frage?",
-    "faqCtaLink": "Schreiben Sie uns – Antwort in 24h 💌",
+    "faqCtaLink": "Schreiben Sie uns, Antwort in 24h",
     "finalCtaTitle": "Bereit, Ihren Raum zu verändern?",
     "finalCtaSubtitle": "Schließen Sie sich Tausenden an, die mit InstaDeco AI gestaltet haben.",
     "finalCtaButton": "Kostenlos testen",
@@ -533,15 +533,15 @@
   },
   "LegalMeta": {
     "mentionsTitle": "Impressum | InstaDeco AI",
-    "mentionsDescription": "Rechtliche Informationen zu InstaDeco AI — Anbieter, Hosting und Nutzungsbedingungen.",
+    "mentionsDescription": "Rechtliche Informationen zu InstaDeco AI, Anbieter, Hosting und Nutzungsbedingungen.",
     "privacyTitle": "Datenschutzerklärung | InstaDeco AI",
-    "privacyDescription": "Schutz Ihrer personenbezogenen Daten bei InstaDeco AI — Schweizer revDSG und EU-DSGVO.",
+    "privacyDescription": "Schutz Ihrer personenbezogenen Daten bei InstaDeco AI, Schweizer revDSG und EU-DSGVO.",
     "cgvTitle": "Allgemeine Geschäftsbedingungen (AGB) | InstaDeco AI",
-    "cgvDescription": "AGB für InstaDeco AI — Credits, Zahlungen, Widerruf und Nutzung des Dienstes."
+    "cgvDescription": "AGB für InstaDeco AI, Credits, Zahlungen, Widerruf und Nutzung des Dienstes."
   },
   "HomeLanding": {
     "howItWorks": {
-      "badgeEmoji": "🚀",
+      "badgeEmoji": "",
       "badgeText": "So funktioniert’s",
       "title": "3 einfache Schritte",
       "subtitle": "Verwandeln Sie jeden Raum mit wenigen Klicks",
@@ -551,32 +551,32 @@
           "number": "01",
           "title": "Foto aufnehmen",
           "description": "Fotografieren Sie Ihren Raum oder laden Sie ein vorhandenes Bild hoch. Die KI funktioniert mit jedem Raum.",
-          "icon": "📸"
+          "icon": ""
         },
         {
           "number": "02",
           "title": "Stil wählen",
           "description": "Wählen Sie aus 20+ Deko-Stilen: Modern, Skandinavisch, Japandi, Boho, Industrial …",
-          "icon": "🎨"
+          "icon": ""
         },
         {
           "number": "03",
           "title": "Magie starten",
           "description": "Unsere KI gestaltet Ihren Raum in unter 30 Sekunden um. Laden Sie das Ergebnis in HD herunter!",
-          "icon": "✨"
+          "icon": ""
         }
       ]
     },
     "gallery": {
-      "badgeEmoji": "🖼️",
+      "badgeEmoji": "",
       "badgeText": "Galerie",
       "title": "Beeindruckendes Vorher / Nachher",
       "subtitle": "Mit der Maus über die Bilder fahren, um die Transformation zu sehen",
       "before": "Vorher",
       "after": "Nachher",
       "styleLine": "Stil {style}",
-      "altBefore": "{room} — vorher",
-      "altAfter": "{room} nachher — Stil {style}",
+      "altBefore": "{room}, vorher",
+      "altAfter": "{room} nachher, Stil {style}",
       "items": [
         {
           "id": 1,
@@ -623,19 +623,19 @@
       ]
     },
     "features": {
-      "badgeEmoji": "✨",
+      "badgeEmoji": "",
       "badgeText": "Warum wir",
-      "titleStart": "Ein Erlebnis, das für ",
+      "titleStart": "Ein Erlebnis, das für",
       "titleHighlight": "Sie",
       "subtitle": "Spitzentechnologie für Ihre Kreativität.",
       "items": [
         {
           "title": "30 Sekunden",
-          "description": "Ein Dekorateur braucht zwei Wochen. Sie erhalten ein fotorealistisches Rendering in 30 Sekunden – vergleichbare Qualität, viel schneller."
+          "description": "Ein Dekorateur braucht zwei Wochen. Sie erhalten ein fotorealistisches Rendering in 30 Sekunden, vergleichbare Qualität, viel schneller."
         },
         {
           "title": "Ihr Raum, keine Vorlage",
-          "description": "Die KI liest IHREN Raum (Wände, Fenster, Volumen) für ein massgeschneidertes Ergebnis – kein generischer Kataloglook."
+          "description": "Die KI liest IHREN Raum (Wände, Fenster, Volumen) für ein massgeschneidertes Ergebnis, kein generischer Kataloglook."
         },
         {
           "title": "0,99 € statt 150 €/h",
@@ -646,7 +646,7 @@
           "description": "Skandinavisch, Japandi, Haussmann, Chalet … probieren Sie jeden Look mit einem Klick. Beim Dekorateur gibt es höchstens drei Varianten."
         },
         {
-          "title": "Foto → Ergebnis. Fertig.",
+          "title": "Foto Ergebnis. Fertig.",
           "description": "Keine komplexe 3D-Software. Foto machen, Stil wählen, fertig. Ihre Grossmutter könnte es bedienen."
         },
         {
@@ -657,7 +657,7 @@
     },
     "stats": {
       "headline": "Ergebnis wie vom Innenarchitekten • Preis wie beim Kaffee",
-      "deal": "→ 0,99 €",
+      "deal": "0,99 €",
       "rows": [
         {
           "target": 12,
@@ -687,7 +687,7 @@
       ]
     },
     "testimonials": {
-      "badgeEmoji": "💡",
+      "badgeEmoji": "",
       "badgeText": "Anwendungsfälle",
       "title": "Für wen ist InstaDeco?",
       "subtitle": "So nutzen verschiedene Profile KI-Deko",
@@ -696,19 +696,19 @@
       "dotAria": "Zu Anwendungsfall {n}",
       "cases": [
         {
-          "icon": "🏠",
+          "icon": "",
           "profile": "Eigentümer",
           "role": "Vor dem Umbau visualisieren",
           "content": "Vergleichen Sie mehrere Stile auf Ihrem eigenen Foto, bevor Sie investieren. Modern, skandinavisch, Japandi … Ergebnis in ~30 Sekunden."
         },
         {
-          "icon": "🏢",
+          "icon": "",
           "profile": "Immobilienmakler",
           "role": "Virtuelles Home Staging",
-          "content": "Leere Objekte virtuell möblieren, damit Käufer sich besser vorstellen können – schnell und günstig ergänzend zum physischen Staging."
+          "content": "Leere Objekte virtuell möblieren, damit Käufer sich besser vorstellen können, schnell und günstig ergänzend zum physischen Staging."
         },
         {
-          "icon": "🎨",
+          "icon": "",
           "profile": "Innenarchitekten",
           "role": "Schnelle Varianten",
           "content": "Zeigen Sie Kunden sofort Vorher/Nachher, um die Richtung vor der kompletten Umsetzung abzustimmen."
@@ -721,7 +721,7 @@
       "line1": "Ein Dekorateur verrechnet ca. 150 €/h und braucht zwei Wochen.",
       "line2": "InstaDeco liefert ein vergleichbares Ergebnis in 30 Sekunden.",
       "cta": "Meinen Raum kostenlos neu gestalten",
-      "footnote": "✨ 3 Gratis-Credits bei Registrierung • Keine Karte nötig • Ergebnis in ~30 Sekunden"
+      "footnote": "3 Gratis-Credits bei Registrierung • Keine Karte nötig • Ergebnis in ~30 Sekunden"
     },
     "beforeAfter": {
       "slides": [
@@ -729,12 +729,12 @@
           "id": "chambre-boheme",
           "before": "/images/before-chambre-1.jpg",
           "after": "/images/after-chambre-1.jpg",
-          "title": "Schlafzimmer → moderner Boho-Stil",
+          "title": "Schlafzimmer moderner Boho-Stil",
           "description": "Boden, Möbel und Deko von unserer KI transformiert"
         }
       ],
       "before": "Vorher",
-      "after": "Nachher KI ✨",
+      "after": "Nachher KI",
       "altBefore": "Vorher Deko",
       "altAfter": "Nachher KI-Deko",
       "prevAria": "Zurück",
