@@ -155,7 +155,7 @@ export default async function IntentPage({ params }: PageProps) {
       </section>
 
       {/* ===== PROBLÈME ===== */}
-      <section className="py-16">
+      <section className="py-16 prestige-reveal">
         <div className="container px-4 md:px-6 max-w-4xl mx-auto">
           <h2 className="prestige-display text-3xl font-bold text-center mb-10">{page.problem.title}</h2>
           <div className="grid md:grid-cols-2 gap-4">
@@ -170,7 +170,7 @@ export default async function IntentPage({ params }: PageProps) {
       </section>
 
       {/* ===== SOLUTION ===== */}
-      <section className="py-16 bg-muted/30">
+      <section className="py-16 bg-muted/30 prestige-reveal">
         <div className="container px-4 md:px-6 max-w-4xl mx-auto space-y-10">
           <div className="text-center space-y-4">
             <h2 className="prestige-display text-3xl font-bold">{page.solution.title}</h2>
@@ -196,7 +196,7 @@ export default async function IntentPage({ params }: PageProps) {
 
       {/* ===== COMPARAISON ===== */}
       {page.comparison && (
-        <section className="py-16">
+        <section className="py-16 prestige-reveal">
           <div className="container px-4 md:px-6 max-w-4xl mx-auto space-y-8">
             <h2 className="prestige-display text-3xl font-bold text-center">{page.comparison.title}</h2>
 
@@ -253,7 +253,7 @@ export default async function IntentPage({ params }: PageProps) {
       )}
 
       {/* ===== ÉTAPES ===== */}
-      <section className="py-16 bg-muted/20">
+      <section className="py-16 bg-muted/20 prestige-reveal">
         <div className="container px-4 md:px-6 max-w-4xl mx-auto space-y-10">
           <h2 className="prestige-display text-3xl font-bold text-center">Comment ça marche ?</h2>
           <div className="grid md:grid-cols-3 gap-8">
@@ -279,7 +279,7 @@ export default async function IntentPage({ params }: PageProps) {
       </section>
 
       {/* ===== CTA MILIEU ===== */}
-      <section className="py-16 bg-[var(--stone-900)] border-y border-[var(--gold-line)] text-[var(--ivory)]">
+      <section className="py-16 bg-[var(--stone-900)] border-y border-[var(--gold-line)] text-[var(--ivory)] prestige-reveal">
         <div className="container px-4 md:px-6 max-w-3xl mx-auto text-center space-y-6">
           <h2 className="prestige-display text-3xl font-bold">Prêt à transformer votre intérieur ?</h2>
           <p className="prestige-body text-muted-foreground text-lg">
@@ -302,7 +302,7 @@ export default async function IntentPage({ params }: PageProps) {
       </section>
 
       {/* ===== FAQ ===== */}
-      <section className="py-16 bg-muted/20">
+      <section className="py-16 bg-muted/20 prestige-reveal">
         <div className="container px-4 md:px-6 max-w-3xl mx-auto space-y-8">
           <h2 className="prestige-display text-3xl font-bold text-center">Questions fréquentes</h2>
           <div className="space-y-4">
@@ -322,7 +322,7 @@ export default async function IntentPage({ params }: PageProps) {
       </section>
 
       {/* ===== PAGES LIÉES ===== */}
-      <section className="py-12 border-t border-border">
+      <section className="py-12 border-t border-border prestige-reveal">
         <div className="container px-4 md:px-6 max-w-4xl mx-auto">
           <h3 className="prestige-display text-xl font-bold mb-6 text-foreground">Découvrez aussi</h3>
           <div className="grid sm:grid-cols-3 gap-4">
