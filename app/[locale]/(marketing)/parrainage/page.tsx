@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Gift, Users, Sparkles, ArrowRight, Heart } from 'lucide-react';
+import { Gift, Users, Sparkles, ArrowRight, Heart, Infinity, Zap, Wallet } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Parrainage : gagnez 5 crédits gratuits | InstaDeco AI',
@@ -94,13 +94,13 @@ export default function ParrainagePage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {[
-              { emoji: '🎁', title: '5 crédits gratuits', desc: 'À chaque parrainage réussi, pour vous ET votre ami.' },
-              { emoji: '♾️', title: 'Aucune limite', desc: 'Parrainez autant d\'amis que vous voulez. Plus vous parrainez, plus vous créez.' },
-              { emoji: '⚡', title: 'Crédits instantanés', desc: 'Les crédits sont ajoutés dès l\'inscription de votre ami. Pas d\'attente.' },
-              { emoji: '💰', title: 'Crédits à vie', desc: 'Vos crédits gagnés n\'expirent jamais. Utilisez-les quand vous voulez.' },
+              { icon: Gift, title: '5 crédits gratuits', desc: 'À chaque parrainage réussi, pour vous ET votre ami.' },
+              { icon: Infinity, title: 'Aucune limite', desc: 'Parrainez autant d\'amis que vous voulez. Plus vous parrainez, plus vous créez.' },
+              { icon: Zap, title: 'Crédits instantanés', desc: 'Les crédits sont ajoutés dès l\'inscription de votre ami. Pas d\'attente.' },
+              { icon: Wallet, title: 'Crédits à vie', desc: 'Vos crédits gagnés n\'expirent jamais. Utilisez-les quand vous voulez.' },
             ].map((item) => (
               <div key={item.title} className="bg-background rounded-2xl p-6 border border-[var(--gold-line)]">
-                <span className="text-3xl mb-3 block">{item.emoji}</span>
+                <item.icon className="w-6 h-6 text-[var(--gold)] mb-3" />
                 <h3 className="prestige-display text-lg font-semibold text-foreground mb-1">{item.title}</h3>
                 <p className="text-sm text-muted-foreground">{item.desc}</p>
               </div>

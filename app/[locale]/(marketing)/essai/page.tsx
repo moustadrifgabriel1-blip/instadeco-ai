@@ -4,7 +4,8 @@ import { useCallback, useState, useEffect, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Plus, ArrowRight, Sparkles, Shield, Zap, Star, Check, UserPlus, Gift, Share2, Mail } from 'lucide-react';
+import { Plus, ArrowRight, Sparkles, Shield, Zap, Star, Check, UserPlus, Gift, Share2, Mail, TreePine, Leaf, Wheat, Factory, Landmark, Sofa, BedDouble, CookingPot, ShowerHead, Briefcase, Utensils } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { FlashOffer } from '@/components/features/flash-offer';
 import { ShareButtons } from '@/components/features/share-buttons';
 import { SocialProofToast } from '@/components/features/social-proof-toast';
@@ -28,22 +29,22 @@ function readTrialCount(): number {
 }
 
 // Styles populaires pour l'essai (6 max)
-const TRIAL_STYLES = [
-  { id: 'moderne', name: 'Moderne', desc: 'Lignes épurées, élégance contemporaine', icon: '✨' },
-  { id: 'scandinave', name: 'Scandinave', desc: 'Cocooning nordique lumineux', icon: '🪵' },
-  { id: 'boheme', name: 'Bohème', desc: 'Chaleur éclectique colorée', icon: '🌿' },
-  { id: 'japandi', name: 'Japandi', desc: 'Zen japonais & hygge nordique', icon: '🎋' },
-  { id: 'industriel', name: 'Industriel', desc: 'Loft urbain brut et moderne', icon: '🏭' },
-  { id: 'classique', name: 'Classique', desc: 'Élégance traditionnelle française', icon: '🏛️' },
+const TRIAL_STYLES: { id: string; name: string; desc: string; Icon: LucideIcon }[] = [
+  { id: 'moderne', name: 'Moderne', desc: 'Lignes épurées, élégance contemporaine', Icon: Sparkles },
+  { id: 'scandinave', name: 'Scandinave', desc: 'Cocooning nordique lumineux', Icon: TreePine },
+  { id: 'boheme', name: 'Bohème', desc: 'Chaleur éclectique colorée', Icon: Leaf },
+  { id: 'japandi', name: 'Japandi', desc: 'Zen japonais et hygge nordique', Icon: Wheat },
+  { id: 'industriel', name: 'Industriel', desc: 'Loft urbain brut et moderne', Icon: Factory },
+  { id: 'classique', name: 'Classique', desc: 'Élégance traditionnelle française', Icon: Landmark },
 ];
 
-const TRIAL_ROOMS = [
-  { id: 'salon', name: 'Salon', icon: '🛋️' },
-  { id: 'chambre', name: 'Chambre', icon: '🛏️' },
-  { id: 'cuisine', name: 'Cuisine', icon: '🍳' },
-  { id: 'salle-de-bain', name: 'Salle de bain', icon: '🚿' },
-  { id: 'bureau', name: 'Bureau', icon: '💼' },
-  { id: 'salle-a-manger', name: 'Salle à manger', icon: '🍽️' },
+const TRIAL_ROOMS: { id: string; name: string; Icon: LucideIcon }[] = [
+  { id: 'salon', name: 'Salon', Icon: Sofa },
+  { id: 'chambre', name: 'Chambre', Icon: BedDouble },
+  { id: 'cuisine', name: 'Cuisine', Icon: CookingPot },
+  { id: 'salle-de-bain', name: 'Salle de bain', Icon: ShowerHead },
+  { id: 'bureau', name: 'Bureau', Icon: Briefcase },
+  { id: 'salle-a-manger', name: 'Salle à manger', Icon: Utensils },
 ];
 
 const LOADING_MESSAGES = [
@@ -351,7 +352,9 @@ export default function EssaiPage() {
                         }
                       `}
                     >
-                      <span className="mr-1">{room.icon}</span> {room.name}
+                      <span className="inline-flex items-center gap-1.5">
+                        <room.Icon className="w-4 h-4" /> {room.name}
+                      </span>
                     </button>
                   ))}
                 </div>
@@ -375,7 +378,7 @@ export default function EssaiPage() {
                         }
                       `}
                     >
-                      <span className="text-2xl">{style.icon}</span>
+                      <style.Icon className="w-6 h-6 text-[var(--gold)]" />
                       <p className={`prestige-display font-semibold text-[14px] mt-1 ${selectedStyle === style.id ? 'text-[var(--gold)]' : 'text-foreground'}`}>
                         {style.name}
                       </p>

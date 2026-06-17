@@ -176,8 +176,9 @@ export function GalleryClient({ initialItems, initialTotal }: GalleryClientProps
 
                 {/* Badge IA */}
                 <div className="absolute top-3 left-3">
-                  <span className="prestige-eyebrow px-3 py-1 rounded-full text-xs font-medium bg-[var(--gold)]/90 text-[#0c0a09] backdrop-blur-sm">
-                    IA ✨
+                  <span className="prestige-eyebrow inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-[var(--gold)]/90 text-[#0c0a09] backdrop-blur-sm">
+                    IA
+                    <Sparkles className="w-3 h-3" />
                   </span>
                 </div>
 
