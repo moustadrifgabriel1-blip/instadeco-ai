@@ -47,3 +47,10 @@ next-env.d.ts
 /*.mp3
 /*.command
 /avant_apres_video.py
+
+# Moteur SEO : rapports et snapshots bruts (trafic, positions, mots-cles).
+# Repo PUBLIC -> jamais publies. Restent en local/VPS pour seo-chief.
+.claude/seo-engine/reports/*
+!.claude/seo-engine/reports/.gitkeep
+.claude/seo-engine/data/*
+!.claude/seo-engine/data/.gitkeep
