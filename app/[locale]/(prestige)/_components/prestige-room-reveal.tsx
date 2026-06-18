@@ -31,13 +31,14 @@ export function PrestigeRoomReveal() {
 
   useGSAP(
     () => {
+      const pinEl = root.current?.querySelector<HTMLElement>('[data-room-pin]');
       const stage = root.current?.querySelector<HTMLElement>('[data-room-stage]');
       const after = root.current?.querySelector<HTMLElement>('[data-room-after]');
       const handle = root.current?.querySelector<HTMLElement>('[data-room-handle]');
       const caption = root.current?.querySelector<HTMLElement>('[data-room-caption]');
       const scrollHint = root.current?.querySelector<HTMLElement>('[data-room-scrollhint]');
       const dragHint = root.current?.querySelector<HTMLElement>('[data-room-draghint]');
-      if (!stage || !after || !handle || !caption) return;
+      if (!pinEl || !stage || !after || !handle || !caption) return;
 
       const state = { p: 0, interactive: false, dragging: false };
 
@@ -124,14 +125,14 @@ export function PrestigeRoomReveal() {
             v: 1,
             ease: 'none',
             scrollTrigger: {
-              // On déclenche sur le stage (pas la section) pour qu'il se fige
-              // exactement quand son haut touche le haut de l'écran : pas de
-              // saut ni de bande noire à l'entrée du pin.
-              trigger: stage,
+              // On pin le WRAPPER pleine hauteur (pas le stage étroit) : pendant
+              // le pin il occupe tout le viewport, donc le comparateur reste
+              // centré, sans saut de largeur ni découpe.
+              trigger: pinEl,
               start: 'top top',
               end: '+=210%',
               scrub: 1.3,
-              pin: stage,
+              pin: pinEl,
               pinSpacing: true,
               anticipatePin: 1,
               invalidateOnRefresh: true,
@@ -217,11 +218,17 @@ export function PrestigeRoomReveal() {
         <div className="prestige-rule mt-10 w-full" aria-hidden />
       </div>
 
-      {/* Scène (élément pinné, puis comparateur interactif) */}
-      <div className="mx-auto max-w-6xl px-6 py-[clamp(2.5rem,7vh,5rem)] sm:px-10">
+      {/* Wrapper PINNÉ pleine hauteur : on pin ce conteneur (et non le stage
+          étroit) pour que, pendant le pin, le comparateur reste centré dans le
+          viewport, sans saut de largeur ni découpe. Pas de min-h sur mobile
+          (le pin n'est actif qu'en >=1024px). */}
+      <div
+        data-room-pin
+        className="flex w-full items-center justify-center px-6 py-[clamp(2.5rem,7vh,5rem)] sm:px-10 lg:min-h-[100svh] lg:py-0"
+      >
         <div
           data-room-stage
-          className="prestige-compare-stage relative aspect-[4/5] w-full touch-pan-y select-none overflow-hidden rounded-sm border border-[var(--gold-line)] sm:aspect-[16/10]"
+          className="prestige-compare-stage relative aspect-[4/5] max-h-[86svh] w-full max-w-6xl touch-pan-y select-none overflow-hidden rounded-sm border border-[var(--gold-line)] sm:aspect-[16/10]"
         >
           {/* AVANT, pièce vide / datée (couche du dessous) */}
           <div className="absolute inset-0">
