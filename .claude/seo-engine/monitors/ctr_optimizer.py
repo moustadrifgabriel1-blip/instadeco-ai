@@ -51,8 +51,10 @@ except ImportError:  # pragma: no cover
     pass
 
 _ENGINE_ROOT = Path(__file__).resolve().parent.parent
+_REPO_ROOT = _ENGINE_ROOT.parent.parent  # .claude/seo-engine -> repo
 _REPORTS_DIR = _ENGINE_ROOT / "reports"
 _DATA_DIR = _ENGINE_ROOT / "data"
+_CITIES_TS = _REPO_ROOT / "src" / "shared" / "constants" / "cities.ts"
 
 _GSC_SCOPE = "https://www.googleapis.com/auth/webmasters.readonly"
 _GSC_LATENCY_DAYS = 3
@@ -139,10 +141,52 @@ def _title_case(query: str) -> str:
     return " ".join(out)
 
 
-def _build_title(query: str) -> str:
+_CITY_BY_SLUG: dict[str, str] | None = None
+
+
+def _load_cities() -> dict[str, str]:
+    """Mapping slug -> nom de ville ACCENTUÉ, lu depuis cities.ts (source de vérité).
+
+    GSC renvoie les requêtes sans accents ; on reconstruit donc le nom propre depuis
+    le repo pour produire un title de qualité (« Neuchâtel », pas « neuchatel »).
+    """
+    global _CITY_BY_SLUG
+    if _CITY_BY_SLUG is not None:
+        return _CITY_BY_SLUG
+    mapping: dict[str, str] = {}
+    try:
+        import re
+
+        text = _CITIES_TS.read_text(encoding="utf-8")
+        # Chaque entrée : { name: 'Xxx', slug: 'xxx', ... } (name avant slug).
+        for name, slug in re.findall(r"name:\s*'([^']+)'[^}]*?slug:\s*'([^']+)'", text):
+            mapping[slug] = name
+    except Exception:
+        mapping = {}
+    _CITY_BY_SLUG = mapping
+    return mapping
+
+
+def _metier(query: str) -> str:
+    """Métier déduit de la requête réelle (GSC, sans accents)."""
+    q = query.lower()
+    if "decorateur" in q or "décorateur" in q or "decoration" in q or "décoration" in q:
+        return "Décorateur d'intérieur"
+    if "design" in q:
+        return "Designer d'intérieur"
+    return "Architecte d'intérieur"
+
+
+def _build_title(path: str, query: str) -> str:
+    """Title propre. Pages villes : nom accentué + métier aligné sur la requête.
+    Sinon, repli sur un title-case de la requête."""
+    if path.startswith("/architecte-interieur/"):
+        slug = path.rsplit("/", 1)[-1]
+        name = _load_cities().get(slug)
+        if name:
+            return f"{_metier(query)} à {name} : visualisez votre déco par IA"[:68]
     base = _title_case(query.strip())
-    title = f"{base} : le rendu déco par IA"
-    return title[:68]
+    return f"{base} : le rendu déco par IA"[:68]
 
 
 def _aggregate(rows: list[dict]) -> dict[str, dict]:
@@ -179,7 +223,7 @@ def _candidates(by_page: dict[str, dict]) -> list[dict]:
             out.append(
                 {
                     "path": path,
-                    "title": _build_title(a["top_query"]),
+                    "title": _build_title(path, a["top_query"]),
                     "source_query": a["top_query"],
                     "clicks": a["clicks"],
                     "impressions": a["impressions"],
