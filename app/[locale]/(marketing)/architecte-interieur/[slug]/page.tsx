@@ -109,8 +109,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const city = CITIES.find((c) => c.slug === slug);
   if (!city) return { title: 'Page non trouvée' };
 
-  const title = `Déco intérieure par IA à ${city.name} : visualisez avant de rénover`;
-  const description = `Vous habitez ${city.name} ou sa région (${city.region}) ? Testez votre futur intérieur en photo avant de lancer les travaux ou d'appeler un architecte. Rendu photoréaliste en quelques secondes, premier essai gratuit.`;
+  // Title aligné sur la requête réellement tapée (« architecte d'intérieur [ville] »)
+  // pour que l'internaute reconnaisse sa recherche dans le résultat : c'est le levier
+  // CTR n°1 sur ces pages (impressions en page 1 mais 0 clic = title hors requête).
+  const title = `Architecte d'intérieur à ${city.name} : visualisez votre déco par IA`;
+  const description = `Architecte d'intérieur à ${city.name} (${city.region}) : visualisez votre futur intérieur en photo avant les travaux. Choisissez un style, l'IA habille la pièce en quelques secondes. Premier essai gratuit.`;
 
   const path = `/architecte-interieur/${city.slug}`;
 
