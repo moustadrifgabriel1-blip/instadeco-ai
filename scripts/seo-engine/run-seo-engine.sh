@@ -2,7 +2,7 @@
 #
 # Lance UN job du moteur SEO depuis le VPS Hetzner (remplace GitHub Actions).
 # Usage : run-seo-engine.sh <job>
-#   jobs : gsc_daily | drift_check | rank_tracker | competitor_diff | citation_batch
+#   jobs : gsc_daily | drift_check | rank_tracker | ctr_optimizer | competitor_diff | citation_batch
 #
 # Pourquoi le VPS plutot que GitHub Actions :
 #   - horaires fiables (Actions retarde les crons et les coupe apres 60j sans commit),
@@ -29,13 +29,16 @@ fi
 #   PERPLEXITY_API_KEY=...     # citation_batch seulement
 #   USD_CHF_RATE=0.88          # optionnel
 #   PUSH_REPORTS=1             # 1 = commit+push des rapports apres le run, 0 = local seul
+#   INSTADECO_BASE_URL=https://instadeco.app   # ctr_optimizer : POST des overrides
+#   CRON_SECRET=...            # ctr_optimizer : Bearer de l'endpoint /api/cron/ctr-optimize
 : "${REPO_DIR:?REPO_DIR manquant (ex: /opt/instadeco/instadeco-ai)}"
 : "${VENV_DIR:?VENV_DIR manquant (ex: /opt/instadeco/seo-venv)}"
 : "${GSC_SITE_URL:?GSC_SITE_URL manquant (ex: https://instadeco.app)}"
 export GOOGLE_APPLICATION_CREDENTIALS GSC_SITE_URL GA4_PROPERTY_ID PAGESPEED_API_KEY \
-       OPENAI_API_KEY PERPLEXITY_API_KEY USD_CHF_RATE
+       OPENAI_API_KEY PERPLEXITY_API_KEY USD_CHF_RATE \
+       INSTADECO_BASE_URL CRON_SECRET CTR_MIN_IMPRESSIONS CTR_MAX_POSITION
 
-job="${1:?Usage: run-seo-engine.sh <gsc_daily|drift_check|rank_tracker|competitor_diff|citation_batch>}"
+job="${1:?Usage: run-seo-engine.sh <gsc_daily|drift_check|rank_tracker|ctr_optimizer|competitor_diff|citation_batch>}"
 ts() { date -u +"%Y-%m-%dT%H:%M:%SZ"; }
 
 cd "$REPO_DIR"
@@ -50,6 +53,7 @@ case "$job" in
   gsc_daily)       script="monitors/gsc_daily.py" ;;
   drift_check)     script="monitors/drift_check.py" ;;
   rank_tracker)    script="monitors/rank_tracker.py" ;;
+  ctr_optimizer)   script="monitors/ctr_optimizer.py" ;;
   competitor_diff) script="scrapers/competitor_diff.py" ;;
   citation_batch)  script="monitors/citation_batch.py" ;;
   *) echo "$(ts) [seo:${job}] job inconnu" && exit 1 ;;

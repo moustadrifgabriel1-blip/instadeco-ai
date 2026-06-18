@@ -6,6 +6,7 @@
 0 6  * * *   /opt/instadeco/run-seo-engine.sh gsc_daily      # KPIs Search Console (quotidien)
 30 6 * * *   /opt/instadeco/run-seo-engine.sh drift_check    # regressions on-page (quotidien)
 0 7  * * 1   /opt/instadeco/run-seo-engine.sh rank_tracker   # positions via GSC (hebdo lundi)
+0 8  * * 1   /opt/instadeco/run-seo-engine.sh ctr_optimizer  # auto-optimisation CTR titles (hebdo lundi)
 #
 # --- Jobs PAS ENCORE PRETS (squelettes) : decommenter quand implementes ---
 # 0 7  * * 0   /opt/instadeco/run-seo-engine.sh competitor_diff   # veille concurrents

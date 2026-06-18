@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { CITIES, City, CountryCode } from '@/src/shared/constants/cities';
+import { getTitleOverride } from '@/lib/seo/title-overrides';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -109,13 +110,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const city = CITIES.find((c) => c.slug === slug);
   if (!city) return { title: 'Page non trouvée' };
 
+  const path = `/architecte-interieur/${city.slug}`;
+
   // Title aligné sur la requête réellement tapée (« architecte d'intérieur [ville] »)
   // pour que l'internaute reconnaisse sa recherche dans le résultat : c'est le levier
   // CTR n°1 sur ces pages (impressions en page 1 mais 0 clic = title hors requête).
-  const title = `Architecte d'intérieur à ${city.name} : visualisez votre déco par IA`;
-  const description = `Architecte d'intérieur à ${city.name} (${city.region}) : visualisez votre futur intérieur en photo avant les travaux. Choisissez un style, l'IA habille la pièce en quelques secondes. Premier essai gratuit.`;
-
-  const path = `/architecte-interieur/${city.slug}`;
+  // La boucle d'auto-optimisation CTR (job VPS ctr_optimizer) peut écraser ces valeurs
+  // via la table seo_title_overrides quand GSC montre un meilleur angle de requête.
+  const override = await getTitleOverride(path);
+  const title = override?.title ?? `Architecte d'intérieur à ${city.name} : visualisez votre déco par IA`;
+  const description =
+    override?.metaDescription ??
+    `Architecte d'intérieur à ${city.name} (${city.region}) : visualisez votre futur intérieur en photo avant les travaux. Choisissez un style, l'IA habille la pièce en quelques secondes. Premier essai gratuit.`;
 
   // Barrière qualité : sur fr, on n'indexe que les villes qui passent le seuil
   // (traction réelle aujourd'hui, contenu enrichi à terme). Les autres restent
