@@ -1,8 +1,6 @@
 import type { Metadata } from 'next';
 import { ArrowRight, Palette, Home, Lightbulb } from 'lucide-react';
 import { VisiteExperience } from '../(prestige)/_components/visite-experience';
-import { LeadCaptureLazy } from '@/components/features/lead-capture-lazy';
-import { SocialProofToast } from '@/components/features/social-proof-toast';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { generateFAQSchema, generateHowToSchema } from '@/lib/seo/schemas';
 import { getLocalizedCanonicalUrl } from '@/lib/seo/config';
@@ -175,9 +173,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           </Link>
         </div>
       </section>
-
-      <LeadCaptureLazy variant="popup" delay={12000} />
-      <SocialProofToast initialDelay={10000} interval={30000} maxNotifications={6} />
     </main>
   );
 }

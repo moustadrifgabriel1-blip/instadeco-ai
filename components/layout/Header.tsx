@@ -75,9 +75,13 @@ export function Header() {
         'sticky top-0 z-50 w-full transition-all duration-300',
         scrolled
           ? prestige
-            ? 'bg-[#0c0a09]/85 backdrop-blur-md border-b border-[rgba(200,162,77,0.28)]'
+            ? 'bg-[#0c0a09]/90 backdrop-blur-md border-b border-[rgba(200,162,77,0.28)]'
             : 'bg-[--white]/95 backdrop-blur-md border-b border-[--border-color] shadow-soft'
-          : 'bg-transparent',
+          : prestige
+            // Fond nuit translucide meme en haut de page : le texte ivoire du mode
+            // prestige serait invisible sur le fond clair du body si le header etait transparent.
+            ? 'bg-[#0c0a09]/70 backdrop-blur-md'
+            : 'bg-transparent',
       )}
     >
       <div className="max-w-7xl mx-auto px-4">
