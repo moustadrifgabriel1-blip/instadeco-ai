@@ -20,8 +20,13 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
+
+      # Aligne npm sur la version qui maintient le lock (npm 11). Sans ca, npm 10
+      # resout @swc/helpers differemment et `npm ci` echoue sur un lock pourtant sain.
+      - name: Pin npm
+        run: npm install -g npm@11
 
       - name: Install dependencies
         run: npm ci
