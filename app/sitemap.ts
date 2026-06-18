@@ -165,14 +165,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   try {
     const { CITIES } = await import('@/src/shared/constants/cities');
+    const { isCityIndexable } = await import('@/lib/seo/pseo-quality');
 
-    cityIndexPage = withAlternatesForAllLocales('/architecte-interieur', {
+    // Hub fr uniquement (en/de en noindex).
+    cityIndexPage = frOnlySitemap('/architecte-interieur', {
       lastModified: now,
-      changeFrequency: 'weekly',
+      changeFrequency: 'weekly' as const,
       priority: 0.8,
     });
 
-    cityPages = CITIES.flatMap((city) =>
+    // Barrière qualité : on ne référence dans le sitemap que les villes
+    // réellement indexables (cohérence avec le robots de chaque page).
+    cityPages = CITIES.filter((city) => isCityIndexable(city.slug)).flatMap((city) =>
       frOnlySitemap(`/architecte-interieur/${city.slug}`, {
         lastModified: now,
         changeFrequency: 'monthly' as const,

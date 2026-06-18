@@ -12,6 +12,7 @@ import {
 import { JsonLd } from '@/lib/seo/json-ld';
 import { generateServiceSchema, generateBreadcrumbList, generateFAQSchema } from '@/lib/seo/schemas';
 import { getCanonicalUrl, getLocalizedCanonicalUrl, withLocalePath, frOnlyProgrammaticMeta } from '@/lib/seo/config';
+import { isCityIndexable, programmaticRobots } from '@/lib/seo/pseo-quality';
 import { LeadCaptureLazy } from '@/components/features/lead-capture-lazy';
 
 interface PageProps {
@@ -113,6 +114,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const path = `/architecte-interieur/${city.slug}`;
 
+  // Barrière qualité : sur fr, on n'indexe que les villes qui passent le seuil
+  // (traction réelle aujourd'hui, contenu enrichi à terme). Les autres restent
+  // en noindex,follow pour ne jamais polluer le domaine avec du thin content.
+  const programmatic = frOnlyProgrammaticMeta(locale, path);
+  const robots = locale === 'fr'
+    ? programmaticRobots(isCityIndexable(city.slug))
+    : programmatic.robots;
+
   return {
     title,
     description,
@@ -137,7 +146,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title,
       description,
     },
-    ...frOnlyProgrammaticMeta(locale, path),
+    ...programmatic,
+    robots,
   };
 }
 
