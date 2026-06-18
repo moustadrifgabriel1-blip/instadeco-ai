@@ -226,8 +226,8 @@ export function PrestigeRoomReveal() {
           {/* AVANT, pièce vide / datée (couche du dessous) */}
           <div className="absolute inset-0">
             <Image
-              src="https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/input-images/f88c9b68-eda4-4d67-bfb4-f631d21b37c6/1769793114162.jpg"
-              alt="Séjour banal et sans relief, photo envoyée par le client"
+              src="https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/input-images/f88c9b68-eda4-4d67-bfb4-f631d21b37c6/1781787540154.jpg"
+              alt="Salon vide aux murs nus, photo brute avant mise en scène"
               fill
               sizes="(min-width: 1024px) 1152px, 100vw"
               className="object-cover object-center"
@@ -245,8 +245,8 @@ export function PrestigeRoomReveal() {
             style={{ clipPath: 'inset(0 100% 0 0)' }}
           >
             <Image
-              src="https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/output-images/f88c9b68-eda4-4d67-bfb4-f631d21b37c6/1d5a7bb4-80dd-406e-85be-4226b553fbf6.jpg"
-              alt="Le même séjour mis en scène par le service, intérieur contemporain chaleureux"
+              src="https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/output-images/f88c9b68-eda4-4d67-bfb4-f631d21b37c6/6db76d94-51a7-4ab0-a469-2135720d76ff.jpg"
+              alt="Le même salon mis en scène par le service, intérieur mid-century chaleureux"
               fill
               sizes="(min-width: 1024px) 1152px, 100vw"
               className="object-cover object-center"
@@ -292,7 +292,7 @@ export function PrestigeRoomReveal() {
           >
             <div className="prestige-eyebrow !text-[var(--gold)]">Mise en scène appliquée</div>
             <p className="prestige-display mt-2 text-[clamp(1.4rem,3.4vw,2.4rem)] leading-tight">
-              Contemporain chaleureux,{' '}
+              Mid-century chaleureux,{' '}
               <span className="italic">livré en quelques secondes</span>
             </p>
           </div>
