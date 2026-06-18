@@ -4,8 +4,8 @@
   "description": "Transformez vos pièces en rendus décorés professionnels par IA",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#FFF8F5",
-  "theme_color": "#E07B54",
+  "background_color": "#0c0a09",
+  "theme_color": "#0c0a09",
   "orientation": "portrait",
   "icons": [
     {
