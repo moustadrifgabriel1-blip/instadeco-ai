@@ -89,7 +89,7 @@ export function PrestigeHero() {
       </div>
 
       {/* Contenu, relative z-10 au-dessus des couches de fond */}
-      <div className="relative z-10 mx-auto flex h-full max-w-6xl flex-col justify-end px-6 pb-[clamp(3rem,9vh,7rem)] sm:px-10">
+      <div className="prestige-hero-copy relative z-10 mx-auto flex h-full max-w-6xl flex-col justify-end px-6 pb-[clamp(3rem,9vh,7rem)] sm:px-10">
         {/* Sur-titre or */}
         <div
           className="prestige-anim prestige-eyebrow flex items-center gap-4"

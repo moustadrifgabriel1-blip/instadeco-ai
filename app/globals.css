@@ -428,21 +428,31 @@ body:has([data-prestige-root]) {
   will-change: transform;
 }
 
-/* Vignettage cinéma : assombrit les bords pour la lisibilité du texte */
+/* Vignettage cinéma : bords sombres + scrim bas marqué pour la lisibilité du texte.
+   Le haut reste respirant (image lumineuse), la moitié basse (zone du titre) plonge
+   franchement dans le nuit pour un contraste premium et un texte toujours net. */
 .prestige-vignette {
-  background: radial-gradient(
-      120% 90% at 50% 32%,
-      rgba(12, 10, 9, 0) 38%,
-      rgba(12, 10, 9, 0.55) 78%,
-      rgba(12, 10, 9, 0.92) 100%
+  background:
+    radial-gradient(
+      130% 100% at 50% 26%,
+      rgba(12, 10, 9, 0) 30%,
+      rgba(12, 10, 9, 0.5) 72%,
+      rgba(12, 10, 9, 0.9) 100%
     ),
     linear-gradient(
       180deg,
-      rgba(12, 10, 9, 0.6) 0%,
-      rgba(12, 10, 9, 0.15) 24%,
-      rgba(12, 10, 9, 0.2) 64%,
-      rgba(12, 10, 9, 0.95) 100%
+      rgba(12, 10, 9, 0.5) 0%,
+      rgba(12, 10, 9, 0.12) 26%,
+      rgba(12, 10, 9, 0.44) 52%,
+      rgba(12, 10, 9, 0.84) 80%,
+      rgba(12, 10, 9, 0.98) 100%
     );
+}
+
+/* Ombre de texte douce sur le contenu du hero : garantit la lisibilité de
+   l'eyebrow or et du sous-titre sur n'importe quelle photo, sans ternir l'image. */
+.prestige-hero-copy {
+  text-shadow: 0 2px 30px rgba(12, 10, 9, 0.6), 0 1px 4px rgba(12, 10, 9, 0.45);
 }
 
 /* Voile sur l'image « après » d'un comparateur (lisibilité légende) */
