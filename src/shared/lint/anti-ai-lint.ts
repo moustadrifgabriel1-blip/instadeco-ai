@@ -168,15 +168,18 @@ export function lintAntiAi(text: string): AntiAiResult {
   }
 
   // --- SOFT : débuts de phrase répétés ---
+  // Seuil proportionnel à la longueur : 3 sur un texte court, plus sur un long
+  // article (une répétition modérée est normale et humaine, pas un marqueur IA).
   const sentences = splitSentences(input);
   if (sentences.length >= 4) {
+    const threshold = Math.max(3, Math.ceil(sentences.length * 0.06));
     const starts = new Map<string, number>();
     for (const s of sentences) {
       const key = s.split(/\s+/).slice(0, 2).join(' ').toLowerCase();
       if (key) starts.set(key, (starts.get(key) ?? 0) + 1);
     }
     for (const [key, count] of starts) {
-      if (count >= 3) {
+      if (count >= threshold) {
         violations.push({ rule: 'repeated_start', severity: 'soft', excerpt: `"${key}" x${count}` });
       }
     }
