@@ -12,7 +12,12 @@ Le copy du site ne doit JAMAIS ressembler à du texte généré par IA. C'est un
 Le texte doit toujours être travaillé : phrases de longueurs variées, ton humain et direct, zéro tournure générique d'IA, zéro remplissage.
 
 ## Projet
-SaaS B2C de **décoration d'intérieur par IA** : l'utilisateur upload une photo de pièce, choisit un style, et reçoit un rendu "avant/après". Modèle freemium (essai gratuit → crédits payants Stripe). Objectif : 2000.-/mois de revenu. Domaine : instadeco.app.
+SaaS B2C de **décoration d'intérieur par IA** : l'utilisateur upload une photo de pièce, choisit un style, et reçoit un rendu "avant/après". Modèle freemium (essai gratuit → crédits payants Stripe). Domaine : instadeco.app.
+
+## Mission active : MRR Pro / immobilier (objectif 50k€/mois)
+Le moteur de revenu cible n'est PLUS le grand public (crédits 9,90€, achat ponctuel, zéro récurrence) mais l'**abonnement Pro** visant agents immobiliers, home stagers, promoteurs (FR+BE+Romandie). Page money `/fr/pro` : 3 paliers (Solo 19€/40 img, **Pro 49€ illimité fair-use**, Agence 99€/3 sièges), annuel −30%. Angle : « Vendez vos biens plus vite, sans 2 000€ de home staging ». **Boussole de priorisation : chaque tâche doit répondre « comment ça aide le MRR Pro ? ».**
+
+Le moteur technique est CONSTRUIT et déployé : tunnel Stripe Checkout + webhook abonnement (activation/renouvellement/annulation), gate illimité, multi-tenant Agence (tables `organizations`/`organization_members`), tracking funnel (Meta Pixel + GA, events `InitiateCheckout`/`Purchase` dans `lib/analytics/`), DA prestige, pSEO. **Le goulot vers 50k n'est donc plus le code mais l'ACQUISITION** (outbound agents immo, playbook `docs/ACQUISITION_PRO_M4.md`). Prérequis bloquant côté user : valider le tunnel bout en bout (1 génération réelle + 1 abo test). Règle copy `/fr/pro` : aucune stat chiffrée non sourçable (reformuler en bénéfice), preuve = vrais avant/après de la table `generations` (compte démo `f88c9b68-...` uniquement sur pages indexées, RGPD).
 
 ## Stack
 - **Next.js 15** (App Router) + **TypeScript strict** + **React 18**
