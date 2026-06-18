@@ -16,8 +16,7 @@ import * as path from 'path';
 dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
 
 import { createClient } from '@supabase/supabase-js';
-import { ROOM_TYPES } from '@/src/shared/constants/styles';
-import { STYLES } from '@/src/shared/constants/styles';
+import { ROOM_TYPES, STYLES } from '@/src/shared/constants/styles';
 import { lintAntiAi, sanitizeAntiAi } from '@/src/shared/lint/anti-ai-lint';
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
