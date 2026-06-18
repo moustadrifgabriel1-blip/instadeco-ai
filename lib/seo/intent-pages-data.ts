@@ -404,6 +404,88 @@ export const INTENT_PAGES: IntentPageData[] = [
     ],
     keywords: ['avant après décoration', 'transformation pièce', 'relooking intérieur', 'avant après home staging', 'transformation décoration', 'avant après déco'],
   },
+  {
+    slug: 'home-staging-virtuel-agents-immobiliers',
+    title: 'Home staging virtuel pour agents immobiliers',
+    metaTitle: 'Home staging virtuel pour agents immobiliers',
+    metaDescription: "Le home staging virtuel par IA pensé pour les agences immobilières. Transformez la photo d'un bien vide ou daté en intérieur désirable, prêt à publier, en quelques secondes. Soignez chaque annonce de votre portefeuille.",
+    hero: {
+      headline: 'Home staging virtuel pour agents immobiliers',
+      subheadline:
+        "Transformez la photo d'un bien vide ou démodé en intérieur désirable, prêt à publier dans votre annonce. Vous envoyez la photo, vous choisissez la mise en scène, le rendu revient en quelques secondes. La force d'un home staging, sans les semaines ni le budget.",
+      cta: 'Voir les offres Pro',
+      ctaLink: '/pro',
+    },
+    problem: {
+      title: "Le home staging classique ne suit pas le rythme d'une agence",
+      points: [
+        'Un home staging physique coûte entre 2 000 et 15 000 euros par bien, impossible à engager sur chaque mandat.',
+        'Comptez deux à quatre semaines entre la décision et la pièce prête à photographier.',
+        'Mobilier à louer, stager à coordonner, transport à organiser pour chaque logement.',
+        'Un bien vide ou daté se visite moins et tire la négociation vers le bas.',
+      ],
+    },
+    solution: {
+      title: 'Mettez chaque bien en valeur avant la première visite',
+      description:
+        "InstaDeco habille vos pièces par intelligence artificielle. Vous partez d'une simple photo, même brute, et vous récupérez un rendu meublé et décoré, photoréaliste, dans le style qui parle à vos acheteurs. De quoi soigner chaque annonce de votre portefeuille, pas seulement les biens de prestige.",
+      benefits: [
+        { icon: 'clock', title: 'En quelques secondes', description: "Le rendu revient le temps d'un café, pas en plusieurs semaines." },
+        { icon: 'euro', title: 'Sans le budget staging', description: "Une fraction du coût d'un home staging physique, sur autant de biens que vous voulez." },
+        { icon: 'layers', title: 'Plusieurs ambiances', description: 'Testez moderne, classique ou chaleureux pour viser le bon acheteur.' },
+        { icon: 'camera', title: "Prêt pour l'annonce", description: 'Des rendus haute définition, directement publiables sur vos portails.' },
+      ],
+    },
+    comparison: {
+      title: 'Home staging virtuel ou physique : ce qui change pour une agence',
+      alternatives: [
+        { name: 'Home staging physique', price: '2 000 à 15 000 € par bien', time: '2 à 4 semaines', quality: 'Excellent' },
+        { name: 'Shooting 3D sur mesure', price: '300 à 800 € par image', time: 'Plusieurs jours', quality: 'Très bon' },
+        { name: 'InstaDeco (IA)', price: 'Abonnement dès 19 €/mois', time: 'Quelques secondes', quality: 'Professionnel', isUs: true },
+      ],
+    },
+    steps: [
+      { step: 1, title: 'Photographiez le bien', description: 'Une photo par pièce suffit, même vide ou mal éclairée.' },
+      { step: 2, title: 'Choisissez la mise en scène', description: 'Sélectionnez le style et le mobilier adaptés à votre cible.' },
+      { step: 3, title: "Publiez l'annonce", description: 'Récupérez le rendu en haute définition et intégrez-le à votre annonce.' },
+    ],
+    faq: [
+      {
+        question: 'Puis-je utiliser ces images dans mes annonces immobilières ?',
+        answer:
+          "Oui. Les rendus sont en haute définition et conviennent aux portails comme SeLoger, Immoweb ou Idealista. Indiquez simplement dans l'annonce que la pièce a fait l'objet d'un home staging virtuel, comme pour toute photo travaillée.",
+      },
+      {
+        question: 'Faut-il savoir manier un logiciel 3D ?',
+        answer:
+          "Non. Vous envoyez une photo, vous choisissez un style, vous récupérez le rendu. Aucune compétence technique requise, vos négociateurs s'en servent en autonomie.",
+      },
+      {
+        question: 'Est-ce que ça marche sur un bien déjà meublé ?',
+        answer:
+          "Oui. L'IA peut aussi rafraîchir une pièce occupée ou démodée pour révéler son potentiel, sans rien déplacer chez le vendeur.",
+      },
+      {
+        question: 'Combien de biens puis-je traiter ?',
+        answer:
+          "L'offre Pro est pensée pour un usage quotidien en agence, avec un forfait illimité en fair-use. De quoi soigner tout votre portefeuille, pas seulement les mandats de prestige.",
+      },
+      {
+        question: 'Est-ce honnête vis-à-vis des acheteurs ?',
+        answer:
+          "Oui, à condition de l'indiquer. Le home staging virtuel montre le potentiel d'aménagement d'un volume, comme un plan meublé. La transparence dans l'annonce protège votre relation de confiance.",
+      },
+    ],
+    keywords: [
+      'home staging virtuel agents immobiliers',
+      'home staging virtuel professionnel',
+      'home staging IA immobilier',
+      'mise en scène annonce immobilière',
+      'home staging virtuel agence',
+      'home staging virtuel pour vendre',
+      'logiciel home staging agent immobilier',
+    ],
+  },
 ];
 
 export function getIntentPageBySlug(slug: string): IntentPageData | undefined {

@@ -263,6 +263,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     'decoration-salon',
     'decoration-chambre',
     'avant-apres-decoration',
+    'home-staging-virtuel-agents-immobiliers',
   ].flatMap((slug) =>
     frOnlySitemap(`/solution/${slug}`, {
       lastModified: now,

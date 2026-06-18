@@ -46,6 +46,14 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 
 const SOLUTIONS = [
   {
+    slug: 'home-staging-virtuel-agents-immobiliers',
+    title: 'Home Staging Virtuel pour Agents Immobiliers',
+    icon: TrendingUp,
+    description: "Le home staging virtuel pensé pour les agences : transformez la photo d'un bien vide ou daté en intérieur désirable, prêt à publier, en quelques secondes.",
+    audience: 'Agences immobilières, Négociateurs, Home stagers',
+    benefit: 'Soignez chaque annonce de votre portefeuille, pas seulement les biens de prestige',
+  },
+  {
     slug: 'home-staging-virtuel',
     title: 'Home Staging Virtuel',
     icon: Home,
