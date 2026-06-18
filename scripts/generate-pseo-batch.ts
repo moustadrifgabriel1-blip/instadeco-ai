@@ -80,7 +80,9 @@ Réponds UNIQUEMENT avec le paragraphe, sans titre, sans préambule, sans guille
     signal: AbortSignal.timeout(120000),
     body: JSON.stringify({
       contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.9, maxOutputTokens: 2000, topP: 0.95, thinkingConfig: { thinkingBudget: 512 } },
+      // thinkingBudget bas : un paragraphe de 80 mots ne demande pas de
+      // raisonnement profond, et ça réduit nettement le coût par appel (budget).
+      generationConfig: { temperature: 0.9, maxOutputTokens: 1200, topP: 0.95, thinkingConfig: { thinkingBudget: 128 } },
     }),
   });
   if (!res.ok) throw new Error(`Gemini ${res.status}: ${(await res.text()).slice(0, 160)}`);

@@ -13,3 +13,4 @@
 0 9   * * *     /opt/instadeco/run-cron.sh blog-monitor
 0 10  * * *     /opt/instadeco/run-cron.sh email-nurturing
 0 14  * * 1,3,5 /opt/instadeco/run-cron.sh pinterest-post
+0 2   * * *     /opt/instadeco/run-cron.sh pseo-publish
