@@ -321,6 +321,28 @@ export default async function IntentPage({ params }: PageProps) {
         </div>
       </section>
 
+      {/* ===== GUIDES LIÉS (cluster hub-and-spoke : pillar -> spokes) ===== */}
+      {page.relatedArticles && page.relatedArticles.length > 0 && (
+        <section className="py-12 border-t border-border prestige-reveal">
+          <div className="container px-4 md:px-6 max-w-3xl mx-auto">
+            <h2 className="prestige-display text-2xl font-bold mb-6 text-foreground">Nos guides pour aller plus loin</h2>
+            <ul className="space-y-3">
+              {page.relatedArticles.map((a) => (
+                <li key={a.slug}>
+                  <Link
+                    href={`/blog/${a.slug}`}
+                    className="flex items-center justify-between gap-4 p-4 border border-border rounded-xl bg-card hover:border-[var(--gold-line)] transition-colors group"
+                  >
+                    <span className="font-medium text-foreground group-hover:text-[var(--gold)] transition-colors">{a.title}</span>
+                    <ChevronRight className="w-4 h-4 shrink-0 text-[var(--gold)]" />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )}
+
       {/* ===== PAGES LIÉES ===== */}
       <section className="py-12 border-t border-border prestige-reveal">
         <div className="container px-4 md:px-6 max-w-4xl mx-auto">

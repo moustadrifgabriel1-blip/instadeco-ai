@@ -47,6 +47,8 @@ export interface IntentPageData {
   faq: Array<{ question: string; answer: string }>;
   /** Keywords pour le SEO */
   keywords: string[];
+  /** Articles de blog liés (maillage hub-and-spoke : le pillar pointe vers ses spokes). */
+  relatedArticles?: Array<{ slug: string; title: string }>;
 }
 
 export const INTENT_PAGES: IntentPageData[] = [
@@ -484,6 +486,13 @@ export const INTENT_PAGES: IntentPageData[] = [
       'home staging virtuel agence',
       'home staging virtuel pour vendre',
       'logiciel home staging agent immobilier',
+    ],
+    relatedArticles: [
+      { slug: 'home-staging-virtuel-ou-physique-comparatif', title: 'Home staging virtuel ou physique : lequel choisir pour vendre un bien ?' },
+      { slug: 'home-staging-vend-il-plus-vite', title: 'Le home staging fait-il vraiment vendre plus vite ?' },
+      { slug: 'photos-annonce-immobiliere-qui-font-visiter', title: "Les photos d'annonce qui déclenchent les visites" },
+      { slug: 'vendre-bien-vide-ou-meuble-virtuellement', title: 'Vendre un bien vide ou le meubler virtuellement : que choisir ?' },
+      { slug: 'home-staging-virtuel-mentions-legales', title: 'Home staging virtuel : ce que dit la loi sur les photos retouchées' },
     ],
   },
 ];
