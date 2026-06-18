@@ -313,7 +313,7 @@ export default function ProPage() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="prestige-display text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Un bien meublé se vend <span className="text-[var(--gold)]">jusqu&apos;à 73% plus vite</span>
+              Un bien meublé se vend <span className="text-[var(--gold)]">nettement plus vite</span>
             </h2>
             <div className="prestige-rule w-24 mx-auto mb-6" />
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -357,7 +357,7 @@ export default function ProPage() {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { value: '−95%', label: 'vs un home staging physique' },
+              { value: '49€', label: 'par mois, vs 2 000€+ de staging physique' },
               { value: '~30s', label: 'pour transformer une pièce' },
               { value: '8', label: 'types de pièces supportés' },
               { value: 'HD+', label: 'jusqu\'à 2048px inclus' },
@@ -648,8 +648,8 @@ export default function ProPage() {
                 <p className="text-[var(--mist)] mt-2">vendu plus vite suffit à rentabiliser l&apos;année</p>
               </div>
               <div style={{ ['--reveal-d' as string]: '240ms' }} className="prestige-reveal">
-                <p className="prestige-display text-4xl font-bold text-[var(--gold)]">−95%</p>
-                <p className="text-[var(--mist)] mt-2">vs un home staging physique</p>
+                <p className="prestige-display text-4xl font-bold text-[var(--gold)]">Illimité</p>
+                <p className="text-[var(--mist)] mt-2">de rendus, pour autant de biens que vous voulez</p>
               </div>
             </div>
             <Link
