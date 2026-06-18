@@ -80,9 +80,10 @@ Réponds UNIQUEMENT avec le paragraphe, sans titre, sans préambule, sans guille
     signal: AbortSignal.timeout(120000),
     body: JSON.stringify({
       contents: [{ parts: [{ text: prompt }] }],
-      // thinkingBudget bas : un paragraphe de 80 mots ne demande pas de
-      // raisonnement profond, et ça réduit nettement le coût par appel (budget).
-      generationConfig: { temperature: 0.9, maxOutputTokens: 1200, topP: 0.95, thinkingConfig: { thinkingBudget: 128 } },
+      // thinkingBudget 512 : en dessous, gemini-3.1-pro renvoie parfois une
+      // sortie vide/tronquée (le thinking consomme tout). 512 est fiable et
+      // reste raisonnable pour un paragraphe court.
+      generationConfig: { temperature: 0.9, maxOutputTokens: 2000, topP: 0.95, thinkingConfig: { thinkingBudget: 512 } },
     }),
   });
   if (!res.ok) throw new Error(`Gemini ${res.status}: ${(await res.text()).slice(0, 160)}`);
@@ -110,7 +111,8 @@ async function main() {
     try {
       let para = sanitizeAntiAi(await geminiParagraph(c.roomName, c.styleName, c.constraint.label));
       let verdict = lintAntiAi(para);
-      if (!verdict.passed) {
+      // Retente si le gate échoue OU si la réponse est trop courte (sortie tronquée).
+      if (!verdict.passed || para.length < 200) {
         para = sanitizeAntiAi(await geminiParagraph(c.roomName, c.styleName, c.constraint.label, true));
         verdict = lintAntiAi(para);
       }
