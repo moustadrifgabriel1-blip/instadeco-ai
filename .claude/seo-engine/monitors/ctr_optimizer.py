@@ -184,7 +184,9 @@ def _build_title(path: str, query: str) -> str:
         slug = path.rsplit("/", 1)[-1]
         name = _load_cities().get(slug)
         if name:
-            return f"{_metier(query)} à {name} : visualisez votre déco par IA"[:68]
+            # Virgule (pas deux-points) : sanitizeAntiAi côté serveur supprime l'espace
+            # avant « : », ce qui casse la typo française. La virgule reste propre.
+            return f"{_metier(query)} à {name}, visualisez votre déco par IA"[:68]
     base = _title_case(query.strip())
     return f"{base} : le rendu déco par IA"[:68]
 
