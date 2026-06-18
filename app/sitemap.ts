@@ -271,6 +271,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }),
   );
 
+  // Pages pSEO publiées (drip-feed) : on ne référence que le statut 'published'.
+  let pseoPages: MetadataRoute.Sitemap = [];
+  try {
+    const { getSupabaseAdmin } = await import('@/lib/supabase/admin-client');
+    const { data } = await getSupabaseAdmin()
+      .from('pseo_pages')
+      .select('slug, updated_at')
+      .eq('status', 'published');
+    pseoPages = (data || []).flatMap((p: { slug: string; updated_at: string }) =>
+      frOnlySitemap(`/amenager/${p.slug}`, {
+        lastModified: p.updated_at ? new Date(p.updated_at) : now,
+        changeFrequency: 'monthly' as const,
+        priority: 0.5,
+      }),
+    );
+  } catch (error) {
+    console.error('Error loading pseo_pages for sitemap:', error);
+  }
+
   return [
     ...staticPages,
     ...blogIndexPage,
@@ -281,5 +300,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...roomPages,
     ...solutionPages,
     ...decoPages,
+    ...pseoPages,
   ];
 }
