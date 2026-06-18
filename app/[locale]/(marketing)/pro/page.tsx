@@ -8,6 +8,7 @@ import { useRouter } from '@/i18n/navigation';
 import { createSubscriptionSession } from '@/src/presentation/api/client';
 import { trackBeginCheckout } from '@/lib/analytics/gtag';
 import { fbTrackInitiateCheckout, fbTrackViewContent } from '@/lib/analytics/fb-pixel';
+import { PrestigeCompare } from '@/components/prestige/prestige-compare';
 import {
   Building2, Camera, Check, ArrowRight,
   Shield, ChevronDown, Home,
@@ -89,27 +90,33 @@ function formatPrice(n: number): string {
   return Number.isInteger(n) ? String(n) : n.toFixed(2).replace('.', ',');
 }
 
-const PRO_USE_CASES = [
+const PRO_USE_CASES: {
+  profile: string;
+  role: string;
+  useCase: string;
+  benefit: string;
+  icon: LucideIcon;
+}[] = [
   {
     profile: 'Agents immobiliers',
     role: 'Home staging virtuel',
     useCase: 'Meublez virtuellement vos biens vides (ou restylez une pièce occupée) pour aider les acquéreurs à se projeter. Un bien meublé se vend nettement plus vite.',
     benefit: 'Vendez plus vite',
-    icon: '🏢',
+    icon: Building2,
   },
   {
     profile: 'Home stagers',
     role: 'Validation rapide',
     useCase: 'Montrez un rendu IA à vos clients pour valider la direction déco avant de réaliser le staging physique. Réduisez les allers-retours.',
     benefit: "Moins d'allers-retours",
-    icon: '🎨',
+    icon: Palette,
   },
   {
     profile: 'Agences & promoteurs',
     role: "À l'échelle",
     useCase: 'Équipez vos équipes pour ajouter une version « meublée virtuellement » à chaque annonce. Illimité, résultat en ~30 secondes, facturation centralisée.',
     benefit: 'Illimité, multi-sièges',
-    icon: '🏗️',
+    icon: Building,
   },
 ];
 
@@ -143,6 +150,30 @@ const USE_CASES = [
     title: 'Architectes d\'intérieur',
     description: 'Montrez à vos clients un avant/après instantané pour valider la direction déco.',
     stat: 'Résultat en quelques secondes',
+  },
+];
+
+// Rendus réels (compte démo propriétaire, conformes RGPD pour page indexée).
+const REAL_RENDERS = [
+  {
+    before:
+      'https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/input-images/f88c9b68-eda4-4d67-bfb4-f631d21b37c6/1769793114162.jpg',
+    after:
+      'https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/output-images/f88c9b68-eda4-4d67-bfb4-f631d21b37c6/1d5a7bb4-80dd-406e-85be-4226b553fbf6.jpg',
+    beforeAlt: 'Salon vide avant home staging virtuel',
+    afterAlt: 'Salon meublé style moderne après home staging virtuel par IA',
+    eyebrow: 'Salon, style moderne',
+    caption: 'Vide à meublé en 10 secondes',
+  },
+  {
+    before:
+      'https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/input-images/f88c9b68-eda4-4d67-bfb4-f631d21b37c6/1772391372984.jpg',
+    after:
+      'https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/output-images/f88c9b68-eda4-4d67-bfb4-f631d21b37c6/3612608f-23fe-459e-9415-e703e1f8566e.jpg',
+    beforeAlt: 'Chambre vide avant home staging virtuel',
+    afterAlt: 'Chambre meublée chaleureuse après home staging virtuel par IA',
+    eyebrow: 'Chambre, ambiance chaleureuse',
+    caption: 'La même pièce, prête à séduire un acheteur',
   },
 ];
 
@@ -413,6 +444,46 @@ export default function ProPage() {
         </div>
       </section>
 
+      {/* ===== RENDUS RÉELS (PREUVE) ===== */}
+      <section className="py-20 bg-card prestige-reveal">
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="prestige-display text-3xl md:text-4xl font-bold text-foreground mb-4">
+              Des rendus réels, pas des promesses
+            </h2>
+            <div className="prestige-rule w-24 mx-auto mb-6" />
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Glissez le curseur. Chaque image a été générée par InstaDeco à partir d&apos;une
+              vraie photo de pièce, en quelques secondes.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            {REAL_RENDERS.map((r, i) => (
+              <PrestigeCompare
+                key={r.after}
+                before={r.before}
+                after={r.after}
+                beforeAlt={r.beforeAlt}
+                afterAlt={r.afterAlt}
+                eyebrow={r.eyebrow}
+                caption={r.caption}
+                priority={i === 0}
+              />
+            ))}
+          </div>
+
+          <div className="text-center mt-10">
+            <Link
+              href="/generate"
+              className="inline-flex items-center gap-2 bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)] px-8 py-4 rounded-full text-base font-semibold transition-all"
+            >
+              Testez sur votre propre photo <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* ===== CAS D'USAGE PROS ===== */}
       <section className="py-20 prestige-reveal">
         <div className="max-w-6xl mx-auto px-6">
@@ -430,7 +501,9 @@ export default function ProPage() {
                 style={{ ['--reveal-d' as string]: `${i * 120}ms` }}
                 className="prestige-reveal bg-card rounded-2xl p-8 border border-[var(--gold-line)]"
               >
-                <div className="text-4xl mb-4">{t.icon}</div>
+                <div className="mb-4 inline-flex p-3 bg-[rgba(200,162,77,0.12)] border border-[var(--gold-line)] rounded-xl">
+                  <t.icon className="w-6 h-6 text-[var(--gold)]" />
+                </div>
                 <h3 className="prestige-display font-semibold text-foreground text-lg mb-2">{t.profile}</h3>
                 <p className="prestige-eyebrow mb-4">{t.role}</p>
                 <p className="text-muted-foreground leading-relaxed mb-4">{t.useCase}</p>
