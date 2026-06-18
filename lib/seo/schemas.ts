@@ -223,6 +223,43 @@ export function generateFAQSchema(items: Array<{
   };
 }
 
+/**
+ * Schema HowTo : décrit le flux réel d'utilisation (photo -> style -> rendu).
+ * Étapes factuelles, aucune invention. Utile pour AI Overviews et rich results.
+ */
+export function generateHowToSchema() {
+  return {
+    '@type': 'HowTo',
+    name: 'Comment redécorer une pièce avec InstaDeco AI',
+    description:
+      "Transformer la photo d'une pièce en rendu décoré photoréaliste avec l'IA, en trois étapes.",
+    totalTime: 'PT1M',
+    step: [
+      {
+        '@type': 'HowToStep',
+        position: 1,
+        name: 'Prendre une photo de la pièce',
+        text: "Photographier ou téléverser la pièce à redécorer, même en désordre. La structure (murs, fenêtres, sol) est préservée par l'IA.",
+        url: `${SEO_CONFIG.siteUrl}/fr/generate`,
+      },
+      {
+        '@type': 'HowToStep',
+        position: 2,
+        name: 'Choisir un style et le type de pièce',
+        text: 'Sélectionner un style de décoration (Moderne, Scandinave, Industriel, Japandi...) et le type de pièce.',
+        url: `${SEO_CONFIG.siteUrl}/fr/generate`,
+      },
+      {
+        '@type': 'HowToStep',
+        position: 3,
+        name: 'Recevoir le rendu',
+        text: "En quelques secondes, l'IA renvoie des propositions photoréalistes à comparer et télécharger.",
+        url: `${SEO_CONFIG.siteUrl}/fr/generate`,
+      },
+    ],
+  };
+}
+
 // ============================================
 // BLOG
 // ============================================

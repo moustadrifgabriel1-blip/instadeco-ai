@@ -5,7 +5,7 @@ import { Hero } from '@/components/features/landing/Hero';
 import { LeadCaptureLazy } from '@/components/features/lead-capture-lazy';
 import { SocialProofToast } from '@/components/features/social-proof-toast';
 import { JsonLd } from '@/lib/seo/json-ld';
-import { generateFAQSchema } from '@/lib/seo/schemas';
+import { generateFAQSchema, generateHowToSchema } from '@/lib/seo/schemas';
 import { getLocalizedCanonicalUrl } from '@/lib/seo/config';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
@@ -82,7 +82,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
   return (
     <main className="prestige-app min-h-screen">
-      <JsonLd data={[generateFAQSchema(faqData)]} />
+      <JsonLd data={[generateFAQSchema(faqData), generateHowToSchema()]} />
 
       <Hero />
       <HowItWorks />
