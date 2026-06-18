@@ -108,8 +108,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const city = CITIES.find((c) => c.slug === slug);
   if (!city) return { title: 'Page non trouvée' };
 
-  const title = `Architecte d'intérieur IA à ${city.name} (${city.zip}) - Rénovation & Déco`;
-  const description = `Habitant de ${city.name} ? Redécorez votre intérieur en 10s avec l'IA. Home Staging virtuel et simulation travaux pour ${city.zip}. Essai gratuit.`;
+  const title = `Déco intérieure par IA à ${city.name} : visualisez avant de rénover`;
+  const description = `Vous habitez ${city.name} ou sa région (${city.region}) ? Testez votre futur intérieur en photo avant de lancer les travaux ou d'appeler un architecte. Rendu photoréaliste en quelques secondes, premier essai gratuit.`;
 
   const path = `/architecte-interieur/${city.slug}`;
 
@@ -153,7 +153,7 @@ export default async function CityPage({ params }: PageProps) {
   const faqItems = [
     {
       question: `Est-ce vraiment moins cher qu'un architecte à ${city.name} ?`,
-      answer: `Oui, incomparablement. Une consultation à domicile à ${city.name} coûte entre 150€ et 300€. Notre IA réalise le même travail de visualisation pour quelques euros, instantanément.`,
+      answer: `Oui. Là où une prestation de conseil déco à domicile représente un vrai budget, notre IA vous donne un rendu photoréaliste de votre pièce pour quelques ${terms.currency}, en quelques secondes. Le premier essai est gratuit.`,
     },
     {
       question: `Puis-je l'utiliser pour vendre mon bien immobilier ?`,
@@ -166,6 +166,7 @@ export default async function CityPage({ params }: PageProps) {
       <JsonLd data={[
         generateServiceSchema({
           name: city.name,
+          slug: city.slug,
           region: city.region,
           zip: city.zip,
           country: city.country,
@@ -351,7 +352,7 @@ export default async function CityPage({ params }: PageProps) {
                   <div className="w-10 h-10 rounded-full bg-[rgba(200,162,77,0.12)] border border-[var(--gold-line)] text-[var(--gold)] flex items-center justify-center font-bold text-xl">2</div>
                   <div>
                     <h4 className="prestige-display text-xl font-bold">Choisissez un style</h4>
-                    <p className="text-muted-foreground">Plus de 20 styles disponibles (Moderne, Vintage, Zen...).</p>
+                    <p className="text-muted-foreground">De nombreux styles au choix (Moderne, Scandinave, Industriel, Japandi...).</p>
                   </div>
                 </div>
                 <div className="flex gap-4">
@@ -441,8 +442,9 @@ export default async function CityPage({ params }: PageProps) {
                 <ArrowRight className="h-4 w-4 text-[var(--gold)] transition-transform group-open:rotate-90" />
               </summary>
               <div className="pt-4 text-muted-foreground">
-                Oui, incomparablement. Une consultation à domicile à {city.name} coûte entre 150€ et 300€.
-                Notre IA réalise le même travail de visualisation pour quelques euros, instantanément.
+                Oui. Là où une prestation de conseil déco à domicile représente un vrai budget,
+                notre IA vous donne un rendu photoréaliste de votre pièce pour quelques {terms.currency},
+                en quelques secondes. Le premier essai est gratuit.
               </div>
             </details>
             <details className="prestige-reveal group border border-[var(--gold-line)] rounded-xl bg-card p-6 transition duration-300 ease" style={{ ['--reveal-d' as string]: '240ms' }}>

@@ -352,6 +352,7 @@ export function generateBreadcrumbList(
  */
 export function generateServiceSchema(city: {
   name: string;
+  slug: string;
   region: string;
   zip: string;
   country: string;
@@ -361,7 +362,8 @@ export function generateServiceSchema(city: {
     '@type': 'Service',
     name: `Décoration d'intérieur par IA à ${city.name}`,
     description: `Service en ligne de décoration d'intérieur et home staging virtuel par IA, disponible à ${city.name} (${city.region}).`,
-    url: getCanonicalUrl(`/architecte-interieur/${city.name.toLowerCase().replace(/\s+/g, '-')}`),
+    // URL basée sur le slug réel de la route (gère les accents : Genève -> geneve).
+    url: getCanonicalUrl(`/architecte-interieur/${city.slug}`),
     provider: {
       '@type': 'Organization',
       '@id': `${SEO_CONFIG.siteUrl}/#organization`,

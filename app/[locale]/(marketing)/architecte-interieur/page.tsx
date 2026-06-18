@@ -3,14 +3,27 @@ import Link from 'next/link';
 import { CITIES, City } from '@/src/shared/constants/cities';
 import { Button } from '@/components/ui/button';
 import { MapPin, ArrowRight } from 'lucide-react';
+import { frOnlyProgrammaticMeta, getLocalizedCanonicalUrl } from '@/lib/seo/config';
 
-export const metadata: Metadata = {
-  title: 'Architecte d\'Intérieur par Ville - IA & Décoration | InstaDeco',
-  description: 'Trouvez des idées de décoration adaptées à l\'architecture de votre ville en France, Belgique et Suisse. Rénovez votre intérieur avec notre IA.',
-  alternates: {
-    canonical: 'https://instadeco.app/architecte-interieur',
-  },
-};
+export async function generateMetadata(
+  { params }: { params: Promise<{ locale: string }> }
+): Promise<Metadata> {
+  const { locale } = await params;
+  const path = '/architecte-interieur';
+  const title = "Architecte d'intérieur par IA, ville par ville | InstaDeco";
+  const description = "Des idées de décoration adaptées à l'architecture de votre ville, en France, Belgique et Suisse. Réinventez votre intérieur avec notre IA, premier essai gratuit.";
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+      url: getLocalizedCanonicalUrl(locale, path),
+    },
+    ...frOnlyProgrammaticMeta(locale, path),
+  };
+}
 
 export default function CitiesIndexPage() {
   // Grouper les villes par pays
@@ -23,9 +36,9 @@ export default function CitiesIndexPage() {
   }, {} as Record<string, City[]>);
 
   const countryNames = {
-    'FR': 'France 🇫🇷',
-    'BE': 'Belgique 🇧🇪',
-    'CH': 'Suisse 🇨🇭',
+    'FR': 'France',
+    'BE': 'Belgique',
+    'CH': 'Suisse',
   };
 
   return (
