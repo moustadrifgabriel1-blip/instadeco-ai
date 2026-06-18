@@ -8,7 +8,6 @@ import { Plus, ArrowRight, Sparkles, Shield, Zap, Star, Check, UserPlus, Gift, S
 import type { LucideIcon } from 'lucide-react';
 import { FlashOffer } from '@/components/features/flash-offer';
 import { ShareButtons } from '@/components/features/share-buttons';
-import { SocialProofToast } from '@/components/features/social-proof-toast';
 import { LeadCaptureLazy } from '@/components/features/lead-capture-lazy';
 import { trackTrialStart, trackTrialComplete, trackLeadCaptured } from '@/lib/analytics/gtag';
 import { compressImageToDataUrl } from '@/lib/image/compress-client';
@@ -694,7 +693,6 @@ export default function EssaiPage() {
           )}
         </div>
       </section>
-      <SocialProofToast initialDelay={5000} interval={20000} maxNotifications={5} />
       {/* Exit-intent popup pour capturer les emails avant départ */}
       <LeadCaptureLazy variant="popup" delay={30000} />
     </div>

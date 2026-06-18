@@ -29,7 +29,6 @@ import { useRouter } from '@/i18n/navigation';
 import { useSearchParams } from 'next/navigation';
 import { usePurchaseCredits } from '@/src/presentation/hooks/usePurchaseCredits';
 import { createSubscriptionSession } from '@/src/presentation/api/client';
-import { SocialProofToast } from '@/components/features/social-proof-toast';
 import { LeadCaptureLazy } from '@/components/features/lead-capture-lazy';
 import { CreditPackId, SubscriptionPlanId, BillingInterval } from '@/src/presentation/types';
 
@@ -671,7 +670,6 @@ function PricingPage() {
           </div>
         </div>
       </div>
-      <SocialProofToast initialDelay={6000} interval={20000} maxNotifications={8} />
       {/* Exit-intent popup pour capturer les emails avant départ */}
       <LeadCaptureLazy variant="popup" delay={20000} />
     </div>
