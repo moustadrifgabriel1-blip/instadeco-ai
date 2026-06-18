@@ -20,6 +20,10 @@ interface PageProps {
   params: Promise<{ locale: string; slug: string }>;
 }
 
+// ISR : régénère chaque page une fois par jour pour relire les overrides de title
+// produits par la boucle CTR (table seo_title_overrides) sans attendre un redéploiement.
+export const revalidate = 86400;
+
 // Génération des routes statiques
 export function generateStaticParams() {
   return CITIES.map((city) => ({
