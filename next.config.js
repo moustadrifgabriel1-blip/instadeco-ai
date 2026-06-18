@@ -165,6 +165,28 @@ const nextConfig = {
         destination: '/fr/blog/:slug+',
         permanent: true,
       },
+      // 301 anti-cannibalisation : les articles en double (depubliés) redirigent
+      // vers l'article gardé, pour concentrer le jus SEO sur une seule URL par sujet.
+      {
+        source: '/fr/blog/home-staging-geneve-vendez-votre-bien-2x-plus-vite-et-plus-cher',
+        destination: '/fr/blog/home-staging-geneve-vendez-plus-vite-au-meilleur-prix',
+        permanent: true,
+      },
+      {
+        source: '/fr/blog/decoration-avec-plantes-vertes-votre-oasis-de-bien-etre-immediat',
+        destination: '/fr/blog/decoration-avec-plantes-vertes-7-secrets-pour-un-interieur-vibrant-et-apaisant',
+        permanent: true,
+      },
+      {
+        source: '/fr/blog/votre-bureau-a-domicile-7-secrets-pour-une-productivite-maximale',
+        destination: '/fr/blog/home-office-ergonomique-design-le-plan-en-5-etapes-dun-pro-pour-un-bureau-sans-douleur',
+        permanent: true,
+      },
+      {
+        source: '/fr/blog/decoration-tons-neutres-chaleureux-creez-votre-cocon-apaisant',
+        destination: '/fr/blog/palette-de-couleurs-neutres-le-secret-dun-interieur-apaisant',
+        permanent: true,
+      },
       // Trailing slash removal
       {
         source: '/:path+/',

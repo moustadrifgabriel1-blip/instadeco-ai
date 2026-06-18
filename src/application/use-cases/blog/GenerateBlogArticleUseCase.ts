@@ -13,6 +13,7 @@ import { ArticleGenerationError } from '../../../domain/errors/ArticleGeneration
 import { DuplicateArticleError } from '../../../domain/errors/DuplicateArticleError';
 import { BlogArticleDTO, GenerateArticleResponseDTO } from '../../dtos/BlogArticleDTO';
 import { BlogArticleMapper } from '../../mappers/BlogArticleMapper';
+import { lintAntiAi, sanitizeAntiAi } from '../../../shared/lint/anti-ai-lint';
 
 // Génération d'UUID simple sans dépendance externe
 function generateUUID(): string {
@@ -97,31 +98,40 @@ export class GenerateBlogArticleUseCase {
         throw DuplicateArticleError.slugExists(slug);
       }
 
-      // 6. Post-processing anti-IA
+      // 6. Post-processing anti-IA (humanisation)
       const cleanedContent = this.antiAIProcessor.process(generatedContent.content);
-      const antiAIResult = this.antiAIProcessor.getScore(cleanedContent);
-
-      if (antiAIResult.score < 50) {
-        console.warn(`Score anti-IA faible (${antiAIResult.score}/100):`, antiAIResult.issues);
-      }
 
       // 7. Ajouter les liens internes
       // Note: On passe undefined pour l'ID car l'article n'est pas encore créé
       const linkResult = await this.internalLinksService.addInternalLinks(cleanedContent, undefined, sessionType);
-      const contentWithLinks = linkResult.content;
 
-      // 8. Créer l'entité article
+      // 8. Barrière qualité anti-IA (gate déterministe). On assainit les
+      // violations réparables (tirets, emojis) sur titre, meta et corps, puis on
+      // vérifie. Un contenu qui ne passe pas part en DRAFT (jamais publié tel
+      // quel) : c'est le garde-fou permanent contre le contenu détectable IA.
+      const finalTitle = sanitizeAntiAi(generatedContent.title);
+      const finalMeta = sanitizeAntiAi(generatedContent.metaDescription);
+      const finalContent = sanitizeAntiAi(linkResult.content);
+      const verdict = lintAntiAi(`${finalTitle}\n${finalMeta}\n${finalContent}`);
+      if (!verdict.passed) {
+        console.warn(
+          `[blog] gate anti-IA non passé (score ${verdict.score}/100), article en draft:`,
+          verdict.violations.slice(0, 5),
+        );
+      }
+
+      // 9. Créer l'entité article
       const article = createBlogArticle({
         id: generateUUID(),
-        title: generatedContent.title,
+        title: finalTitle,
         slug,
-        content: contentWithLinks,
-        metaDescription: generatedContent.metaDescription,
+        content: finalContent,
+        metaDescription: finalMeta,
         tags: generatedContent.tags,
-        status: 'published',
+        status: verdict.passed ? 'published' : 'draft',
         sessionType,
         source: `${sessionType}-automation`,
-        antiAIScore: antiAIResult.score,
+        antiAIScore: verdict.score,
         language,
       });
 

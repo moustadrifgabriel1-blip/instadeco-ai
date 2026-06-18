@@ -219,13 +219,6 @@ export class AntiAIPostProcessor {
     },
   ];
 
-  // Variations de ponctuation pour humaniser
-  private readonly sentenceVariations = [
-    { pattern: /\. /g, weight: 0.05, replacement: '... ' },
-    { pattern: /\. /g, weight: 0.03, replacement: ' – ' },
-    { pattern: /!\s/g, weight: 0.2, replacement: '. ' },
-  ];
-
   async process(content: string): Promise<ProcessingResult> {
     const modifications: string[] = [];
     let processedContent = content;
