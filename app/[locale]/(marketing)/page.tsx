@@ -1,7 +1,6 @@
-import dynamic from 'next/dynamic';
 import type { Metadata } from 'next';
 import { ArrowRight, Palette, Home, Lightbulb } from 'lucide-react';
-import { Hero } from '@/components/features/landing/Hero';
+import { VisiteExperience } from '../(prestige)/_components/visite-experience';
 import { LeadCaptureLazy } from '@/components/features/lead-capture-lazy';
 import { SocialProofToast } from '@/components/features/social-proof-toast';
 import { JsonLd } from '@/lib/seo/json-ld';
@@ -11,36 +10,6 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { routing } from '@/i18n/routing';
 import { notFound } from 'next/navigation';
-
-const HowItWorks = dynamic(() =>
-  import('@/components/features/landing/HowItWorks').then((mod) => ({ default: mod.HowItWorks })),
-  { loading: () => <div className="min-h-[400px]" /> },
-);
-
-const Gallery = dynamic(() =>
-  import('@/components/features/landing/Gallery').then((mod) => ({ default: mod.Gallery })),
-  { loading: () => <div className="min-h-[400px]" /> },
-);
-
-const Features = dynamic(() =>
-  import('@/components/features/landing/Features').then((mod) => ({ default: mod.Features })),
-  { loading: () => <div className="min-h-[400px]" /> },
-);
-
-const Stats = dynamic(() =>
-  import('@/components/features/landing/Stats').then((mod) => ({ default: mod.Stats })),
-  { loading: () => <div className="min-h-[200px]" /> },
-);
-
-const Testimonials = dynamic(() =>
-  import('@/components/features/landing/Testimonials').then((mod) => ({ default: mod.Testimonials })),
-  { loading: () => <div className="min-h-[400px]" /> },
-);
-
-const FinalCTA = dynamic(() =>
-  import('@/components/features/landing/FinalCTA').then((mod) => ({ default: mod.FinalCTA })),
-  { loading: () => <div className="min-h-[200px]" /> },
-);
 
 const POPULAR_STYLE_SLUGS = ['moderne', 'scandinave', 'industriel', 'boheme', 'japandi', 'minimaliste'] as const;
 
@@ -84,13 +53,9 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     <main className="prestige-app min-h-screen">
       <JsonLd data={[generateFAQSchema(faqData), generateHowToSchema()]} />
 
-      <Hero />
-      <HowItWorks />
-      <Gallery />
-      <Features />
-      <Stats />
-      <Testimonials />
-      <FinalCTA />
+      {/* Expérience cinématique de prestige (ex page /visite), désormais en tête
+          de la home. Le contenu SEO (maillage interne, FAQ, blog) suit dessous. */}
+      <VisiteExperience />
 
       <section className="py-16 bg-muted/20 border-t">
         <div className="container px-4 md:px-6">

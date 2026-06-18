@@ -187,6 +187,18 @@ const nextConfig = {
         destination: '/fr/blog/palette-de-couleurs-neutres-le-secret-dun-interieur-apaisant',
         permanent: true,
       },
+      // L'ancienne maquette /visite est devenue la page d'accueil : 301 vers la
+      // racine localisée pour concentrer le jus SEO sur une seule URL.
+      {
+        source: '/:locale(fr|en|de)/visite',
+        destination: '/:locale',
+        permanent: true,
+      },
+      {
+        source: '/visite',
+        destination: '/fr',
+        permanent: true,
+      },
       // Trailing slash removal
       {
         source: '/:path+/',

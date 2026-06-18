@@ -1,27 +1,29 @@
 'use client';
 
-import { PrestigeHero } from '../_components/prestige-hero';
-import { PrestigeRoomReveal } from '../_components/prestige-room-reveal';
-import { PrestigeEditorial } from '../_components/prestige-editorial';
-import { PrestigeClimax } from '../_components/prestige-climax';
-import { PrestigeService } from '../_components/prestige-service';
-import { PrestigeSignature } from '../_components/prestige-signature';
+import { PrestigeHero } from './prestige-hero';
+import { PrestigeRoomReveal } from './prestige-room-reveal';
+import { PrestigeEditorial } from './prestige-editorial';
+import { PrestigeClimax } from './prestige-climax';
+import { PrestigeService } from './prestige-service';
+import { PrestigeSignature } from './prestige-signature';
 import { usePrestigeSmoothScroll } from '@/lib/prestige-scroll';
 
 /**
- * /[locale]/visite, Maquette FLAGSHIP « Visite de prestige ».
+ * Expérience cinématique « Visite de prestige », montée en tête de la page
+ * d'accueil. Une visite guidée pièce après pièce qui garde le plus beau pour
+ * la fin, puis laisse la place au contenu SEO de la home.
  *
- * Une visite guidée, pièce après pièce, qui garde le plus beau pour la fin.
- * Page isolée (route group (prestige)) pour validation avant de dérouler la
- * refonte complète. Header/footer marketing masqués via le marqueur
- * data-prestige-root (cf. prestige.css). Smooth scroll Lenis + GSAP
- * ScrollTrigger montés ici, désactivés si prefers-reduced-motion.
+ * Contrairement à l'ancienne page /visite isolée, ce wrapper NE pose PAS
+ * data-prestige-root : le header et le footer globaux restent donc visibles
+ * (navigation + CTA vers /pro, essentiels au maillage et au MRR). La DA nuit
+ * + or vient de la classe prestige-root (fond noir, variables). Smooth scroll
+ * Lenis + GSAP ScrollTrigger montés ici, désactivés si prefers-reduced-motion.
  */
-export default function VisitePage() {
+export function VisiteExperience() {
   usePrestigeSmoothScroll();
 
   return (
-    <div data-prestige-root>
+    <div className="prestige-root prestige-body">
       {/* L'entrée */}
       <PrestigeHero />
 

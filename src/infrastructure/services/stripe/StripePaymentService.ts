@@ -89,6 +89,7 @@ export class StripePaymentService implements IPaymentService {
         line_items: [{ price: options.priceId, quantity: 1 }],
         success_url: options.successUrl,
         cancel_url: options.cancelUrl,
+        allow_promotion_codes: true,
         metadata: options.metadata,
         subscription_data: { metadata: options.subscriptionMetadata },
       });
