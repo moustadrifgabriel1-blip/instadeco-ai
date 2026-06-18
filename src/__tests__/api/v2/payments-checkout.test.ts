@@ -135,7 +135,9 @@ describe('POST /api/v2/payments/create-checkout', () => {
     const data = await response.json();
 
     expect(response.status).toBe(500);
-    expect(data.error).toBe('Stripe API error');
+    // Sécurité : le détail brut (pouvant contenir la clé API) ne doit jamais fuiter au client.
+    expect(data.error).not.toContain('Stripe');
+    expect(data.error).toContain('momentanément indisponible');
   });
 
   it('devrait retourner 500 en cas d\'exception', async () => {

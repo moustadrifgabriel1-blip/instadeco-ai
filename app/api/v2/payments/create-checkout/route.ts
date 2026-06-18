@@ -120,10 +120,17 @@ export async function POST(req: Request) {
     });
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error.message },
-        { status: result.error.statusCode }
-      );
+      const status = result.error.statusCode;
+      // Erreurs serveur (Stripe/interne) : logger le détail mais ne JAMAIS renvoyer le
+      // message brut au client (il peut contenir la clé API, cf. « Expired API Key ... »).
+      if (status >= 500) {
+        console.error('[Checkout] ❌ Erreur:', result.error.message);
+        return NextResponse.json(
+          { error: 'Le paiement est momentanément indisponible. Merci de réessayer dans quelques minutes.' },
+          { status }
+        );
+      }
+      return NextResponse.json({ error: result.error.message }, { status });
     }
 
     const { checkoutUrl, sessionId } = result.data;

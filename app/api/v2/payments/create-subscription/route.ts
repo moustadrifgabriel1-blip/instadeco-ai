@@ -63,10 +63,18 @@ export async function POST(req: Request) {
     });
 
     if (!result.success) {
-      // Plan/prix invalide → 400 (comme l'origine) ; erreur Stripe → 500.
-      const status = result.error instanceof InvalidSubscriptionPlanError ? 400 : 500;
-      if (status === 500) console.error('[Subscription] ❌ Erreur:', result.error.message);
-      return NextResponse.json({ error: result.error.message }, { status });
+      // Plan/prix invalide → 400 avec message utile (non sensible).
+      if (result.error instanceof InvalidSubscriptionPlanError) {
+        return NextResponse.json({ error: result.error.message }, { status: 400 });
+      }
+      // Erreur Stripe/interne : on logge le détail côté serveur mais on NE renvoie
+      // JAMAIS le message brut au client (il peut contenir la clé API, cf. « Expired
+      // API Key provided: sk_live_... »).
+      console.error('[Subscription] ❌ Erreur:', result.error.message);
+      return NextResponse.json(
+        { error: 'Le paiement est momentanément indisponible. Merci de réessayer dans quelques minutes.' },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({
