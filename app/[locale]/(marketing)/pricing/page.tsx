@@ -471,7 +471,29 @@ function PricingPage() {
             <div className="prestige-rule w-24 mx-auto mt-5" />
           </div>
           <div className="prestige-reveal rounded-2xl border border-[var(--gold-line)] overflow-hidden">
-            <div className="overflow-x-auto">
+            {/* Mobile : comparaison en cartes empilees (pas de scroll horizontal) */}
+            <div className="divide-y divide-[var(--gold-line)] sm:hidden">
+              {compareRows.map((row, idx) => (
+                <div key={idx} className={idx % 2 === 0 ? 'bg-card p-4' : 'bg-[rgba(200,162,77,0.04)] p-4'}>
+                  <p className="font-medium text-foreground mb-3">{row.label}</p>
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div className="rounded-lg bg-[rgba(200,162,77,0.08)] px-3 py-2">
+                      <p className="prestige-eyebrow text-[var(--gold)] mb-1">{t('compareColUs')}</p>
+                      <span className="inline-flex items-center gap-1 font-medium text-foreground">
+                        <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                        {row.us}
+                      </span>
+                    </div>
+                    <div className="px-3 py-2">
+                      <p className="text-xs text-muted-foreground mb-1">{t('compareColThem')}</p>
+                      <span className="text-muted-foreground">{row.them}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {/* Desktop : tableau classique */}
+            <div className="hidden sm:block overflow-x-auto">
             <table className="w-full text-sm min-w-[480px]">
               <thead>
                 <tr className="bg-[rgba(200,162,77,0.08)]">

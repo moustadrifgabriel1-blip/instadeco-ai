@@ -532,7 +532,7 @@ export default function ProPage() {
             <div className="inline-flex items-center bg-background border border-border rounded-full p-1">
               <button
                 onClick={() => setBillingPeriod('monthly')}
-                className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
+                className={`px-5 sm:px-6 py-2 rounded-full text-sm font-medium transition-all ${
                   billingPeriod === 'monthly' ? 'bg-[var(--gold)] text-[#0c0a09]' : 'text-muted-foreground'
                 }`}
               >
@@ -540,7 +540,7 @@ export default function ProPage() {
               </button>
               <button
                 onClick={() => setBillingPeriod('annual')}
-                className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
+                className={`px-5 sm:px-6 py-2 rounded-full text-sm font-medium transition-all ${
                   billingPeriod === 'annual' ? 'bg-[var(--gold)] text-[#0c0a09]' : 'text-muted-foreground'
                 }`}
               >
@@ -565,7 +565,7 @@ export default function ProPage() {
                   style={{ ['--reveal-d' as string]: `${i * 120}ms` }}
                   className={`prestige-reveal rounded-2xl p-8 transition-all ${
                     plan.popular
-                      ? 'bg-[var(--ink)] text-[var(--ivory)] ring-2 ring-[var(--gold)] shadow-2xl md:scale-105'
+                      ? 'bg-[var(--ink)] text-[var(--ivory)] ring-2 ring-[var(--gold)] shadow-2xl md:-translate-y-2'
                       : 'bg-background border border-border'
                   }`}
                 >

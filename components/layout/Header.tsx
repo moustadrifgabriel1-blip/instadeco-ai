@@ -86,7 +86,7 @@ export function Header() {
     >
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex h-16 items-center justify-between gap-4">
-          <Link href="/" className="flex items-center gap-2 font-bold text-xl group shrink-0">
+          <Link href="/" className="flex items-center gap-2 font-bold text-xl group shrink-0 min-w-0">
             <Image
               src={prestige ? '/images/logo-prestige.svg' : '/images/logo-v3-house-sparkle.svg'}
               alt="InstaDeco AI"
@@ -219,7 +219,7 @@ export function Header() {
             )}
           </div>
 
-          <div className="flex lg:hidden items-center gap-2">
+          <div className="flex lg:hidden items-center gap-2 shrink-0">
             <LanguageSwitcher />
             <button
               className={cn(
@@ -240,8 +240,10 @@ export function Header() {
 
         <div
           className={cn(
-            'lg:hidden overflow-hidden transition-all duration-300',
-            mobileMenuOpen ? 'max-h-[560px] opacity-100' : 'max-h-0 opacity-0',
+            'lg:hidden transition-all duration-300',
+            mobileMenuOpen
+              ? 'max-h-[calc(100dvh-4rem)] overflow-y-auto opacity-100'
+              : 'max-h-0 overflow-hidden opacity-0',
           )}
         >
           <div

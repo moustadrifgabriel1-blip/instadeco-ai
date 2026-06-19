@@ -388,7 +388,9 @@
   text-transform: uppercase;
   letter-spacing: 0.42em;
   font-weight: 300;
-  font-size: clamp(0.62rem, 1.4vw, 0.78rem);
+  /* Min remonte a ~11.5px : a 10px le label en majuscules tres espacees
+     devenait illisible sur petit telephone. */
+  font-size: clamp(0.72rem, 1.4vw, 0.8rem);
   color: var(--gold);
 }
 .prestige-rule {
