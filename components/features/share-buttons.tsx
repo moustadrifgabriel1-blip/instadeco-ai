@@ -119,7 +119,7 @@ export function ShareButtons({
       <div className={`relative ${className}`}>
         <button
           onClick={handleNativeShare}
-          className="w-10 h-10 flex items-center justify-center rounded-full bg-white/90 backdrop-blur-md shadow-lg hover:bg-[#FFF3ED] hover:shadow-xl transition-all duration-200 border border-black/5"
+          className="w-11 h-11 flex items-center justify-center rounded-full bg-white/90 backdrop-blur-md shadow-lg hover:bg-[#FFF3ED] hover:shadow-xl transition-all duration-200 border border-black/5"
           aria-label="Partager"
         >
           <Share2 className="w-4 h-4 text-[#E07B54]" />

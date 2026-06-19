@@ -225,7 +225,7 @@ function SignupForm() {
                 id="accept-terms"
                 checked={acceptTerms}
                 onChange={(e) => setAcceptTerms(e.target.checked)}
-                className="mt-1 h-4 w-4 rounded border-border bg-background text-[var(--gold)] accent-[var(--gold)] focus:ring-[var(--gold)]"
+                className="mt-1 h-5 w-5 rounded border-border bg-background text-[var(--gold)] accent-[var(--gold)] focus:ring-[var(--gold)]"
                 required
               />
               <label htmlFor="accept-terms" className="text-[13px] text-muted-foreground leading-5">
@@ -247,7 +247,7 @@ function SignupForm() {
                 id="accept-marketing"
                 checked={acceptMarketing}
                 onChange={(e) => setAcceptMarketing(e.target.checked)}
-                className="mt-1 h-4 w-4 rounded border-border bg-background text-[var(--gold)] accent-[var(--gold)] focus:ring-[var(--gold)]"
+                className="mt-1 h-5 w-5 rounded border-border bg-background text-[var(--gold)] accent-[var(--gold)] focus:ring-[var(--gold)]"
               />
               <label htmlFor="accept-marketing" className="text-[13px] text-muted-foreground leading-5">
                 J&apos;accepte de recevoir des emails d&apos;inspiration déco et des offres promotionnelles.

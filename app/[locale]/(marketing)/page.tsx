@@ -114,7 +114,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           <p className="text-muted-foreground text-center mb-10 max-w-2xl mx-auto">
             {t('solutionsSectionSubtitle')}
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
               { slug: 'home-staging-virtuel', titleKey: 'solStagingTitle' as const, descKey: 'solStagingDesc' as const },
               {
@@ -133,7 +133,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                 <Lightbulb className="w-5 h-5 text-primary mb-2" />
                 <div className="font-semibold text-sm mb-1">{t(sol.titleKey)}</div>
                 <div className="text-xs text-muted-foreground">{t(sol.descKey)}</div>
-                <div className="text-xs text-primary mt-2 opacity-0 group-hover:opacity-100 transition-opacity inline-flex items-center gap-1">
+                <div className="text-xs text-primary mt-2 opacity-70 group-hover:opacity-100 group-active:opacity-100 transition-opacity inline-flex items-center gap-1">
                   {t('learnMore')} <ArrowRight className="w-3 h-3" />
                 </div>
               </Link>
@@ -153,7 +153,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           <div className="space-y-4">
             {faqData.map((item, i) => (
               <details key={i} className="group border rounded-xl bg-background p-5">
-                <summary className="flex cursor-pointer items-center justify-between font-medium text-sm">
+                <summary className="flex min-h-[44px] cursor-pointer items-center justify-between font-medium text-sm">
                   {item.question}
                   <ArrowRight className="h-4 w-4 transition-transform group-open:rotate-90 shrink-0 ml-4" />
                 </summary>

@@ -116,7 +116,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className={prestige ? 'text-sm text-[rgba(250,248,244,0.62)] hover:text-[#c8a24d] transition-colors' : 'text-sm text-[#6B6B6B] hover:text-[#E07B54] transition-colors'}
+                    className={prestige ? 'block py-1 text-sm text-[rgba(250,248,244,0.62)] hover:text-[#c8a24d] transition-colors' : 'block py-1 text-sm text-[#6B6B6B] hover:text-[#E07B54] transition-colors'}
                   >
                     {t(`links.${link.key}`)}
                   </Link>
@@ -132,7 +132,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className={prestige ? 'text-sm text-[rgba(250,248,244,0.62)] hover:text-[#c8a24d] transition-colors' : 'text-sm text-[#6B6B6B] hover:text-[#E07B54] transition-colors'}
+                    className={prestige ? 'block py-1 text-sm text-[rgba(250,248,244,0.62)] hover:text-[#c8a24d] transition-colors' : 'block py-1 text-sm text-[#6B6B6B] hover:text-[#E07B54] transition-colors'}
                   >
                     {t(`links.${link.key}`)}
                   </Link>
@@ -148,7 +148,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className={prestige ? 'text-sm text-[rgba(250,248,244,0.62)] hover:text-[#c8a24d] transition-colors' : 'text-sm text-[#6B6B6B] hover:text-[#E07B54] transition-colors'}
+                    className={prestige ? 'block py-1 text-sm text-[rgba(250,248,244,0.62)] hover:text-[#c8a24d] transition-colors' : 'block py-1 text-sm text-[#6B6B6B] hover:text-[#E07B54] transition-colors'}
                   >
                     {t(`links.${link.key}`)}
                   </Link>
@@ -172,7 +172,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className={prestige ? 'text-sm text-[rgba(250,248,244,0.62)] hover:text-[#c8a24d] transition-colors' : 'text-sm text-[#6B6B6B] hover:text-[#E07B54] transition-colors'}
+                    className={prestige ? 'block py-1 text-sm text-[rgba(250,248,244,0.62)] hover:text-[#c8a24d] transition-colors' : 'block py-1 text-sm text-[#6B6B6B] hover:text-[#E07B54] transition-colors'}
                   >
                     {t(`links.${link.key}`)}
                   </Link>
@@ -198,7 +198,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className={prestige ? 'text-sm text-[rgba(250,248,244,0.62)] hover:text-[#c8a24d] transition-colors' : 'text-sm text-[#6B6B6B] hover:text-[#E07B54] transition-colors'}
+                    className={prestige ? 'block py-1 text-sm text-[rgba(250,248,244,0.62)] hover:text-[#c8a24d] transition-colors' : 'block py-1 text-sm text-[#6B6B6B] hover:text-[#E07B54] transition-colors'}
                   >
                     {t(`links.${link.key}`)}
                   </Link>
@@ -216,7 +216,7 @@ export function Footer() {
                     href={link.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={prestige ? 'text-sm text-[rgba(250,248,244,0.62)] hover:text-[#c8a24d] transition-colors' : 'text-sm text-[#6B6B6B] hover:text-[#E07B54] transition-colors'}
+                    className={prestige ? 'block py-1 text-sm text-[rgba(250,248,244,0.62)] hover:text-[#c8a24d] transition-colors' : 'block py-1 text-sm text-[#6B6B6B] hover:text-[#E07B54] transition-colors'}
                   >
                     {t(`links.${link.key}`)}
                   </a>

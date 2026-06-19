@@ -54,7 +54,7 @@ export function GenerationsTab({ generations, refetchGenerations, referralCode }
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value as FilterStatus)}
-            className="bg-muted border border-border rounded-lg px-3 py-2 text-sm text-foreground"
+            className="bg-muted border border-border rounded-lg px-3 py-2.5 text-base sm:text-sm text-foreground"
           >
             <option value="all">Toutes</option>
             <option value="completed">Terminées</option>

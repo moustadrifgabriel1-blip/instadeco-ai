@@ -109,7 +109,7 @@ export function GalleryClient({ initialItems, initialTotal }: GalleryClientProps
             <select
               value={styleFilter}
               onChange={(e) => setStyleFilter(e.target.value)}
-              className="px-3 py-2 rounded-xl border border-border text-sm bg-card text-foreground focus:outline-none focus:border-[var(--gold)]"
+              className="px-3 py-2.5 rounded-xl border border-border text-base sm:text-sm bg-card text-foreground focus:outline-none focus:border-[var(--gold)]"
             >
               <option value="">Tous les styles</option>
               {Object.entries(STYLE_LABELS).map(([key, label]) => (
@@ -193,7 +193,7 @@ export function GalleryClient({ initialItems, initialTotal }: GalleryClientProps
                 </div>
 
                 {/* Actions au hover */}
-                <div className="absolute top-3 right-3 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <div className="absolute top-3 right-3 flex gap-1.5 opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 transition-opacity duration-300">
                   <ShareButtons
                     url="https://instadeco.app/galerie"
                     title={`Transformation ${ROOM_LABELS[item.room_type_slug] || item.room_type_slug} style ${STYLE_LABELS[item.style_slug] || item.style_slug} 🏠✨`}
@@ -202,7 +202,7 @@ export function GalleryClient({ initialItems, initialTotal }: GalleryClientProps
                   />
                   <Link
                     href={`/essai`}
-                    className="w-10 h-10 flex items-center justify-center rounded-full bg-[var(--gold)]/90 backdrop-blur-md shadow-lg hover:bg-[var(--gold)] transition-all duration-200 border border-[var(--gold-line)]"
+                    className="w-11 h-11 flex items-center justify-center rounded-full bg-[var(--gold)]/90 backdrop-blur-md shadow-lg hover:bg-[var(--gold)] transition-all duration-200 border border-[var(--gold-line)]"
                     title="Essayer ce style"
                   >
                     <Sparkles className="w-4 h-4 text-[#0c0a09]" />

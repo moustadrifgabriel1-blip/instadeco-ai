@@ -223,7 +223,7 @@ export function Header() {
             <LanguageSwitcher />
             <button
               className={cn(
-                'p-2 -mr-2 rounded-lg transition-colors',
+                'p-3 -mr-1 rounded-lg transition-colors',
                 prestige ? 'hover:bg-[rgba(250,248,244,0.06)]' : 'hover:bg-[#FFF8F5]',
               )}
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}

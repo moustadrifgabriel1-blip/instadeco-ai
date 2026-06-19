@@ -327,7 +327,7 @@ export default function EssaiPage() {
                 />
                 <button
                   onClick={() => { setImageFile(null); setImagePreview(null); setStep('upload'); }}
-                  className="absolute top-3 right-3 px-3 py-1.5 bg-background/90 backdrop-blur-md border border-[var(--gold-line)] rounded-full text-[12px] font-medium text-foreground hover:bg-background transition-colors shadow-sm"
+                  className="absolute top-3 right-3 px-4 py-2.5 bg-background/90 backdrop-blur-md border border-[var(--gold-line)] rounded-full text-[13px] font-medium text-foreground hover:bg-background transition-colors shadow-sm"
                 >
                   Changer de photo
                 </button>
@@ -552,7 +552,7 @@ export default function EssaiPage() {
                       value={trialEmail}
                       onChange={(e) => { setTrialEmail(e.target.value); setEmailStatus('idle'); }}
                       placeholder="votre@email.com"
-                      className="flex-1 px-4 py-3 rounded-xl bg-background border border-border focus:border-[var(--gold)] focus:ring-2 focus:ring-[var(--gold-soft)]/20 outline-none transition-all text-foreground placeholder:text-muted-foreground text-[15px]"
+                      className="flex-1 px-4 py-3 rounded-xl bg-background border border-border focus:border-[var(--gold)] focus:ring-2 focus:ring-[var(--gold-soft)]/20 outline-none transition-all text-foreground placeholder:text-muted-foreground text-base"
                       required
                     />
                     <button

@@ -515,7 +515,7 @@ export default function QuizPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="votre@email.com"
-              className="w-full px-5 py-3.5 rounded-2xl border border-border bg-card text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[var(--gold)] focus:ring-2 focus:ring-[var(--gold-soft)]/20 transition-all"
+              className="w-full px-5 py-3.5 rounded-2xl border border-border bg-card text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[var(--gold)] focus:ring-2 focus:ring-[var(--gold-soft)]/20 transition-all"
             />
             <button
               type="submit"
