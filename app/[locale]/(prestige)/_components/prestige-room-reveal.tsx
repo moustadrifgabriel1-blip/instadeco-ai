@@ -252,8 +252,8 @@ export function PrestigeRoomReveal() {
             style={{ clipPath: 'inset(0 100% 0 0)' }}
           >
             <Image
-              src="https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/output-images/f88c9b68-eda4-4d67-bfb4-f631d21b37c6/6db76d94-51a7-4ab0-a469-2135720d76ff.jpg"
-              alt="Le même salon mis en scène par le service, intérieur mid-century chaleureux"
+              src="https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/output-images/gemini/1781862702952-ec11kc.jpg"
+              alt="Le même salon mis en scène par le service, intérieur scandinave épuré et chaleureux"
               fill
               sizes="(min-width: 1024px) 1152px, 100vw"
               className="object-cover object-center"
@@ -299,7 +299,7 @@ export function PrestigeRoomReveal() {
           >
             <div className="prestige-eyebrow !text-[var(--gold)]">Mise en scène appliquée</div>
             <p className="prestige-display mt-2 text-[clamp(1.4rem,3.4vw,2.4rem)] leading-tight">
-              Mid-century chaleureux,{' '}
+              Scandinave épuré,{' '}
               <span className="italic">livré en quelques secondes</span>
             </p>
           </div>
