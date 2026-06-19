@@ -22,26 +22,38 @@ function buildMagicLinkEmail(magicLink: string, credits: number): string {
   return `
 <!DOCTYPE html>
 <html lang="fr">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width"></head>
-<body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background-color:#f9f9f9;">
-  <div style="max-width:560px;margin:0 auto;padding:32px 24px;">
-    <h1 style="font-size:22px;color:#1d1d1f;margin:0 0 16px;">Merci pour votre achat 🎉</h1>
-    <p style="font-size:15px;color:#3a3a3c;line-height:1.6;margin:0 0 12px;">
-      Vos <strong>${credits} crédits</strong> ont été ajoutés à votre compte InstaDeco.
-    </p>
-    <p style="font-size:15px;color:#3a3a3c;line-height:1.6;margin:0 0 24px;">
-      Cliquez ci-dessous pour accéder à votre compte (aucun mot de passe nécessaire) :
-    </p>
-    <a href="${magicLink}"
-       style="display:inline-block;background:#1d1d1f;color:#fff;text-decoration:none;
-              padding:14px 28px;border-radius:9999px;font-size:15px;font-weight:600;">
-      Accéder à mon compte
-    </a>
-    <p style="font-size:12px;color:#aeaeb2;line-height:1.6;margin:24px 0 0;">
-      Ce lien est valable un temps limité. Si vous n'êtes pas à l'origine de cet achat,
-      ignorez cet email.
-    </p>
-  </div>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="dark"></head>
+<body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background-color:#0a0807;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0a0807;">
+    <tr><td align="center" style="padding:24px 12px;">
+      <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background-color:#0c0a09;border:1px solid rgba(200,162,77,0.28);border-radius:18px;overflow:hidden;">
+        <tr><td style="padding:32px 32px 24px;text-align:center;border-bottom:1px solid rgba(200,162,77,0.18);">
+          <img src="https://instadeco.app/images/logo-prestige.svg" alt="InstaDeco AI" width="44" height="44" style="display:inline-block;margin-bottom:12px;" />
+          <div style="font-family:Georgia,'Times New Roman',serif;font-size:13px;letter-spacing:0.34em;text-transform:uppercase;color:#c8a24d;">InstaDeco&nbsp;AI</div>
+        </td></tr>
+        <tr><td style="padding:34px 32px;color:#b3a89a;">
+          <h1 style="font-family:Georgia,'Times New Roman',serif;font-size:25px;color:#faf8f4;margin:0 0 16px;text-align:center;font-weight:normal;">Merci pour votre achat.</h1>
+          <p style="font-size:15px;color:#b3a89a;line-height:1.7;margin:0 0 12px;text-align:center;">
+            Vos <strong style="color:#c8a24d;">${credits} crédits</strong> ont été ajoutés à votre compte InstaDeco.
+          </p>
+          <p style="font-size:15px;color:#b3a89a;line-height:1.7;margin:0 0 26px;text-align:center;">
+            Accédez à votre compte ci-dessous, aucun mot de passe requis.
+          </p>
+          <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto;">
+            <tr><td style="border-radius:999px;background-color:#c8a24d;">
+              <a href="${magicLink}" style="display:inline-block;padding:15px 38px;font-size:14px;font-weight:700;color:#0c0a09;text-decoration:none;border-radius:999px;">Accéder à mon compte</a>
+            </td></tr>
+          </table>
+          <p style="font-size:12px;color:#8c8478;line-height:1.6;margin:26px 0 0;text-align:center;">
+            Ce lien est valable un temps limité. Si vous n'êtes pas à l'origine de cet achat, ignorez cet email.
+          </p>
+        </td></tr>
+        <tr><td style="background-color:#0a0807;padding:20px 32px;text-align:center;border-top:1px solid rgba(200,162,77,0.18);">
+          <p style="color:#8c8478;font-size:12px;margin:0;"><a href="https://instadeco.app" style="color:#c8a24d;text-decoration:none;">instadeco.app</a></p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
 </body>
 </html>`;
 }
@@ -65,7 +77,7 @@ export async function sendGuestCheckoutMagicLink(
     const { error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: [email],
-      subject: `Vos ${credits} crédits InstaDeco sont prêts 🎨`,
+      subject: `Vos ${credits} crédits InstaDeco sont prêts`,
       html: buildMagicLinkEmail(magicLink, credits),
     });
     if (error) {

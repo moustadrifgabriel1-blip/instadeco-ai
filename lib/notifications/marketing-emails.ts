@@ -1,9 +1,11 @@
 /**
  * Service: Marketing Emails (Welcome + Post-Generation)
- * 
+ *
  * Emails transactionnels envoyés automatiquement :
  * - Email de bienvenue à l'inscription
  * - Email après génération avec CTA de partage + parrainage
+ *
+ * Direction artistique : prestige (nuit + or), cohérente avec le site.
  */
 
 import { Resend } from 'resend';
@@ -20,102 +22,125 @@ function getResend(): Resend | null {
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'InstaDeco AI <contact@instadeco.app>';
 
 // ============================================
-// EMAIL WRAPPER (réutilise le même design)
+// PALETTE PRESTIGE (cohérente avec le site)
 // ============================================
-function emailWrapper(content: string): string {
+const INK = '#0c0a09';
+const INK_DEEP = '#0a0807';
+const SURFACE = '#1c1917';
+const GOLD = '#c8a24d';
+const IVORY = '#faf8f4';
+const MIST = '#b3a89a';
+const MIST_DIM = '#8c8478';
+const LINE = 'rgba(200,162,77,0.28)';
+const SERIF = "Georgia, 'Times New Roman', serif";
+
+// ============================================
+// EMAIL WRAPPER (design prestige, table email-safe)
+// ============================================
+function emailWrapper(content: string, preheader = ''): string {
   return `
 <!DOCTYPE html>
 <html lang="fr">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width"></head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f9f9f9;">
-  <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; margin-top: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
-    <!-- Header -->
-    <div style="background: linear-gradient(135deg, #E07B54, #D4603C); padding: 32px 24px; text-align: center;">
-      <img src="https://instadeco.app/images/logo-v3-house-sparkle.svg" alt="InstaDeco AI" width="48" height="48" style="border-radius: 12px; margin-bottom: 12px;" />
-      <h1 style="color: white; font-size: 24px; margin: 0; font-weight: 700;">InstaDeco AI</h1>
-    </div>
-    
-    <!-- Content -->
-    <div style="padding: 32px 24px;">
-      ${content}
-    </div>
-    
-    <!-- Footer -->
-    <div style="background: #f5f5f7; padding: 16px 24px; text-align: center;">
-      <p style="color: #636366; font-size: 12px; margin: 0;">
-        InstaDeco AI — Décoration d'intérieur par intelligence artificielle<br />
-        <a href="https://instadeco.app" style="color: #E07B54; text-decoration: none;">instadeco.app</a>
-      </p>
-      <p style="color: #aaa; font-size: 11px; margin: 8px 0 0;">
-        Vous recevez cet email car vous avez créé un compte sur InstaDeco AI.
-      </p>
-    </div>
-  </div>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="supported-color-schemes" content="dark">
+</head>
+<body style="margin:0; padding:0; background-color:${INK_DEEP}; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+  ${preheader ? `<div style="display:none; max-height:0; overflow:hidden; opacity:0; color:${INK_DEEP};">${preheader}</div>` : ''}
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${INK_DEEP};">
+    <tr><td align="center" style="padding:24px 12px;">
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px; width:100%; background-color:${INK}; border:1px solid ${LINE}; border-radius:18px; overflow:hidden;">
+        <!-- Header -->
+        <tr><td style="padding:34px 32px 26px; text-align:center; border-bottom:1px solid rgba(200,162,77,0.18);">
+          <img src="https://instadeco.app/images/logo-prestige.svg" alt="InstaDeco AI" width="44" height="44" style="display:inline-block; margin-bottom:14px;" />
+          <div style="font-family:${SERIF}; font-size:13px; letter-spacing:0.34em; text-transform:uppercase; color:${GOLD};">InstaDeco&nbsp;AI</div>
+        </td></tr>
+        <!-- Content -->
+        <tr><td style="padding:36px 32px; color:${MIST};">
+          ${content}
+        </td></tr>
+        <!-- Footer -->
+        <tr><td style="background-color:${INK_DEEP}; padding:24px 32px; text-align:center; border-top:1px solid rgba(200,162,77,0.18);">
+          <div style="font-family:${SERIF}; font-size:12px; letter-spacing:0.28em; text-transform:uppercase; color:${MIST_DIM}; margin-bottom:8px;">Home staging virtuel par IA</div>
+          <p style="color:${MIST_DIM}; font-size:12px; line-height:1.7; margin:0;">
+            <a href="https://instadeco.app" style="color:${GOLD}; text-decoration:none;">instadeco.app</a><br />
+            Vous recevez cet email car vous avez un compte InstaDeco AI.
+          </p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
 </body>
 </html>`;
+}
+
+// Bouton or pleine confiance (CTA principal)
+function primaryButton(href: string, label: string): string {
+  return `
+    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto;">
+      <tr><td style="border-radius:999px; background-color:${GOLD};">
+        <a href="${href}" style="display:inline-block; padding:15px 38px; font-size:14px; font-weight:700; letter-spacing:0.02em; color:${INK}; text-decoration:none; border-radius:999px;">${label}</a>
+      </td></tr>
+    </table>`;
+}
+
+// Bouton secondaire (contour or)
+function ghostButton(href: string, label: string): string {
+  return `
+    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto;">
+      <tr><td style="border-radius:999px; border:1px solid ${GOLD};">
+        <a href="${href}" style="display:inline-block; padding:12px 30px; font-size:13px; font-weight:600; color:${GOLD}; text-decoration:none; border-radius:999px;">${label}</a>
+      </td></tr>
+    </table>`;
 }
 
 // ============================================
 // 1. EMAIL DE BIENVENUE
 // ============================================
 function buildWelcomeEmail(name: string): string {
+  const step = (n: string, title: string, desc: string) => `
+    <tr>
+      <td width="40" style="padding:10px 14px 10px 0; vertical-align:top;">
+        <div style="background-color:${GOLD}; color:${INK}; width:30px; height:30px; border-radius:50%; text-align:center; line-height:30px; font-weight:700; font-size:14px;">${n}</div>
+      </td>
+      <td style="padding:10px 0; color:${MIST}; font-size:14px; line-height:1.5;">
+        <strong style="color:${IVORY}; font-weight:600;">${title}</strong><br />
+        <span style="color:${MIST};">${desc}</span>
+      </td>
+    </tr>`;
+
   return emailWrapper(`
-    <h2 style="color: #1d1d1f; font-size: 24px; margin: 0 0 16px; text-align: center;">
-      Bienvenue ${name} ! 🎉
-    </h2>
-    
-    <p style="color: #6B6B6B; line-height: 1.6; margin: 0 0 16px; text-align: center;">
-      Votre compte InstaDeco AI est prêt. Vous avez 
-      <strong style="color: #E07B54;">3 crédits gratuits</strong> pour découvrir
+    <h1 style="font-family:${SERIF}; color:${IVORY}; font-size:28px; line-height:1.25; margin:0 0 16px; text-align:center; font-weight:normal;">
+      Bienvenue${name ? `, ${name}` : ''}.
+    </h1>
+
+    <p style="color:${MIST}; line-height:1.7; font-size:15px; margin:0 0 26px; text-align:center;">
+      Votre compte est prêt. Vous disposez de
+      <strong style="color:${GOLD};">3 crédits offerts</strong> pour découvrir
       la transformation de vos pièces par intelligence artificielle.
     </p>
 
-    <div style="background: linear-gradient(135deg, #FFF8F5, #FFF0EB); border-radius: 16px; padding: 24px; margin: 0 0 24px; border: 1px solid #F5D5C8;">
-      <p style="font-weight: 700; color: #1d1d1f; margin: 0 0 16px; text-align: center; font-size: 16px;">
-        3 étapes simples :
-      </p>
-      <table style="width: 100%;" cellpadding="0" cellspacing="0">
-        <tr>
-          <td style="padding: 8px 12px; vertical-align: top;">
-            <div style="background: #E07B54; color: white; width: 28px; height: 28px; border-radius: 50%; text-align: center; line-height: 28px; font-weight: 700; font-size: 14px;">1</div>
-          </td>
-          <td style="padding: 8px 0; color: #2D2D2D; font-size: 14px;">
-            <strong>Prenez une photo</strong><br />
-            <span style="color: #6B6B6B;">Photographiez votre pièce avec votre smartphone</span>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding: 8px 12px; vertical-align: top;">
-            <div style="background: #E07B54; color: white; width: 28px; height: 28px; border-radius: 50%; text-align: center; line-height: 28px; font-weight: 700; font-size: 14px;">2</div>
-          </td>
-          <td style="padding: 8px 0; color: #2D2D2D; font-size: 14px;">
-            <strong>Choisissez un style</strong><br />
-            <span style="color: #6B6B6B;">12 styles disponibles : Moderne, Scandinave, Japandi...</span>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding: 8px 12px; vertical-align: top;">
-            <div style="background: #E07B54; color: white; width: 28px; height: 28px; border-radius: 50%; text-align: center; line-height: 28px; font-weight: 700; font-size: 14px;">3</div>
-          </td>
-          <td style="padding: 8px 0; color: #2D2D2D; font-size: 14px;">
-            <strong>Admirez le résultat</strong><br />
-            <span style="color: #6B6B6B;">En 10 secondes, votre pièce est transformée !</span>
-          </td>
-        </tr>
-      </table>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${SURFACE}; border:1px solid ${LINE}; border-radius:14px; padding:22px; margin:0 0 28px;">
+      <tr><td>
+        <p style="font-family:${SERIF}; color:${IVORY}; margin:0 0 14px; text-align:center; font-size:17px;">Trois gestes, rien de plus</p>
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+          ${step('1', 'Prenez une photo', 'Photographiez votre pièce avec votre smartphone.')}
+          ${step('2', 'Choisissez un style', '12 styles : Moderne, Scandinave, Japandi et plus.')}
+          ${step('3', 'Découvrez le rendu', 'En quelques secondes, la pièce apparaît mise en scène.')}
+        </table>
+      </td></tr>
+    </table>
+
+    <div style="text-align:center; margin:26px 0 18px;">
+      ${primaryButton('https://instadeco.app/generate', 'Transformer ma pièce')}
     </div>
 
-    <div style="text-align: center; margin: 24px 0;">
-      <a href="https://instadeco.app/generate"
-         style="display: inline-block; background: linear-gradient(135deg, #E07B54, #D4603C); color: white; text-decoration: none; padding: 16px 40px; border-radius: 50px; font-weight: 700; font-size: 16px;">
-        Transformer ma pièce →
-      </a>
-    </div>
-
-    <p style="color: #636366; font-size: 13px; text-align: center; margin: 16px 0 0;">
+    <p style="color:${MIST_DIM}; font-size:13px; text-align:center; margin:16px 0 0;">
       Vos 3 crédits n'expirent jamais. Prenez votre temps.
     </p>
-  `);
+  `, 'Votre compte InstaDeco est prêt, avec 3 crédits offerts.');
 }
 
 /**
@@ -135,8 +160,8 @@ export async function sendWelcomeEmail(
     const { error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: [email],
-      subject: '🏠 Bienvenue sur InstaDeco — 3 crédits offerts !',
-      html: buildWelcomeEmail(name || 'là'),
+      subject: 'Bienvenue sur InstaDeco, 3 crédits vous attendent',
+      html: buildWelcomeEmail(name || ''),
     });
 
     if (error) {
@@ -144,7 +169,7 @@ export async function sendWelcomeEmail(
       return { success: false, error: error.message };
     }
 
-    console.log(`[Welcome Email] ✅ Envoyé à ${email}`);
+    console.log(`[Welcome Email] Envoyé à ${email}`);
     return { success: true };
   } catch (err) {
     console.error('[Welcome Email] Erreur:', err);
@@ -162,57 +187,52 @@ function buildGenerationCompleteEmail(
   referralCode: string | null,
 ): string {
   const referralSection = referralCode ? `
-    <div style="background: linear-gradient(135deg, #FFF8F5, #FFF0EB); border-radius: 16px; padding: 24px; margin: 24px 0; border: 2px dashed #E07B54; text-align: center;">
-      <p style="font-size: 16px; font-weight: 700; color: #1d1d1f; margin: 0 0 8px;">
-        🎁 Parrainez un ami, gagnez 5 crédits
-      </p>
-      <p style="color: #6B6B6B; font-size: 14px; margin: 0 0 16px;">
-        Partagez votre code de parrainage et recevez <strong style="color: #E07B54;">5 crédits gratuits</strong>
-        pour chaque ami qui s'inscrit !
-      </p>
-      <div style="background: white; border: 2px solid #E07B54; border-radius: 12px; padding: 12px; display: inline-block;">
-        <span style="font-size: 20px; font-weight: 800; color: #E07B54; letter-spacing: 2px;">${referralCode}</span>
-      </div>
-      <p style="color: #636366; font-size: 12px; margin: 12px 0 0;">
-        Lien de parrainage : <a href="https://instadeco.app/signup?ref=${referralCode}" style="color: #E07B54;">instadeco.app/signup?ref=${referralCode}</a>
-      </p>
-    </div>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${SURFACE}; border:1px dashed ${GOLD}; border-radius:14px; padding:24px; margin:28px 0 0; text-align:center;">
+      <tr><td>
+        <p style="font-family:${SERIF}; font-size:18px; color:${IVORY}; margin:0 0 8px;">Parrainez, gagnez 5 crédits</p>
+        <p style="color:${MIST}; font-size:14px; line-height:1.6; margin:0 0 16px;">
+          Partagez votre code et recevez <strong style="color:${GOLD};">5 crédits</strong>
+          pour chaque ami qui s'inscrit.
+        </p>
+        <div style="background-color:${INK}; border:1px solid ${GOLD}; border-radius:12px; padding:12px 18px; display:inline-block;">
+          <span style="font-size:20px; font-weight:800; color:${GOLD}; letter-spacing:3px;">${referralCode}</span>
+        </div>
+        <p style="color:${MIST_DIM}; font-size:12px; margin:14px 0 0;">
+          <a href="https://instadeco.app/signup?ref=${referralCode}" style="color:${GOLD}; text-decoration:none;">instadeco.app/signup?ref=${referralCode}</a>
+        </p>
+      </td></tr>
+    </table>
   ` : '';
 
   return emailWrapper(`
-    <h2 style="color: #1d1d1f; font-size: 22px; margin: 0 0 16px; text-align: center;">
-      Votre transformation est prête ! ✨
-    </h2>
-    
-    <p style="color: #6B6B6B; line-height: 1.6; margin: 0 0 16px; text-align: center;">
-      Bonjour ${name}, votre ${roomType} style <strong style="color: #E07B54;">${style}</strong> 
-      est prête à être découverte !
+    <h1 style="font-family:${SERIF}; color:${IVORY}; font-size:26px; line-height:1.25; margin:0 0 16px; text-align:center; font-weight:normal;">
+      Votre transformation est prête.
+    </h1>
+
+    <p style="color:${MIST}; line-height:1.7; font-size:15px; margin:0 0 26px; text-align:center;">
+      Bonjour ${name || ''}, votre ${roomType} en style
+      <strong style="color:${GOLD};">${style}</strong> vous attend.
     </p>
 
-    <div style="text-align: center; margin: 24px 0;">
-      <a href="https://instadeco.app/dashboard"
-         style="display: inline-block; background: linear-gradient(135deg, #E07B54, #D4603C); color: white; text-decoration: none; padding: 16px 40px; border-radius: 50px; font-weight: 700; font-size: 16px;">
-        Voir mon résultat →
-      </a>
+    <div style="text-align:center; margin:26px 0;">
+      ${primaryButton('https://instadeco.app/dashboard', 'Voir mon résultat')}
     </div>
 
-    <div style="background: #f5f5f7; border-radius: 12px; padding: 16px; margin: 24px 0;">
-      <p style="margin: 0 0 4px; font-weight: 600; color: #1d1d1f; font-size: 14px;">💡 Astuce</p>
-      <p style="margin: 0; color: #6B6B6B; font-size: 14px;">
-        Essayez le même espace dans un style différent pour comparer ! 
-        Vos crédits vous permettent d'explorer les 12 styles disponibles.
-      </p>
-    </div>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${SURFACE}; border:1px solid ${LINE}; border-radius:12px; padding:18px; margin:26px 0;">
+      <tr><td>
+        <p style="margin:0 0 6px; font-weight:600; color:${IVORY}; font-size:14px;">Le conseil</p>
+        <p style="margin:0; color:${MIST}; font-size:14px; line-height:1.6;">
+          Essayez le même espace dans un autre style pour comparer. Vos crédits ouvrent les 12 ambiances.
+        </p>
+      </td></tr>
+    </table>
 
-    <div style="text-align: center; margin: 16px 0;">
-      <a href="https://instadeco.app/generate"
-         style="display: inline-block; background: white; color: #E07B54; text-decoration: none; padding: 12px 32px; border-radius: 50px; font-weight: 600; font-size: 14px; border: 2px solid #E07B54;">
-        Essayer un autre style →
-      </a>
+    <div style="text-align:center; margin:18px 0;">
+      ${ghostButton('https://instadeco.app/generate', 'Essayer un autre style')}
     </div>
 
     ${referralSection}
-  `);
+  `, 'Votre rendu InstaDeco est prêt à découvrir.');
 }
 
 /**
@@ -251,9 +271,9 @@ export async function sendGenerationCompleteEmail(
     const { error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: [email],
-      subject: `🎨 Votre ${displayRoom} ${displayStyle} est prête !`,
+      subject: `Votre ${displayRoom} en style ${displayStyle} est prête`,
       html: buildGenerationCompleteEmail(
-        name || 'là',
+        name || '',
         displayStyle,
         displayRoom,
         referralCode,
@@ -265,7 +285,7 @@ export async function sendGenerationCompleteEmail(
       return { success: false, error: error.message };
     }
 
-    console.log(`[Generation Email] ✅ Envoyé à ${email}`);
+    console.log(`[Generation Email] Envoyé à ${email}`);
     return { success: true };
   } catch (err) {
     console.error('[Generation Email] Erreur:', err);
@@ -281,38 +301,35 @@ function buildReferralNotificationEmail(
   creditsAwarded: number,
 ): string {
   return emailWrapper(`
-    <h2 style="color: #1d1d1f; font-size: 22px; margin: 0 0 16px; text-align: center;">
-      Bonne nouvelle ! 🎉
-    </h2>
-    
-    <p style="color: #6B6B6B; line-height: 1.6; margin: 0 0 16px; text-align: center;">
-      Bonjour ${name}, un ami vient de s'inscrire grâce à votre code de parrainage !
+    <h1 style="font-family:${SERIF}; color:${IVORY}; font-size:26px; line-height:1.25; margin:0 0 16px; text-align:center; font-weight:normal;">
+      Bonne nouvelle.
+    </h1>
+
+    <p style="color:${MIST}; line-height:1.7; font-size:15px; margin:0 0 26px; text-align:center;">
+      Bonjour ${name || ''}, un ami vient de s'inscrire grâce à votre code de parrainage.
     </p>
 
-    <div style="background: linear-gradient(135deg, #FFF8F5, #FFF0EB); border-radius: 16px; padding: 24px; margin: 0 0 24px; border: 2px solid #E07B54; text-align: center;">
-      <p style="font-size: 36px; font-weight: 800; color: #E07B54; margin: 0 0 8px;">+${creditsAwarded}</p>
-      <p style="font-size: 18px; font-weight: 600; color: #1d1d1f; margin: 0 0 4px;">crédits ajoutés à votre compte</p>
-      <p style="color: #6B6B6B; font-size: 14px; margin: 0;">
-        Utilisez-les pour transformer vos pièces !
-      </p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${SURFACE}; border:1px solid ${GOLD}; border-radius:14px; padding:28px; margin:0 0 26px; text-align:center;">
+      <tr><td>
+        <p style="font-family:${SERIF}; font-size:40px; font-weight:700; color:${GOLD}; margin:0 0 6px;">+${creditsAwarded}</p>
+        <p style="font-size:17px; font-weight:600; color:${IVORY}; margin:0 0 4px;">crédits ajoutés à votre compte</p>
+        <p style="color:${MIST}; font-size:14px; margin:0;">Prêts à transformer vos pièces.</p>
+      </td></tr>
+    </table>
+
+    <div style="text-align:center; margin:26px 0;">
+      ${primaryButton('https://instadeco.app/generate', 'Utiliser mes crédits')}
     </div>
 
-    <div style="text-align: center; margin: 24px 0;">
-      <a href="https://instadeco.app/generate"
-         style="display: inline-block; background: linear-gradient(135deg, #E07B54, #D4603C); color: white; text-decoration: none; padding: 14px 32px; border-radius: 50px; font-weight: 600; font-size: 16px;">
-        Utiliser mes crédits →
-      </a>
-    </div>
-
-    <div style="background: #f5f5f7; border-radius: 12px; padding: 16px; margin: 24px 0; text-align: center;">
-      <p style="margin: 0; color: #636366; font-size: 14px;">
-        💡 Continuez à partager votre code pour gagner encore plus de crédits !<br />
-        <a href="https://instadeco.app/dashboard" style="color: #E07B54; text-decoration: none; font-weight: 500;">
-          Voir mon code de parrainage →
-        </a>
-      </p>
-    </div>
-  `);
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${SURFACE}; border:1px solid ${LINE}; border-radius:12px; padding:18px; margin:26px 0 0; text-align:center;">
+      <tr><td>
+        <p style="margin:0; color:${MIST}; font-size:14px; line-height:1.6;">
+          Continuez à partager votre code pour gagner plus de crédits.<br />
+          <a href="https://instadeco.app/dashboard" style="color:${GOLD}; text-decoration:none; font-weight:500;">Voir mon code de parrainage</a>
+        </p>
+      </td></tr>
+    </table>
+  `, `Un ami a utilisé votre code, +${creditsAwarded} crédits.`);
 }
 
 /**
@@ -333,8 +350,8 @@ export async function sendReferralNotificationEmail(
     const { error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: [referrerEmail],
-      subject: `🎁 +${creditsAwarded} crédits — Un ami a utilisé votre code !`,
-      html: buildReferralNotificationEmail(referrerName || 'là', creditsAwarded),
+      subject: `+${creditsAwarded} crédits, un ami a utilisé votre code`,
+      html: buildReferralNotificationEmail(referrerName || '', creditsAwarded),
     });
 
     if (error) {
@@ -342,7 +359,7 @@ export async function sendReferralNotificationEmail(
       return { success: false, error: error.message };
     }
 
-    console.log(`[Referral Email] ✅ Notification envoyée à ${referrerEmail}`);
+    console.log(`[Referral Email] Notification envoyée à ${referrerEmail}`);
     return { success: true };
   } catch (err) {
     console.error('[Referral Email] Erreur:', err);
