@@ -13,6 +13,7 @@ import { ArticleCard, ArticleCardSkeleton, BlogSidebar, Pagination } from '@/com
 import { useCases } from '@/src/infrastructure/config/di-container';
 import { BlogArticleMapper } from '@/src/application/mappers/BlogArticleMapper';
 import { getLocalizedCanonicalUrl } from '@/lib/seo/config';
+import { withRetry } from '@/lib/utils/retry';
 
 // ISR : la liste blog change au plus une fois/heure (publication d'articles).
 // Évite un rendu SSR à chaque requête (x-vercel-cache MISS age 0 constaté en prod).
@@ -75,14 +76,16 @@ function toBlogLocale(locale: string): BlogLocale {
 // Fonction pour récupérer les articles (filtrés par langue = locale courante)
 async function getArticles(locale: BlogLocale, page: number, tag?: string, search?: string) {
   try {
-    const result = await useCases.listBlogArticles.execute({
-      page,
-      limit: 9,
-      status: 'published',
-      language: locale,
-      tags: tag ? [tag] : undefined,
-      search,
-    });
+    const result = await withRetry(() =>
+      useCases.listBlogArticles.execute({
+        page,
+        limit: 9,
+        status: 'published',
+        language: locale,
+        tags: tag ? [tag] : undefined,
+        search,
+      }),
+    );
 
     return {
       data: result.articles.map(a => ({
@@ -110,13 +113,15 @@ async function getArticles(locale: BlogLocale, page: number, tag?: string, searc
 async function getSidebarData(locale: BlogLocale) {
   try {
     // Récupérer les 5 derniers articles pour la sidebar
-    const result = await useCases.listBlogArticles.execute({
-      limit: 5,
-      status: 'published',
-      language: locale,
-      sortBy: 'publishedAt',
-      sortOrder: 'desc'
-    });
+    const result = await withRetry(() =>
+      useCases.listBlogArticles.execute({
+        limit: 5,
+        status: 'published',
+        language: locale,
+        sortBy: 'publishedAt',
+        sortOrder: 'desc',
+      }),
+    );
 
     const recentArticles = result.articles.map(article => ({
       slug: article.slug,

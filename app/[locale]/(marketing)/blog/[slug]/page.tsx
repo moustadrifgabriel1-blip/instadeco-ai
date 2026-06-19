@@ -24,6 +24,7 @@ import { sanitizeHtml, sanitizeJsonLd } from '@/lib/security/sanitize';
 
 import { useCases } from '@/src/infrastructure/config/di-container';
 import { BlogArticleMapper } from '@/src/application/mappers/BlogArticleMapper';
+import { withRetry } from '@/lib/utils/retry';
 import { SEO_CONFIG, getCanonicalUrl, getLocalizedCanonicalUrl } from '@/lib/seo/config';
 import { generateBreadcrumbSchema } from '@/lib/seo/schemas';
 
@@ -118,12 +119,14 @@ function toBlogLocale(locale: string): BlogLocale {
 
 const getArticle = cache(async (slug: string, language: BlogLocale): Promise<ArticleData | null> => {
   try {
-    const result = await useCases.getBlogArticleBySlug.execute({
-      slug,
-      language,
-      includeRelated: true,
-      relatedLimit: 3
-    });
+    const result = await withRetry(() =>
+      useCases.getBlogArticleBySlug.execute({
+        slug,
+        language,
+        includeRelated: true,
+        relatedLimit: 3,
+      }),
+    );
 
     if (!result.article) {
       console.log(`[getArticle] Article not found for slug: ${slug}`);
