@@ -16,6 +16,17 @@ export function prefersReducedMotion(): boolean {
 }
 
 /**
+ * Détecte un appareil dont le pointeur principal est tactile (téléphones,
+ * tablettes). Sur ces appareils on garde le scroll NATIF : le momentum du
+ * doigt est déjà fluide, et le smoothing Lenis (pensé pour la molette) le
+ * combat, ce qui donne un scroll caoutchouteux et imprécis.
+ */
+export function isTouchPrimary(): boolean {
+  if (typeof window === 'undefined' || !window.matchMedia) return false;
+  return window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+}
+
+/**
  * Lenis (smooth scroll cinématographique) synchronisé avec GSAP ScrollTrigger.
  * Partagé par toutes les surfaces prestige (visite, exemples, home).
  *
@@ -27,12 +38,14 @@ export function prefersReducedMotion(): boolean {
 export function usePrestigeSmoothScroll() {
   useEffect(() => {
     if (prefersReducedMotion()) return;
+    // Tactile : on n'installe PAS Lenis (scroll natif). ScrollTrigger continue
+    // de fonctionner sur les events de scroll natifs, donc rien à synchroniser.
+    if (isTouchPrimary()) return;
 
     const lenis = new Lenis({
       duration: 1.15,
       easing: (t: number) => 1 - Math.pow(1 - t, 3.2), // lent, sortie douce
       smoothWheel: true,
-      touchMultiplier: 1.4,
     });
 
     // Lenis pilote ScrollTrigger

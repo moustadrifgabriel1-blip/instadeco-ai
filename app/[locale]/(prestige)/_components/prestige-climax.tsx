@@ -25,28 +25,76 @@ export function PrestigeClimax() {
       const lines = root.current?.querySelectorAll('[data-climax-line]');
       const kicker = root.current?.querySelector('[data-climax-kicker]');
 
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: root.current,
-          start: 'top top',
-          end: '+=170%',
-          scrub: 1.1,
-          pin: true,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
-        },
+      const mm = gsap.matchMedia();
+
+      // Desktop / tablette large : section epinglee, l'image se rapproche et la
+      // phrase se pose mot a mot pendant le pin (l'effet « clou » d'origine).
+      mm.add('(min-width: 1024px)', () => {
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: root.current,
+            start: 'top top',
+            end: '+=170%',
+            scrub: 1.1,
+            pin: true,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+          },
+        });
+
+        if (img) tl.fromTo(img, { scale: 1.18 }, { scale: 1, ease: 'none' }, 0);
+        if (kicker) tl.fromTo(kicker, { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, ease: 'power2.out' }, 0.08);
+        if (lines && lines.length) {
+          tl.fromTo(
+            lines,
+            { autoAlpha: 0, y: 40 },
+            { autoAlpha: 1, y: 0, ease: 'power3.out', stagger: 0.14, duration: 0.6 },
+            0.16
+          );
+        }
+        return () => {
+          tl.scrollTrigger?.kill();
+          tl.kill();
+        };
       });
 
-      if (img) tl.fromTo(img, { scale: 1.18 }, { scale: 1, ease: 'none' }, 0);
-      if (kicker) tl.fromTo(kicker, { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, ease: 'power2.out' }, 0.08);
-      if (lines && lines.length) {
+      // Mobile / tactile : AUCUN pin (le pin epingle l'ecran et bloque le
+      // scroll au doigt). L'image se rapproche doucement au defilement et la
+      // phrase apparait a l'entree dans le viewport, scroll 100 % natif.
+      mm.add('(max-width: 1023px)', () => {
+        if (img) {
+          gsap.fromTo(
+            img,
+            { scale: 1.12 },
+            {
+              scale: 1,
+              ease: 'none',
+              scrollTrigger: {
+                trigger: root.current,
+                start: 'top bottom',
+                end: 'bottom top',
+                scrub: 0.8,
+                invalidateOnRefresh: true,
+              },
+            }
+          );
+        }
+        const reveal = [kicker, ...(lines ? Array.from(lines) : [])].filter(Boolean);
+        const tl = gsap.timeline({
+          scrollTrigger: { trigger: root.current, start: 'top 72%', invalidateOnRefresh: true },
+        });
         tl.fromTo(
-          lines,
-          { autoAlpha: 0, y: 40 },
-          { autoAlpha: 1, y: 0, ease: 'power3.out', stagger: 0.14, duration: 0.6 },
-          0.16
+          reveal,
+          { autoAlpha: 0, y: 28 },
+          { autoAlpha: 1, y: 0, ease: 'power3.out', stagger: 0.1, duration: 0.6 }
         );
-      }
+        return () => {
+          tl.scrollTrigger?.kill();
+          tl.kill();
+        };
+      });
+
+      return () => mm.revert();
     },
     { scope: root }
   );

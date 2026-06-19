@@ -88,9 +88,17 @@
   }
   
   html {
-    scroll-behavior: smooth;
+    /* Desktop : Lenis pilote le smooth (eviter le double-smooth natif).
+       Tactile : scroll natif, on garde le smooth des ancres via la media
+       query ci-dessous. */
+    scroll-behavior: auto;
   }
-  
+  @media (hover: none) and (pointer: coarse) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
   body {
     background-color: var(--white);
     color: var(--text-dark);
@@ -98,6 +106,9 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     transition: background-color 0.3s ease, color 0.3s ease;
+    /* Supprime le delai de tap de 300ms et le double-tap-zoom ; le pinch-zoom
+       d'accessibilite reste possible (userScalable). */
+    touch-action: manipulation;
   }
   
 
