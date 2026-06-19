@@ -82,7 +82,7 @@ export function ReferralTab({ referralCode, referralStats }: ReferralTabProps) {
         </CardHeader>
         <CardContent>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-            <div className="flex-1 bg-muted rounded-xl px-4 py-3 font-mono text-base sm:text-lg font-bold text-foreground tracking-widest text-center">
+            <div className="flex-1 min-w-0 overflow-x-auto bg-muted rounded-xl px-4 py-3 font-mono text-base sm:text-lg font-bold text-foreground tracking-widest text-center">
               {referralCode || '...'}
             </div>
             <Button variant="outline" onClick={copyCode} className="flex items-center gap-2">

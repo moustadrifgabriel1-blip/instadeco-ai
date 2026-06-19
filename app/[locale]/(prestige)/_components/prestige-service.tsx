@@ -71,7 +71,7 @@ export function PrestigeService() {
           </h2>
         </div>
 
-        <div className="mt-14 grid gap-px overflow-hidden rounded-sm border border-[var(--gold-line)] sm:grid-cols-3">
+        <div className="mt-14 grid gap-px overflow-hidden rounded-sm border border-[var(--gold-line)] md:grid-cols-3">
           {STEPS.map((step) => (
             <div
               key={step.num}

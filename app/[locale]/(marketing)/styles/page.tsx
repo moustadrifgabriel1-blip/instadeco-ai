@@ -216,7 +216,7 @@ export default async function StylesIndexPage({ params }: { params: Promise<{ lo
       {/* GRILLE DES STYLES */}
       <section className="pb-20 prestige-reveal">
         <div className="container px-4 md:px-6">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-6">
             {STYLES.map((style, idx) => (
               <Card key={style.slug} style={{ ['--reveal-d' as string]: `${(idx % 3) * 120}ms` }} className="prestige-reveal group bg-card border border-[var(--gold-line)] hover:border-[var(--gold)] hover:shadow-lg transition-all duration-500 ease">
                 <CardContent className="p-6">

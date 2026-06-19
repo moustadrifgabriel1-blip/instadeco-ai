@@ -98,7 +98,7 @@ export default async function StylePage({ params }: PageProps) {
             <Palette className="w-3 h-3 mr-2 text-[var(--gold)]" />
             <span className="prestige-eyebrow">Style de décoration</span>
           </Badge>
-          <h1 className="prestige-display text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight">
+          <h1 className="prestige-display text-3xl xs:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight break-words">
             {style.title}
           </h1>
           <div className="prestige-rule mx-auto w-24" />

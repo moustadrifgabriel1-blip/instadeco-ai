@@ -310,7 +310,7 @@ function ArticleContent({ content, slug }: { content: string, slug: string }) {
 
   return (
     <div
-      className="prose prose-lg max-w-none
+      className="prose prose-lg max-w-none xl:max-w-[75ch]
         prose-headings:font-bold prose-headings:text-foreground prose-headings:scroll-mt-20 prose-headings:prestige-display
         prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-6 prose-h2:pb-2 prose-h2:border-b prose-h2:border-[var(--gold-line)]
         prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-4
@@ -402,7 +402,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   return (
     <div className="min-h-[100dvh] bg-background pb-20">
       {/* Hero Header avec Image */}
-      <div className="relative h-[400px] md:h-[500px] w-full overflow-hidden">
+      <div className="relative h-[260px] sm:h-[340px] md:h-[500px] w-full overflow-hidden">
         <Image 
           src={heroImageUrl} 
           alt={article.title}

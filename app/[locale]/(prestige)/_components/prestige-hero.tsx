@@ -101,7 +101,7 @@ export function PrestigeHero() {
 
         {/* Titre Cormorant énorme, accent or */}
         <h1
-          className="prestige-anim prestige-display mt-6 max-w-4xl text-balance text-[clamp(2.6rem,8.4vw,7rem)] leading-[0.96] tracking-tight"
+          className="prestige-anim prestige-display mt-6 max-w-4xl text-balance text-[clamp(2.2rem,7.6vw,7rem)] leading-[1.02] tracking-tight"
           style={{ ['--d' as string]: '320ms' }}
         >
           Vendez le rêve{' '}
