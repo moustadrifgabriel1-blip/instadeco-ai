@@ -54,3 +54,6 @@ next-env.d.ts
 !.claude/seo-engine/reports/.gitkeep
 .claude/seo-engine/data/*
 !.claude/seo-engine/data/.gitkeep
+
+# Config locale du serveur de preview (valeurs d'env factices pour la QA visuelle).
+.claude/launch.json
