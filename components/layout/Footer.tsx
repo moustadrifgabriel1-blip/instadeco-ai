@@ -83,7 +83,7 @@ export function Footer() {
           : 'border-t border-[#F0E6E0] bg-[#FFF8F5]'
       }
     >
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto px-4 pt-12 pb-[max(3rem,env(safe-area-inset-bottom))]">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-8 gap-6 lg:gap-8 mb-12">
           <div className="col-span-2 sm:col-span-3 lg:col-span-2">
             <Link href="/" className="flex items-center gap-2 font-bold text-xl mb-4 group">

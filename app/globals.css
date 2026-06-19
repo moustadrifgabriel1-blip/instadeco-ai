@@ -3,6 +3,32 @@
 @tailwind utilities;
 
 /* ============================================
+   SAFE-AREA (encoches iOS, Dynamic Island, bords incurves Android)
+   Necessite viewportFit:'cover' dans l'export viewport (sinon env() = 0).
+   Sur device sans encoche, env(...) vaut 0 : ces classes n'ont aucun effet.
+   ============================================ */
+@layer utilities {
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .pl-safe {
+    padding-left: env(safe-area-inset-left);
+  }
+  .pr-safe {
+    padding-right: env(safe-area-inset-right);
+  }
+  /* Inset horizontal global (paysage sur device a encoche) sans rogner
+     la largeur en portrait : max(0px, env(...)) reste a 0 si pas d'encoche. */
+  .px-safe {
+    padding-left: max(0px, env(safe-area-inset-left));
+    padding-right: max(0px, env(safe-area-inset-right));
+  }
+}
+
+/* ============================================
    INSTADECO AI - DESIGN SYSTEM
    ============================================ */
 

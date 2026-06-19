@@ -143,7 +143,7 @@ export function AccountTab({ user, supabase, credits, generationsCount, onAccoun
       {/* Modale de suppression */}
       {account.showDeleteModal && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]"
           onClick={() => { account.setShowDeleteModal(false); account.setDeleteConfirmText(''); }}
         >
           <div

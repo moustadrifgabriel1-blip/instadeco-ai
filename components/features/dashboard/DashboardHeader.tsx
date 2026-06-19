@@ -19,7 +19,7 @@ export function DashboardHeader({
   onLogout,
 }: DashboardHeaderProps) {
   return (
-    <header className="border-b border-[var(--gold-line)] bg-card/80 backdrop-blur-xl sticky top-0 z-50">
+    <header className="border-b border-[var(--gold-line)] bg-card/80 backdrop-blur-xl sticky top-0 z-50 pt-safe">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between">
         <Link href="/" className="prestige-display text-lg sm:text-[21px] font-semibold text-foreground">
           InstaDeco

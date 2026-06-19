@@ -72,7 +72,7 @@ export function Header() {
   return (
     <header
       className={cn(
-        'sticky top-0 z-50 w-full transition-all duration-300',
+        'sticky top-0 z-50 w-full transition-all duration-300 pt-safe',
         scrolled
           ? prestige
             ? 'bg-[#0c0a09]/90 backdrop-blur-md border-b border-[rgba(200,162,77,0.28)]'

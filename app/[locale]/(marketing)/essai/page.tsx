@@ -245,7 +245,7 @@ export default function EssaiPage() {
   return (
     <div className="min-h-[100dvh] bg-background">
       {/* Navigation simplifiée */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-[var(--gold-line)]">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-[var(--gold-line)] pt-safe">
         <div className="max-w-[980px] mx-auto px-6 h-12 flex items-center justify-between">
           <Link href="/" className="prestige-display text-[21px] font-semibold tracking-[-0.01em] text-foreground">
             InstaDeco
@@ -260,7 +260,7 @@ export default function EssaiPage() {
       </nav>
 
       {/* Hero */}
-      <section className="pt-20 pb-6 px-4 sm:pt-24 sm:pb-8 sm:px-6">
+      <section className="pt-[calc(5rem+env(safe-area-inset-top))] pb-6 px-4 sm:pt-[calc(6rem+env(safe-area-inset-top))] sm:pb-8 sm:px-6">
         <div className="max-w-[680px] mx-auto text-center">
           <div className="prestige-eyebrow inline-flex items-center gap-2 px-4 py-1.5 bg-[rgba(200,162,77,0.12)] border border-[var(--gold-line)] rounded-full mb-4">
             <Gift className="w-4 h-4" />

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { Cookie } from 'lucide-react';
 
 /**
  * Bandeau d'information cookies (RGPD / ePrivacy).
@@ -31,12 +32,15 @@ export function CookieBanner() {
   if (!visible) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 p-4 sm:p-6 animate-in slide-in-from-bottom duration-300">
+    <div className="fixed bottom-0 left-0 right-0 z-50 px-4 pt-4 sm:px-6 sm:pt-6 pb-[max(1.25rem,env(safe-area-inset-bottom))] pl-safe pr-safe animate-in slide-in-from-bottom duration-300">
       <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.12)] border border-[#e5e5e7] p-5 sm:p-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
           <div className="flex-1">
             <p className="text-[14px] text-[#1d1d1f] leading-relaxed">
-              <span className="font-semibold">🍪 Cookies & Analyse.</span>{' '}
+              <span className="inline-flex items-center gap-1.5 font-semibold">
+                <Cookie className="h-4 w-4 text-[#1d1d1f]" aria-hidden="true" />
+                Cookies & Analyse.
+              </span>{' '}
               Nous utilisons des cookies pour la connexion et des outils d&apos;analyse (Google Analytics, Facebook Pixel) 
               afin de mesurer nos performances publicitaires.{' '}
               <Link 
