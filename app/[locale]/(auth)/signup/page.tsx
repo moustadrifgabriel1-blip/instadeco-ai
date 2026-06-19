@@ -134,7 +134,7 @@ function SignupForm() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Image
-            src="/images/logo-v3-house-sparkle.svg"
+            src="/images/logo-prestige.svg"
             alt="InstaDeco AI"
             width={64}
             height={64}

@@ -193,7 +193,7 @@ export async function GET(req: Request) {
       if (await sendCapped({
         from: FROM_EMAIL,
         to: [lead.email],
-        subject: `🎨 Votre style ${quizStyle} vous attend — testez-le sur vos photos !`,
+        subject: `🎨 Votre style ${quizStyle} vous attend, testez-le sur vos photos !`,
         html: buildQuizFollowUpEmail(lead.name || 'là', lead.email, quizStyle),
       }) === 'sent') {
         results.quiz++;
@@ -201,7 +201,7 @@ export async function GET(req: Request) {
     }
 
     // ========================================
-    // TRIAL: J+1 — Rappel résultat + inscription
+    // TRIAL: J+1, Rappel résultat + inscription
     // Leads qui ont fait l'essai il y a 1 jour et ne sont pas inscrits
     // ========================================
     const { data: trialJ1Leads } = await supabaseAdmin
@@ -235,7 +235,7 @@ export async function GET(req: Request) {
     }
 
     // ========================================
-    // TRIAL: J+3 — Inspiration + offre flash
+    // TRIAL: J+3, Inspiration + offre flash
     // ========================================
     const { data: trialJ3Leads } = await supabaseAdmin
       .from('leads')
@@ -258,7 +258,7 @@ export async function GET(req: Request) {
       if (await sendCapped({
         from: FROM_EMAIL,
         to: [lead.email],
-        subject: '✨ 3 crédits offerts — Transformez toutes vos pièces',
+        subject: '✨ 3 crédits offerts, Transformez toutes vos pièces',
         html: buildTrialJ3Email(lead.name || 'là', lead.email),
       }) === 'sent') {
         results.trial_j3++;
@@ -266,7 +266,7 @@ export async function GET(req: Request) {
     }
 
     // ========================================
-    // TRIAL: J+7 — Dernière chance + offre -20%
+    // TRIAL: J+7, Dernière chance + offre -20%
     // ========================================
     const { data: trialJ7Leads } = await supabaseAdmin
       .from('leads')
@@ -364,7 +364,7 @@ function buildJ3Email(name: string, email: string): string {
     </p>
     
     <p style="color: #b3a89a; line-height: 1.6; margin: 0 0 24px;">
-      <strong style="color: #faf8f4;">Vos 3 crédits gratuits vous attendent</strong> — prenez simplement
+      <strong style="color: #faf8f4;">Vos 3 crédits gratuits vous attendent</strong>, prenez simplement
       une photo de votre pièce et découvrez-la transformée en 30 secondes.
     </p>
 
@@ -397,7 +397,7 @@ function buildJ7Email(name: string, email: string): string {
     <div style="margin: 0 0 24px;">
       <div style="background: #1c1917; border-radius: 12px; padding: 16px; margin: 0 0 12px;">
         <p style="margin: 0 0 4px; font-weight: 600; color: #faf8f4;">🏠 Salon Moderne Minimaliste</p>
-        <p style="margin: 0; color: #b3a89a; font-size: 14px;">Le style le plus demandé — lignes épurées, tons neutres, espaces ouverts.</p>
+        <p style="margin: 0; color: #b3a89a; font-size: 14px;">Le style le plus demandé, lignes épurées, tons neutres, espaces ouverts.</p>
       </div>
       <div style="background: #1c1917; border-radius: 12px; padding: 16px; margin: 0 0 12px;">
         <p style="margin: 0 0 4px; font-weight: 600; color: #faf8f4;">🌿 Chambre Japandi</p>
@@ -405,12 +405,12 @@ function buildJ7Email(name: string, email: string): string {
       </div>
       <div style="background: #1c1917; border-radius: 12px; padding: 16px;">
         <p style="margin: 0 0 4px; font-weight: 600; color: #faf8f4;">🏭 Bureau Industriel</p>
-        <p style="margin: 0; color: #b3a89a; font-size: 14px;">Briques, métal et bois brut — le style qui booste la productivité.</p>
+        <p style="margin: 0; color: #b3a89a; font-size: 14px;">Briques, métal et bois brut, le style qui booste la productivité.</p>
       </div>
     </div>
     
     <p style="color: #b3a89a; line-height: 1.6; margin: 0 0 24px;">
-      <strong style="color: #faf8f4;">12 styles, 8 types de pièces, ~30 secondes</strong> — c'est tout ce qu'il faut pour visualiser votre intérieur autrement.
+      <strong style="color: #faf8f4;">12 styles, 8 types de pièces, ~30 secondes</strong>, c'est tout ce qu'il faut pour visualiser votre intérieur autrement.
       Et votre pièce ?
     </p>
     
@@ -467,7 +467,7 @@ function buildJ14Email(name: string, email: string): string {
     </div>
     
     <p style="color: #8c8478; font-size: 13px; text-align: center; margin: 16px 0 0;">
-      Pas intéressé ? Pas de souci — vos 3 crédits gratuits n'expirent jamais.
+      Pas intéressé ? Pas de souci, vos 3 crédits gratuits n'expirent jamais.
     </p>
   `, unsubUrl);
 }
@@ -559,7 +559,7 @@ function buildTrialJ1Email(name: string, email: string, style: string): string {
     <div style="text-align: center; margin: 24px 0;">
       <a href="https://instadeco.app/signup"
          style="display: inline-block; background: linear-gradient(135deg, #c8a24d, #a8842f); color: #0c0a09; text-decoration: none; padding: 14px 32px; border-radius: 50px; font-weight: 600; font-size: 16px;">
-        Créer mon compte — 3 crédits offerts →
+        Créer mon compte, 3 crédits offerts →
       </a>
     </div>
     
@@ -647,7 +647,7 @@ function buildTrialJ7Email(name: string, email: string): string {
     </div>
     
     <p style="color: #8c8478; font-size: 13px; text-align: center; margin: 16px 0 0;">
-      Pas intéressé ? Pas de souci — votre essai gratuit reste disponible sur inscription.
+      Pas intéressé ? Pas de souci, votre essai gratuit reste disponible sur inscription.
     </p>
   `, unsubUrl);
 }

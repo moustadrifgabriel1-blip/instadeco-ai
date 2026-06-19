@@ -101,7 +101,7 @@ export function GenerationsTab({ generations, refetchGenerations, referralCode }
                       </div>
                       <ShareButtons
                         url="https://instadeco.app/galerie"
-                        title={`Ma transformation déco en style ${gen.styleSlug.replace(/-/g, ' ')} 🏠✨`}
+                        title={`Ma transformation déco en style ${gen.styleSlug.replace(/-/g, ' ')}`}
                         description={`${gen.roomType.replace(/-/g, ' ')} transformé en style ${gen.styleSlug.replace(/-/g, ' ')} avec l'IA`}
                         imageUrl={gen.outputImageUrl}
                         referralCode={referralCode || undefined}

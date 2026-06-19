@@ -94,7 +94,7 @@ export function ShareButtons({
       <div className={`relative ${className}`}>
         <button
           onClick={handleNativeShare}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#636366] hover:text-[#E07B54] bg-[#f5f5f7] hover:bg-[#FFF3ED] rounded-full transition-all duration-200"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[var(--mist)] hover:text-[var(--gold)] bg-[#1c1917] hover:bg-[rgba(200,162,77,0.12)] rounded-full transition-all duration-200"
           aria-label="Partager"
         >
           <Share2 className="w-3.5 h-3.5" />
@@ -119,10 +119,10 @@ export function ShareButtons({
       <div className={`relative ${className}`}>
         <button
           onClick={handleNativeShare}
-          className="w-11 h-11 flex items-center justify-center rounded-full bg-white/90 backdrop-blur-md shadow-lg hover:bg-[#FFF3ED] hover:shadow-xl transition-all duration-200 border border-black/5"
+          className="w-11 h-11 flex items-center justify-center rounded-full bg-[#1c1917]/90 backdrop-blur-md shadow-lg hover:bg-[rgba(200,162,77,0.12)] hover:shadow-xl transition-all duration-200 border border-[var(--gold-line)]"
           aria-label="Partager"
         >
-          <Share2 className="w-4 h-4 text-[#E07B54]" />
+          <Share2 className="w-4 h-4 text-[var(--gold)]" />
         </button>
         {showMenu && (
           <ShareMenu
@@ -176,7 +176,7 @@ export function ShareButtons({
         className={`inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-full transition-all duration-200 shadow-sm hover:shadow-md ${
           copied
             ? 'text-white bg-green-500'
-            : 'text-[#636366] bg-[#f5f5f7] hover:bg-[#e8e8ed]'
+            : 'text-[var(--mist)] bg-[#1c1917] hover:bg-[#26211c]'
         }`}
         aria-label="Copier le lien"
       >
@@ -208,14 +208,14 @@ function ShareMenu({
       {/* Overlay transparent pour fermer */}
       <div className="fixed inset-0 z-40" onClick={onClose} />
       <div
-        className={`absolute z-50 mt-2 w-52 bg-white rounded-2xl shadow-2xl border border-black/5 py-2 animate-in fade-in slide-in-from-top-2 duration-200 ${
+        className={`absolute z-50 mt-2 w-52 bg-[#1c1917] rounded-2xl shadow-2xl border border-[var(--gold-line)] py-2 animate-in fade-in slide-in-from-top-2 duration-200 ${
           position === 'bottom-right' ? 'right-0' : 'left-0'
         }`}
       >
-        <div className="px-3 py-2 border-b border-black/5">
+        <div className="px-3 py-2 border-b border-[var(--gold-line)]">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-[#636366] uppercase tracking-wider">Partager</span>
-            <button onClick={onClose} className="text-[#636366] hover:text-[#1d1d1f]">
+            <span className="text-xs font-semibold text-[var(--mist)] uppercase tracking-wider">Partager</span>
+            <button onClick={onClose} className="text-[var(--mist)] hover:text-[var(--ivory)]">
               <X className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -223,7 +223,7 @@ function ShareMenu({
         
         <button
           onClick={() => { openShareLink(shareLinks.whatsapp); onClose(); }}
-          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#1d1d1f] hover:bg-[#f5f5f7] transition-colors"
+          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--ivory)] hover:bg-[rgba(200,162,77,0.1)] transition-colors"
         >
           <span className="w-8 h-8 flex items-center justify-center rounded-full bg-[#25D366]">
             <MessageCircle className="w-4 h-4 text-white" />
@@ -233,7 +233,7 @@ function ShareMenu({
         
         <button
           onClick={() => { openShareLink(shareLinks.pinterest); onClose(); }}
-          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#1d1d1f] hover:bg-[#f5f5f7] transition-colors"
+          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--ivory)] hover:bg-[rgba(200,162,77,0.1)] transition-colors"
         >
           <span className="w-8 h-8 flex items-center justify-center rounded-full bg-[#E60023]">
             <PinterestIcon className="w-4 h-4 text-white" />
@@ -243,7 +243,7 @@ function ShareMenu({
         
         <button
           onClick={() => { openShareLink(shareLinks.twitter); onClose(); }}
-          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#1d1d1f] hover:bg-[#f5f5f7] transition-colors"
+          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--ivory)] hover:bg-[rgba(200,162,77,0.1)] transition-colors"
         >
           <span className="w-8 h-8 flex items-center justify-center rounded-full bg-[#1DA1F2]">
             <XIcon className="w-4 h-4 text-white" />
@@ -253,7 +253,7 @@ function ShareMenu({
 
         <button
           onClick={() => { openShareLink(shareLinks.facebook); onClose(); }}
-          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#1d1d1f] hover:bg-[#f5f5f7] transition-colors"
+          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--ivory)] hover:bg-[rgba(200,162,77,0.1)] transition-colors"
         >
           <span className="w-8 h-8 flex items-center justify-center rounded-full bg-[#1877F2]">
             <FacebookIcon className="w-4 h-4 text-white" />
@@ -261,12 +261,12 @@ function ShareMenu({
           Facebook
         </button>
 
-        <div className="border-t border-black/5 mt-1 pt-1">
+        <div className="border-t border-[var(--gold-line)] mt-1 pt-1">
           <button
             onClick={() => { onCopy(); }}
-            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#1d1d1f] hover:bg-[#f5f5f7] transition-colors"
+            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--ivory)] hover:bg-[rgba(200,162,77,0.1)] transition-colors"
           >
-            <span className={`w-8 h-8 flex items-center justify-center rounded-full ${copied ? 'bg-green-500' : 'bg-[#636366]'}`}>
+            <span className={`w-8 h-8 flex items-center justify-center rounded-full ${copied ? 'bg-green-500' : 'bg-[#3a342d]'}`}>
               {copied ? <Check className="w-4 h-4 text-white" /> : <Copy className="w-4 h-4 text-white" />}
             </span>
             {copied ? 'Lien copié !' : 'Copier le lien'}

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Gift, Share2, Copy, CheckCircle2, Users, Sparkles } from 'lucide-react';
+import { Gift, Share2, Copy, CheckCircle2, Users, Sparkles, MessageCircle } from 'lucide-react';
 import { trackReferralShared } from '@/lib/analytics/gtag';
 import type { ReferralStats } from './useReferral';
 
@@ -107,7 +107,8 @@ export function ReferralTab({ referralCode, referralStats }: ReferralTabProps) {
               Partager le lien
             </Button>
             <Button variant="outline" className="flex-1" onClick={shareWhatsApp}>
-              💬 WhatsApp
+              <MessageCircle className="w-4 h-4 mr-2" />
+              WhatsApp
             </Button>
           </div>
         </CardContent>

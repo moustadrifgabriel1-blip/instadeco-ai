@@ -134,7 +134,7 @@ export function GenerationCard({
               </Button>
               <ShareButtons
                 url={`https://instadeco.app/galerie`}
-                title={`Ma transformation déco en style ${styleSlug.replace(/-/g, ' ')} 🏠✨`}
+                title={`Ma transformation déco en style ${styleSlug.replace(/-/g, ' ')}`}
                 description={`${roomTypeSlug.replace(/-/g, ' ')} transformé en style ${styleSlug.replace(/-/g, ' ')} avec InstaDeco AI`}
                 imageUrl={outputImageUrl}
                 variant="floating"

@@ -196,7 +196,7 @@ export function GalleryClient({ initialItems, initialTotal }: GalleryClientProps
                 <div className="absolute top-3 right-3 flex gap-1.5 opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 transition-opacity duration-300">
                   <ShareButtons
                     url="https://instadeco.app/galerie"
-                    title={`Transformation ${ROOM_LABELS[item.room_type_slug] || item.room_type_slug} style ${STYLE_LABELS[item.style_slug] || item.style_slug} 🏠✨`}
+                    title={`Transformation ${ROOM_LABELS[item.room_type_slug] || item.room_type_slug} style ${STYLE_LABELS[item.style_slug] || item.style_slug}`}
                     imageUrl={item.output_image_url}
                     variant="floating"
                   />

@@ -591,7 +591,7 @@ export default function EssaiPage() {
                 </div>
                 <ShareButtons
                   url="https://instadeco.app/essai"
-                  title={`Regardez ma transformation déco en style ${selectedStyleInfo?.name} ! 🏠✨ Testez gratuitement :`}
+                  title={`Regardez ma transformation déco en style ${selectedStyleInfo?.name} ! Testez gratuitement :`}
                   description="J'ai transformé ma pièce avec l'IA en 30 secondes. Testez gratuitement !"
                   imageUrl={generatedImage}
                   variant="inline"

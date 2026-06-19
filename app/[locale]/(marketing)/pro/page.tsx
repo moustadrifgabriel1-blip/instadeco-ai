@@ -27,7 +27,7 @@ interface ProPlan {
   name: string;
   tagline: string;
   monthly: number;       // €/mois en facturation mensuelle
-  annual: number;        // €/mois équivalent en facturation annuelle (−30%)
+  annual: number;        // €/mois équivalent en facturation annuelle (-30%)
   annualBilled: string;  // libellé "Facturé X€/an"
   features: string[];
   popular: boolean;
@@ -544,7 +544,7 @@ export default function ProPage() {
                   billingPeriod === 'annual' ? 'bg-[var(--gold)] text-[#0c0a09]' : 'text-muted-foreground'
                 }`}
               >
-                Annuel <span className={`font-bold ${billingPeriod === 'annual' ? 'text-[#0c0a09]' : 'text-[var(--gold)]'}`}>−30%</span>
+                Annuel <span className={`font-bold ${billingPeriod === 'annual' ? 'text-[#0c0a09]' : 'text-[var(--gold)]'}`}>-30%</span>
               </button>
             </div>
           </div>

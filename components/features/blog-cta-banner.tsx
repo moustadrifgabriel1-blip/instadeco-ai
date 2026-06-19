@@ -38,22 +38,22 @@ const TAG_CTA_MAP: Record<string, { title: string; description: string; style?: 
   },
   'moderne': {
     title: 'Passez au style moderne chez vous',
-    description: 'Lignes épurées, tons neutres — visualisez votre pièce en style moderne.',
+    description: 'Lignes épurées, tons neutres : visualisez votre pièce en style moderne.',
     style: 'moderne',
   },
   'scandinave': {
     title: 'Le style scandinave chez vous, maintenant',
-    description: 'Bois clair, simplicité, hygge — testez le scandinave sur vos photos.',
+    description: 'Bois clair, simplicité, hygge : testez le scandinave sur vos photos.',
     style: 'scandinave',
   },
   'industriel': {
     title: 'Adoptez le style industriel',
-    description: 'Briques, métal, bois brut — voyez votre pièce en mode loft.',
+    description: 'Briques, métal, bois brut : voyez votre pièce en mode loft.',
     style: 'industriel',
   },
   'bohème': {
     title: 'Libérez le bohème en vous',
-    description: 'Couleurs chaudes, textures, plantes — le bohème transforme tout.',
+    description: 'Couleurs chaudes, textures, plantes : le bohème transforme tout.',
     style: 'boheme',
   },
   'japandi': {
@@ -68,7 +68,7 @@ const TAG_CTA_MAP: Record<string, { title: string; description: string; style?: 
   },
   'art déco': {
     title: 'L\'élégance Art Déco dans votre intérieur',
-    description: 'Géométrie, dorures, luxe — voyez votre pièce en Art Déco.',
+    description: 'Géométrie, dorures, luxe : voyez votre pièce en Art Déco.',
     style: 'art-deco',
   },
   'home staging': {

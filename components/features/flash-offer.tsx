@@ -101,12 +101,12 @@ export function FlashOffer({
 
   return (
     <div className={`relative overflow-hidden ${className}`}>
-      {/* Fond avec gradient animé */}
-      <div className={`rounded-[24px] border-2 ${isPulsing ? 'border-[#E07B54] animate-pulse' : 'border-[#F5D5C8]'} bg-gradient-to-br from-[#FFF8F5] via-[#FFF0E8] to-[#FFE4D9] p-6 sm:p-8 shadow-lg`}>
-        
+      {/* Fond prestige nuit + or */}
+      <div className={`rounded-[24px] border ${isPulsing ? 'border-[var(--gold)] animate-pulse' : 'border-[var(--gold-line)]'} bg-[var(--ink)] p-6 sm:p-8 shadow-lg`}>
+
         {/* Badge "Offre limitée" */}
         <div className="flex items-center justify-center mb-4">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#E07B54] text-white rounded-full text-sm font-bold shadow-lg shadow-[#E07B54]/30">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[var(--gold)] text-[#0c0a09] rounded-full text-sm font-bold shadow-lg shadow-[var(--gold)]/20">
             <Flame className="w-4 h-4 animate-bounce" />
             OFFRE DE BIENVENUE
             <Flame className="w-4 h-4 animate-bounce" />
@@ -114,19 +114,19 @@ export function FlashOffer({
         </div>
 
         {/* Titre */}
-        <h3 className="text-center text-[24px] sm:text-[28px] font-bold text-[#1d1d1f] tracking-[-0.02em] mb-1">
-          {credits} générations pour <span className="text-[#E07B54]">{flashPrice}</span>
+        <h3 className="prestige-display text-center text-[24px] sm:text-[28px] font-semibold text-[var(--ivory)] tracking-[-0.02em] mb-1">
+          {credits} générations pour <span className="text-[var(--gold)]">{flashPrice}</span>
         </h3>
-        <p className="text-center text-[15px] text-[#636366] mb-5">
-          au lieu de <span className="line-through">{originalPrice}</span> — <span className="font-semibold text-[#E07B54]">-50%</span>
+        <p className="text-center text-[15px] text-[var(--mist)] mb-5">
+          au lieu de <span className="line-through">{originalPrice}</span>, <span className="font-semibold text-[var(--gold)]">-50%</span>
         </p>
 
         {/* Countdown */}
         <div className="flex justify-center mb-5">
-          <div className={`inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-white/80 backdrop-blur-md border ${isPulsing ? 'border-red-200 bg-red-50/50' : 'border-black/5'} shadow-sm`}>
-            <Clock className={`w-5 h-5 ${isPulsing ? 'text-red-500' : 'text-[#E07B54]'}`} />
+          <div className={`inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-[#1c1917] border ${isPulsing ? 'border-red-500/40' : 'border-[var(--gold-line)]'} shadow-sm`}>
+            <Clock className={`w-5 h-5 ${isPulsing ? 'text-red-400' : 'text-[var(--gold)]'}`} />
             <div className="text-center">
-              <span className={`text-[28px] font-mono font-bold tracking-wider ${isPulsing ? 'text-red-500' : 'text-[#1d1d1f]'}`}>
+              <span className={`text-[28px] font-mono font-bold tracking-wider ${isPulsing ? 'text-red-400' : 'text-[var(--ivory)]'}`}>
                 {formatTime(timeLeft)}
               </span>
             </div>
@@ -134,25 +134,25 @@ export function FlashOffer({
         </div>
 
         {/* Barre de progression */}
-        <div className="w-full max-w-xs mx-auto h-1.5 bg-white/60 rounded-full overflow-hidden mb-5">
+        <div className="w-full max-w-xs mx-auto h-1.5 bg-[#1c1917] rounded-full overflow-hidden mb-5">
           <div
-            className={`h-full rounded-full transition-all duration-1000 ease-linear ${isPulsing ? 'bg-red-500' : 'bg-[#E07B54]'}`}
+            className={`h-full rounded-full transition-all duration-1000 ease-linear ${isPulsing ? 'bg-red-400' : 'bg-[var(--gold)]'}`}
             style={{ width: `${percentage}%` }}
           />
         </div>
 
         {/* Avantages */}
         <div className="flex flex-wrap justify-center gap-3 mb-6">
-          <span className="inline-flex items-center gap-1.5 text-[13px] font-medium text-[#1d1d1f] bg-white/70 px-3 py-1.5 rounded-full">
-            <Check className="w-3.5 h-3.5 text-green-500" />
+          <span className="inline-flex items-center gap-1.5 text-[13px] font-medium text-[var(--ivory)] bg-[#1c1917] px-3 py-1.5 rounded-full">
+            <Check className="w-3.5 h-3.5 text-[var(--gold)]" />
             {credits} transformations IA
           </span>
-          <span className="inline-flex items-center gap-1.5 text-[13px] font-medium text-[#1d1d1f] bg-white/70 px-3 py-1.5 rounded-full">
-            <Check className="w-3.5 h-3.5 text-green-500" />
+          <span className="inline-flex items-center gap-1.5 text-[13px] font-medium text-[var(--ivory)] bg-[#1c1917] px-3 py-1.5 rounded-full">
+            <Check className="w-3.5 h-3.5 text-[var(--gold)]" />
             HD inclus
           </span>
-          <span className="inline-flex items-center gap-1.5 text-[13px] font-medium text-[#1d1d1f] bg-white/70 px-3 py-1.5 rounded-full">
-            <Check className="w-3.5 h-3.5 text-green-500" />
+          <span className="inline-flex items-center gap-1.5 text-[13px] font-medium text-[var(--ivory)] bg-[#1c1917] px-3 py-1.5 rounded-full">
+            <Check className="w-3.5 h-3.5 text-[var(--gold)]" />
             Sans abonnement
           </span>
         </div>
@@ -161,13 +161,13 @@ export function FlashOffer({
         <div className="flex flex-col items-center gap-3">
           <Link
             href={stripePaymentUrl}
-            className="group w-full max-w-sm inline-flex items-center justify-center gap-2 bg-[#E07B54] text-white px-8 py-4 rounded-full text-[17px] font-bold hover:bg-[#d06a45] transition-all duration-200 shadow-xl shadow-[#E07B54]/30 active:scale-[0.98] hover:scale-[1.02]"
+            className="group w-full max-w-sm inline-flex items-center justify-center gap-2 bg-[var(--gold)] text-[#0c0a09] px-8 py-4 rounded-full text-[17px] font-bold hover:bg-[#d4b15f] transition-all duration-200 shadow-xl shadow-[var(--gold)]/20 active:scale-[0.98] hover:scale-[1.02]"
           >
             <Zap className="w-5 h-5" />
-            Profiter de l&apos;offre — {flashPrice}
+            Profiter de l&apos;offre, {flashPrice}
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Link>
-          <p className="text-[11px] text-[#636366]">
+          <p className="text-[11px] text-[var(--mist)]">
             Paiement sécurisé par Stripe • Sans engagement
           </p>
         </div>
