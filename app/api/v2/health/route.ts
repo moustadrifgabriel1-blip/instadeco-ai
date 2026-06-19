@@ -65,12 +65,13 @@ export async function GET(req: Request) {
   // Checks lourds (storage, RPC) : seulement pour un appelant authentifie,
   // pour eviter qu'un anonyme declenche des appels admin a volonte.
   if (isAuthed) {
+    const { createClient: createAdmin } = await import('@supabase/supabase-js');
+    const admin = createAdmin(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    );
+
     try {
-      const { createClient: createAdmin } = await import('@supabase/supabase-js');
-      const admin = createAdmin(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!,
-      );
       const { data: buckets } = await admin.storage.listBuckets();
       checks['supabase:bucket:input-images'] = {
         ok: !!buckets?.find((b) => b.name === 'input-images'),
@@ -88,11 +89,6 @@ export async function GET(req: Request) {
     }
 
     try {
-      const { createClient: createAdmin } = await import('@supabase/supabase-js');
-      const admin = createAdmin(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!,
-      );
       const { error } = await admin.rpc('deduct_credits', {
         user_id_input: '00000000-0000-0000-0000-000000000000',
         amount_input: 1,
