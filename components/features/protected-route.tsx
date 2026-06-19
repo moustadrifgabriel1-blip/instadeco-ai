@@ -22,7 +22,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   // Afficher un loader pendant la vérification
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#fbfbfd]">
+      <div className="min-h-[100dvh] flex items-center justify-center bg-[#fbfbfd]">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-[#d2d2d7] border-t-[#1d1d1f] rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-[#636366]">Vérification de l&apos;authentification...</p>

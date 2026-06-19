@@ -62,7 +62,7 @@ export default async function AmenagerPage({ params }: PageProps) {
   const styleLabel = page.style;
 
   return (
-    <div className="prestige-app flex flex-col min-h-screen bg-background">
+    <div className="prestige-app flex flex-col min-h-[100dvh] bg-background">
       <JsonLd data={[
         generateBreadcrumbList([
           { label: 'Aménager', path: withLocalePath(locale, '/amenager') },

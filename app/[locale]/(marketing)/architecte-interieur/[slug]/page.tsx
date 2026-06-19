@@ -185,7 +185,7 @@ export default async function CityPage({ params }: PageProps) {
   ];
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className="flex flex-col min-h-[100dvh] bg-background">
       <JsonLd data={[
         generateServiceSchema({
           name: city.name,

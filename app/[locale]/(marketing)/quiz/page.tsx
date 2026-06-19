@@ -355,7 +355,7 @@ export default function QuizPage() {
   // ── INTRO ──
   if (step === 'intro') {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-[100dvh] bg-background">
         <section className="pt-6 pb-12 px-4 sm:pt-8 sm:pb-20 sm:px-6">
           <div className="max-w-[600px] mx-auto text-center">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[rgba(200,162,77,0.12)] border border-[var(--gold-line)] text-[var(--gold)] rounded-full text-sm font-medium mb-6">
@@ -411,7 +411,7 @@ export default function QuizPage() {
     const question = QUIZ_QUESTIONS[currentQuestion];
 
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-[100dvh] bg-background">
         {/* Header avec progression */}
         <nav className="sticky top-16 z-40 bg-background/80 backdrop-blur-xl border-b border-[var(--gold-line)]">
           <div className="max-w-[980px] mx-auto px-6">
@@ -496,7 +496,7 @@ export default function QuizPage() {
   // ── EMAIL CAPTURE ──
   if (step === 'email') {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center px-6">
+      <div className="min-h-[100dvh] bg-background flex items-center justify-center px-6">
         <div className="max-w-[440px] w-full text-center">
           <div className="w-16 h-16 mx-auto mb-5 rounded-full bg-[rgba(200,162,77,0.12)] border border-[var(--gold-line)] flex items-center justify-center shadow-lg shadow-[var(--gold-soft)]/20">
             <Sparkles className="w-7 h-7 text-[var(--gold)]" />
@@ -555,7 +555,7 @@ export default function QuizPage() {
   if (step === 'result' && resultStyle) {
     const ResultIcon = resultStyle.icon;
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-[100dvh] bg-background">
         <section className="pt-8 pb-20 px-6">
           <div className="max-w-[640px] mx-auto">
             {/* Résultat principal */}

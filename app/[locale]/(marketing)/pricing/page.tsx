@@ -61,7 +61,7 @@ const TRUST_ICON_MAP: Record<string, LucideIcon> = {
 
 export default function PricingPageWrapper() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-background" />}>
+    <Suspense fallback={<div className="min-h-[100dvh] bg-background" />}>
       <PricingPage />
     </Suspense>
   );
@@ -162,7 +162,7 @@ function PricingPage() {
   const isAnyLoading = isLoading || subLoading;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-[100dvh] bg-background">
       {/* Hero */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-16 md:py-20 text-center relative overflow-hidden">
         <div className="absolute top-10 left-10 w-20 h-20 bg-[var(--gold-soft)] rounded-full blur-3xl opacity-40 hidden sm:block" />

@@ -304,7 +304,10 @@
 .prestige-root {
   background-color: var(--ink);
   color: #faf8f4;
+  /* 100vh d'abord (fallback navigateurs anciens), puis 100dvh qui suit la
+     barre d'outils mobile : plus de contenu rogne en bas sur iOS/Android. */
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
 /* Surface applicative : remap des tokens shadcn vers la palette nuit + or.

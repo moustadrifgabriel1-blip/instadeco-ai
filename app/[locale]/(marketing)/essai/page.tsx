@@ -243,7 +243,7 @@ export default function EssaiPage() {
   const selectedStyleInfo = TRIAL_STYLES.find((s) => s.id === selectedStyle);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-[100dvh] bg-background">
       {/* Navigation simplifiée */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-[var(--gold-line)]">
         <div className="max-w-[980px] mx-auto px-6 h-12 flex items-center justify-between">

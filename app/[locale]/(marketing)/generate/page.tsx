@@ -292,7 +292,7 @@ function GenerateContent() {
     .find(s => s.id === selectedStyle);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-[100dvh] bg-background">
       {/* Bandeau : ton studio */}
       <div className="bg-[var(--stone-900)] text-foreground py-2.5 px-4 text-center border-b border-[var(--gold-line)]">
         <p className="prestige-eyebrow text-[11px] sm:text-[12px] mb-1 text-[var(--gold)]">

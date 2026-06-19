@@ -32,7 +32,7 @@ export default function CGVPage() {
   const lastUpdated = '22 janvier 2026';
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-[100dvh] bg-background">
       <div className="max-w-4xl mx-auto px-4 py-16">
         <LegalFrenchBodyNotice />
         <p className="prestige-eyebrow mb-3">InstaDeco AI</p>

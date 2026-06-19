@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 export default function ParrainagePage() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-[100dvh] bg-background">
       {/* Hero */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-16 sm:py-20 md:py-24 text-center">
         <div className="inline-flex items-center gap-2 bg-[rgba(200,162,77,0.12)] border border-[var(--gold-line)] text-[var(--gold)] px-4 py-2 rounded-full text-sm font-medium mb-6">

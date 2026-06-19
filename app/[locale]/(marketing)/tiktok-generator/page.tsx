@@ -4,7 +4,7 @@ import { Film, Zap, Share2, Sparkles } from 'lucide-react';
 
 export default function TikTokGeneratorPage() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-[100dvh] bg-background">
       {/* Hero */}
       <section className="relative pt-20 pb-12 overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-primary/5 to-background -z-10" />

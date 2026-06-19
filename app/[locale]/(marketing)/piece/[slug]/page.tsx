@@ -78,7 +78,7 @@ export default async function RoomPage({ params }: PageProps) {
   );
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-[100dvh] bg-background">
       <JsonLd data={[
         generateWebPageSchema({
           title: `Décoration ${room.name}`,

@@ -38,7 +38,7 @@ function PaymentSuccessContent() {
 
   if (isVerifying) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-[100dvh] flex items-center justify-center bg-background">
         <Card className="w-full max-w-md bg-card border border-border">
           <CardContent className="pt-6">
             <div className="flex flex-col items-center space-y-4">
@@ -57,7 +57,7 @@ function PaymentSuccessContent() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+    <div className="min-h-[100dvh] flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md bg-card border border-border">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
@@ -109,7 +109,7 @@ function PaymentSuccessContent() {
 
 function LoadingFallback() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
+    <div className="min-h-[100dvh] flex items-center justify-center bg-background">
       <Card className="w-full max-w-md bg-card border border-border">
         <CardContent className="pt-6">
           <div className="flex flex-col items-center space-y-4">

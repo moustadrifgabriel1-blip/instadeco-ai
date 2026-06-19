@@ -18,7 +18,7 @@ export default function MarketingLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className={`${cormorant.variable} ${josefin.variable} prestige-app min-h-screen`}>
+    <div className={`${cormorant.variable} ${josefin.variable} prestige-app min-h-[100dvh]`}>
       {children}
       <PrestigeRevealObserver />
     </div>

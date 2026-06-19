@@ -400,7 +400,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   const heroImageUrl = getBlogImageUrl(mainTag, article.slug, 1200, 600);
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-[100dvh] bg-background pb-20">
       {/* Hero Header avec Image */}
       <div className="relative h-[400px] md:h-[500px] w-full overflow-hidden">
         <Image 

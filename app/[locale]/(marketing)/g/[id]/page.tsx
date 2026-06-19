@@ -115,7 +115,7 @@ export default async function PublicGenerationPage({ params }: PageProps) {
     .slice(0, 4);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-[100dvh] bg-background">
       {/* Hero Section */}
       <section className="relative">
         <div className="container mx-auto px-4 py-12 md:py-20">

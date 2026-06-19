@@ -130,7 +130,7 @@ function SignupForm() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-6 py-12">
+    <div className="min-h-[100dvh] bg-background flex items-center justify-center px-6 py-12">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Image
@@ -302,7 +302,7 @@ function SignupForm() {
 export default function SignupPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-[100dvh] bg-background flex items-center justify-center">
         <div className="animate-spin w-8 h-8 border-2 border-[var(--gold)] border-t-transparent rounded-full" />
       </div>
     }>

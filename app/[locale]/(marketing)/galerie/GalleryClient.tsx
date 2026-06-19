@@ -83,7 +83,7 @@ export function GalleryClient({ initialItems, initialTotal }: GalleryClientProps
   }, [fetchGallery]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-[100dvh] bg-background">
       {/* Hero */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16 text-center">
         <div className="prestige-eyebrow inline-flex items-center gap-2 bg-[rgba(200,162,77,0.12)] text-[var(--gold)] px-4 py-2 rounded-full text-sm font-medium mb-6 border border-[var(--gold-line)]">

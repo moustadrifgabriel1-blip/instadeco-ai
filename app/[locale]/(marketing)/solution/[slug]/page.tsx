@@ -101,7 +101,7 @@ export default async function IntentPage({ params }: PageProps) {
   const relatedPages = INTENT_PAGES.filter((p) => p.slug !== page.slug).slice(0, 3);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-[100dvh] bg-background">
       <JsonLd data={[
         generateWebPageSchema({
           title: page.title,

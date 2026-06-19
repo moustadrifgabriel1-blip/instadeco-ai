@@ -75,7 +75,7 @@ export default async function StylePage({ params }: PageProps) {
     .slice(0, 4);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-[100dvh] bg-background">
       <JsonLd data={[
         generateWebPageSchema({
           title: style.title,

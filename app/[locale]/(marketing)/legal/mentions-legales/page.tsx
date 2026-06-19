@@ -31,7 +31,7 @@ export default function MentionsLegalesPage() {
   const lastUpdated = '22 janvier 2026';
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-[100dvh] bg-background">
       <div className="max-w-4xl mx-auto px-4 py-16">
         <LegalFrenchBodyNotice />
         <h1 className="prestige-display text-4xl font-bold text-foreground mb-8">Mentions <span className="text-[var(--gold)]">Légales</span></h1>

@@ -48,7 +48,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const faqData = t.raw('faq') as { question: string; answer: string }[];
 
   return (
-    <main className="prestige-app min-h-screen">
+    <main className="prestige-app min-h-[100dvh]">
       <JsonLd data={[generateFAQSchema(faqData), generateHowToSchema()]} />
 
       {/* Expérience cinématique de prestige (ex page /visite), désormais en tête

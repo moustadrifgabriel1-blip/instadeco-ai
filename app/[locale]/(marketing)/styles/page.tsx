@@ -184,7 +184,7 @@ const FAQ = [
 export default async function StylesIndexPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className="flex flex-col min-h-[100dvh] bg-background">
       <JsonLd data={[
         generateBreadcrumbList([{ label: 'Styles', path: withLocalePath(locale, '/styles') }], {
           home: { name: 'Accueil', url: withLocalePath(locale, '/') },
