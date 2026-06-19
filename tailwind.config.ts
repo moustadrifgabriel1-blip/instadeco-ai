@@ -10,12 +10,22 @@ const config: Config = {
   theme: {
   	container: {
   		center: true,
-  		padding: '2rem',
+  		padding: {
+  			DEFAULT: '1rem',
+  			sm: '1.5rem',
+  			md: '2rem'
+  		},
   		screens: {
   			'2xl': '1400px'
   		}
   	},
   	extend: {
+  		// Ajout net d'un palier sous le sm de Tailwind pour piloter
+  		// finement les petits telephones (iPhone SE, petits Android).
+  		// Les paliers sm/md/lg/xl restent les defauts (zero impact desktop).
+  		screens: {
+  			xs: '360px'
+  		},
   		fontFamily: {
   			sans: ['var(--font-inter)', 'sans-serif'],
   			heading: ['var(--font-playfair)', 'serif'],
