@@ -40,6 +40,15 @@ const SUBSCRIPTION_PLANS: Record<string, { proPlan: ProPlan; monthlyCredits: num
 };
 
 /**
+ * Quantités de crédits valides = les seuls packs vendus (pack_10/25/50/100).
+ * Defense en profondeur : même si l'event est signé, on ne crédite jamais une
+ * quantité hors de cet ensemble (rempart contre une metadata.credits forgée ou
+ * un futur mauvais mapping pack -> crédits). Coupon-safe (la quantité de crédits
+ * ne dépend pas du montant payé).
+ */
+const VALID_CREDIT_AMOUNTS = new Set([10, 25, 50, 100]);
+
+/**
  * Use Case: Traiter les webhooks Stripe
  *
  * Gère les événements:
@@ -171,6 +180,12 @@ export class ProcessStripeWebhookUseCase {
       const credits = parseInt(metadata.credits, 10);
       const userId = metadata.userId;
 
+      // Defense en profondeur : ne jamais créditer une quantité hors des packs connus.
+      if (!VALID_CREDIT_AMOUNTS.has(credits)) {
+        this.logger.error('Webhook crédits: quantité hors packs connus, rejetée', undefined as unknown as Error, { userId, credits });
+        return failure(new PaymentError('Quantité de crédits invalide'));
+      }
+
       const addResult = await this.creditRepo.addCredits(
         userId,
         credits,
@@ -207,8 +222,8 @@ export class ProcessStripeWebhookUseCase {
       const credits = parseInt(metadata.credits, 10);
       const email = (metadata.email || event.customerEmail || '').trim().toLowerCase();
 
-      if (!email || Number.isNaN(credits) || credits <= 0) {
-        this.logger.error('Guest checkout : email ou crédits invalides', undefined as unknown as Error);
+      if (!email || !VALID_CREDIT_AMOUNTS.has(credits)) {
+        this.logger.error('Guest checkout : email ou crédits invalides', undefined as unknown as Error, { credits });
         return failure(new PaymentError('Données guest checkout invalides'));
       }
 

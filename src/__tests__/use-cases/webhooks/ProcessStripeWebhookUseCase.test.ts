@@ -57,6 +57,21 @@ describe('ProcessStripeWebhookUseCase — idempotence', () => {
     expect(mockCreditRepo.addCredits).toHaveBeenCalledTimes(1);
   });
 
+  it('rejette une quantité de crédits hors des packs connus (ex: 999999 forgé) sans créditer', async () => {
+    mockPaymentService.verifyWebhook = vi.fn().mockResolvedValue(
+      success({
+        ...CREDITS_EVENT,
+        eventId: 'evt_forged_credits',
+        metadata: { type: 'credits_purchase', credits: '999999', userId: 'user-1' },
+      }),
+    );
+
+    const result = await useCase.execute({ payload: '{}', signature: 'sig' });
+
+    expect(result.success).toBe(false);
+    expect(mockCreditRepo.addCredits).not.toHaveBeenCalled();
+  });
+
   it('rejette une signature invalide avec le code WEBHOOK_SIGNATURE_INVALID (→ HTTP 400)', async () => {
     mockPaymentService.verifyWebhook = vi.fn().mockResolvedValue(failure(new Error('bad signature')));
 
@@ -118,7 +133,7 @@ describe('ProcessStripeWebhookUseCase — guest checkout', () => {
     customerId: 'cus_guest_1',
     customerEmail: 'guest@example.com',
     amountTotal: 999,
-    metadata: { type: 'guest_credits_purchase', credits: '20', email: 'guest@example.com' },
+    metadata: { type: 'guest_credits_purchase', credits: '25', email: 'guest@example.com' },
   };
 
   beforeEach(() => {
@@ -160,11 +175,11 @@ describe('ProcessStripeWebhookUseCase — guest checkout', () => {
       expect(first.data.action).toBe('guest_account_created_credits_added');
     }
     // Email normalisé + crédits parsés transmis au provisionnement.
-    expect(mockAuthService.provisionGuestForPurchase).toHaveBeenCalledWith('guest@example.com', 20);
+    expect(mockAuthService.provisionGuestForPurchase).toHaveBeenCalledWith('guest@example.com', 25);
     // Crédite l'userId renvoyé par le provisionnement, avec le sessionId pour idempotence.
     expect(mockCreditRepo.addCredits).toHaveBeenCalledWith(
       'guest-user-42',
-      20,
+      25,
       expect.any(String),
       'cs_guest_1',
     );
@@ -196,7 +211,7 @@ describe('ProcessStripeWebhookUseCase — guest checkout', () => {
     }
     expect(mockCreditRepo.addCredits).toHaveBeenCalledWith(
       'existing-user',
-      20,
+      25,
       expect.any(String),
       'cs_guest_1',
     );
