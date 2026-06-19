@@ -5,16 +5,23 @@ export const dynamic = 'force-dynamic';
 
 /**
  * GET /api/v2/health
- * 
- * Endpoint de diagnostic pour vérifier que tous les services
- * sont correctement configurés en production.
- * 
- * Utilisation : curl https://instadeco.app/api/v2/health
+ *
+ * Endpoint de diagnostic.
+ *
+ * - PUBLIC : renvoie uniquement un statut global (healthy/unhealthy) + code HTTP,
+ *   sans aucun detail (pas de longueur de secret, ni nom de table/bucket/RPC, ni
+ *   message d'erreur). Suffisant pour un monitoring d'uptime, zero reconnaissance.
+ * - AUTHENTIFIE (Authorization: Bearer CRON_SECRET) : diagnostic complet, y compris
+ *   les checks lourds (storage, RPC) qui ne tournent que dans ce cas.
  */
 export async function GET(req: Request) {
+  const authHeader = req.headers.get('authorization');
+  const isAuthed =
+    !!process.env.CRON_SECRET && authHeader === `Bearer ${process.env.CRON_SECRET}`;
+
   const checks: Record<string, { ok: boolean; detail?: string }> = {};
 
-  // 1. Variables d'environnement critiques
+  // 1. Variables d'environnement critiques (presence seule, jamais la longueur).
   const envVars = [
     'FAL_KEY',
     'NEXT_PUBLIC_SUPABASE_URL',
@@ -32,110 +39,110 @@ export async function GET(req: Request) {
     const value = process.env[key];
     checks[`env:${key}`] = {
       ok: !!value && value.length > 0,
-      detail: value ? `set (${value.length} chars)` : 'MISSING',
+      detail: value ? 'set' : 'MISSING',
     };
   }
 
-  // 2. NEXT_PUBLIC_APP_URL ne doit PAS être localhost en production
+  // 2. NEXT_PUBLIC_APP_URL ne doit PAS être localhost en production.
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || '';
   checks['env:APP_URL_not_localhost'] = {
     ok: !appUrl.includes('localhost'),
-    detail: appUrl.includes('localhost') 
-      ? `PROBLEM: "${appUrl}" — Les webhooks Fal.ai ne fonctionneront pas !` 
-      : appUrl,
+    detail: appUrl.includes('localhost') ? 'PROBLEM: localhost en prod' : 'ok',
   };
 
-  // 3. Supabase connection
+  // 3. Connexion Supabase (check leger, toujours execute).
   try {
     const supabase = await createClient();
-    const { data, error } = await supabase.from('profiles').select('id').limit(1);
+    const { error } = await supabase.from('profiles').select('id').limit(1);
     checks['supabase:connection'] = {
       ok: !error,
-      detail: error ? error.message : `Connected (found ${data?.length ?? 0} row)`,
+      detail: error ? 'error' : 'connected',
     };
-  } catch (e) {
-    checks['supabase:connection'] = {
-      ok: false,
-      detail: e instanceof Error ? e.message : String(e),
+  } catch {
+    checks['supabase:connection'] = { ok: false, detail: 'error' };
+  }
+
+  // Checks lourds (storage, RPC) : seulement pour un appelant authentifie,
+  // pour eviter qu'un anonyme declenche des appels admin a volonte.
+  if (isAuthed) {
+    try {
+      const { createClient: createAdmin } = await import('@supabase/supabase-js');
+      const admin = createAdmin(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      );
+      const { data: buckets } = await admin.storage.listBuckets();
+      checks['supabase:bucket:input-images'] = {
+        ok: !!buckets?.find((b) => b.name === 'input-images'),
+        detail: buckets?.find((b) => b.name === 'input-images') ? 'EXISTS' : 'MISSING',
+      };
+      checks['supabase:bucket:output-images'] = {
+        ok: !!buckets?.find((b) => b.name === 'output-images'),
+        detail: buckets?.find((b) => b.name === 'output-images') ? 'EXISTS' : 'MISSING',
+      };
+    } catch (e) {
+      checks['supabase:storage'] = {
+        ok: false,
+        detail: e instanceof Error ? e.message : String(e),
+      };
+    }
+
+    try {
+      const { createClient: createAdmin } = await import('@supabase/supabase-js');
+      const admin = createAdmin(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      );
+      const { error } = await admin.rpc('deduct_credits', {
+        user_id_input: '00000000-0000-0000-0000-000000000000',
+        amount_input: 1,
+      });
+      checks['supabase:rpc:deduct_credits'] = {
+        ok: !error || /not found/i.test(error.message),
+        detail: error ? error.message : 'callable',
+      };
+    } catch (e) {
+      checks['supabase:rpc:deduct_credits'] = {
+        ok: false,
+        detail: e instanceof Error ? e.message : String(e),
+      };
+    }
+
+    const falKey = process.env.FAL_KEY || process.env.FAL_API_KEY;
+    checks['fal:key_format'] = {
+      ok: !!falKey && falKey.includes(':'),
+      detail: falKey ? 'ok' : 'MISSING',
+    };
+
+    checks['vercel:region'] = { ok: true, detail: process.env.VERCEL_REGION || 'local' };
+    checks['vercel:env'] = {
+      ok: true,
+      detail: process.env.VERCEL_ENV || process.env.NODE_ENV || 'unknown',
     };
   }
 
-  // 4. Supabase Storage bucket "input-images"
-  try {
-    const { createClient: createAdmin } = await import('@supabase/supabase-js');
-    const admin = createAdmin(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    );
-    const { data: buckets, error } = await admin.storage.listBuckets();
-    const inputBucket = buckets?.find(b => b.name === 'input-images');
-    checks['supabase:bucket:input-images'] = {
-      ok: !!inputBucket,
-      detail: inputBucket ? 'EXISTS' : 'MISSING — Upload de photos échouera (500)',
-    };
+  const allOk = Object.values(checks).every((c) => c.ok);
+  const httpStatus = allOk ? 200 : 503;
+  const status = allOk ? 'healthy' : 'unhealthy';
+  const timestamp = new Date().toISOString();
 
-    const outputBucket = buckets?.find(b => b.name === 'output-images');
-    checks['supabase:bucket:output-images'] = {
-      ok: !!outputBucket,
-      detail: outputBucket ? 'EXISTS' : 'MISSING — Sauvegarde des résultats échouera',
-    };
-  } catch (e) {
-    checks['supabase:storage'] = {
-      ok: false,
-      detail: e instanceof Error ? e.message : String(e),
-    };
+  // Public : statut nu, aucun detail.
+  if (!isAuthed) {
+    return NextResponse.json({ status, timestamp }, { status: httpStatus });
   }
 
-  // 5. Supabase RPC deduct_credits fonctionne
-  try {
-    const { createClient: createAdmin } = await import('@supabase/supabase-js');
-    const admin = createAdmin(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    );
-    // Test avec un UUID inexistant — on s'attend à une erreur "User not found", pas une erreur de fonction
-    const { error } = await admin.rpc('deduct_credits', {
-      user_id_input: '00000000-0000-0000-0000-000000000000',
-      amount_input: 1,
-    });
-    checks['supabase:rpc:deduct_credits'] = {
-      ok: !error || error.message.includes('User not found') || error.message.includes('not found'),
-      detail: error ? error.message : 'Function exists and callable',
-    };
-  } catch (e) {
-    checks['supabase:rpc:deduct_credits'] = {
-      ok: false,
-      detail: e instanceof Error ? e.message : String(e),
-    };
-  }
-
-  // 6. Fal.ai key format
-  const falKey = process.env.FAL_KEY || process.env.FAL_API_KEY;
-  checks['fal:key_format'] = {
-    ok: !!falKey && falKey.includes(':'),
-    detail: falKey ? `Format OK (contains separator)` : 'MISSING',
-  };
-
-  // 7. Vercel environment
-  checks['vercel:region'] = {
-    ok: true,
-    detail: process.env.VERCEL_REGION || 'local',
-  };
-  checks['vercel:env'] = {
-    ok: true,
-    detail: process.env.VERCEL_ENV || process.env.NODE_ENV || 'unknown',
-  };
-
-  // Résumé
-  const allOk = Object.values(checks).every(c => c.ok);
+  // Authentifie : diagnostic complet.
   const failedChecks = Object.entries(checks)
     .filter(([, c]) => !c.ok)
     .map(([name, c]) => `${name}: ${c.detail}`);
 
-  return NextResponse.json({
-    status: allOk ? 'healthy' : 'unhealthy',
-    timestamp: new Date().toISOString(),
-    failedChecks: failedChecks.length > 0 ? failedChecks : undefined,
-    checks,
-  }, { status: allOk ? 200 : 503 });
+  return NextResponse.json(
+    {
+      status,
+      timestamp,
+      failedChecks: failedChecks.length > 0 ? failedChecks : undefined,
+      checks,
+    },
+    { status: httpStatus },
+  );
 }
