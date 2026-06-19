@@ -52,6 +52,10 @@ const FAQ_ICONS_ORDER: LucideIcon[] = [
   Image,
 ];
 
+// Icones (par index) qui remplacent les anciens emojis de l'i18n.
+const HOW_IT_WORKS_ICONS: LucideIcon[] = [Image, Palette, Sparkles, Download];
+const USE_CASE_ICONS: LucideIcon[] = [Building2, Users, Crown, Heart];
+
 const TRUST_ICON_MAP: Record<string, LucideIcon> = {
   stripe: Shield,
   credits: Clock,
@@ -402,7 +406,7 @@ function PricingPage() {
                 className="prestige-reveal text-center"
                 style={{ ['--reveal-d' as string]: `${idx * 120}ms` }}
               >
-                <div className="text-4xl mb-4">{item.emoji}</div>
+                {(() => { const StepIcon = HOW_IT_WORKS_ICONS[idx] ?? Sparkles; return <StepIcon className="w-9 h-9 mx-auto mb-4 text-[var(--gold)]" />; })()}
                 <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[var(--gold)] text-[#0c0a09] text-sm font-bold mb-3">
                   {item.step}
                 </div>
@@ -443,7 +447,7 @@ function PricingPage() {
                 className="prestige-reveal bg-card rounded-2xl p-6 border border-[var(--gold-line)] shadow-sm hover:border-[var(--gold)] transition-colors duration-300 ease-out"
                 style={{ ['--reveal-d' as string]: `${idx * 120}ms` }}
               >
-                <div className="text-3xl mb-3">{useCase.icon}</div>
+                {(() => { const UseIcon = USE_CASE_ICONS[idx] ?? Building2; return <UseIcon className="w-8 h-8 mb-3 text-[var(--gold)]" />; })()}
                 <h3 className="prestige-display font-semibold text-foreground mb-2">{useCase.profile}</h3>
                 <p className="text-muted-foreground text-sm leading-relaxed mb-4">
                   {useCase.text}
@@ -746,7 +750,7 @@ function PricingCard({
       )}
 
       <div className="text-center mb-6">
-        <div className="text-4xl mb-3">{plan.emoji}</div>
+        {/* Emoji retire : le nom et le prix du plan suffisent. */}
         <h3 className="prestige-display text-2xl font-semibold text-foreground mb-1">
           {plan.name}
         </h3>
@@ -930,7 +934,7 @@ function SubscriptionCard({
       </div>
 
       <div className="text-center mb-6">
-        <div className="text-4xl mb-3">{plan.emoji}</div>
+        {/* Emoji retire : le nom et le prix du plan suffisent. */}
         <h3 className="prestige-display text-2xl font-semibold text-foreground mb-1">{plan.name}</h3>
         <p className="text-sm text-muted-foreground">{plan.description}</p>
       </div>

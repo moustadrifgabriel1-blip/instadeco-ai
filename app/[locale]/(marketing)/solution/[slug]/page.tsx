@@ -19,7 +19,7 @@ import Link from 'next/link';
 import {
   ArrowRight, Clock, Euro, Palette, Camera, Zap, Upload, Download,
   Globe, Brain, Layers, TrendingUp, Maximize, Repeat, Eye,
-  Sun, Shield, Share2, Heart, Moon, Sparkles, Check, Star, ChevronRight,
+  Sun, Shield, Share2, Heart, Moon, Sparkles, Check, Star, ChevronRight, X,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -161,7 +161,7 @@ export default async function IntentPage({ params }: PageProps) {
           <div className="grid md:grid-cols-2 gap-4">
             {page.problem.points.map((point, i) => (
               <div key={i} className="flex items-start gap-3 p-4 bg-card rounded-xl border border-border">
-                <span className="text-destructive text-lg mt-0.5">✗</span>
+                <X className="text-destructive w-5 h-5 mt-0.5 shrink-0" />
                 <p className="text-sm text-muted-foreground">{point}</p>
               </div>
             ))}

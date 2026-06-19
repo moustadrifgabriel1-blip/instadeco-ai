@@ -723,7 +723,6 @@ function GenerateContent() {
                     const room = ROOM_TYPES.find(r => r.id === selectedRoomType || r.slug === selectedRoomType);
                     return (
                       <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-card border border-[var(--gold-line)]">
-                        <span className="text-[15px]">{room?.icon ?? '🏠'}</span>
                         <span className="text-[13px] font-semibold text-foreground">
                           {room?.name ?? selectedRoomType}
                         </span>

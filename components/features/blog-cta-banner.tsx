@@ -177,8 +177,8 @@ export function BlogCtaBanner({ tags, variant = 'inline' }: BlogCtaBannerProps) 
         </Link>
       </div>
       
-      <p className="relative z-10 mt-4 text-xs text-muted-foreground/80 text-center sm:text-left">
-        ✨ Gratuit • Sans inscription • Résultat en 30 secondes
+      <p className="relative z-10 mt-4 text-xs text-muted-foreground/80 text-center sm:text-left inline-flex items-center gap-1.5">
+        <Sparkles className="w-3.5 h-3.5 shrink-0" />Gratuit • Sans inscription • Résultat en 30 secondes
       </p>
     </div>
   );

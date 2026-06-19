@@ -365,7 +365,7 @@ export default function PrivacyPolicyPage() {
           <h2 className="prestige-display text-2xl font-semibold text-foreground mb-4">9. Protection des mineurs</h2>
           <div className="bg-destructive/10 border border-destructive/40 p-4 rounded-lg">
             <p className="text-foreground">
-              <strong className="text-destructive">⚠️ SERVICE RÉSERVÉ AUX PERSONNES MAJEURES (18 ANS ET PLUS)</strong>
+              <strong className="text-destructive inline-flex items-center gap-1.5"><AlertTriangle className="w-4 h-4 shrink-0" />SERVICE RÉSERVÉ AUX PERSONNES MAJEURES (18 ANS ET PLUS)</strong>
             </p>
             <p className="text-muted-foreground mt-2">
               Notre service est strictement réservé aux personnes âgées de <strong className="text-foreground">18 ans et plus</strong>.

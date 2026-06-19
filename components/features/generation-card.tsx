@@ -2,7 +2,7 @@
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Download, Loader2, AlertCircle, Clock, Share2, ChevronDown, Info } from 'lucide-react';
+import { Download, Loader2, AlertCircle, Clock, Share2, ChevronDown, Info, Check, X } from 'lucide-react';
 import { OptimizedRemoteImage, IMAGE_SIZES } from '@/components/ui/optimized-image';
 import { ShareButtons } from './share-buttons';
 import { useState } from 'react';
@@ -63,14 +63,14 @@ export function GenerationCard({
     switch (status) {
       case 'completed':
         return (
-          <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
-            ✓ Terminé
+          <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 inline-flex items-center gap-1">
+            <Check className="w-3.5 h-3.5" />Terminé
           </span>
         );
       case 'failed':
         return (
-          <span className="px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
-            ✗ Échoué
+          <span className="px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700 inline-flex items-center gap-1">
+            <X className="w-3.5 h-3.5" />Échoué
           </span>
         );
       case 'processing':

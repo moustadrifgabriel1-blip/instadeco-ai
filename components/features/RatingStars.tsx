@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 /**
@@ -83,11 +84,11 @@ export function RatingStars({ generationId, initialRating, className }: RatingSt
               onMouseLeave={() => setHover(0)}
               onClick={() => submit(value)}
               className={cn(
-                'text-2xl leading-none transition-transform hover:scale-110 disabled:opacity-50',
+                'leading-none transition-transform hover:scale-110 disabled:opacity-50',
                 active ? 'text-yellow-400' : 'text-gray-300',
               )}
             >
-              ★
+              <Star className="w-6 h-6" fill={active ? 'currentColor' : 'none'} />
             </button>
           );
         })}

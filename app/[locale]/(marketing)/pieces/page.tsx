@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { Home, ArrowRight, Sofa, Bed, CookingPot, Bath, Monitor, DoorOpen, TreePine, UtensilsCrossed } from 'lucide-react';
+import { Home, ArrowRight, Sofa, Bed, CookingPot, Bath, Monitor, DoorOpen, TreePine, UtensilsCrossed, Lightbulb } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Breadcrumbs } from '@/components/ui/breadcrumbs';
@@ -182,7 +182,7 @@ export default async function PiecesIndexPage({ params }: { params: Promise<{ lo
                           </h2>
                         </Link>
                         <p className="text-sm text-muted-foreground mb-3">{room.description}</p>
-                        <p className="text-xs text-muted-foreground italic mb-3">💡 {room.tips}</p>
+                        <p className="text-xs text-muted-foreground italic mb-3 inline-flex items-start gap-1.5"><Lightbulb className="w-3.5 h-3.5 mt-0.5 shrink-0" />{room.tips}</p>
                         <div className="flex flex-wrap gap-2 mb-3">
                           <span className="text-xs text-muted-foreground">Styles populaires :</span>
                           {room.popularStyles.map((style) => (

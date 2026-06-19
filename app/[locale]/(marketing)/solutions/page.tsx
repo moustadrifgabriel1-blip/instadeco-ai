@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowRight, Lightbulb, Home, Camera, Palette, TrendingUp, Maximize, Eye, Sun } from 'lucide-react';
+import { ArrowRight, Lightbulb, Home, Camera, Palette, TrendingUp, Maximize, Eye, Sun, Users, Check } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Breadcrumbs } from '@/components/ui/breadcrumbs';
@@ -175,10 +175,10 @@ export default async function SolutionsIndexPage({ params }: { params: Promise<{
                         </Link>
                         <p className="prestige-body text-sm text-muted-foreground mb-3">{sol.description}</p>
                         <div className="flex flex-wrap gap-3 text-xs text-muted-foreground mb-3">
-                          <span>👤 {sol.audience}</span>
+                          <span className="inline-flex items-center gap-1.5"><Users className="w-3.5 h-3.5" />{sol.audience}</span>
                         </div>
                         <div className="text-sm font-medium text-[var(--gold)] mb-3">
-                          ✓ {sol.benefit}
+                          <span className="inline-flex items-center gap-1.5"><Check className="w-4 h-4" />{sol.benefit}</span>
                         </div>
                         <Link
                           href={`/solution/${sol.slug}`}

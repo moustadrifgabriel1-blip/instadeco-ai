@@ -58,7 +58,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
         <div className="container px-4 md:px-6 max-w-3xl mx-auto text-center">
           <div className="prestige-eyebrow inline-flex items-center gap-2 bg-[rgba(200,162,77,0.12)] text-[var(--gold)] text-sm font-medium px-4 py-1.5 rounded-full mb-6 border border-[var(--gold-line)]">
             <Mountain className="h-4 w-4" />
-            Créé en Suisse 🇨🇭
+            Créé en Suisse
           </div>
           <h1 className="prestige-display text-4xl md:text-5xl font-bold tracking-tight mb-6">
             Quand la <span className="text-[var(--gold)]">déco</span> rencontre la <span className="text-[var(--gold)]">tech</span>

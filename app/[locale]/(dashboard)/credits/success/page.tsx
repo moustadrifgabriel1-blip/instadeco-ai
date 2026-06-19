@@ -70,8 +70,8 @@ function PaymentSuccessContent() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="bg-muted border border-[var(--gold-line)] rounded-lg p-4">
-            <p className="text-sm text-emerald-400 text-center">
-              ✅ Transaction complétée avec succès
+            <p className="text-sm text-emerald-400 text-center inline-flex items-center justify-center gap-1.5 w-full">
+              <CheckCircle className="w-4 h-4 shrink-0" />Transaction complétée avec succès
             </p>
             {credits !== null && (
               <p className="prestige-display text-lg font-bold text-primary text-center mt-2">

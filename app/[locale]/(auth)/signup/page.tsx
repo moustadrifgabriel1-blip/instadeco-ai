@@ -218,7 +218,7 @@ function SignupForm() {
               />
             </div>
 
-            {/* ✅ Consentement RGPD obligatoire */}
+            {/* Consentement RGPD obligatoire */}
             <div className="flex items-start gap-3">
               <input
                 type="checkbox"
