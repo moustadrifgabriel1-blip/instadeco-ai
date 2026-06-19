@@ -5,6 +5,7 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import { captureUTMParams } from '@/lib/analytics/utm';
 import { fbPageView, fbTrackViewContent, FB_PIXEL_ID } from '@/lib/analytics/fb-pixel';
 import { trackEvent } from '@/lib/analytics/gtag';
+import { useCookieConsent } from '@/lib/analytics/consent';
 
 /**
  * Composant interne qui utilise useSearchParams (nécessite Suspense).
@@ -58,6 +59,9 @@ function AdTrackerInner() {
  * Wrapper Suspense pour AdTracker (useSearchParams nécessite Suspense dans Next.js).
  */
 export function AdTracker() {
+  const consent = useCookieConsent();
+  // RGPD : aucun event de tracking (GA/FB/UTM) tant que le consentement n'est pas accordé.
+  if (consent !== 'granted') return null;
   return (
     <Suspense fallback={null}>
       <AdTrackerInner />

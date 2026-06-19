@@ -356,7 +356,13 @@ export default function PrivacyPolicyPage() {
           </div>
 
           <p className="text-muted-foreground text-sm mt-4">
-            <strong className="text-foreground">Note :</strong> Nous n&apos;utilisons actuellement pas de cookies publicitaires ou de tracking analytique.
+            <strong className="text-foreground">Mesure d&apos;audience (soumise à votre consentement) :</strong> avec votre accord
+            explicite, donné via le bandeau cookies, nous utilisons Google Analytics 4 et Meta Pixel pour mesurer
+            l&apos;audience du site et l&apos;efficacité de nos campagnes. Ces outils déposent des cookies et peuvent
+            transférer des données (adresse IP, identifiant d&apos;appareil) vers Google et Meta, y compris hors de
+            l&apos;Union européenne, encadrés par les clauses contractuelles types. Aucun de ces outils n&apos;est activé
+            tant que vous n&apos;avez pas accepté ; vous pouvez refuser, et votre choix est respecté. Les cookies
+            essentiels ci-dessus, eux, ne nécessitent pas de consentement.
           </p>
         </section>
 

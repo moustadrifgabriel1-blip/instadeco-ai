@@ -27,9 +27,15 @@ interface Job {
 const EMPTY_LIVING =
   'https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/input-images/f88c9b68-eda4-4d67-bfb4-f631d21b37c6/1781787540154.jpg';
 
+// Set de preuves : la MEME piece vide demo, declinee en styles premium.
+// Memes cadrage/structure preserves (moteur Gemini), polyvalence demontree.
 const JOBS: Job[] = [
   { label: 'salon-scandinave', photoUrl: EMPTY_LIVING, style: 'scandinave', room: 'salon', mode: 'full_redesign' },
   { label: 'salon-industriel', photoUrl: EMPTY_LIVING, style: 'industriel', room: 'salon', mode: 'full_redesign' },
+  { label: 'salon-japandi', photoUrl: EMPTY_LIVING, style: 'japandi', room: 'salon', mode: 'full_redesign' },
+  { label: 'salon-midcentury', photoUrl: EMPTY_LIVING, style: 'midcentury', room: 'salon', mode: 'full_redesign' },
+  { label: 'salon-minimaliste', photoUrl: EMPTY_LIVING, style: 'minimaliste', room: 'salon', mode: 'full_redesign' },
+  { label: 'salon-boheme', photoUrl: EMPTY_LIVING, style: 'boheme', room: 'salon', mode: 'full_redesign' },
 ];
 
 async function main() {

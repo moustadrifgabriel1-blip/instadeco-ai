@@ -4,6 +4,7 @@ import Script from 'next/script';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useEffect, Suspense } from 'react';
 import { GA_MEASUREMENT_ID, trackPageView } from '@/lib/analytics/gtag';
+import { useCookieConsent } from '@/lib/analytics/consent';
 
 function GoogleAnalyticsPageTracker() {
   const pathname = usePathname();
@@ -25,7 +26,9 @@ function GoogleAnalyticsPageTracker() {
  * Ne charge rien si NEXT_PUBLIC_GA_MEASUREMENT_ID n'est pas défini.
  */
 export function GoogleAnalytics() {
-  if (!GA_MEASUREMENT_ID) return null;
+  const consent = useCookieConsent();
+  // RGPD : aucun script GA tant que le consentement n'est pas explicitement accordé.
+  if (!GA_MEASUREMENT_ID || consent !== 'granted') return null;
 
   return (
     <>

@@ -1,11 +1,14 @@
 'use client';
 
 import Script from 'next/script';
+import { useCookieConsent } from '@/lib/analytics/consent';
 
 const PIXEL_ID = (process.env.NEXT_PUBLIC_FB_PIXEL_ID || '').trim();
 
 export function MetaPixel() {
-  if (!PIXEL_ID) return null;
+  const consent = useCookieConsent();
+  // RGPD : aucun script Meta Pixel tant que le consentement n'est pas accordé.
+  if (!PIXEL_ID || consent !== 'granted') return null;
 
   return (
     <>
