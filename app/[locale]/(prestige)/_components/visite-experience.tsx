@@ -42,8 +42,8 @@ export function VisiteExperience() {
           </>
         }
         body="Séjour, cuisine, suite, salle de bain, terrasse : le service met en scène l'intégralité du bien dans le style qui parle à votre clientèle. Du contemporain feutré au classique parisien, vous habillez chaque volume à l'image de votre agence. Un seul outil pour transformer tout un portefeuille."
-        image="https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/output-images/400d05a5-0d19-4feb-a922-d555c9ea9f85/b9fd06a0-f082-4408-a4e7-328ae890b97d.jpg"
-        alt="Salle de bain transformée en espace spa par home staging virtuel IA"
+        image="https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/output-images/gemini/1781863565007-frinll.jpg"
+        alt="Séjour mis en scène en style moderne par home staging virtuel IA"
       />
 
       {/* Capacité du service, volet 2 : vitesse et coût divisé */}

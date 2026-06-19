@@ -16,7 +16,7 @@ const U = 'f88c9b68-eda4-4d67-bfb4-f631d21b37c6';
  */
 const GALLERY = [
   { src: `${OUT}/${U}/8cf082e3-f460-4d66-b76a-6a4741cfe8e2.jpg`, label: 'Contemporain · Séjour', alt: 'Séjour contemporain mis en scène par IA' },
-  { src: `https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/output-images/400d05a5-0d19-4feb-a922-d555c9ea9f85/b9fd06a0-f082-4408-a4e7-328ae890b97d.jpg`, label: 'Spa · Salle de bain', alt: 'Salle de bain transformée en spa par IA' },
+  { src: `${OUT}/gemini/1781863553799-atz5u.jpg`, label: 'Minimaliste · Séjour', alt: 'Séjour minimaliste mis en scène par IA' },
   { src: `${OUT}/${U}/a529f606-f9ed-4c0e-b757-9bf2bb53bbce.jpg`, label: 'Minimaliste · Chambre', alt: 'Chambre minimaliste mise en scène par IA' },
   { src: `${OUT}/${U}/7a770405-faef-4d16-9822-1a76e7748741.jpg`, label: 'Bohème · Salle à manger', alt: 'Salle à manger bohème mise en scène par IA' },
   { src: `${OUT}/${U}/4068c5cc-d422-4b9b-8b9f-a0870cac5572.jpg`, label: 'Bohème · Chambre', alt: 'Chambre bohème mise en scène par IA' },
@@ -78,12 +78,12 @@ export function ExemplesExperience() {
       {/* Comparateur 1 */}
       <section className="mx-auto w-full max-w-6xl px-6 py-[clamp(3rem,9vh,7rem)] sm:px-10">
         <PrestigeCompare
-          before={`${IN}/${U}/1769793114162.jpg`}
-          after={`${OUT}/${U}/1d5a7bb4-80dd-406e-85be-4226b553fbf6.jpg`}
-          beforeAlt="Séjour banal et sans relief, photo de départ"
-          afterAlt="Le même séjour mis en scène, contemporain chaleureux"
+          before={`${IN}/${U}/proof-japandi-115712.jpg`}
+          after={`${OUT}/gemini/1781863530051-fswrzf.jpg`}
+          beforeAlt="Séjour vide aux murs gris, photo de départ"
+          afterAlt="Le même séjour mis en scène en japandi, épuré et chaleureux"
           eyebrow="Avant et après réel · Séjour"
-          caption="Une pièce quelconque devient une évidence"
+          caption="Une pièce vide devient une évidence"
           priority
         />
       </section>
@@ -100,12 +100,12 @@ export function ExemplesExperience() {
       {/* Comparateur 2 */}
       <section className="mx-auto w-full max-w-6xl px-6 py-[clamp(3rem,9vh,7rem)] sm:px-10">
         <PrestigeCompare
-          before={`${IN}/${U}/1772390553458.jpg`}
-          after={`${OUT}/${U}/25b57a45-973e-4628-85ec-ad46b9cec7dd.jpg`}
-          beforeAlt="Séjour le soir, brut et impersonnel"
-          afterAlt="Le même séjour mis en scène, ambiance chaleureuse du soir"
-          eyebrow="Avant et après réel · Séjour au crépuscule"
-          caption="La lumière qui fait basculer une visite"
+          before={`${IN}/${U}/proof-midcentury-221951.jpg`}
+          after={`${OUT}/gemini/1781863542515-tv4qpk.jpg`}
+          beforeAlt="Séjour vide et impersonnel, photo de départ"
+          afterAlt="Le même séjour mis en scène en mid-century, chaleureux et vivant"
+          eyebrow="Avant et après réel · Séjour"
+          caption="La mise en scène qui fait basculer une visite"
         />
       </section>
 
