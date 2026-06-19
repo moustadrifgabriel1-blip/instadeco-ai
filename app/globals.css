@@ -618,22 +618,25 @@ body:has([data-prestige-root]) {
 
 /* --- Révélation au scroll réutilisable (.prestige-reveal) ---
    Sûr pour le SEO/no-JS et le LCP : par défaut l'élément est VISIBLE.
-   Le composant client PrestigeRevealObserver ajoute la classe --armed
-   (état caché) uniquement si JS est présent, puis .is-visible à l'entrée
-   en vue. Donc sans JS, ou si l'observer ne tourne pas, rien n'est masqué. */
-.prestige-reveal--armed {
+   Le composant client PrestigeRevealObserver pose le flag .prestige-reveal-on
+   sur <html> (seulement si JS et pas de reduced-motion), ce qui ARME l'état
+   caché via CSS, SANS jamais muter le className des éléments .prestige-reveal.
+   On évite ainsi tout mismatch d'hydratation (l'observer vit dans le layout et
+   son effet pouvait stamper un élément de page encore en cours d'hydratation
+   via un Suspense en streaming). .is-visible est ajouté à l'entrée en vue. */
+.prestige-reveal-on .prestige-reveal {
   opacity: 0;
   transform: translate3d(0, 26px, 0);
   transition: opacity 0.9s var(--ease-slow), transform 0.9s var(--ease-slow);
   transition-delay: var(--reveal-d, 0ms);
   will-change: opacity, transform;
 }
-.prestige-reveal--armed.is-visible {
+.prestige-reveal-on .prestige-reveal.is-visible {
   opacity: 1;
   transform: none;
 }
 @media (prefers-reduced-motion: reduce) {
-  .prestige-reveal--armed {
+  .prestige-reveal-on .prestige-reveal {
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;
