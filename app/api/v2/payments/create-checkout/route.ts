@@ -104,7 +104,9 @@ export async function POST(req: Request) {
 
     // URLs par défaut
     const origin = new URL(req.url).origin;
-    const defaultSuccessUrl = successUrl || `${origin}/credits/success?session_id={CHECKOUT_SESSION_ID}`;
+    const defaultSuccessUrl =
+      successUrl ||
+      `${origin}/credits/success?type=credits&n=${packConfig.credits}&session_id={CHECKOUT_SESSION_ID}`;
     const defaultCancelUrl = cancelUrl || `${origin}/pricing?purchase=cancelled`;
 
     // Exécuter le Use Case

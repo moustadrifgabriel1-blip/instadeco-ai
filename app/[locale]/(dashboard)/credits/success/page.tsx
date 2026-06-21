@@ -1,133 +1,198 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
-import { CheckCircle, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useEffect, useState, Suspense, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { Link } from '@/i18n/navigation';
+import { Loader2, CheckCircle2, Crown, Sparkles, ArrowRight, ImageIcon } from 'lucide-react';
+import { useAuth } from '@/hooks/use-auth';
+import { useSupabaseBrowser } from '@/hooks/use-supabase-browser';
 
-function PaymentSuccessContent() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const sessionId = searchParams.get('session_id');
-  
-  const [isVerifying, setIsVerifying] = useState(true);
+const PLAN_LABEL: Record<string, string> = { solo: 'Solo', pro: 'Pro', agence: 'Agence' };
+
+type Phase = 'verifying' | 'done' | 'pending';
+
+function SuccessContent() {
+  const sp = useSearchParams();
+  const isSub = sp.get('type') === 'subscription';
+  const planLabel = PLAN_LABEL[sp.get('plan') || ''] ?? 'Pro';
+  const expected = Number(sp.get('n')) || null;
+
+  const { user } = useAuth();
+  const supabase = useSupabaseBrowser();
+
+  const [phase, setPhase] = useState<Phase>('verifying');
   const [credits, setCredits] = useState<number | null>(null);
+  const cancelled = useRef(false);
 
   useEffect(() => {
-    // Vérifier le solde de crédits réel après le paiement
-    const fetchCredits = async () => {
+    cancelled.current = false;
+    let tries = 0;
+    const MAX = 10; // ~20s d'attente active de l'activation par le webhook
+
+    const poll = async () => {
+      tries += 1;
       try {
-        // Délai pour laisser le temps au webhook Stripe de traiter
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        const response = await fetch('/api/v2/credits');
-        if (response.ok) {
-          const data = await response.json();
-          setCredits(data.data?.credits || null);
+        if (isSub) {
+          if (supabase && user) {
+            const { data } = await supabase.from('profiles').select('pro_status').eq('id', user.id).single();
+            if (data?.pro_status === 'active' && !cancelled.current) { setPhase('done'); return; }
+          }
+        } else {
+          const res = await fetch('/api/v2/credits');
+          if (res.ok) {
+            const d = await res.json();
+            const c = d.data?.credits ?? null;
+            if (!cancelled.current) setCredits(c);
+            if (c !== null && (expected === null || c >= expected) && !cancelled.current) { setPhase('done'); return; }
+          }
         }
-      } catch (error) {
-        console.error('Erreur lors de la récupération des crédits:', error);
-      } finally {
-        setIsVerifying(false);
+      } catch {
+        /* on retente */
       }
+      if (cancelled.current) return;
+      if (tries >= MAX) { setPhase('pending'); return; }
+      setTimeout(poll, 2000);
     };
 
-    fetchCredits();
-  }, [sessionId]);
+    poll();
+    return () => { cancelled.current = true; };
+  }, [isSub, supabase, user, expected]);
 
-  if (isVerifying) {
+  // ── En cours de vérification ──
+  if (phase === 'verifying') {
     return (
-      <div className="min-h-[100dvh] flex items-center justify-center bg-background">
-        <Card className="w-full max-w-md bg-card border border-border">
-          <CardContent className="pt-6">
-            <div className="flex flex-col items-center space-y-4">
-              <Loader2 className="h-12 w-12 animate-spin text-primary" />
-              <p className="prestige-display text-lg font-medium text-foreground">
-                Vérification du paiement...
-              </p>
-              <p className="text-sm text-muted-foreground text-center">
-                Vos crédits seront ajoutés dans quelques secondes
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <Shell>
+        <div className="relative w-[68px] h-[68px] mb-6">
+          <div className="absolute inset-0 rounded-full border-[2px] border-[var(--gold-line)]" />
+          <div className="absolute inset-0 rounded-full border-[2px] border-[var(--gold)] border-t-transparent animate-spin" />
+          <Sparkles className="absolute inset-0 m-auto h-5 w-5 text-[var(--gold)]" aria-hidden />
+        </div>
+        <p className="prestige-eyebrow text-[11px] text-[var(--gold)] mb-2">Paiement reçu</p>
+        <h1 className="prestige-display text-[24px] sm:text-[28px] font-semibold text-[var(--ivory)] tracking-[-0.02em] text-center">
+          {isSub ? 'Activation de votre abonnement' : 'Confirmation de votre achat'}
+        </h1>
+        <p className="mt-3 text-[14px] text-[var(--mist)] text-center max-w-sm">
+          Quelques secondes, le temps que tout se mette en place.
+        </p>
+      </Shell>
     );
   }
 
-  return (
-    <div className="min-h-[100dvh] flex items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md bg-card border border-border">
-        <CardHeader className="text-center">
-          <div className="flex justify-center mb-4">
-            <CheckCircle className="h-16 w-16 text-emerald-400" />
-          </div>
-          <CardTitle className="prestige-display text-2xl text-foreground">Paiement réussi !</CardTitle>
-          <CardDescription className="text-muted-foreground">
-            Vos crédits ont été ajoutés à votre compte
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="bg-muted border border-[var(--gold-line)] rounded-lg p-4">
-            <p className="text-sm text-emerald-400 text-center inline-flex items-center justify-center gap-1.5 w-full">
-              <CheckCircle className="w-4 h-4 shrink-0" />Transaction complétée avec succès
-            </p>
-            {credits !== null && (
-              <p className="prestige-display text-lg font-bold text-primary text-center mt-2">
-                Vous avez maintenant {credits} crédit{credits > 1 ? 's' : ''}
-              </p>
-            )}
-            {sessionId && (
-              <p className="text-xs text-muted-foreground text-center mt-2">
-                ID: {sessionId.slice(0, 20)}...
-              </p>
-            )}
-          </div>
+  // ── Paiement reçu mais activation pas encore visible (webhook en retard) ──
+  if (phase === 'pending') {
+    return (
+      <Shell>
+        <Badge ok={false} />
+        <h1 className="prestige-display text-[26px] sm:text-[32px] font-semibold text-[var(--ivory)] tracking-[-0.02em] text-center mt-5">
+          Paiement bien reçu.
+        </h1>
+        <p className="mt-3 text-[15px] text-[var(--mist)] text-center max-w-md leading-relaxed">
+          {isSub ? 'Votre abonnement' : 'Vos crédits'} {isSub ? 'sera actif' : 'seront ajoutés'} d&apos;ici une
+          minute. Vous recevez aussi un email de confirmation. Rafraîchissez votre espace si besoin.
+        </p>
+        <Actions isSub={isSub} />
+      </Shell>
+    );
+  }
 
-          <div className="space-y-2">
-            <Button 
-              onClick={() => router.push('/dashboard')} 
-              className="w-full"
-              size="lg"
-            >
-              Commencer à générer
-            </Button>
-            <Button 
-              onClick={() => router.push('/pricing')} 
-              variant="outline"
-              className="w-full"
-            >
-              Acheter plus de crédits
-            </Button>
+  // ── Succès confirmé ──
+  return (
+    <Shell>
+      <Badge ok />
+      {isSub ? (
+        <>
+          <p className="prestige-eyebrow text-[11px] text-[var(--gold)] mb-2 mt-5 flex items-center gap-1.5">
+            <Crown className="w-3.5 h-3.5" /> Abonnement {planLabel}
+          </p>
+          <h1 className="prestige-display text-[28px] sm:text-[36px] font-semibold text-[var(--ivory)] tracking-[-0.02em] text-center leading-tight">
+            Bienvenue dans <span className="text-[var(--gold)]">{planLabel}</span>.
+          </h1>
+          <p className="mt-3 text-[15px] text-[var(--mist)] text-center max-w-md leading-relaxed">
+            Votre abonnement est actif. Transformez vos biens vides en intérieurs qui se vendent, sans limite.
+          </p>
+        </>
+      ) : (
+        <>
+          <h1 className="prestige-display text-[28px] sm:text-[36px] font-semibold text-[var(--ivory)] tracking-[-0.02em] text-center leading-tight mt-5">
+            Paiement confirmé.
+          </h1>
+          <div className="mt-5 inline-flex flex-col items-center rounded-2xl border border-[var(--gold)] bg-[rgba(200,162,77,0.08)] px-8 py-5">
+            <span className="prestige-display text-[40px] font-bold text-[var(--gold)] leading-none">
+              +{credits ?? expected ?? ''}
+            </span>
+            <span className="mt-1 text-[14px] text-[var(--ivory)] font-medium">crédits ajoutés</span>
           </div>
-        </CardContent>
-      </Card>
+          {credits !== null && (
+            <p className="mt-3 text-[13px] text-[var(--mist)]">Nouveau solde : {credits} crédits.</p>
+          )}
+        </>
+      )}
+      <Actions isSub={isSub} />
+      <p className="mt-6 text-[12px] text-[var(--mist)] text-center">
+        Un email de confirmation vient de vous être envoyé.
+      </p>
+    </Shell>
+  );
+}
+
+function Shell({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="min-h-[100dvh] bg-[var(--ink)] flex items-center justify-center px-4 py-12">
+      <div className="w-full max-w-lg flex flex-col items-center rounded-[28px] border border-[var(--gold-line)] bg-[var(--stone-900)] px-6 py-12 sm:px-10 shadow-[0_30px_80px_rgba(0,0,0,0.4)]">
+        {children}
+      </div>
     </div>
   );
 }
 
-function LoadingFallback() {
+function Badge({ ok }: { ok: boolean }) {
   return (
-    <div className="min-h-[100dvh] flex items-center justify-center bg-background">
-      <Card className="w-full max-w-md bg-card border border-border">
-        <CardContent className="pt-6">
-          <div className="flex flex-col items-center space-y-4">
-            <Loader2 className="h-12 w-12 animate-spin text-primary" />
-            <p className="prestige-display text-lg font-medium text-foreground">
-              Chargement...
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+    <div
+      className={`w-16 h-16 rounded-full flex items-center justify-center ${
+        ok ? 'bg-emerald-500/12 border border-emerald-500/30' : 'bg-[rgba(200,162,77,0.12)] border border-[var(--gold-line)]'
+      }`}
+    >
+      {ok ? (
+        <CheckCircle2 className="w-8 h-8 text-emerald-400" />
+      ) : (
+        <Loader2 className="w-8 h-8 text-[var(--gold)] animate-spin" />
+      )}
+    </div>
+  );
+}
+
+function Actions({ isSub }: { isSub: boolean }) {
+  return (
+    <div className="mt-8 flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+      <Link
+        href="/generate"
+        className="group inline-flex items-center justify-center gap-2 w-full sm:w-auto bg-[var(--gold)] text-[#0c0a09] px-7 py-3.5 rounded-full text-[15px] font-semibold hover:bg-transparent hover:text-[var(--gold)] border border-[var(--gold)] transition-all"
+      >
+        <Sparkles className="w-4 h-4" />
+        Transformer une pièce
+        <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+      </Link>
+      <Link
+        href="/dashboard"
+        className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3.5 rounded-full text-[14px] text-[var(--mist)] hover:text-[var(--gold)] border border-[var(--gold-line)] transition-colors"
+      >
+        <ImageIcon className="w-4 h-4" />
+        {isSub ? 'Mon espace' : 'Mes créations'}
+      </Link>
     </div>
   );
 }
 
 export default function PaymentSuccessPage() {
   return (
-    <Suspense fallback={<LoadingFallback />}>
-      <PaymentSuccessContent />
+    <Suspense
+      fallback={
+        <Shell>
+          <Loader2 className="h-10 w-10 animate-spin text-[var(--gold)]" />
+        </Shell>
+      }
+    >
+      <SuccessContent />
     </Suspense>
   );
 }

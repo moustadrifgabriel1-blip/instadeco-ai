@@ -27,7 +27,20 @@ export interface ProcessWebhookOutput {
   processed: boolean;
   eventType: string;
   action?: string;
+  /**
+   * Intention d'email de confirmation. Le use-case reste pur (ne fait pas l'envoi) :
+   * c'est la route webhook (frontière infra) qui envoie l'email en best-effort.
+   */
+  confirmationEmail?: {
+    to: string;
+    kind: 'credits' | 'subscription';
+    credits?: number;
+    planName?: string;
+  };
 }
+
+/** Libellés des plans pour l'email de confirmation. */
+const PLAN_LABEL: Record<string, string> = { solo: 'Solo', pro: 'Pro', agence: 'Agence' };
 
 /**
  * Mapping plan d'abonnement → profil.
@@ -204,10 +217,17 @@ export class ProcessStripeWebhookUseCase {
         newBalance: addResult.data,
       });
 
+      let to = (event.customerEmail || '').trim();
+      if (!to && this.userRepo) {
+        const u = await this.userRepo.findById(userId);
+        if (u.success && u.data) to = u.data.email;
+      }
+
       return success({
         processed: true,
         eventType: event.type,
         action: 'credits_added',
+        confirmationEmail: to ? { to, kind: 'credits', credits } : undefined,
       });
 
     }
@@ -260,6 +280,8 @@ export class ProcessStripeWebhookUseCase {
         processed: true,
         eventType: event.type,
         action: created ? 'guest_account_created_credits_added' : 'guest_credits_added',
+        // L'email guest reçoit déjà le magic link (compte créé) ; sinon, confirmation d'achat.
+        confirmationEmail: created ? undefined : { to: email, kind: 'credits', credits },
       });
     }
 
@@ -340,8 +362,21 @@ export class ProcessStripeWebhookUseCase {
       }
     }
 
+    let subEmail = (event.customerEmail || '').trim();
+    if (!subEmail && this.userRepo) {
+      const u = await this.userRepo.findById(userId);
+      if (u.success && u.data) subEmail = u.data.email;
+    }
+
     this.logger.info('Abonnement activé', { userId, plan: cfg.proPlan, unlimited: cfg.unlimited });
-    return success({ processed: true, eventType: event.type, action: `subscription_activated_${cfg.proPlan}` });
+    return success({
+      processed: true,
+      eventType: event.type,
+      action: `subscription_activated_${cfg.proPlan}`,
+      confirmationEmail: subEmail
+        ? { to: subEmail, kind: 'subscription', planName: PLAN_LABEL[cfg.proPlan] ?? cfg.proPlan }
+        : undefined,
+    });
   }
 
   /** Renouvellement (invoice.paid). billingReason distingue initial vs cycle. */

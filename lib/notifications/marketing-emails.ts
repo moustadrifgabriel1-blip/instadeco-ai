@@ -366,3 +366,99 @@ export async function sendReferralNotificationEmail(
     return { success: false, error: err instanceof Error ? err.message : 'Unknown error' };
   }
 }
+
+// ============================================
+// 4. CONFIRMATION D'ACHAT DE CRÉDITS
+// ============================================
+function buildCreditsPurchaseEmail(credits: number): string {
+  return emailWrapper(`
+    <h1 style="font-family:${SERIF}; color:${IVORY}; font-size:26px; line-height:1.25; margin:0 0 16px; text-align:center; font-weight:normal;">
+      Paiement confirmé.
+    </h1>
+    <p style="color:${MIST}; line-height:1.7; font-size:15px; margin:0 0 26px; text-align:center;">
+      Merci pour votre achat. Vos crédits sont déjà disponibles sur votre compte.
+    </p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${SURFACE}; border:1px solid ${GOLD}; border-radius:14px; padding:28px; margin:0 0 26px; text-align:center;">
+      <tr><td>
+        <p style="font-family:${SERIF}; font-size:40px; font-weight:700; color:${GOLD}; margin:0 0 6px;">+${credits}</p>
+        <p style="font-size:17px; font-weight:600; color:${IVORY}; margin:0;">crédits ajoutés</p>
+      </td></tr>
+    </table>
+    <div style="text-align:center; margin:26px 0;">
+      ${primaryButton('https://instadeco.app/generate', 'Transformer une pièce')}
+    </div>
+    <p style="color:${MIST_DIM}; font-size:13px; text-align:center; margin:16px 0 0;">
+      Une facture est disponible depuis votre espace, onglet Abonnement.
+    </p>
+  `, `Paiement confirmé, ${credits} crédits ajoutés.`);
+}
+
+/** Email de confirmation après un achat de crédits réussi. */
+export async function sendCreditsPurchaseEmail(
+  email: string,
+  credits: number,
+): Promise<{ success: boolean; error?: string }> {
+  const resend = getResend();
+  if (!resend) return { success: false, error: 'RESEND_API_KEY not configured' };
+  try {
+    const { error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: [email],
+      subject: `Paiement confirmé, vos ${credits} crédits sont prêts`,
+      html: buildCreditsPurchaseEmail(credits),
+    });
+    if (error) return { success: false, error: error.message };
+    console.log(`[Purchase Email] Confirmation envoyée à ${email}`);
+    return { success: true };
+  } catch (err) {
+    return { success: false, error: err instanceof Error ? err.message : 'Unknown error' };
+  }
+}
+
+// ============================================
+// 5. CONFIRMATION D'ABONNEMENT
+// ============================================
+function buildSubscriptionEmail(planName: string): string {
+  return emailWrapper(`
+    <h1 style="font-family:${SERIF}; color:${IVORY}; font-size:26px; line-height:1.25; margin:0 0 16px; text-align:center; font-weight:normal;">
+      Bienvenue dans ${planName}.
+    </h1>
+    <p style="color:${MIST}; line-height:1.7; font-size:15px; margin:0 0 26px; text-align:center;">
+      Votre abonnement <strong style="color:${GOLD};">${planName}</strong> est actif. Vous pouvez dès maintenant
+      transformer vos biens vides en intérieurs qui se vendent.
+    </p>
+    <div style="text-align:center; margin:26px 0;">
+      ${primaryButton('https://instadeco.app/generate', 'Commencer maintenant')}
+    </div>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${SURFACE}; border:1px solid ${LINE}; border-radius:12px; padding:18px; margin:26px 0 0; text-align:center;">
+      <tr><td>
+        <p style="margin:0; color:${MIST}; font-size:14px; line-height:1.6;">
+          Gérez votre formule, votre carte et vos factures à tout moment.<br />
+          <a href="https://instadeco.app/dashboard" style="color:${GOLD}; text-decoration:none; font-weight:500;">Espace abonnement</a>
+        </p>
+      </td></tr>
+    </table>
+  `, `Votre abonnement ${planName} est actif.`);
+}
+
+/** Email de confirmation après activation d'un abonnement. */
+export async function sendSubscriptionConfirmationEmail(
+  email: string,
+  planName: string,
+): Promise<{ success: boolean; error?: string }> {
+  const resend = getResend();
+  if (!resend) return { success: false, error: 'RESEND_API_KEY not configured' };
+  try {
+    const { error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: [email],
+      subject: `Votre abonnement ${planName} est activé`,
+      html: buildSubscriptionEmail(planName),
+    });
+    if (error) return { success: false, error: error.message };
+    console.log(`[Subscription Email] Confirmation envoyée à ${email}`);
+    return { success: true };
+  } catch (err) {
+    return { success: false, error: err instanceof Error ? err.message : 'Unknown error' };
+  }
+}

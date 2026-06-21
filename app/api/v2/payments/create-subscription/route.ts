@@ -58,7 +58,9 @@ export async function POST(req: Request) {
       interval,
       userId,
       email,
-      successUrl: successUrl || `${origin}/credits/success?session_id={CHECKOUT_SESSION_ID}`,
+      successUrl:
+        successUrl ||
+        `${origin}/credits/success?type=subscription&plan=${planId}&session_id={CHECKOUT_SESSION_ID}`,
       cancelUrl: cancelUrl || `${origin}/pricing?subscription=cancelled`,
     });
 
