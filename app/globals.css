@@ -421,6 +421,12 @@ body:has([data-prestige-root]) > div > header,
 body:has([data-prestige-root]) > div > footer {
   display: none !important;
 }
+/* Exception : sur une surface immersive marquée data-keep-global-header (ex : la
+   page Exemples), on RÉAFFICHE le header global pour garder la navigation. Le
+   footer global reste masqué car l'expérience fournit son propre pied immersif. */
+body:has([data-prestige-root][data-keep-global-header]) > div > header {
+  display: block !important;
+}
 body:has([data-prestige-root]) {
   background-color: var(--ink, #0c0a09);
 }

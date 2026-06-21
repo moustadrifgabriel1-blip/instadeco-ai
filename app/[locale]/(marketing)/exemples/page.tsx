@@ -41,6 +41,7 @@ export default function ExemplesPage() {
     <div
       className={`${cormorant.variable} ${josefin.variable} prestige-root prestige-body`}
       data-prestige-root
+      data-keep-global-header
     >
       <ExemplesExperience />
     </div>

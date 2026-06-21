@@ -30,35 +30,44 @@ export function PrestigeRevealObserver() {
     // <html> porte suppressHydrationWarning, le flag y est donc sûr et immédiat.
     document.documentElement.classList.add('prestige-reveal-on');
 
-    let io: IntersectionObserver | undefined;
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            io.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -8% 0px' },
+    );
 
-    // On diffère l'observation (qui ajoute .is-visible) d'une frame, pour la
-    // sortir du commit d'hydratation tout en gardant une révélation rapide
-    // (au-dessus de la ligne de flottaison comprise).
-    const raf = window.requestAnimationFrame(() => {
-      const els = Array.from(
-        document.querySelectorAll<HTMLElement>('.prestige-reveal:not(.is-visible)'),
-      );
-      if (els.length === 0) return;
+    // Observe tous les .prestige-reveal pas encore révélés. Idempotent : ré-observer
+    // un élément déjà suivi est sans effet. On NE bail PAS si le DOM est vide au
+    // premier passage : sur une page dont les données sont awaitées/streamées (ex :
+    // liste blog), les cartes arrivent APRÈS, et seraient sinon armées-cachées sans
+    // jamais être observées, donc invisibles à vie.
+    const scan = () => {
+      document
+        .querySelectorAll<HTMLElement>('.prestige-reveal:not(.is-visible)')
+        .forEach((el) => io.observe(el));
+    };
 
-      io = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add('is-visible');
-              io?.unobserve(entry.target);
-            }
-          });
-        },
-        { threshold: 0.12, rootMargin: '0px 0px -8% 0px' },
-      );
-
-      els.forEach((el) => io!.observe(el));
-    });
+    // Scan initial différé d'une frame (hors commit d'hydratation) + re-scans courts
+    // pour capter le contenu async, et un MutationObserver pour tout ajout tardif
+    // (Suspense, navigation client).
+    const raf = window.requestAnimationFrame(scan);
+    const t1 = window.setTimeout(scan, 250);
+    const t2 = window.setTimeout(scan, 1000);
+    const mo = new MutationObserver(scan);
+    mo.observe(document.body, { childList: true, subtree: true });
 
     return () => {
       window.cancelAnimationFrame(raf);
-      io?.disconnect();
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+      mo.disconnect();
+      io.disconnect();
     };
   }, [pathname]);
 
