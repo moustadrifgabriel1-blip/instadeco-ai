@@ -243,7 +243,7 @@ export default function ProPage() {
       const res = await createSubscriptionSession({
         planId,
         interval: billingPeriod,
-        successUrl: `${window.location.origin}/${locale}/dashboard?subscription=success&plan=${planId}&v=${value}`,
+        successUrl: `${window.location.origin}/${locale}/credits/success?type=subscription&plan=${planId}&v=${value}&session_id={CHECKOUT_SESSION_ID}`,
         cancelUrl: `${window.location.origin}/${locale}/pro?subscription=cancelled`,
       });
       if (res.checkoutUrl) {

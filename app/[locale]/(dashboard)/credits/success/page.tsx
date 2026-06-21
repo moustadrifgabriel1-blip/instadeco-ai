@@ -6,6 +6,8 @@ import { Link } from '@/i18n/navigation';
 import { Loader2, CheckCircle2, Crown, Sparkles, ArrowRight, ImageIcon } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { useSupabaseBrowser } from '@/hooks/use-supabase-browser';
+import { trackPurchase } from '@/lib/analytics/gtag';
+import { fbTrackPurchase } from '@/lib/analytics/fb-pixel';
 
 const PLAN_LABEL: Record<string, string> = { solo: 'Solo', pro: 'Pro', agence: 'Agence' };
 
@@ -14,8 +16,10 @@ type Phase = 'verifying' | 'done' | 'pending';
 function SuccessContent() {
   const sp = useSearchParams();
   const isSub = sp.get('type') === 'subscription';
-  const planLabel = PLAN_LABEL[sp.get('plan') || ''] ?? 'Pro';
+  const planId = sp.get('plan') || 'pro';
+  const planLabel = PLAN_LABEL[planId] ?? 'Pro';
   const expected = Number(sp.get('n')) || null;
+  const value = Number(sp.get('v')) || 0;
 
   const { user } = useAuth();
   const supabase = useSupabaseBrowser();
@@ -57,6 +61,16 @@ function SuccessContent() {
     poll();
     return () => { cancelled.current = true; };
   }, [isSub, supabase, user, expected]);
+
+  // Conversion : abonnement Pro activé. Une seule fois (anti double-comptage au refresh).
+  useEffect(() => {
+    if (phase !== 'done' || !isSub) return;
+    const key = `sub_tracked_${planId}_${value}`;
+    if (sessionStorage.getItem(key)) return;
+    sessionStorage.setItem(key, '1');
+    trackPurchase(`sub_${planId}`, value);
+    fbTrackPurchase(planId, value);
+  }, [phase, isSub, planId, value]);
 
   // ── En cours de vérification ──
   if (phase === 'verifying') {
