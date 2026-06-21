@@ -37,6 +37,8 @@ npm run test:run     # Vitest (doit rester vert, bloquant en CI)
 ```
 Avant tout commit : `npm run type-check && npm run lint && npm run test:run` doivent être **verts**. Le CI (`.github/workflows/ci.yml`) les impose (tsc + lint + tests bloquants).
 
+⚠️ **Piège CI lockfile (vécu, fix le 21/06).** Le CI commence par `npm ci` (install STRICTE) qui échoue si `package-lock.json` est désynchro de `package.json` (ex : `npm error code EUSAGE … Missing: @emnapi/core@x from lock file`). Ça plante en ~9 s AVANT tsc/lint/tests, donc tous les commits suivants partent en rouge même si le code est sain. En local, `npm run …` n'attrape PAS ça (il réutilise `node_modules`). Donc : après tout changement de dépendance (ou si le CI rougit à l'install), régénérer le lock avec **npm@11** (la version épinglée par le CI) : `npm install --package-lock-only`, vérifier `npm ci --dry-run` (« up to date »), committer le lock. Cause d'origine du rouge du 19→21/06 : le `chore(deps): bump securite` avait modifié package.json sans régénérer le lock complet (deps natives optionnelles Linux absentes).
+
 ## Architecture (clean architecture sous `src/`)
 - `src/domain/`, entités, ports (interfaces), erreurs. **Ne dépend de rien d'externe.**
 - `src/application/use-cases/`, logique métier orchestrée.
