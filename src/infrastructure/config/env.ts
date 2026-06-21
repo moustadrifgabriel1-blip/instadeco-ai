@@ -15,13 +15,18 @@ const envSchema = z.object({
   NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1),
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
 
-  // Fal.ai
-  FAL_KEY: z.string().min(1),
+  // Fal.ai — OPTIONNEL : le provider par défaut est Gemini (cf. image-generator-factory).
+  // Le rendre requis faisait crasher TOUTE route touchant getEnv() (webhook, SSR blog/galerie)
+  // en prod où seule GEMINI_API_KEY est posée → 500 "Invalid environment variables".
+  FAL_KEY: z.string().optional(),
+  GEMINI_API_KEY: z.string().optional(),
 
   // Stripe
   STRIPE_SECRET_KEY: z.string().startsWith('sk_'),
   STRIPE_WEBHOOK_SECRET: z.string().startsWith('whsec_'),
-  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().startsWith('pk_'),
+  // Optionnelle : seulement requise pour Stripe.js côté client (Elements). Le tunnel
+  // passe par Checkout en redirection, donc absente possible en prod.
+  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().startsWith('pk_').optional(),
 
   // Stripe Price IDs (optionnels car configurés dans Stripe Dashboard)
   STRIPE_PRICE_10_CREDITS: z.string().optional(),
