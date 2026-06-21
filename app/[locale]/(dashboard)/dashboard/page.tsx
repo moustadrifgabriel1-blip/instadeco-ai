@@ -9,6 +9,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useSupabaseBrowser } from '@/hooks/use-supabase-browser';
 import { useGenerations } from '@/src/presentation/hooks/useGenerations';
 import { useCredits } from '@/src/presentation/hooks/useCredits';
+import { usePlan } from '@/hooks/use-plan';
 import { DashboardHeader } from '@/components/features/dashboard/DashboardHeader';
 import { DashboardSidebar } from '@/components/features/dashboard/DashboardSidebar';
 import { GenerationsTab } from '@/components/features/dashboard/GenerationsTab';
@@ -36,6 +37,7 @@ export default function DashboardPageV2() {
 
   const { generations, state: generationsState, refetch: refetchGenerations } = useGenerations({ limit: 50 });
   const { credits, state: creditsState } = useCredits();
+  const { isUnlimited } = usePlan();
   const { referralCode, referralStats } = useReferral(user);
 
   const [activeTab, setActiveTab] = useState<ActiveTab>('generations');
@@ -92,6 +94,7 @@ export default function DashboardPageV2() {
       <DashboardHeader
         credits={credits}
         creditsLoading={creditsState.isLoading}
+        unlimited={isUnlimited}
         showUserMenu={showUserMenu}
         setShowUserMenu={setShowUserMenu}
         onLogout={handleLogout}
@@ -118,6 +121,7 @@ export default function DashboardPageV2() {
                 user={user}
                 supabase={supabase}
                 credits={credits}
+                unlimited={isUnlimited}
                 generationsCount={generations.length}
                 onAccountDeleted={() => router.push('/')}
               />

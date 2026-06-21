@@ -28,6 +28,7 @@ import { Button } from '@/components/ui/button';
 
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
+import { usePlan } from '@/hooks/use-plan';
 import { LanguageSwitcher } from './LanguageSwitcher';
 
 const NAV_KEYS = [
@@ -47,6 +48,7 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { user, credits, loading } = useAuth();
+  const { isUnlimited } = usePlan();
   const t = useTranslations('Nav');
   const tCommon = useTranslations('Common');
 
@@ -151,24 +153,28 @@ export function Header() {
                   )}
                 >
                   <span className={cn('font-bold', prestige ? 'text-[#c8a24d]' : 'text-[#E07B54]')}>
-                    {credits}
+                    {isUnlimited ? 'Illimité' : credits}
                   </span>
-                  <span
-                    className={cn('text-xs', prestige ? 'text-[rgba(250,248,244,0.62)]' : 'text-[#C95D3A]')}
-                  >
-                    {tCommon('credits')}
-                  </span>
-                  <Link
-                    href="/pricing"
-                    className={cn(
-                      'ml-1 p-1 rounded transition-colors',
-                      prestige
-                        ? 'bg-[rgba(200,162,77,0.12)] hover:bg-[rgba(200,162,77,0.24)] text-[#c8a24d]'
-                        : 'bg-white/50 hover:bg-white text-[#E07B54]',
-                    )}
-                  >
-                    <Plus className="h-3.5 w-3.5" />
-                  </Link>
+                  {!isUnlimited && (
+                    <>
+                      <span
+                        className={cn('text-xs', prestige ? 'text-[rgba(250,248,244,0.62)]' : 'text-[#C95D3A]')}
+                      >
+                        {tCommon('credits')}
+                      </span>
+                      <Link
+                        href="/pricing"
+                        className={cn(
+                          'ml-1 p-1 rounded transition-colors',
+                          prestige
+                            ? 'bg-[rgba(200,162,77,0.12)] hover:bg-[rgba(200,162,77,0.24)] text-[#c8a24d]'
+                            : 'bg-white/50 hover:bg-white text-[#E07B54]',
+                        )}
+                      >
+                        <Plus className="h-3.5 w-3.5" />
+                      </Link>
+                    </>
+                  )}
                 </div>
                 <Link href="/dashboard">
                   <Button
@@ -310,12 +316,12 @@ export function Header() {
                           prestige ? 'text-[rgba(250,248,244,0.62)]' : 'text-[#6B6B6B]',
                         )}
                       >
-                        {tCommon('creditsAvailable')}
+                        {isUnlimited ? 'Générations' : tCommon('creditsAvailable')}
                       </span>
                       <span
                         className={cn('font-bold', prestige ? 'text-[#c8a24d]' : 'text-[#E07B54]')}
                       >
-                        {credits}
+                        {isUnlimited ? 'Illimité' : credits}
                       </span>
                     </div>
                     <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>

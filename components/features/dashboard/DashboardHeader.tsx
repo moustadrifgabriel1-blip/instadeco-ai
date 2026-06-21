@@ -1,11 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { Coins, User, ChevronDown, LogOut } from 'lucide-react';
+import { Coins, User, ChevronDown, LogOut, Crown } from 'lucide-react';
 
 interface DashboardHeaderProps {
   credits: number;
   creditsLoading: boolean;
+  /** Abonné Pro/Agence illimité : on affiche « Illimité » au lieu d'un solde. */
+  unlimited?: boolean;
   showUserMenu: boolean;
   setShowUserMenu: (open: boolean) => void;
   onLogout: () => void;
@@ -14,6 +16,7 @@ interface DashboardHeaderProps {
 export function DashboardHeader({
   credits,
   creditsLoading,
+  unlimited,
   showUserMenu,
   setShowUserMenu,
   onLogout,
@@ -25,12 +28,19 @@ export function DashboardHeader({
           InstaDeco
         </Link>
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-muted rounded-full">
-            <Coins className="w-4 h-4 text-primary" />
-            <span className="text-sm font-medium text-foreground">
-              {creditsLoading ? '...' : credits}
-            </span>
-          </div>
+          {unlimited ? (
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[rgba(200,162,77,0.12)] border border-[var(--gold-line)]">
+              <Crown className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium text-primary">Illimité</span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-muted rounded-full">
+              <Coins className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium text-foreground">
+                {creditsLoading ? '...' : credits}
+              </span>
+            </div>
+          )}
           <div className="relative">
             <button
               onClick={() => setShowUserMenu(!showUserMenu)}

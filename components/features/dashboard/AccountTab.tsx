@@ -14,11 +14,13 @@ interface AccountTabProps {
   user: User | null;
   supabase: SupabaseClient | null;
   credits: number;
+  /** Abonné Pro/Agence illimité : on affiche « Illimité » au lieu d'un solde. */
+  unlimited?: boolean;
   generationsCount: number;
   onAccountDeleted: () => void;
 }
 
-export function AccountTab({ user, supabase, credits, generationsCount, onAccountDeleted }: AccountTabProps) {
+export function AccountTab({ user, supabase, credits, unlimited, generationsCount, onAccountDeleted }: AccountTabProps) {
   const profile = useProfileSettings(user, supabase);
   const account = useAccountActions(supabase, onAccountDeleted);
 
@@ -99,8 +101,12 @@ export function AccountTab({ user, supabase, credits, generationsCount, onAccoun
         <CardContent>
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-muted border border-[var(--gold-line)] rounded-xl p-4 text-center">
-              <div className="prestige-display text-2xl font-bold text-primary">{credits}</div>
-              <div className="text-sm text-muted-foreground mt-1">Crédits disponibles</div>
+              <div className="prestige-display text-2xl font-bold text-primary">
+                {unlimited ? 'Illimité' : credits}
+              </div>
+              <div className="text-sm text-muted-foreground mt-1">
+                {unlimited ? 'Générations' : 'Crédits disponibles'}
+              </div>
             </div>
             <div className="bg-muted border border-border rounded-xl p-4 text-center">
               <div className="prestige-display text-2xl font-bold text-foreground">{generationsCount}</div>
