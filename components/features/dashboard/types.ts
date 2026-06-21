@@ -1,2 +1,2 @@
 export type FilterStatus = 'all' | 'completed' | 'processing' | 'failed';
-export type ActiveTab = 'generations' | 'account' | 'security' | 'referral' | 'team';
+export type ActiveTab = 'generations' | 'account' | 'subscription' | 'security' | 'referral' | 'team';

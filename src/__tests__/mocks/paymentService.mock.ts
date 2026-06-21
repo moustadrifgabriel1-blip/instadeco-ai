@@ -35,6 +35,9 @@ export function createMockPaymentService(overrides: Partial<IPaymentService> = {
       metadata: {},
     })),
     getOrCreateCustomer: vi.fn().mockResolvedValue(success('cus_test_123')),
+    createBillingPortalSession: vi.fn().mockResolvedValue(success({
+      url: 'https://billing.stripe.com/portal-test',
+    })),
     ...overrides,
   };
 }

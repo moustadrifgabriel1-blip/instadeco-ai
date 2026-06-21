@@ -48,6 +48,7 @@ import { SupabaseUserDeletionRepository } from '../repositories/supabase/Supabas
 import { IUserDeletionRepository } from '@/src/domain/ports/repositories/IUserDeletionRepository';
 import { DeleteAccountUseCase } from '@/src/application/use-cases/user/DeleteAccountUseCase';
 import { CreateSubscriptionUseCase } from '@/src/application/use-cases/payments/CreateSubscriptionUseCase';
+import { CreateBillingPortalSessionUseCase } from '@/src/application/use-cases/payments/CreateBillingPortalSessionUseCase';
 import { PurchaseCreditsUseCase } from '@/src/application/use-cases/credits/PurchaseCreditsUseCase';
 import { CreateGuestCheckoutUseCase } from '@/src/application/use-cases/payments/CreateGuestCheckoutUseCase';
 import { AddCreditsUseCase } from '@/src/application/use-cases/credits/AddCreditsUseCase';
@@ -303,6 +304,10 @@ class DIContainer {
     return new CreateSubscriptionUseCase(this.paymentService, this.logger);
   }
 
+  get createBillingPortalSessionUseCase(): CreateBillingPortalSessionUseCase {
+    return new CreateBillingPortalSessionUseCase(this.userRepository, this.paymentService);
+  }
+
   get purchaseCreditsUseCase(): PurchaseCreditsUseCase {
     return new PurchaseCreditsUseCase(
       this.creditRepository,
@@ -463,6 +468,7 @@ export const useCases = {
   get exportUserData() { return container.exportUserDataUseCase; },
   get deleteAccount() { return container.deleteAccountUseCase; },
   get createSubscription() { return container.createSubscriptionUseCase; },
+  get createBillingPortal() { return container.createBillingPortalSessionUseCase; },
   get purchaseCredits() { return container.purchaseCreditsUseCase; },
   get createGuestCheckout() { return container.createGuestCheckoutUseCase; },
   get addCredits() { return container.addCreditsUseCase; },

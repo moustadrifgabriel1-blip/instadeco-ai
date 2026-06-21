@@ -105,6 +105,22 @@ export class StripePaymentService implements IPaymentService {
     }
   }
 
+  async createBillingPortalSession(
+    customerId: string,
+    returnUrl: string,
+  ): Promise<Result<{ url: string }>> {
+    try {
+      const session = await this.stripe.billingPortal.sessions.create({
+        customer: customerId,
+        return_url: returnUrl,
+      });
+      return success({ url: session.url });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      return failure(new Error(`Failed to create billing portal session: ${message}`));
+    }
+  }
+
   async retrieveSession(sessionId: string): Promise<Result<{
     id: string;
     paymentStatus: string;

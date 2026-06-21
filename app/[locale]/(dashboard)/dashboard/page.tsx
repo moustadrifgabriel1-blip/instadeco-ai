@@ -13,6 +13,7 @@ import { DashboardHeader } from '@/components/features/dashboard/DashboardHeader
 import { DashboardSidebar } from '@/components/features/dashboard/DashboardSidebar';
 import { GenerationsTab } from '@/components/features/dashboard/GenerationsTab';
 import { AccountTab } from '@/components/features/dashboard/AccountTab';
+import { SubscriptionTab } from '@/components/features/dashboard/SubscriptionTab';
 import { SecurityTab } from '@/components/features/dashboard/SecurityTab';
 import { ReferralTab } from '@/components/features/dashboard/ReferralTab';
 import { TeamTab } from '@/components/features/dashboard/TeamTab';
@@ -121,6 +122,7 @@ export default function DashboardPageV2() {
                 onAccountDeleted={() => router.push('/')}
               />
             )}
+            {activeTab === 'subscription' && <SubscriptionTab user={user} supabase={supabase} />}
             {activeTab === 'security' && <SecurityTab user={user} supabase={supabase} />}
             {activeTab === 'referral' && (
               <ReferralTab referralCode={referralCode} referralStats={referralStats} />

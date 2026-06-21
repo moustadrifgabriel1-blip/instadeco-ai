@@ -92,4 +92,10 @@ export interface IPaymentService {
    * Crée ou récupère un client Stripe
    */
   getOrCreateCustomer(email: string, userId: string): Promise<Result<string>>;
+
+  /**
+   * Crée une session du portail de facturation Stripe (gestion d'abonnement :
+   * changer de plan, mettre à jour la carte, annuler, factures).
+   */
+  createBillingPortalSession(customerId: string, returnUrl: string): Promise<Result<{ url: string }>>;
 }
