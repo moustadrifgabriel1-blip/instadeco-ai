@@ -93,6 +93,7 @@ function GenerateContent() {
   const [showAuthPrompt, setShowAuthPrompt] = useState(false);
   const [showPromptDetails, setShowPromptDetails] = useState(false);
   const resultRef = useRef<HTMLDivElement>(null);
+  const optionsRef = useRef<HTMLDivElement>(null);
 
   // Hooks de la couche Presentation
   const { generate, state: generateState, reset: resetGenerate } = useGenerate();
@@ -168,6 +169,18 @@ function GenerateContent() {
       }, 100);
     }
   }, [generatedImage]);
+
+  // Après un upload, amener les options et le bouton de génération dans le champ
+  // de vision. Sans ça, un aperçu plein cadre cache le bouton sous la ligne de
+  // flottaison et l'utilisateur croit qu'il n'existe pas.
+  useEffect(() => {
+    if (imagePreview && !generatedImage && optionsRef.current) {
+      const t = setTimeout(() => {
+        optionsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 250);
+      return () => clearTimeout(t);
+    }
+  }, [imagePreview, generatedImage]);
 
   // Quand la génération démarre, stocker l'ID pour le polling (confirmation)
   // Skip le polling si le résultat synchrone est déjà complet avec outputImageUrl
@@ -387,7 +400,7 @@ function GenerateContent() {
                   alt="Votre pièce, aperçu avant transformation"
                   width={1200}
                   height={800}
-                  className="w-full h-auto"
+                  className="w-full h-auto max-h-[46vh] object-contain"
                   sizes="(max-width: 768px) 100vw, 672px"
                   unoptimized
                 />
@@ -400,7 +413,7 @@ function GenerateContent() {
               </div>
 
               {/* Options */}
-              <div className="space-y-8">
+              <div ref={optionsRef} className="space-y-8 scroll-mt-6">
                 {/* Transform Mode */}
                 <div className="text-center prestige-reveal">
                   <label className="block prestige-eyebrow text-[12px] text-[var(--gold)] mb-4">
@@ -703,6 +716,7 @@ function GenerateContent() {
                       height={400}
                       className="w-full h-auto"
                       sizes="(max-width: 768px) 100vw, 50vw"
+                      unoptimized
                     />
                   </div>
                 </div>

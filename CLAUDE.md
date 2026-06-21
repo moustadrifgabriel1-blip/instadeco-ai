@@ -46,7 +46,7 @@ Avant tout commit : `npm run type-check && npm run lint && npm run test:run` doi
 - Langue UI : **français** (textes, commentaires).
 
 ## Génération d'images, système de provider
-- Sélection via env **`IMAGE_PROVIDER`** = `fal` (défaut) ou `gemini`. Factory : `src/infrastructure/services/image-generator-factory.ts`, branchée dans le DI container.
+- Sélection via env **`IMAGE_PROVIDER`** = `fal` ou `gemini` (override explicite prioritaire). **Sans variable, défaut auto = `gemini` si `GEMINI_API_KEY` est présente, sinon `fal`.** L'ancien défaut « fal en dur » faisait échouer TOUTE génération web faute de `FAL_KEY` (local ET prod) : le tunnel ne passait jamais par le moteur configuré (corrigé le 21/06). Factory : `src/infrastructure/services/image-generator-factory.ts`, branchée dans le DI container.
 - Les deux implémentent `IImageGeneratorService` (`generate()` synchrone).
 - **FAL** : `fal.run()` SYNCHRONE uniquement (JAMAIS `fal.queue.submit` → ré-exécute le modèle). Toujours `fal.storage.upload()` avant. ControlNet depth désactivé (bug tenseur 14/02/2026).
 - **Gemini** ("Nano Banana", `gemini-2.5-flash-image`) : REST pur, édite la photo en préservant la structure. Override modèle via `GEMINI_IMAGE_MODEL`.

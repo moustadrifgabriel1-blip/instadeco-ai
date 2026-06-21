@@ -1,13 +1,14 @@
 /**
  * Image Generator Factory
  *
- * Sélectionne l'implémentation de IImageGeneratorService selon la variable
- * d'environnement IMAGE_PROVIDER :
+ * Sélectionne l'implémentation de IImageGeneratorService :
  *   - 'gemini' → GeminiImageGeneratorService (Google Gemini 2.5 Flash Image / Nano Banana)
- *   - 'fal'    → FalImageGeneratorService (défaut — ne rien casser en prod)
+ *   - 'fal'    → FalImageGeneratorService (Flux)
  *
- * Défaut = 'fal' pour préserver le comportement existant. En local, où seule
- * GEMINI_API_KEY est présente, il suffit de poser IMAGE_PROVIDER=gemini dans .env.local.
+ * IMAGE_PROVIDER explicite est toujours prioritaire. Sans variable, on choisit le
+ * provider dont la clé est réellement présente : Gemini est le moteur configuré et
+ * financé (il n'y a pas de FAL_KEY). L'ancien défaut « fal en dur » faisait échouer
+ * TOUTE génération web faute de clé FAL, en local comme en prod.
  */
 import { IImageGeneratorService } from '@/src/domain/ports/services/IImageGeneratorService';
 import { FalImageGeneratorService } from '@/src/infrastructure/services/fal/FalImageGeneratorService';
@@ -16,20 +17,23 @@ import { GeminiImageGeneratorService } from '@/src/infrastructure/services/gemin
 export type ImageProvider = 'fal' | 'gemini';
 
 export function createImageGeneratorService(): IImageGeneratorService {
-  const provider = (process.env.IMAGE_PROVIDER || 'fal').toLowerCase() as ImageProvider;
+  const explicit = process.env.IMAGE_PROVIDER?.toLowerCase();
+  const provider: ImageProvider =
+    explicit === 'gemini' || explicit === 'fal'
+      ? explicit
+      : process.env.GEMINI_API_KEY
+        ? 'gemini'
+        : 'fal';
+
+  if (explicit && explicit !== 'gemini' && explicit !== 'fal') {
+    console.warn(`[ImageFactory] IMAGE_PROVIDER="${explicit}" inconnu — choix automatique: ${provider}.`);
+  }
 
   if (provider === 'gemini') {
     console.log('[ImageFactory] Provider sélectionné: gemini (Nano Banana)');
     return new GeminiImageGeneratorService();
   }
 
-  if (provider !== 'fal') {
-    console.warn(
-      `[ImageFactory] IMAGE_PROVIDER="${provider}" inconnu — fallback sur 'fal'.`,
-    );
-  } else {
-    console.log('[ImageFactory] Provider sélectionné: fal (Flux)');
-  }
-
+  console.log('[ImageFactory] Provider sélectionné: fal (Flux)');
   return new FalImageGeneratorService();
 }
