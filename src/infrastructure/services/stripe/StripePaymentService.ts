@@ -159,11 +159,22 @@ export class StripePaymentService implements IPaymentService {
 
   async verifyWebhook(payload: string, signature: string): Promise<Result<PaymentWebhookEvent>> {
     try {
-      const event = this.stripe.webhooks.constructEvent(
-        payload,
-        signature,
-        this.webhookSecret
-      );
+      // Tolérant : STRIPE_WEBHOOK_SECRET peut contenir PLUSIEURS secrets séparés par
+      // des virgules (plusieurs endpoints Stripe), avec d'éventuels espaces. On essaie
+      // chacun ; l'event est valide dès qu'un secret correspond.
+      const secrets = this.webhookSecret.split(',').map((s) => s.trim()).filter(Boolean);
+      let event: Stripe.Event | null = null;
+      for (const secret of secrets) {
+        try {
+          event = this.stripe.webhooks.constructEvent(payload, signature, secret);
+          break;
+        } catch {
+          /* essaie le secret suivant */
+        }
+      }
+      if (!event) {
+        throw new Error('Signature webhook invalide (aucun secret ne correspond)');
+      }
 
       const base = {
         eventId: event.id,
