@@ -51,6 +51,15 @@ export class StripePaymentService implements IPaymentService {
         ],
         success_url: options.successUrl,
         cancel_url: options.cancelUrl,
+        // Facturation B2B : adresse de facturation + numéro de TVA, et facture
+        // conforme téléchargeable (indispensable pour qu'une agence déduise l'achat).
+        billing_address_collection: 'required',
+        tax_id_collection: { enabled: true },
+        customer_creation: 'always',
+        invoice_creation: { enabled: true },
+        // Stripe Tax (TVA/autoliquidation B2B) : gaté par env, requiert une config
+        // Stripe Tax dans le compte. Off par défaut pour ne jamais casser le checkout.
+        automatic_tax: { enabled: process.env.STRIPE_TAX_ENABLED === 'true' },
         metadata: {
           ...options.metadata,
           // userId absent pour un achat invité : on n'écrit pas une clé vide.
@@ -90,6 +99,11 @@ export class StripePaymentService implements IPaymentService {
         success_url: options.successUrl,
         cancel_url: options.cancelUrl,
         allow_promotion_codes: true,
+        // Facturation B2B : adresse + numéro de TVA. Les abonnements génèrent
+        // déjà une facture conforme à chaque cycle.
+        billing_address_collection: 'required',
+        tax_id_collection: { enabled: true },
+        automatic_tax: { enabled: process.env.STRIPE_TAX_ENABLED === 'true' },
         metadata: options.metadata,
         subscription_data: { metadata: options.subscriptionMetadata },
       });

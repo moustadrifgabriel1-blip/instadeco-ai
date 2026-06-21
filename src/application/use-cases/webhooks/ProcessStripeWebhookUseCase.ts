@@ -218,9 +218,16 @@ export class ProcessStripeWebhookUseCase {
       });
 
       let to = (event.customerEmail || '').trim();
-      if (!to && this.userRepo) {
-        const u = await this.userRepo.findById(userId);
-        if (u.success && u.data) to = u.data.email;
+      if (this.userRepo) {
+        // Stocke le client Stripe (le checkout crédits cree desormais un customer)
+        // pour donner acces aux factures via le portail. Best-effort, non bloquant.
+        if (event.customerId) {
+          await this.userRepo.update(userId, { stripeCustomerId: event.customerId });
+        }
+        if (!to) {
+          const u = await this.userRepo.findById(userId);
+          if (u.success && u.data) to = u.data.email;
+        }
       }
 
       return success({
