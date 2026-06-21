@@ -6,6 +6,9 @@ import { GalleryClient, type GalleryItem } from './GalleryClient';
 export const revalidate = 300;
 
 const DEFAULT_LIMIT = 24;
+// RGPD : page indexée → uniquement les rendus du compte démo (curés, consentis),
+// jamais ceux de vrais utilisateurs (structure de pièce reconnaissable).
+const DEMO_GALLERY_USER = 'f88c9b68-eda4-4d67-bfb4-f631d21b37c6';
 
 /**
  * Récupère les générations publiques côté serveur pour le rendu initial.
@@ -22,6 +25,7 @@ async function getInitialGallery(): Promise<{ items: GalleryItem[]; total: numbe
       .from('generations')
       .select('id, style_slug, room_type_slug, output_image_url, created_at')
       .eq('status', 'completed')
+      .eq('user_id', DEMO_GALLERY_USER)
       .not('output_image_url', 'is', null)
       .order('created_at', { ascending: false })
       .range(0, limit - 1);
@@ -35,6 +39,7 @@ async function getInitialGallery(): Promise<{ items: GalleryItem[]; total: numbe
       .from('generations')
       .select('id', { count: 'exact', head: true })
       .eq('status', 'completed')
+      .eq('user_id', DEMO_GALLERY_USER)
       .not('output_image_url', 'is', null);
 
     return { items: (data as GalleryItem[]) || [], total: count || 0 };

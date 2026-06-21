@@ -198,11 +198,18 @@ export class SupabaseGenerationRepository implements IGenerationRepository {
     const limit = Math.max(1, Math.min(query.limit ?? 24, 50));
     const offset = Math.max(0, query.offset ?? 0);
 
-    // ANONYMISATION au niveau data : on ne SELECT JAMAIS user_id ni input_image_url.
+    // RGPD : la galerie est une page INDEXÉE. On n'expose QUE les rendus du compte
+    // démo (curés, libres de droits), jamais ceux de vrais utilisateurs dont la
+    // structure de pièce serait reconnaissable sans consentement.
+    const DEMO_GALLERY_USER = 'f88c9b68-eda4-4d67-bfb4-f631d21b37c6';
+
+    // ANONYMISATION au niveau data : on ne SELECT JAMAIS user_id ni input_image_url
+    // (on filtre dessus sans le retourner).
     let dataQuery = this.supabase
       .from('generations')
       .select('id, style_slug, room_type_slug, output_image_url, created_at')
       .eq('status', 'completed')
+      .eq('user_id', DEMO_GALLERY_USER)
       .not('output_image_url', 'is', null)
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
@@ -211,6 +218,7 @@ export class SupabaseGenerationRepository implements IGenerationRepository {
       .from('generations')
       .select('id', { count: 'exact', head: true })
       .eq('status', 'completed')
+      .eq('user_id', DEMO_GALLERY_USER)
       .not('output_image_url', 'is', null);
 
     if (query.styleSlug) {
