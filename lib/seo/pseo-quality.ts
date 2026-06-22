@@ -60,3 +60,18 @@ export function isCityIndexable(slug: string, uniqueWordCount = 0): boolean {
 export function programmaticRobots(indexable: boolean) {
   return indexable ? undefined : { index: false, follow: true };
 }
+
+/** Nombre de mots d'un texte (séparateurs d'espaces, vides ignorés). */
+export function countWords(text: string | null | undefined): number {
+  if (!text) return 0;
+  return text.trim().split(/\s+/).filter(Boolean).length;
+}
+
+/**
+ * Une page pSEO (ex: /amenager) est-elle indexable au vu de son contenu unique ?
+ * Même règle que les villes : sous le seuil d'unicité -> noindex,follow, et
+ * réindexation automatique dès que le contenu enrichi franchit le seuil.
+ */
+export function isPseoContentIndexable(uniqueText: string | null | undefined): boolean {
+  return countWords(uniqueText) >= MIN_UNIQUE_WORDS;
+}

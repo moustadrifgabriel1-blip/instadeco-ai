@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next';
 import { SEO_CONFIG } from '@/lib/seo/config';
+import { isPseoContentIndexable } from '@/lib/seo/pseo-quality';
 
 export const revalidate = 3600;
 
@@ -280,15 +281,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const { getSupabaseAdmin } = await import('@/lib/supabase/admin-client');
     const { data } = await getSupabaseAdmin()
       .from('pseo_pages')
-      .select('slug, updated_at')
+      .select('slug, updated_at, unique_seo_text')
       .eq('status', 'published');
-    pseoPages = (data || []).flatMap((p: { slug: string; updated_at: string }) =>
-      frOnlySitemap(`/amenager/${p.slug}`, {
-        lastModified: p.updated_at ? new Date(p.updated_at) : now,
-        changeFrequency: 'monthly' as const,
-        priority: 0.5,
-      }),
-    );
+    // Barrière qualité : on ne référence que les pages au-dessus du seuil d'unicité
+    // (cohérent avec le noindex,follow posé dans le rendu de la page).
+    pseoPages = (data || [])
+      .filter((p: { unique_seo_text: string | null }) => isPseoContentIndexable(p.unique_seo_text))
+      .flatMap((p: { slug: string; updated_at: string }) =>
+        frOnlySitemap(`/amenager/${p.slug}`, {
+          lastModified: p.updated_at ? new Date(p.updated_at) : now,
+          changeFrequency: 'monthly' as const,
+          priority: 0.5,
+        }),
+      );
   } catch (error) {
     console.error('Error loading pseo_pages for sitemap:', error);
   }

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { generateBreadcrumbList } from '@/lib/seo/schemas';
 import { getLocalizedCanonicalUrl, withLocalePath, frOnlyProgrammaticMeta } from '@/lib/seo/config';
+import { isPseoContentIndexable, programmaticRobots } from '@/lib/seo/pseo-quality';
 import { getSupabaseAdmin } from '@/lib/supabase/admin-client';
 
 interface PageProps {
@@ -46,11 +47,21 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const title = page.h1_title;
   const description = page.meta_description ?? page.unique_seo_text.slice(0, 155);
 
+  // Barrière qualité (même règle que les pages villes) : une page pSEO sous le seuil
+  // de contenu unique reste en noindex,follow tant qu'elle n'est pas enrichie. Évite
+  // le thin content / scaled content à l'échelle sur le domaine entier.
+  const programmatic = frOnlyProgrammaticMeta(locale, path);
+  const robots =
+    locale === 'fr'
+      ? programmaticRobots(isPseoContentIndexable(page.unique_seo_text))
+      : programmatic.robots;
+
   return {
     title,
     description,
     openGraph: { title, description, type: 'article', url: getLocalizedCanonicalUrl(locale, path) },
-    ...frOnlyProgrammaticMeta(locale, path),
+    ...programmatic,
+    robots,
   };
 }
 
