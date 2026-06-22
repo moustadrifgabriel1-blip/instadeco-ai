@@ -61,11 +61,11 @@ const PRO_PLANS: ProPlan[] = [
     annualBilled: 'Facturé 408€/an',
     annualTotal: 408,
     features: [
-      'Générations ILLIMITÉES (fair-use)',
+      'Générations illimitées (fair-use)',
       '1 utilisateur',
       'Qualité HD',
-      'Export « pièce vide »',
       'Tous les styles',
+      'Licence commerciale incluse',
       'Support prioritaire',
       'Sans engagement, annulez en 1 clic',
     ],
@@ -127,7 +127,7 @@ const PRO_USE_CASES: {
 const ROI_COMPARISONS = [
   { label: 'Home staging physique', price: '2 000 - 5 000 €', time: '1-2 semaines', quality: 'Excellent mais limité à 1 style', icon: Home },
   { label: 'Photographe 3D', price: '500 - 1 500 €/bien', time: '3-5 jours', quality: 'Bon mais coûteux à l\'échelle', icon: Camera },
-  { label: 'InstaDeco Pro', price: '49 €/mois illimité', time: '10 secondes', quality: 'Illimité, tous styles, HD', icon: Sparkles, highlight: true },
+  { label: 'InstaDeco Pro', price: '49 €/mois illimité', time: '30 secondes', quality: 'Illimité, tous styles, HD', icon: Sparkles, highlight: true },
 ];
 
 const USE_CASES = [
@@ -190,11 +190,11 @@ const FAQ = [
   },
   {
     q: 'Les images générées sont-elles utilisables commercialement ?',
-    a: 'Oui, la licence commerciale est incluse : utilisez les rendus dans vos annonces, votre site, vos présentations clients et sur les réseaux. Un filigrane « visuel virtuel » et l\'export d\'une version non meublée sont disponibles pour rester conforme à la déontologie immobilière.',
+    a: 'Oui, la licence commerciale est incluse : utilisez les rendus dans vos annonces, votre site, vos présentations clients et sur les réseaux. Pensez à signaler le caractère virtuel du home staging sur vos annonces, conformément à la déontologie immobilière.',
   },
   {
     q: 'Comment ça marche concrètement ?',
-    a: '1) Prenez une photo de la pièce (vide ou occupée). 2) Uploadez-la sur InstaDeco. 3) Choisissez un style. 4) En ~10 secondes, téléchargez le rendu meublé en HD. C\'est tout.',
+    a: '1) Prenez une photo de la pièce (vide ou occupée). 2) Uploadez-la sur InstaDeco. 3) Choisissez un style. 4) En ~30 secondes, téléchargez le rendu meublé en HD. C\'est tout.',
   },
   {
     q: 'Est-ce que ça remplace un vrai home staging ?',
@@ -287,7 +287,7 @@ export default function ProPage() {
             </h1>
 
             <p className="text-lg md:text-xl text-[var(--mist)] max-w-3xl mx-auto mb-10 leading-relaxed">
-              Meublez n&apos;importe quelle pièce (vide ou occupée) en 10 secondes par IA.
+              Meublez n&apos;importe quelle pièce (vide ou occupée) en 30 secondes par IA.
               Rendu HD prêt pour votre annonce.
               <strong className="text-[var(--ivory)]"> Home staging virtuel illimité pour les pros de l&apos;immobilier.</strong>
             </p>
@@ -310,7 +310,7 @@ export default function ProPage() {
             <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-[var(--mist)]">
               <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-emerald-400" /> Essai gratuit, sans CB</span>
               <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-emerald-400" /> Sans engagement</span>
-              <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-emerald-400" /> Résultat en 10 secondes</span>
+              <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-emerald-400" /> Résultat en 30 secondes</span>
             </div>
           </div>
         </div>
@@ -363,6 +363,10 @@ export default function ProPage() {
             ))}
           </div>
 
+          <p className="text-center text-xs text-muted-foreground italic mb-10">
+            Tarifs et délais du home staging physique et de la photo 3D donnés à titre indicatif.
+          </p>
+
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
               { value: '49€', label: 'par mois, vs 2 000€+ de staging physique' },
@@ -388,11 +392,11 @@ export default function ProPage() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="prestige-display text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Qui utilise InstaDeco Pro ?
+              À qui s&apos;adresse InstaDeco Pro ?
             </h2>
             <div className="prestige-rule w-24 mx-auto mb-6" />
             <p className="text-lg text-muted-foreground">
-              Des professionnels de l&apos;immobilier et du design dans toute la francophonie.
+              Pensé pour les professionnels de l&apos;immobilier et du design, dans toute la francophonie.
             </p>
           </div>
 
@@ -424,7 +428,7 @@ export default function ProPage() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="prestige-display text-3xl md:text-4xl font-bold text-foreground mb-4">
-              3 étapes, 10 secondes
+              3 étapes, 30 secondes
             </h2>
             <div className="prestige-rule w-24 mx-auto mt-6" />
           </div>
@@ -433,7 +437,7 @@ export default function ProPage() {
             {[
               { step: 1, icon: Camera, title: 'Photographiez la pièce', desc: 'Prenez une photo de la pièce vide ou occupée. Smartphone ou appareil pro.' },
               { step: 2, icon: Palette, title: 'Choisissez un style', desc: 'Moderne, scandinave, industriel... un style pour chaque bien et chaque cible.' },
-              { step: 3, icon: Download, title: 'Téléchargez en HD', desc: 'En 10 secondes, obtenez le rendu meublé en haute définition. Prêt pour vos annonces.' },
+              { step: 3, icon: Download, title: 'Téléchargez en HD', desc: 'En 30 secondes, obtenez le rendu meublé en haute définition. Prêt pour vos annonces.' },
             ].map((item, i) => (
               <div
                 key={item.step}
@@ -634,6 +638,9 @@ export default function ProPage() {
                 <strong>Sans engagement.</strong> Annulez en 1 clic. Essai gratuit sans carte bancaire.
               </span>
             </div>
+            <p className="text-xs text-muted-foreground mt-4">
+              Paiement sécurisé par Stripe. Facture avec TVA disponible.
+            </p>
           </div>
         </div>
       </section>
@@ -711,8 +718,8 @@ export default function ProPage() {
             Prêt à vendre plus <span className="text-[var(--gold)] italic">vite</span> ?
           </h2>
           <p className="text-lg text-[var(--mist)] mb-10">
-            Rejoignez les professionnels qui utilisent déjà
-            le home staging virtuel par IA pour se démarquer.
+            Offrez à vos annonces un home staging virtuel par IA
+            et démarquez-vous dès aujourd&apos;hui.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
