@@ -191,7 +191,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
       tags: article.tags,
       images: [imageUrl],
       url: canonical,
-      authors: ['InstaDeco AI'],
+      authors: ['Gabriel Moustadrif'],
     },
     twitter: {
       card: 'summary_large_image',
@@ -443,7 +443,10 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                  <div className="w-8 h-8 rounded-full bg-[rgba(200,162,77,0.18)] backdrop-blur flex items-center justify-center text-[var(--gold)] border border-[var(--gold-line)]">
                     <User className="w-4 h-4" />
                  </div>
-                 <span>InstaDeco Team</span>
+                 <div className="flex flex-col leading-tight">
+                   <span>Gabriel Moustadrif</span>
+                   <span className="text-xs font-normal text-[var(--ivory)]/60">Fondateur d&apos;InstaDeco</span>
+                 </div>
                </div>
                <div className="w-px h-4 bg-[var(--gold-line)] hidden sm:block"></div>
                <div className="flex items-center gap-2">
@@ -554,9 +557,10 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             dateModified: article.publishedAt,
             inLanguage: locale,
             author: {
-              '@type': 'Organization',
-              name: 'InstaDeco AI',
-              url: SITE_URL,
+              '@type': 'Person',
+              name: 'Gabriel Moustadrif',
+              jobTitle: "Fondateur d'InstaDeco",
+              url: `${SITE_URL}/${locale}/a-propos`,
             },
             publisher: {
               '@type': 'Organization',
