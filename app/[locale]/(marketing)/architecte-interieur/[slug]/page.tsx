@@ -193,9 +193,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     title,
     description,
     keywords: [
+      `home staging virtuel ${city.name}`,
+      `home staging immobilier ${city.name}`,
+      `simulateur déco ${city.name}`,
       `architecte intérieur ${city.name}`,
       `décoration ${city.name}`,
-      `home staging ${city.name}`,
       `rénovation intérieur ${city.name}`,
       `design intérieur ${city.name} ${city.zip}`,
       `aménagement ${city.region}`,
@@ -274,12 +276,12 @@ export default async function CityPage({ params }: PageProps) {
               </Badge>
 
               <h1 className="prestige-display text-4xl lg:text-6xl font-extrabold tracking-tight text-balance leading-tight">
-                Réinventez votre intérieur à <span className="text-[var(--gold)]">{city.name}</span>
+                Home staging virtuel et déco par IA à <span className="text-[var(--gold)]">{city.name}</span>
               </h1>
 
               <p className="text-xl text-muted-foreground text-balance">
-                L&apos;alternative intelligente aux architectes d&apos;intérieur.
-                Obtenez des visuels photoréalistes de votre <strong className="text-foreground">{terms.apartment}</strong> ou <strong className="text-foreground">{terms.housing}</strong> en quelques secondes.
+                L&apos;alternative intelligente à l&apos;architecte d&apos;intérieur à {city.name}.
+                Visualisez votre <strong className="text-foreground">{terms.apartment}</strong> ou votre <strong className="text-foreground">{terms.housing}</strong> redécoré en quelques secondes, pour rénover, décorer ou faire du home staging avant de vendre.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">
@@ -482,11 +484,16 @@ export default async function CityPage({ params }: PageProps) {
                 </div>
                 <h3 className="prestige-display font-bold">Agents immobiliers</h3>
                 <p className="text-sm text-muted-foreground">
-                  Le Home Staging virtuel aide vos acheteurs à se projeter. Vendez plus vite à {city.name}.
+                  Le home staging virtuel aide vos acheteurs à se projeter. Vendez plus vite à {city.name}.
                 </p>
-                <Link href="/pro" className="inline-flex items-center text-sm font-medium text-[var(--gold)] hover:underline">
-                  Offre Pro pour agences <ArrowRight className="ml-1 w-3.5 h-3.5" />
-                </Link>
+                <div className="flex flex-col gap-1.5">
+                  <Link href="/solution/home-staging-virtuel-agents-immobiliers" className="inline-flex items-center text-sm font-medium text-[var(--gold)] hover:underline">
+                    Home staging virtuel pour l&apos;immobilier <ArrowRight className="ml-1 w-3.5 h-3.5" />
+                  </Link>
+                  <Link href="/pro" className="inline-flex items-center text-sm font-medium text-[var(--gold)] hover:underline">
+                    Offre Pro pour agences <ArrowRight className="ml-1 w-3.5 h-3.5" />
+                  </Link>
+                </div>
               </CardContent>
             </Card>
             <Card className="prestige-reveal bg-card border border-[var(--gold-line)] transition duration-300 ease" style={{ ['--reveal-d' as string]: '360ms' }}>
