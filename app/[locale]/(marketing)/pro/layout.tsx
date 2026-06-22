@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 
   return {
     title: 'InstaDeco Pro : home staging virtuel pour agents immobiliers',
-    description: 'Transformez vos annonces immobilières avec le home staging virtuel par IA. Générations illimitées et HD pour 49€/mois. Vendez plus vite, à meilleur prix.',
+    description: 'Transformez vos annonces immobilières avec le home staging virtuel par IA. Générations illimitées et HD pour 49€/mois. Vendez vos biens plus vite.',
     ...frOnly,
     openGraph: {
       title: 'InstaDeco Pro : home staging virtuel pour agents immobiliers',
