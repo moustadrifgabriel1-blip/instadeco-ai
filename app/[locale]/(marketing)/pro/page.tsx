@@ -29,6 +29,7 @@ interface ProPlan {
   monthly: number;       // €/mois en facturation mensuelle
   annual: number;        // €/mois équivalent en facturation annuelle (-30%)
   annualBilled: string;  // libellé "Facturé X€/an"
+  annualTotal: number;   // montant réellement facturé sur l'année (€), pour le tracking
   features: string[];
   popular: boolean;
 }
@@ -41,6 +42,7 @@ const PRO_PLANS: ProPlan[] = [
     monthly: 19,
     annual: 13.3,
     annualBilled: 'Facturé 160€/an',
+    annualTotal: 160,
     features: [
       '40 images / mois',
       '1 utilisateur',
@@ -57,6 +59,7 @@ const PRO_PLANS: ProPlan[] = [
     monthly: 49,
     annual: 34,
     annualBilled: 'Facturé 408€/an',
+    annualTotal: 408,
     features: [
       'Générations ILLIMITÉES (fair-use)',
       '1 utilisateur',
@@ -75,6 +78,7 @@ const PRO_PLANS: ProPlan[] = [
     monthly: 99,
     annual: 69,
     annualBilled: 'Facturé 828€/an',
+    annualTotal: 828,
     features: [
       'Générations illimitées',
       "Jusqu'à 3 sièges inclus",
@@ -154,26 +158,28 @@ const USE_CASES = [
 ];
 
 // Rendus réels (compte démo propriétaire, conformes RGPD pour page indexée).
+// Chaque paire provient d'UNE même ligne de la table `generations` (input vide +
+// output meublé), donc l'avant/après est garanti être la même pièce.
 const REAL_RENDERS = [
   {
     before:
-      'https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/input-images/f88c9b68-eda4-4d67-bfb4-f631d21b37c6/1769793114162.jpg',
+      'https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/input-images/f88c9b68-eda4-4d67-bfb4-f631d21b37c6/gallery30-4030028-japandi.jpg',
     after:
-      'https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/output-images/f88c9b68-eda4-4d67-bfb4-f631d21b37c6/1d5a7bb4-80dd-406e-85be-4226b553fbf6.jpg',
+      'https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/output-images/gemini/1782047046789-mee0h.jpg',
     beforeAlt: 'Salon vide avant home staging virtuel',
-    afterAlt: 'Salon meublé style moderne après home staging virtuel par IA',
-    eyebrow: 'Salon, style moderne',
-    caption: 'Vide à meublé en 10 secondes',
+    afterAlt: 'Salon meublé style japandi après home staging virtuel par IA',
+    eyebrow: 'Salon, style japandi',
+    caption: 'La même pièce, meublée pour séduire un acheteur',
   },
   {
     before:
-      'https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/input-images/f88c9b68-eda4-4d67-bfb4-f631d21b37c6/1772391372984.jpg',
+      'https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/input-images/f88c9b68-eda4-4d67-bfb4-f631d21b37c6/gallery30-6835102-midcentury.jpg',
     after:
-      'https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/output-images/f88c9b68-eda4-4d67-bfb4-f631d21b37c6/3612608f-23fe-459e-9415-e703e1f8566e.jpg',
-    beforeAlt: 'Chambre vide avant home staging virtuel',
-    afterAlt: 'Chambre meublée chaleureuse après home staging virtuel par IA',
-    eyebrow: 'Chambre, ambiance chaleureuse',
-    caption: 'La même pièce, prête à séduire un acheteur',
+      'https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/output-images/gemini/1782047014810-s1f7n.jpg',
+    beforeAlt: 'Salon vide avant home staging virtuel',
+    afterAlt: 'Salon meublé style midcentury après home staging virtuel par IA',
+    eyebrow: 'Salon, style midcentury',
+    caption: 'Le même espace, prêt pour vos visites',
   },
 ];
 
@@ -225,7 +231,9 @@ export default function ProPage() {
 
   const handleSubscribe = async (planId: PlanId) => {
     const plan = PRO_PLANS.find((p) => p.id === planId);
-    const value = plan ? (billingPeriod === 'monthly' ? plan.monthly : plan.annual) : 0;
+    // Valeur de conversion = montant réellement facturé (annuel = total sur l'année,
+    // pas l'équivalent mensuel), pour ne pas sous-évaluer le ROAS Meta/GA.
+    const value = plan ? (billingPeriod === 'monthly' ? plan.monthly : plan.annualTotal) : 0;
 
     // Funnel : début de checkout (mesure essai→Pro).
     trackBeginCheckout(planId, value);
@@ -292,7 +300,7 @@ export default function ProPage() {
                 Voir les tarifs Pro <ArrowRight className="w-5 h-5" />
               </Link>
               <Link
-                href="/generate"
+                href="/essai"
                 className="inline-flex items-center gap-2 bg-[rgba(200,162,77,0.10)] hover:bg-[rgba(200,162,77,0.18)] backdrop-blur-sm border border-[var(--gold-line)] text-[var(--ivory)] px-8 py-4 rounded-full text-lg font-medium transition-all"
               >
                 Testez gratuitement sur votre photo
@@ -475,7 +483,7 @@ export default function ProPage() {
 
           <div className="text-center mt-10">
             <Link
-              href="/generate"
+              href="/essai"
               className="inline-flex items-center gap-2 bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)] px-8 py-4 rounded-full text-base font-semibold transition-all"
             >
               Testez sur votre propre photo <ArrowRight className="w-5 h-5" />
