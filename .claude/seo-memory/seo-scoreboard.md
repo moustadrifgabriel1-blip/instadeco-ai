@@ -2,7 +2,14 @@
 
 > Tableau de bord central. Écrit par `seo-chief` après chaque audit. Source de vérité partagée.
 > Statut système : **ACTIF (Google-safe, croissance progressive)** — installé le 2026-06-14.
-> Dernier audit : **2026-06-18** (sur données GSC réelles du VPS Hetzner).
+> Dernier audit : **2026-06-22** (cadre v2, données GSC **live** via ADC, voir mémoire `gsc-live-access`).
+
+## Audit 2026-06-22 (cadre v2, GSC live)
+- **Baseline (28 j, fin 19/06)** : 7 clics / 305 impr / CTR 2,3 % / pos 18,5. Sitemap = 233 URLs. Re-mesure J+30, ne pas retoucher les titres d'ici là.
+- **Opportunité money confirmée** : « logiciel home staging à partir d'une photo » pos ~11, page `/solution/logiciel-home-staging` indexée. Title recentré sur cette requête.
+- **Déployé** : CTR titles 8 villes indexées, `/pro` fr-only, pivot intention villes (H1 home staging), double suffixe de marque retiré, H1 /pro réparé, tirets cadratins purgés, claim ControlNet corrigé, E-E-A-T blog (auteur Gabriel Moustadrif, schema Person), barrière qualité pSEO /amenager (noindex < 120 mots).
+- **Findings critiques (URL Inspection)** : `/fr/pro` NON indexée (alternate, crawl pré-fix, forcer Request Indexing) ; articles blog « inconnus de Google » (découverte faible) ; /amenager jamais indexées (noindex = 0 coût) ; crawl ~2 à 4 sem.
+- **À suivre** : PR6 maillage money pages ; cluster contenu agents immo ; Option 2 pSEO dépriorisée (pas de demande). Aucun spam/abus (corrections only, empreinte réduite).
 
 ## KPIs (28 jours glissants — GSC réel, période 2026-05-19 → 2026-06-15)
 | métrique | valeur | cible | trend | source |
@@ -98,3 +105,4 @@
 |---|---|---|---|
 | 2026-06-14 | technical, content, schema, cluster, link-graph (sans GSC) | 18 issues (5 P0, 5 P1, 8 P2) | P0 #1,2,4,5 + P1 #6,7,8 appliqués (code). |
 | 2026-06-18 | seo-chief + 2 explorations (pSEO deep-dive + GEO/schema), sur GSC réel | 8 issues du 14/06 fermées. Nouveau focus : pSEO (P0-1→P0-4, P1-1→P1-4) + GEO (G-1→G-6). | aucun (audit lecture seule, patchs proposés au human). |
+| 2026-06-22 | audit cadre v2 sur GSC **live** (ADC) + curl prod + URL Inspection. Workflows multi-agents partiels (limites de session), mesures faites en direct par le lead. | CTR titles villes, /pro fr-only, pivot intention, double suffixe marque, H1 /pro, E-E-A-T blog (auteur humain), barrière qualité /amenager. Findings : /pro non indexée, blog inconnu de Google. | 8 commits déployés (344616d→30082da). STOP, re-mesure J+30. |
