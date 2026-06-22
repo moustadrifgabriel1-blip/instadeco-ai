@@ -29,7 +29,7 @@ export async function generateMetadata({
 }
 
 export default function PrivacyPolicyPage() {
-  const lastUpdated = '22 janvier 2026';
+  const lastUpdated = '22 juin 2026';
 
   return (
     <div className="min-h-[100dvh] bg-background">
@@ -176,8 +176,14 @@ export default function PrivacyPolicyPage() {
               </thead>
               <tbody>
                 <tr className="border-b border-border">
+                  <td className="px-4 py-2 font-medium text-foreground">Google (Gemini API)</td>
+                  <td className="px-4 py-2">Génération d&apos;images par IA (traitement de la photo transmise)</td>
+                  <td className="px-4 py-2">États-Unis</td>
+                  <td className="px-4 py-2">Clauses contractuelles types (CCT)</td>
+                </tr>
+                <tr className="border-b border-border">
                   <td className="px-4 py-2 font-medium text-foreground">Fal.ai</td>
-                  <td className="px-4 py-2">Génération d&apos;images par IA</td>
+                  <td className="px-4 py-2">Génération d&apos;images par IA (moteur alternatif / de secours)</td>
                   <td className="px-4 py-2">États-Unis</td>
                   <td className="px-4 py-2">Clauses contractuelles types (CCT)</td>
                 </tr>
@@ -196,6 +202,12 @@ export default function PrivacyPolicyPage() {
                 <tr className="border-b border-border">
                   <td className="px-4 py-2 font-medium text-foreground">Vercel</td>
                   <td className="px-4 py-2">Hébergement de l&apos;application</td>
+                  <td className="px-4 py-2">États-Unis</td>
+                  <td className="px-4 py-2">Clauses contractuelles types (CCT)</td>
+                </tr>
+                <tr className="border-b border-border">
+                  <td className="px-4 py-2 font-medium text-foreground">Resend</td>
+                  <td className="px-4 py-2">Envoi des emails transactionnels et marketing</td>
                   <td className="px-4 py-2">États-Unis</td>
                   <td className="px-4 py-2">Clauses contractuelles types (CCT)</td>
                 </tr>
