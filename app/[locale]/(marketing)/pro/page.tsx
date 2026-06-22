@@ -281,7 +281,7 @@ export default function ProPage() {
             </div>
 
             <h1 className="prestige-display text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
-              Vendez vos biens plus vite,
+              Vendez vos biens plus vite,{' '}
               <br />
               <span className="text-[var(--gold)]">sans dépenser 2 000 € de home staging</span>
             </h1>

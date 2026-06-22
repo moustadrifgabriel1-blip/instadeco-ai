@@ -55,7 +55,7 @@ export const INTENT_PAGES: IntentPageData[] = [
   {
     slug: 'home-staging-virtuel',
     title: 'Home Staging Virtuel par IA',
-    metaTitle: 'Home Staging Virtuel par IA : meublez vos pièces en 10 secondes | InstaDeco',
+    metaTitle: 'Home Staging Virtuel par IA : meublez vos pièces en 10 secondes',
     metaDescription: 'Home staging virtuel par intelligence artificielle. Meublez et décorez vos pièces vides en 10 secondes. Alternative 50x moins chère au home staging physique.',
     hero: {
       headline: 'Home Staging Virtuel par IA',
@@ -106,7 +106,7 @@ export const INTENT_PAGES: IntentPageData[] = [
   {
     slug: 'simulateur-decoration-interieur',
     title: 'Simulateur de Décoration Intérieure par IA',
-    metaTitle: 'Simulateur Déco Intérieur Gratuit par IA : visualisez avant de décorer | InstaDeco',
+    metaTitle: 'Simulateur Déco Intérieur Gratuit par IA : visualisez avant de décorer',
     metaDescription: 'Simulateur de décoration intérieure par IA. Uploadez une photo de votre pièce et visualisez le résultat avec différents styles déco en 10 secondes.',
     hero: {
       headline: 'Simulateur de Décoration Intérieure',
@@ -149,8 +149,8 @@ export const INTENT_PAGES: IntentPageData[] = [
   {
     slug: 'logiciel-home-staging',
     title: 'Logiciel de Home Staging en Ligne',
-    metaTitle: 'Logiciel Home Staging en Ligne : IA instantanée | InstaDeco',
-    metaDescription: 'Logiciel de home staging virtuel en ligne par IA. Pas d\'installation, résultat en 10 secondes. Meublez et décorez vos annonces immobilières facilement.',
+    metaTitle: 'Logiciel de home staging à partir d\'une photo',
+    metaDescription: 'Logiciel de home staging virtuel à partir d\'une photo. Aucune installation : uploadez la photo d\'une pièce, l\'IA la meuble et la décore pour vos annonces immobilières. Essai gratuit.',
     hero: {
       headline: 'Le Logiciel de Home Staging le Plus Simple',
       subheadline: 'Pas de logiciel à installer. Pas de formation nécessaire. Uploadez une photo, l\'IA fait le reste en 10 secondes.',
@@ -199,7 +199,7 @@ export const INTENT_PAGES: IntentPageData[] = [
   {
     slug: 'idee-amenagement-studio',
     title: 'Idées d\'Aménagement Studio & Petit Espace',
-    metaTitle: 'Idées Aménagement Studio 20m² 30m² : visualisez par IA | InstaDeco',
+    metaTitle: 'Idées Aménagement Studio 20m² 30m² : visualisez par IA',
     metaDescription: 'Découvrez des idées d\'aménagement pour votre studio ou petit appartement. Visualisez le résultat avec l\'IA avant de commencer les travaux.',
     hero: {
       headline: 'Aménagez Votre Studio avec l\'IA',
@@ -241,7 +241,7 @@ export const INTENT_PAGES: IntentPageData[] = [
   {
     slug: 'simulateur-peinture',
     title: 'Simulateur de Peinture et Couleurs par IA',
-    metaTitle: 'Simulateur Peinture Mur par IA : testez les couleurs chez vous | InstaDeco',
+    metaTitle: 'Simulateur Peinture Mur par IA : testez les couleurs chez vous',
     metaDescription: 'Simulateur de peinture par IA. Testez des couleurs et des ambiances sur vos murs. Visualisez le rendu en 10 secondes avant de peindre.',
     hero: {
       headline: 'Testez les Couleurs Avant de Peindre',
@@ -283,7 +283,7 @@ export const INTENT_PAGES: IntentPageData[] = [
   {
     slug: 'decoration-salon',
     title: 'Idées Décoration Salon - Visualisez par IA',
-    metaTitle: 'Décoration Salon : 12 Styles à Visualiser par IA | InstaDeco',
+    metaTitle: 'Décoration Salon : 12 Styles à Visualiser par IA',
     metaDescription: 'Découvrez les meilleures idées déco pour votre salon. Visualisez 12 styles différents directement sur votre photo. Résultat en 10 secondes.',
     hero: {
       headline: 'Trouvez la Déco Parfaite pour Votre Salon',
@@ -325,7 +325,7 @@ export const INTENT_PAGES: IntentPageData[] = [
   {
     slug: 'decoration-chambre',
     title: 'Idées Décoration Chambre - Visualisez par IA',
-    metaTitle: 'Décoration Chambre : Styles Cosy, Moderne & Bohème par IA | InstaDeco',
+    metaTitle: 'Décoration Chambre : Styles Cosy, Moderne & Bohème par IA',
     metaDescription: 'Idées de décoration chambre à coucher. Visualisez le rendu de 12 styles sur votre photo. Créez un cocon de bien-être en 10 secondes.',
     hero: {
       headline: 'Créez la Chambre de Vos Rêves',
@@ -367,7 +367,7 @@ export const INTENT_PAGES: IntentPageData[] = [
   {
     slug: 'avant-apres-decoration',
     title: 'Avant/Après Décoration par IA',
-    metaTitle: 'Avant Après Décoration : transformez vos pièces par IA | InstaDeco',
+    metaTitle: 'Avant Après Décoration : transformez vos pièces par IA',
     metaDescription: 'Créez des avant/après impressionnants de décoration intérieure avec l\'IA. Montrez le potentiel de vos pièces en 10 secondes.',
     hero: {
       headline: 'Avant / Après en 10 Secondes',

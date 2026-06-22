@@ -42,7 +42,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!page) return { title: 'Page non trouvée', robots: { index: false, follow: false } };
 
   const path = `/amenager/${page.slug}`;
-  const title = `${page.h1_title} | InstaDeco`;
+  // Le template de layout ajoute déjà « | InstaDeco AI ». On ne double donc pas la marque.
+  const title = page.h1_title;
   const description = page.meta_description ?? page.unique_seo_text.slice(0, 155);
 
   return {
