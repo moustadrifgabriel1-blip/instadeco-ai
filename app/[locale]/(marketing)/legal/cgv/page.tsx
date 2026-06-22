@@ -29,7 +29,7 @@ export async function generateMetadata({
 }
 
 export default function CGVPage() {
-  const lastUpdated = '22 janvier 2026';
+  const lastUpdated = '22 juin 2026';
 
   return (
     <div className="min-h-[100dvh] bg-background">
@@ -64,8 +64,8 @@ export default function CGVPage() {
             <p>Email : <a href="mailto:contact@instadeco.app" className="text-[var(--gold)] hover:underline">contact@instadeco.app</a></p>
           </div>
           <p className="prestige-body text-muted-foreground mt-4">
-            En utilisant le service et en achetant des crédits, l&apos;utilisateur déclare avoir pris connaissance
-            des présentes CGV et les accepte sans réserve.
+            En utilisant le service, en achetant des crédits ou en souscrivant un abonnement, l&apos;utilisateur
+            déclare avoir pris connaissance des présentes CGV et les accepte sans réserve.
           </p>
         </section>
 
@@ -78,6 +78,7 @@ export default function CGVPage() {
             <li><strong className="text-foreground">&quot;Crédit&quot;</strong> : Unité de valeur permettant d&apos;utiliser les fonctionnalités du Service. 1 crédit = 1 génération d&apos;image.</li>
             <li><strong className="text-foreground">&quot;Génération&quot;</strong> : Création d&apos;une image de décoration par l&apos;IA à partir d&apos;une photo fournie par l&apos;Utilisateur.</li>
             <li><strong className="text-foreground">&quot;HD Unlock&quot;</strong> : Option de téléchargement en haute définition d&apos;une image générée.</li>
+            <li><strong className="text-foreground">&quot;Abonnement&quot;</strong> : Formule professionnelle à paiement récurrent (mensuel ou annuel) donnant accès aux fonctionnalités du Service selon le palier souscrit (Solo, Pro, Agence).</li>
           </ul>
         </section>
 
@@ -199,6 +200,94 @@ export default function CGVPage() {
           <h3 className="prestige-display text-lg font-medium text-foreground mt-4 mb-2">4.4 Facturation</h3>
           <p className="prestige-body text-muted-foreground">
             Un reçu électronique est envoyé automatiquement par email après chaque achat.
+          </p>
+        </section>
+
+        {/* Article 4 bis - Abonnements Pro */}
+        <section className="bg-card border border-border rounded-lg shadow-sm p-6 mb-6">
+          <h2 className="prestige-display text-2xl font-semibold text-foreground mb-4">Article 4 bis - Abonnements Pro</h2>
+
+          <h3 className="prestige-display text-lg font-medium text-foreground mt-4 mb-2">4 bis.1 Formules d&apos;abonnement</h3>
+          <p className="prestige-body text-muted-foreground mb-4">
+            En complément des crédits, InstaDeco propose des formules d&apos;abonnement à destination des
+            professionnels (agents immobiliers, home stagers, promoteurs, décorateurs). Les prix sont indiqués
+            TTC (TVA non applicable, Art. 21 ch. 19 LTVA) et sont également disponibles en CHF selon la région.
+          </p>
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm text-muted-foreground mb-4">
+              <thead className="bg-[rgba(200,162,77,0.12)]">
+                <tr>
+                  <th className="px-4 py-2 text-left font-semibold text-foreground">Formule</th>
+                  <th className="px-4 py-2 text-left font-semibold text-foreground">Prix mensuel</th>
+                  <th className="px-4 py-2 text-left font-semibold text-foreground">Prix annuel (-30%)</th>
+                  <th className="px-4 py-2 text-left font-semibold text-foreground">Inclus</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-b border-border">
+                  <td className="px-4 py-2">Solo</td>
+                  <td className="px-4 py-2 font-medium text-foreground">19 €/mois</td>
+                  <td className="px-4 py-2 font-medium text-foreground">160 €/an</td>
+                  <td className="px-4 py-2">40 générations/mois, 1 utilisateur, qualité HD, licence commerciale</td>
+                </tr>
+                <tr className="border-b border-[var(--gold-line)] bg-[rgba(200,162,77,0.12)]">
+                  <td className="px-4 py-2">Pro</td>
+                  <td className="px-4 py-2 font-medium text-foreground">49 €/mois</td>
+                  <td className="px-4 py-2 font-medium text-foreground">408 €/an</td>
+                  <td className="px-4 py-2">Générations illimitées (usage équitable, voir 4 bis.4), 1 utilisateur, qualité HD, support prioritaire</td>
+                </tr>
+                <tr className="border-b border-border">
+                  <td className="px-4 py-2">Agence</td>
+                  <td className="px-4 py-2 font-medium text-foreground">99 €/mois</td>
+                  <td className="px-4 py-2 font-medium text-foreground">828 €/an</td>
+                  <td className="px-4 py-2">Générations illimitées (usage équitable), jusqu&apos;à 3 sièges, facturation centralisée, support dédié</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3 className="prestige-display text-lg font-medium text-foreground mt-4 mb-2">4 bis.2 Facturation et reconduction</h3>
+          <p className="prestige-body text-muted-foreground mb-4">
+            L&apos;abonnement est facturé d&apos;avance, pour la période choisie (mensuelle ou annuelle), via Stripe.
+            Il se reconduit tacitement à chaque échéance pour une période identique, au tarif en vigueur, jusqu&apos;à
+            résiliation par l&apos;Utilisateur. L&apos;option annuelle est réglée en une fois pour douze mois, au tarif
+            réduit indiqué ci-dessus.
+          </p>
+
+          <h3 className="prestige-display text-lg font-medium text-foreground mt-4 mb-2">4 bis.3 Résiliation</h3>
+          <p className="prestige-body text-muted-foreground mb-4">
+            L&apos;Utilisateur peut résilier son abonnement à tout moment, sans frais ni justification, depuis son
+            espace client (portail de gestion Stripe). La résiliation prend effet à la fin de la période déjà payée :
+            l&apos;accès aux fonctionnalités de l&apos;abonnement est conservé jusqu&apos;à cette échéance, puis
+            l&apos;abonnement n&apos;est pas reconduit. Aucun remboursement au prorata n&apos;est dû pour la période en cours.
+          </p>
+
+          <h3 className="prestige-display text-lg font-medium text-foreground mt-4 mb-2">4 bis.4 Usage équitable (formules illimitées)</h3>
+          <p className="prestige-body text-muted-foreground mb-4">
+            Les formules Pro et Agence permettent de générer sans quota mensuel fixe, dans le cadre d&apos;un usage
+            professionnel normal. Pour préserver la qualité du Service pour tous, une politique d&apos;usage équitable
+            s&apos;applique : l&apos;usage doit rester celui d&apos;un professionnel pour ses propres biens et projets,
+            à l&apos;exclusion de la revente de générations, de l&apos;usage automatisé (bots, scripts, accès
+            programmatique non autorisé) et du partage des accès au-delà des sièges souscrits. En cas d&apos;usage
+            manifestement disproportionné, l&apos;Éditeur contacte l&apos;Utilisateur et peut limiter temporairement le
+            débit de génération ou proposer une formule adaptée.
+          </p>
+
+          <h3 className="prestige-display text-lg font-medium text-foreground mt-4 mb-2">4 bis.5 Sièges (formule Agence)</h3>
+          <p className="prestige-body text-muted-foreground mb-4">
+            La formule Agence inclut jusqu&apos;à 3 sièges (utilisateurs). Le propriétaire du compte invite ou retire
+            des membres dans la limite des sièges souscrits. Pour plus de 3 sièges, un tarif sur mesure est disponible
+            sur demande à <a href="mailto:contact@instadeco.app" className="text-[var(--gold)] hover:underline">contact@instadeco.app</a>.
+          </p>
+
+          <h3 className="prestige-display text-lg font-medium text-foreground mt-4 mb-2">4 bis.6 Droit de rétractation (abonnement)</h3>
+          <p className="prestige-body text-muted-foreground">
+            Pour les consommateurs de l&apos;UE, l&apos;abonnement est un contrat de fourniture de contenu numérique.
+            En souscrivant et en demandant l&apos;accès immédiat au Service, l&apos;Utilisateur consent expressément à
+            l&apos;exécution immédiate et renonce à son droit de rétractation de 14 jours pour la période en cours
+            d&apos;exécution. Cette renonciation n&apos;affecte pas la faculté de résilier à tout moment pour les
+            périodes futures (voir 4 bis.3). Pour les Utilisateurs professionnels (B2B), le droit de rétractation des
+            consommateurs ne s&apos;applique pas.
           </p>
         </section>
 
@@ -381,7 +470,9 @@ export default function CGVPage() {
           <h3 className="prestige-display text-lg font-medium text-foreground mt-4 mb-2">12.1 Par l&apos;Utilisateur</h3>
           <p className="prestige-body text-muted-foreground mb-4">
             L&apos;Utilisateur peut résilier son compte à tout moment en contactant le support ou via les
-            paramètres de son compte. La résiliation entraîne la perte des crédits non utilisés.
+            paramètres de son compte. La résiliation entraîne la perte des crédits non utilisés. La résiliation
+            d&apos;un abonnement obéit aux modalités de l&apos;Article 4 bis (prise d&apos;effet à la fin de la
+            période déjà payée).
           </p>
 
           <h3 className="prestige-display text-lg font-medium text-foreground mt-4 mb-2">12.2 Par l&apos;Éditeur</h3>
