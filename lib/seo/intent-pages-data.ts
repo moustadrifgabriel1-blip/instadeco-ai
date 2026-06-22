@@ -55,7 +55,7 @@ export const INTENT_PAGES: IntentPageData[] = [
   {
     slug: 'home-staging-virtuel',
     title: 'Home Staging Virtuel par IA',
-    metaTitle: 'Home Staging Virtuel par IA - Meublez vos pièces en 10 secondes | InstaDeco',
+    metaTitle: 'Home Staging Virtuel par IA : meublez vos pièces en 10 secondes | InstaDeco',
     metaDescription: 'Home staging virtuel par intelligence artificielle. Meublez et décorez vos pièces vides en 10 secondes. Alternative 50x moins chère au home staging physique.',
     hero: {
       headline: 'Home Staging Virtuel par IA',
@@ -106,7 +106,7 @@ export const INTENT_PAGES: IntentPageData[] = [
   {
     slug: 'simulateur-decoration-interieur',
     title: 'Simulateur de Décoration Intérieure par IA',
-    metaTitle: 'Simulateur Déco Intérieur Gratuit par IA - Visualisez avant de décorer | InstaDeco',
+    metaTitle: 'Simulateur Déco Intérieur Gratuit par IA : visualisez avant de décorer | InstaDeco',
     metaDescription: 'Simulateur de décoration intérieure par IA. Uploadez une photo de votre pièce et visualisez le résultat avec différents styles déco en 10 secondes.',
     hero: {
       headline: 'Simulateur de Décoration Intérieure',
@@ -149,7 +149,7 @@ export const INTENT_PAGES: IntentPageData[] = [
   {
     slug: 'logiciel-home-staging',
     title: 'Logiciel de Home Staging en Ligne',
-    metaTitle: 'Logiciel Home Staging en Ligne - IA Instantanée | InstaDeco',
+    metaTitle: 'Logiciel Home Staging en Ligne : IA instantanée | InstaDeco',
     metaDescription: 'Logiciel de home staging virtuel en ligne par IA. Pas d\'installation, résultat en 10 secondes. Meublez et décorez vos annonces immobilières facilement.',
     hero: {
       headline: 'Le Logiciel de Home Staging le Plus Simple',
@@ -199,7 +199,7 @@ export const INTENT_PAGES: IntentPageData[] = [
   {
     slug: 'idee-amenagement-studio',
     title: 'Idées d\'Aménagement Studio & Petit Espace',
-    metaTitle: 'Idées Aménagement Studio 20m² 30m² - Visualisez par IA | InstaDeco',
+    metaTitle: 'Idées Aménagement Studio 20m² 30m² : visualisez par IA | InstaDeco',
     metaDescription: 'Découvrez des idées d\'aménagement pour votre studio ou petit appartement. Visualisez le résultat avec l\'IA avant de commencer les travaux.',
     hero: {
       headline: 'Aménagez Votre Studio avec l\'IA',
@@ -210,7 +210,7 @@ export const INTENT_PAGES: IntentPageData[] = [
     problem: {
       title: 'Aménager un studio est un casse-tête',
       points: [
-        'Chaque mètre carré compte — impossible de se tromper',
+        'Chaque mètre carré compte, impossible de se tromper',
         'Difficile de visualiser le rendu avant d\'acheter les meubles',
         'Un architecte d\'intérieur pour un studio coûte 1 000€ minimum',
         'Les plans 2D ne donnent pas le rendu réel',
@@ -241,7 +241,7 @@ export const INTENT_PAGES: IntentPageData[] = [
   {
     slug: 'simulateur-peinture',
     title: 'Simulateur de Peinture et Couleurs par IA',
-    metaTitle: 'Simulateur Peinture Mur par IA - Testez les couleurs chez vous | InstaDeco',
+    metaTitle: 'Simulateur Peinture Mur par IA : testez les couleurs chez vous | InstaDeco',
     metaDescription: 'Simulateur de peinture par IA. Testez des couleurs et des ambiances sur vos murs. Visualisez le rendu en 10 secondes avant de peindre.',
     hero: {
       headline: 'Testez les Couleurs Avant de Peindre',
@@ -254,7 +254,7 @@ export const INTENT_PAGES: IntentPageData[] = [
       points: [
         'Les échantillons en magasin ne reflètent pas le rendu réel sur vos murs',
         'Les couleurs changent selon la luminosité de la pièce',
-        'Repeindre coûte 500€ à 2 000€ — impossible de se tromper',
+        'Repeindre coûte 500€ à 2 000€, impossible de se tromper',
         'Les simulateurs de peinture classiques sont limités et peu réalistes',
       ],
     },
@@ -276,7 +276,7 @@ export const INTENT_PAGES: IntentPageData[] = [
     faq: [
       { question: 'Le simulateur montre-t-il les couleurs exactes des marques ?', answer: 'Notre IA génère des ambiances colorées globales plutôt que des teintes RAL exactes. C\'est l\'outil idéal pour valider une direction de couleur avant d\'aller en magasin choisir la teinte exacte.' },
       { question: 'Ça marche pour le papier peint aussi ?', answer: 'Oui ! En choisissant un style avec des textures murales, l\'IA peut simuler l\'effet du papier peint, du crépi ou d\'autres revêtements muraux.' },
-      { question: 'Puis-je tester sur plusieurs pièces ?', answer: 'Absolument ! Chaque photo génère un crédit. Testez salon, chambre, cuisine — et trouvez l\'harmonie parfaite entre vos pièces.' },
+      { question: 'Puis-je tester sur plusieurs pièces ?', answer: 'Absolument ! Chaque photo génère un crédit. Testez salon, chambre, cuisine, et trouvez l\'harmonie parfaite entre vos pièces.' },
     ],
     keywords: ['simulateur peinture', 'simulateur peinture mur', 'simulateur couleur mur', 'tester peinture mur', 'visualiser peinture', 'simulateur peinture chambre', 'simulateur peinture salon'],
   },
@@ -294,7 +294,7 @@ export const INTENT_PAGES: IntentPageData[] = [
     problem: {
       title: 'Décorer son salon sans se tromper',
       points: [
-        'Le salon est la pièce la plus vue — impossible de se tromper',
+        'Le salon est la pièce la plus vue, impossible de se tromper',
         'Les magazines montrent des intérieurs qui ne ressemblent pas au vôtre',
         'Acheter un canapé à 2 000€ sans visualiser le rendu = risque',
         'Faire appel à un décorateur pour le salon coûte 1 500€+',
@@ -304,7 +304,7 @@ export const INTENT_PAGES: IntentPageData[] = [
       title: 'Votre salon, 12 ambiances différentes',
       description: 'Uploadez une photo de votre salon actuel et voyez-le transformé dans 12 styles décoratifs différents. Trouvez votre coup de coeur avant d\'acheter.',
       benefits: [
-        { icon: 'sofa', title: 'Salon complet', description: 'Meubles, couleurs, éclairage — tout est repensé' },
+        { icon: 'sofa', title: 'Salon complet', description: 'Meubles, couleurs, éclairage : tout est repensé' },
         { icon: 'palette', title: '12 styles', description: 'Du moderne au bohème, trouvez votre identité' },
         { icon: 'share', title: 'Partageable', description: 'Envoyez les rendus à votre conjoint ou ami pour avis' },
         { icon: 'heart', title: 'Inspirant', description: 'Découvrez des styles auxquels vous n\'auriez pas pensé' },
@@ -348,7 +348,7 @@ export const INTENT_PAGES: IntentPageData[] = [
       benefits: [
         { icon: 'moon', title: 'Ambiance zen', description: 'L\'IA propose des ambiances propices au repos' },
         { icon: 'palette', title: 'Palettes apaisantes', description: 'Tons naturels, pastels ou earth tones' },
-        { icon: 'bed', title: 'Chambre complète', description: 'Lit, tables, éclairage, textiles — tout est pensé' },
+        { icon: 'bed', title: 'Chambre complète', description: 'Lit, tables, éclairage, textiles : tout est pensé' },
         { icon: 'sparkles', title: 'Style unique', description: 'Trouvez VOTRE ambiance, pas celle du voisin' },
       ],
     },
@@ -367,7 +367,7 @@ export const INTENT_PAGES: IntentPageData[] = [
   {
     slug: 'avant-apres-decoration',
     title: 'Avant/Après Décoration par IA',
-    metaTitle: 'Avant Après Décoration - Transformez vos pièces par IA | InstaDeco',
+    metaTitle: 'Avant Après Décoration : transformez vos pièces par IA | InstaDeco',
     metaDescription: 'Créez des avant/après impressionnants de décoration intérieure avec l\'IA. Montrez le potentiel de vos pièces en 10 secondes.',
     hero: {
       headline: 'Avant / Après en 10 Secondes',

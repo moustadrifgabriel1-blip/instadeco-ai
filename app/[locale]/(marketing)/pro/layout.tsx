@@ -1,26 +1,24 @@
 import { Metadata } from 'next';
-import { getCanonicalUrl, getLocalizedCanonicalUrl } from '@/lib/seo/config';
+import { getCanonicalUrl, getLocalizedCanonicalUrl, frOnlyProgrammaticMeta } from '@/lib/seo/config';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
   const path = '/pro';
 
+  // La page Pro est rédigée en français uniquement (cible FR + Belgique francophone +
+  // Suisse romande). Les variantes /en/pro et /de/pro servaient ce même texte FR tout
+  // en étant indexables et déclarées en hreflang : duplicate qui diluait l'autorité de
+  // la money page. On consolide tout vers /fr/pro (canonical fr, noindex en/de).
+  const frOnly = frOnlyProgrammaticMeta(locale, path);
+
   return {
-    title: 'InstaDeco Pro, Home Staging Virtuel pour Agents Immobiliers',
-    description: 'Transformez vos annonces immobilières avec le home staging virtuel par IA. Générations illimitées + HD pour 49€/mois. Vendez plus vite, à meilleur prix.',
-    alternates: {
-      canonical: getLocalizedCanonicalUrl(locale, path),
-      languages: {
-        'fr-FR': getLocalizedCanonicalUrl('fr', path),
-        en: getLocalizedCanonicalUrl('en', path),
-        de: getLocalizedCanonicalUrl('de', path),
-        'x-default': getLocalizedCanonicalUrl('fr', path),
-      },
-    },
+    title: 'InstaDeco Pro : home staging virtuel pour agents immobiliers',
+    description: 'Transformez vos annonces immobilières avec le home staging virtuel par IA. Générations illimitées et HD pour 49€/mois. Vendez plus vite, à meilleur prix.',
+    ...frOnly,
     openGraph: {
-      title: 'InstaDeco Pro, Home Staging Virtuel pour Agents Immobiliers',
-      description: 'Générations illimitées + qualité HD. Vendez plus vite avec le home staging virtuel par IA.',
-      url: getLocalizedCanonicalUrl(locale, path),
+      title: 'InstaDeco Pro : home staging virtuel pour agents immobiliers',
+      description: 'Générations illimitées et qualité HD. Vendez plus vite avec le home staging virtuel par IA.',
+      url: getLocalizedCanonicalUrl('fr', path),
       type: 'website',
       images: [getCanonicalUrl('/og-image.png')],
     },

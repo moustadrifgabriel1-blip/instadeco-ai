@@ -82,12 +82,12 @@ const getArchitectureContent = (city: City) => {
     case 'brick':
       return {
         title: "L'esprit industriel et chaleureux",
-        description: `La brique typique de la région donne une âme forte aux intérieurs. InstaDeco propose des styles Loft ou Industriel qui s'harmonisent parfaitement avec ces matériaux bruts.`
+        description: `À ${city.name}, la brique typique de ${city.region} donne une âme forte aux intérieurs. InstaDeco propose des styles Loft ou Industriel qui s'harmonisent avec ces matériaux bruts.`
       };
     case 'timber':
       return {
         title: "Moderniser sans dénaturer",
-        description: `Les structures à colombages ou bois apparents demandent de la douceur. Nous suggérons des styles Scandinaves ou Japandi pour illuminer ces intérieurs parfois sombres.`
+        description: `À ${city.name}, les structures à colombages et bois apparents demandent de la douceur. Nous suggérons des styles Scandinave ou Japandi pour illuminer ces intérieurs parfois sombres.`
       };
     case 'mediterranean':
       return {
@@ -97,7 +97,7 @@ const getArchitectureContent = (city: City) => {
     case 'stone':
       return {
         title: "L'authenticité de la pierre",
-        description: `La pierre apparente est le joyau de l'immobilier à ${city.name}. Notre technologie 'ControlNet' détecte ces textures pour ne jamais les effacer lors de la redécoration.`
+        description: `La pierre apparente est le joyau de l'immobilier à ${city.name}. Notre IA préserve ces textures d'origine et compose la nouvelle décoration autour, sans jamais les effacer.`
       };
     default:
       return {
@@ -107,6 +107,55 @@ const getArchitectureContent = (city: City) => {
   }
 };
 
+
+// Title + meta dédiés par ville indexée. Branchés ENTRE l'override CTR du cron
+// (table seo_title_overrides, prioritaire) et le gabarit générique : on ne touche
+// donc PAS la table (le cron ctr-optimize l'écraserait via upsert onConflict:'path').
+// But : un snippet qui colle à la requête « architecte d'intérieur {ville} » avec un
+// angle bénéfice honnête (visualiser sa déco avant les travaux / avant une vente),
+// pour transformer en clics les villes en page 1 qui n'en récoltaient aucun.
+const CITY_SEO_OVERRIDES: Record<string, { title: string; description: string }> = {
+  nice: {
+    title: "Architecte d'intérieur à Nice : votre déco avant travaux",
+    description:
+      "Visualisez votre intérieur à Nice avant les travaux. Une photo, un style, et l'IA redécore la pièce en 10 secondes. Premier essai gratuit.",
+  },
+  annecy: {
+    title: "Architecte d'intérieur à Annecy : déco avant travaux",
+    description:
+      "Projetez votre intérieur à Annecy avant de rénover. Une photo, un style, un rendu réaliste en 10 secondes. Premier essai gratuit.",
+  },
+  amiens: {
+    title: "Architecte d'intérieur à Amiens : déco avant travaux",
+    description:
+      "Visualisez votre intérieur à Amiens avant les travaux. Une photo, un style, un rendu photoréaliste en 10 secondes. Premier essai gratuit.",
+  },
+  neuchatel: {
+    title: "Architecte d'intérieur à Neuchâtel : déco avant travaux",
+    description:
+      "Visualisez votre intérieur à Neuchâtel avant de décorer ou de vendre. Une photo, un style, un rendu réaliste en 10 secondes. Essai gratuit.",
+  },
+  liege: {
+    title: "Architecte d'intérieur à Liège : votre déco avant travaux",
+    description:
+      "Projetez votre intérieur à Liège avant les travaux. Une photo, un style, un rendu réaliste en 10 secondes. Idéal avant une vente. Essai gratuit.",
+  },
+  'louvain-la-neuve': {
+    title: "Architecte d'intérieur à Louvain-la-Neuve : déco IA",
+    description:
+      "Visualisez votre intérieur à Louvain-la-Neuve avant de décorer. Une photo, un style, un rendu réaliste en 10 secondes. Premier essai gratuit.",
+  },
+  uccle: {
+    title: "Architecte d'intérieur Uccle : votre déco avant travaux",
+    description:
+      "Visualisez votre intérieur à Uccle avant de décorer. Une photo, un style, un rendu réaliste en 10 secondes. Idéal avant une vente. Essai gratuit.",
+  },
+  bruxelles: {
+    title: "Architecte d'intérieur à Bruxelles : déco avant travaux",
+    description:
+      "Visualisez votre intérieur à Bruxelles avant les travaux. Une photo, un style, un rendu réaliste en 10 secondes. Premier essai gratuit.",
+  },
+};
 
 // Métadonnées SEO
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -122,9 +171,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   // La boucle d'auto-optimisation CTR (job VPS ctr_optimizer) peut écraser ces valeurs
   // via la table seo_title_overrides quand GSC montre un meilleur angle de requête.
   const override = await getTitleOverride(path);
-  const title = override?.title ?? `Architecte d'intérieur à ${city.name} : visualisez votre déco par IA`;
+  const seoDefault = CITY_SEO_OVERRIDES[city.slug];
+  const title =
+    override?.title ??
+    seoDefault?.title ??
+    `Architecte d'intérieur à ${city.name} : visualisez votre déco par IA`;
   const description =
     override?.metaDescription ??
+    seoDefault?.description ??
     `Architecte d'intérieur à ${city.name} (${city.region}) : visualisez votre futur intérieur en photo avant les travaux. Choisissez un style, l'IA habille la pièce en quelques secondes. Premier essai gratuit.`;
 
   // Barrière qualité : sur fr, on n'indexe que les villes qui passent le seuil

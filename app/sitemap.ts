@@ -70,10 +70,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly',
       priority: 0.8,
     }),
-    ...withAlternatesForAllLocales('/pro', {
+    // Page Pro = FR uniquement (contenu non traduit, cible francophone). On émet la
+    // seule URL fr, cohérent avec le noindex en/de posé dans pro/layout.tsx.
+    ...frOnlySitemap('/pro', {
       lastModified: now,
       changeFrequency: 'weekly',
-      priority: 0.8,
+      priority: 0.9,
     }),
     ...withAlternatesForAllLocales('/quiz', {
       lastModified: now,
