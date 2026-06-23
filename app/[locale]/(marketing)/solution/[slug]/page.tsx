@@ -146,7 +146,7 @@ export default async function IntentPage({ params }: PageProps) {
           <div className="flex items-center justify-center gap-6 pt-6 text-sm text-muted-foreground">
             <span className="flex items-center gap-1">
               <Zap className="w-4 h-4 text-[var(--gold)]" />
-              Résultat en 10 secondes
+              Résultat en 30 secondes
             </span>
             <span>12 styles disponibles</span>
             <span>Essai gratuit</span>

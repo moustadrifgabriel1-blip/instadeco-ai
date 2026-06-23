@@ -212,7 +212,7 @@ export default async function RoomPage({ params }: PageProps) {
             Prêt à transformer votre <span className="text-[var(--gold)] italic">{room.name.toLowerCase()}</span> ?
           </h2>
           <p className="text-primary-foreground/80 text-lg">
-            Uploadez une photo de votre {room.name.toLowerCase()} actuel(le) et obtenez un rendu professionnel en 10 secondes.
+            Uploadez une photo de votre {room.name.toLowerCase()} actuel(le) et obtenez un rendu professionnel en 30 secondes.
           </p>
           <Button
             size="lg"

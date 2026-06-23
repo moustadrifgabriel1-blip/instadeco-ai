@@ -201,7 +201,7 @@ export default async function StylePage({ params }: PageProps) {
             Visualisez le style {style.name} dans <span className="text-[var(--gold)] italic">VOTRE</span> pièce
           </h2>
           <p className="text-primary-foreground/80 text-lg">
-            Uploadez une photo de votre pièce actuelle et obtenez un rendu en style {style.name} en 10 secondes.
+            Uploadez une photo de votre pièce actuelle et obtenez un rendu en style {style.name} en 30 secondes.
           </p>
           <Button
             size="lg"

@@ -55,11 +55,11 @@ export const INTENT_PAGES: IntentPageData[] = [
   {
     slug: 'home-staging-virtuel',
     title: 'Home Staging Virtuel par IA',
-    metaTitle: 'Home Staging Virtuel par IA : meublez vos pièces en 10 secondes',
-    metaDescription: 'Home staging virtuel par intelligence artificielle. Meublez et décorez vos pièces vides en 10 secondes. Alternative 50x moins chère au home staging physique.',
+    metaTitle: 'Home Staging Virtuel par IA : meublez vos pièces en 30 secondes',
+    metaDescription: 'Home staging virtuel par intelligence artificielle. Meublez et décorez vos pièces vides en 30 secondes. Alternative 50x moins chère au home staging physique.',
     hero: {
       headline: 'Home Staging Virtuel par IA',
-      subheadline: 'Meublez et décorez n\'importe quelle pièce en 10 secondes. Résultat photoréaliste. 50x moins cher que le home staging physique.',
+      subheadline: 'Meublez et décorez n\'importe quelle pièce en 30 secondes. Résultat photoréaliste. 50x moins cher que le home staging physique.',
       cta: 'Essayer le home staging virtuel',
       ctaLink: '/generate',
     },
@@ -74,9 +74,9 @@ export const INTENT_PAGES: IntentPageData[] = [
     },
     solution: {
       title: 'Le home staging virtuel par IA change la donne',
-      description: 'InstaDeco transforme vos photos de pièces vides en intérieurs meublés et décorés en 10 secondes grâce à l\'intelligence artificielle Flux.1.',
+      description: 'InstaDeco transforme vos photos de pièces vides en intérieurs meublés et décorés en 30 secondes grâce à l\'intelligence artificielle Flux.1.',
       benefits: [
-        { icon: 'clock', title: '10 secondes', description: 'Résultat instantané, pas de délai d\'attente' },
+        { icon: 'clock', title: '30 secondes', description: 'Résultat instantané, pas de délai d\'attente' },
         { icon: 'euro', title: 'Dès 1€/image', description: '50x moins cher que le staging physique' },
         { icon: 'palette', title: '12+ styles', description: 'Testez scandinave, moderne, industriel et plus' },
         { icon: 'camera', title: 'Photoréaliste', description: 'Résultats haute qualité pour vos annonces' },
@@ -87,13 +87,13 @@ export const INTENT_PAGES: IntentPageData[] = [
       alternatives: [
         { name: 'Home staging physique', price: '2 000€ - 15 000€', time: '2-4 semaines', quality: 'Excellent' },
         { name: 'Photographe 3D', price: '300€ - 800€/image', time: '3-7 jours', quality: 'Très bon' },
-        { name: 'InstaDeco (IA)', price: '1€ - 3€/image', time: '10 secondes', quality: 'Très bon', isUs: true },
+        { name: 'InstaDeco (IA)', price: '1€ - 3€/image', time: '30 secondes', quality: 'Très bon', isUs: true },
       ],
     },
     steps: [
       { step: 1, title: 'Uploadez votre photo', description: 'Prenez une photo de votre pièce vide ou à redécorer' },
       { step: 2, title: 'Choisissez un style', description: 'Sélectionnez parmi 12 styles déco : scandinave, moderne, bohème...' },
-      { step: 3, title: 'Résultat en 10 secondes', description: 'L\'IA génère un rendu photoréaliste de votre pièce meublée' },
+      { step: 3, title: 'Résultat en 30 secondes', description: 'L\'IA génère un rendu photoréaliste de votre pièce meublée' },
     ],
     faq: [
       { question: 'Le home staging virtuel est-il aussi efficace que le physique ?', answer: 'Le home staging virtuel permet aux acquéreurs de se projeter dans un bien meublé, comme le staging physique, mais pour une fraction du coût et en quelques secondes seulement.' },
@@ -107,10 +107,10 @@ export const INTENT_PAGES: IntentPageData[] = [
     slug: 'simulateur-decoration-interieur',
     title: 'Simulateur de Décoration Intérieure par IA',
     metaTitle: 'Simulateur Déco Intérieur Gratuit par IA : visualisez avant de décorer',
-    metaDescription: 'Simulateur de décoration intérieure par IA. Uploadez une photo de votre pièce et visualisez le résultat avec différents styles déco en 10 secondes.',
+    metaDescription: 'Simulateur de décoration intérieure par IA. Uploadez une photo de votre pièce et visualisez le résultat avec différents styles déco en 30 secondes.',
     hero: {
       headline: 'Simulateur de Décoration Intérieure',
-      subheadline: 'Visualisez votre future décoration avant d\'acheter quoi que ce soit. Uploadez une photo, choisissez un style, voyez le résultat en 10 secondes.',
+      subheadline: 'Visualisez votre future décoration avant d\'acheter quoi que ce soit. Uploadez une photo, choisissez un style, voyez le résultat en 30 secondes.',
       cta: 'Tester le simulateur',
       ctaLink: '/generate',
     },
@@ -124,10 +124,10 @@ export const INTENT_PAGES: IntentPageData[] = [
       ],
     },
     solution: {
-      title: 'Visualisez votre déco en 10 secondes avec l\'IA',
+      title: 'Visualisez votre déco en 30 secondes avec l\'IA',
       description: 'Notre simulateur utilise l\'intelligence artificielle pour transformer vos photos de pièces réelles en propositions de décoration complètes.',
       benefits: [
-        { icon: 'zap', title: 'Instantané', description: 'Pas de logiciel à installer, résultat en 10 secondes' },
+        { icon: 'zap', title: 'Instantané', description: 'Pas de logiciel à installer, résultat en 30 secondes' },
         { icon: 'palette', title: '12 styles', description: 'Du scandinave au japonais, tous les styles populaires' },
         { icon: 'upload', title: 'Votre pièce', description: 'Basé sur VOS photos, pas des modèles génériques' },
         { icon: 'download', title: 'Téléchargeable', description: 'Sauvegardez et partagez vos simulations' },
@@ -153,7 +153,7 @@ export const INTENT_PAGES: IntentPageData[] = [
     metaDescription: 'Logiciel de home staging virtuel à partir d\'une photo. Aucune installation : uploadez la photo d\'une pièce, l\'IA la meuble et la décore pour vos annonces immobilières. Essai gratuit.',
     hero: {
       headline: 'Le Logiciel de Home Staging le Plus Simple',
-      subheadline: 'Pas de logiciel à installer. Pas de formation nécessaire. Uploadez une photo, l\'IA fait le reste en 10 secondes.',
+      subheadline: 'Pas de logiciel à installer. Pas de formation nécessaire. Uploadez une photo, l\'IA fait le reste en 30 secondes.',
       cta: 'Essayer maintenant',
       ctaLink: '/generate',
     },
@@ -181,7 +181,7 @@ export const INTENT_PAGES: IntentPageData[] = [
       alternatives: [
         { name: 'Logiciel 3D pro', price: '100-500€/mois', time: '2-5h/image', quality: 'Excellent' },
         { name: 'App mobile staging', price: '20-50€/mois', time: '30-60 min', quality: 'Moyen' },
-        { name: 'InstaDeco (IA)', price: 'Dès 1€/image', time: '10 secondes', quality: 'Très bon', isUs: true },
+        { name: 'InstaDeco (IA)', price: 'Dès 1€/image', time: '30 secondes', quality: 'Très bon', isUs: true },
       ],
     },
     steps: [
@@ -242,7 +242,7 @@ export const INTENT_PAGES: IntentPageData[] = [
     slug: 'simulateur-peinture',
     title: 'Simulateur de Peinture et Couleurs par IA',
     metaTitle: 'Simulateur Peinture Mur par IA : testez les couleurs chez vous',
-    metaDescription: 'Simulateur de peinture par IA. Testez des couleurs et des ambiances sur vos murs. Visualisez le rendu en 10 secondes avant de peindre.',
+    metaDescription: 'Simulateur de peinture par IA. Testez des couleurs et des ambiances sur vos murs. Visualisez le rendu en 30 secondes avant de peindre.',
     hero: {
       headline: 'Testez les Couleurs Avant de Peindre',
       subheadline: 'Fini les échantillons de peinture ! Uploadez une photo de votre pièce et visualisez instantanément le rendu avec différentes ambiances colorées.',
@@ -264,7 +264,7 @@ export const INTENT_PAGES: IntentPageData[] = [
       benefits: [
         { icon: 'palette', title: 'Toutes les ambiances', description: 'Des teintes douces aux couleurs vives, testez tout' },
         { icon: 'sun', title: 'Rendu réaliste', description: 'L\'IA prend en compte la luminosité de votre pièce' },
-        { icon: 'clock', title: 'Instantané', description: '10 secondes au lieu de jours avec des échantillons' },
+        { icon: 'clock', title: 'Instantané', description: '30 secondes au lieu de jours avec des échantillons' },
         { icon: 'shield', title: 'Zéro risque', description: 'Validez votre choix avant d\'acheter la peinture' },
       ],
     },
@@ -284,10 +284,10 @@ export const INTENT_PAGES: IntentPageData[] = [
     slug: 'decoration-salon',
     title: 'Idées Décoration Salon - Visualisez par IA',
     metaTitle: 'Décoration Salon : 12 Styles à Visualiser par IA',
-    metaDescription: 'Découvrez les meilleures idées déco pour votre salon. Visualisez 12 styles différents directement sur votre photo. Résultat en 10 secondes.',
+    metaDescription: 'Découvrez les meilleures idées déco pour votre salon. Visualisez 12 styles différents directement sur votre photo. Résultat en 30 secondes.',
     hero: {
       headline: 'Trouvez la Déco Parfaite pour Votre Salon',
-      subheadline: 'Le salon est la pièce la plus importante de votre maison. Visualisez 12 styles disponibles directement sur votre photo en 10 secondes.',
+      subheadline: 'Le salon est la pièce la plus importante de votre maison. Visualisez 12 styles disponibles directement sur votre photo en 30 secondes.',
       cta: 'Redécorer mon salon',
       ctaLink: '/generate',
     },
@@ -326,10 +326,10 @@ export const INTENT_PAGES: IntentPageData[] = [
     slug: 'decoration-chambre',
     title: 'Idées Décoration Chambre - Visualisez par IA',
     metaTitle: 'Décoration Chambre : Styles Cosy, Moderne & Bohème par IA',
-    metaDescription: 'Idées de décoration chambre à coucher. Visualisez le rendu de 12 styles sur votre photo. Créez un cocon de bien-être en 10 secondes.',
+    metaDescription: 'Idées de décoration chambre à coucher. Visualisez le rendu de 12 styles sur votre photo. Créez un cocon de bien-être en 30 secondes.',
     hero: {
       headline: 'Créez la Chambre de Vos Rêves',
-      subheadline: 'Votre chambre est votre refuge. Visualisez-la dans un style cosy, scandinave, bohème ou tout autre ambiance en 10 secondes.',
+      subheadline: 'Votre chambre est votre refuge. Visualisez-la dans un style cosy, scandinave, bohème ou tout autre ambiance en 30 secondes.',
       cta: 'Redécorer ma chambre',
       ctaLink: '/generate',
     },
@@ -368,7 +368,7 @@ export const INTENT_PAGES: IntentPageData[] = [
     slug: 'avant-apres-decoration',
     title: 'Avant/Après Décoration par IA',
     metaTitle: 'Avant Après Décoration : transformez vos pièces par IA',
-    metaDescription: 'Créez des avant/après impressionnants de décoration intérieure avec l\'IA. Montrez le potentiel de vos pièces en 10 secondes.',
+    metaDescription: 'Créez des avant/après impressionnants de décoration intérieure avec l\'IA. Montrez le potentiel de vos pièces en 30 secondes.',
     hero: {
       headline: 'Avant / Après en 10 Secondes',
       subheadline: 'Transformez n\'importe quelle pièce et créez des comparaisons avant/après bluffantes. Idéal pour les pros de l\'immobilier et les passionnés de déco.',
@@ -385,7 +385,7 @@ export const INTENT_PAGES: IntentPageData[] = [
       ],
     },
     solution: {
-      title: 'Des avant/après professionnels en 10 secondes',
+      title: 'Des avant/après professionnels en 30 secondes',
       description: 'Uploadez la photo "avant" et l\'IA crée instantanément une version "après" meublée et décorée. Parfait pour les annonces immobilières.',
       benefits: [
         { icon: 'split', title: 'Comparaison directe', description: 'Avant/après côte à côte pour un impact maximal' },

@@ -399,7 +399,7 @@
       },
       {
         "key": "speed",
-        "label": "Result in ~10 seconds"
+        "label": "Result in ~30 seconds"
       }
     ],
     "annualSavingsBanner": "Save up to €192/year with annual billing",
@@ -426,7 +426,7 @@
         "step": "3",
         "emoji": "",
         "title": "Love the result",
-        "desc": "In ~10 seconds, see your room transformed by AI."
+        "desc": "In ~30 seconds, see your room transformed by AI."
       }
     ],
     "tryNow": "Try it now",
@@ -443,7 +443,7 @@
       },
       {
         "label": "Turnaround",
-        "us": "~10 seconds",
+        "us": "~30 seconds",
         "them": "1, 3 weeks"
       },
       {

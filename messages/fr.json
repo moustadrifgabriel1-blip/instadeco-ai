@@ -406,7 +406,7 @@
       },
       {
         "key": "speed",
-        "label": "Résultat en 10 secondes"
+        "label": "Résultat en 30 secondes"
       }
     ],
     "annualSavingsBanner": "Économisez jusqu'à 192€/an avec l'annuel",
@@ -433,7 +433,7 @@
         "step": "3",
         "emoji": "",
         "title": "Admirez le résultat",
-        "desc": "En 10 secondes, découvrez votre pièce transformée par l'IA."
+        "desc": "En 30 secondes, découvrez votre pièce transformée par l'IA."
       }
     ],
     "tryNow": "Essayer maintenant",
@@ -450,7 +450,7 @@
       },
       {
         "label": "Délai",
-        "us": "10 secondes",
+        "us": "30 secondes",
         "them": "1 - 3 semaines"
       },
       {

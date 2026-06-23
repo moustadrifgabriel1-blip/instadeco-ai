@@ -399,7 +399,7 @@
       },
       {
         "key": "speed",
-        "label": "Ergebnis in ~10 Sekunden"
+        "label": "Ergebnis in ~30 Sekunden"
       }
     ],
     "annualSavingsBanner": "Bis zu 192 €/Jahr mit Jahresabo sparen",
@@ -426,7 +426,7 @@
         "step": "3",
         "emoji": "",
         "title": "Ergebnis genießen",
-        "desc": "In ~10 Sekunden sehen Sie die KI-Transformation."
+        "desc": "In ~30 Sekunden sehen Sie die KI-Transformation."
       }
     ],
     "tryNow": "Jetzt ausprobieren",
@@ -443,7 +443,7 @@
       },
       {
         "label": "Dauer",
-        "us": "~10 Sekunden",
+        "us": "~30 Sekunden",
         "them": "1, 3 Wochen"
       },
       {

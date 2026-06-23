@@ -118,42 +118,42 @@ const CITY_SEO_OVERRIDES: Record<string, { title: string; description: string }>
   nice: {
     title: "Architecte d'intérieur à Nice : votre déco avant travaux",
     description:
-      "Visualisez votre intérieur à Nice avant les travaux. Une photo, un style, et l'IA redécore la pièce en 10 secondes. Premier essai gratuit.",
+      "Visualisez votre intérieur à Nice avant les travaux. Une photo, un style, et l'IA redécore la pièce en 30 secondes. Premier essai gratuit.",
   },
   annecy: {
     title: "Architecte d'intérieur à Annecy : déco avant travaux",
     description:
-      "Projetez votre intérieur à Annecy avant de rénover. Une photo, un style, un rendu réaliste en 10 secondes. Premier essai gratuit.",
+      "Projetez votre intérieur à Annecy avant de rénover. Une photo, un style, un rendu réaliste en 30 secondes. Premier essai gratuit.",
   },
   amiens: {
     title: "Architecte d'intérieur à Amiens : déco avant travaux",
     description:
-      "Visualisez votre intérieur à Amiens avant les travaux. Une photo, un style, un rendu photoréaliste en 10 secondes. Premier essai gratuit.",
+      "Visualisez votre intérieur à Amiens avant les travaux. Une photo, un style, un rendu photoréaliste en 30 secondes. Premier essai gratuit.",
   },
   neuchatel: {
     title: "Architecte d'intérieur à Neuchâtel : déco avant travaux",
     description:
-      "Visualisez votre intérieur à Neuchâtel avant de décorer ou de vendre. Une photo, un style, un rendu réaliste en 10 secondes. Essai gratuit.",
+      "Visualisez votre intérieur à Neuchâtel avant de décorer ou de vendre. Une photo, un style, un rendu réaliste en 30 secondes. Essai gratuit.",
   },
   liege: {
     title: "Architecte d'intérieur à Liège : votre déco avant travaux",
     description:
-      "Projetez votre intérieur à Liège avant les travaux. Une photo, un style, un rendu réaliste en 10 secondes. Idéal avant une vente. Essai gratuit.",
+      "Projetez votre intérieur à Liège avant les travaux. Une photo, un style, un rendu réaliste en 30 secondes. Idéal avant une vente. Essai gratuit.",
   },
   'louvain-la-neuve': {
     title: "Architecte d'intérieur à Louvain-la-Neuve : déco IA",
     description:
-      "Visualisez votre intérieur à Louvain-la-Neuve avant de décorer. Une photo, un style, un rendu réaliste en 10 secondes. Premier essai gratuit.",
+      "Visualisez votre intérieur à Louvain-la-Neuve avant de décorer. Une photo, un style, un rendu réaliste en 30 secondes. Premier essai gratuit.",
   },
   uccle: {
     title: "Architecte d'intérieur Uccle : votre déco avant travaux",
     description:
-      "Visualisez votre intérieur à Uccle avant de décorer. Une photo, un style, un rendu réaliste en 10 secondes. Idéal avant une vente. Essai gratuit.",
+      "Visualisez votre intérieur à Uccle avant de décorer. Une photo, un style, un rendu réaliste en 30 secondes. Idéal avant une vente. Essai gratuit.",
   },
   bruxelles: {
     title: "Architecte d'intérieur à Bruxelles : déco avant travaux",
     description:
-      "Visualisez votre intérieur à Bruxelles avant les travaux. Une photo, un style, un rendu réaliste en 10 secondes. Premier essai gratuit.",
+      "Visualisez votre intérieur à Bruxelles avant les travaux. Une photo, un style, un rendu réaliste en 30 secondes. Premier essai gratuit.",
   },
 };
 
@@ -304,7 +304,7 @@ export default async function CityPage({ params }: PageProps) {
                   <span>Service 100% en ligne</span>
                 </div>
                 <span>·</span>
-                <span>Résultat en 10 secondes</span>
+                <span>Résultat en 30 secondes</span>
                 <span>·</span>
                 <span>Essai gratuit</span>
               </div>
@@ -320,7 +320,7 @@ export default async function CityPage({ params }: PageProps) {
                   </div>
                   <div>
                     <p className="prestige-display text-xl font-bold text-foreground">Avant → Après</p>
-                    <p className="text-muted-foreground mt-2">Uploadez votre photo et voyez la transformation en 10 secondes</p>
+                    <p className="text-muted-foreground mt-2">Uploadez votre photo et voyez la transformation en 30 secondes</p>
                   </div>
                   <Button className="rounded-full bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)]" asChild>
                     <Link href="/essai">
@@ -356,7 +356,7 @@ export default async function CityPage({ params }: PageProps) {
                 </div>
                 <h3 className="prestige-display text-xl font-bold">Instantané & Économique</h3>
                 <p className="text-muted-foreground">
-                  Oubliez les devis à 4 chiffres. Le design d&apos;intérieur devient accessible à tous les budgets de {city.name}. Résultat en 10 secondes chrono.
+                  Oubliez les devis à 4 chiffres. Le design d&apos;intérieur devient accessible à tous les budgets de {city.name}. Résultat en 30 secondes chrono.
                 </p>
               </CardContent>
             </Card>
@@ -438,7 +438,7 @@ export default async function CityPage({ params }: PageProps) {
                   <div className="w-10 h-10 rounded-full bg-[var(--gold)] flex items-center justify-center font-bold text-xl text-[#0c0a09]">3</div>
                   <div>
                     <h4 className="prestige-display text-xl font-bold">La magie opère</h4>
-                    <p className="text-muted-foreground">En 10 secondes, recevez 4 propositions d&apos;aménagement photoréalistes.</p>
+                    <p className="text-muted-foreground">En 30 secondes, recevez 4 propositions d&apos;aménagement photoréalistes.</p>
                   </div>
                 </div>
               </div>

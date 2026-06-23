@@ -134,7 +134,7 @@ ${topics.map((t, i) => `${i + 1}. ${t}`).join('\n')}
 
 L'article serait 100% original, illustré avec des avant/après réalisés par notre IA, et adapté à votre ligne éditoriale. Pas de contenu promotionnel — juste de la valeur pour vos lecteurs.
 
-Notre plateforme propose 12 styles de décoration et un résultat en 10 secondes, pour des particuliers et professionnels en France, Suisse et Belgique.
+Notre plateforme propose 12 styles de décoration et un résultat en 30 secondes, pour des particuliers et professionnels en France, Suisse et Belgique.
 
 Est-ce que ça vous intéresserait d'en discuter ?
 
@@ -146,7 +146,7 @@ https://instadeco.app`,
       'Comment l\'IA révolutionne la décoration intérieure en 2026',
       '5 tendances déco 2026 identifiées par l\'intelligence artificielle',
       'Home staging virtuel : le guide complet pour vendre plus vite',
-      'Avant/Après : transformer une pièce en 10 secondes avec l\'IA',
+      'Avant/Après : transformer une pièce en 30 secondes avec l\'IA',
       'Scandinave, Japandi ou Bohème : quel style pour votre intérieur ? (avec exemples IA)',
       'Décoration d\'intérieur : les outils IA qui changent la donne',
       'Comment visualiser sa future déco sans faire de travaux',
@@ -155,14 +155,14 @@ https://instadeco.app`,
 
   // Template 2: Proposition de contenu presse
   press_pitch: {
-    subject: () => `[Nouveauté] Une IA suisse transforme votre intérieur en 10 secondes`,
+    subject: () => `[Nouveauté] Une IA suisse transforme votre intérieur en 30 secondes`,
     body: (contactName: string, _siteName: string) => `Bonjour ${contactName || ''},
 
-Un salon daté des années 90 transformé en loft moderne en 10 secondes ? C'est ce que propose InstaDeco, une application d'IA développée en Suisse qui démocratise la décoration intérieure.
+Un salon daté des années 90 transformé en loft moderne en 30 secondes ? C'est ce que propose InstaDeco, une application d'IA développée en Suisse qui démocratise la décoration intérieure.
 
 Quelques chiffres :
 • 12 styles de décoration (du Scandinave au Wabi-Sabi)
-• 10 secondes pour transformer n'importe quelle pièce
+• 30 secondes pour transformer n'importe quelle pièce
 • Disponible en France, Suisse et Belgique
 
 L'application utilise Flux.1 + ControlNet (technologies open source de pointe) pour analyser la structure d'une pièce et proposer un redesign complet tout en respectant l'architecture existante.
