@@ -100,7 +100,7 @@
     "faq": [
       {
         "question": "Comment fonctionne la décoration par IA d'InstaDeco ?",
-        "answer": "Prenez une photo de votre pièce, choisissez un style parmi plus de 20 options (Moderne, Scandinave, Japandi, Bohème…), et notre IA génère un rendu photoréaliste de votre pièce redécorée en ~30 secondes. Le résultat respecte la structure de votre espace (murs, fenêtres, volumes)."
+        "answer": "Prenez une photo de votre pièce, choisissez un style parmi nos 12 styles (Moderne, Scandinave, Japandi, Bohème…), et notre IA génère un rendu photoréaliste de votre pièce redécorée en ~30 secondes. Le résultat respecte la structure de votre espace (murs, fenêtres, volumes)."
       },
       {
         "question": "Combien coûte InstaDeco par rapport à un architecte d'intérieur ?",
@@ -116,11 +116,11 @@
       },
       {
         "question": "Les images générées sont-elles réalistes ?",
-        "answer": "Nos rendus utilisent la technologie Flux.1 avec ControlNet, qui analyse la structure de votre pièce pour produire des résultats photoréalistes. Les images sont téléchargeables en HD et peuvent être partagées ou imprimées."
+        "answer": "Notre IA analyse la structure de votre pièce (murs, fenêtres, volumes) pour produire des résultats photoréalistes qui la préservent. Les images sont téléchargeables en HD et peuvent être partagées ou imprimées."
       }
     ],
     "stylesSectionTitle": "Explorez nos styles de décoration",
-    "stylesSectionSubtitle": "Chaque intérieur mérite un style qui lui correspond. Découvrez nos 20+ styles de décoration et trouvez celui qui vous ressemble.",
+    "stylesSectionSubtitle": "Chaque intérieur mérite un style qui lui correspond. Découvrez nos 12 styles de décoration et trouvez celui qui vous ressemble.",
     "viewAllStyles": "Voir tous les styles",
     "roomsSectionTitle": "Décorez chaque pièce de votre intérieur",
     "roomsSectionSubtitle": "Salon, chambre, cuisine ou bureau : notre IA s'adapte à chaque espace pour des résultats sur mesure.",
@@ -235,7 +235,7 @@
         },
         "features": [
           "30 crédits / mois",
-          "20+ styles de déco",
+          "12 styles de déco",
           "Téléchargement illimité",
           "Usage commercial inclus",
           "Support par email"
@@ -258,7 +258,7 @@
         },
         "features": [
           "80 crédits / mois",
-          "20+ styles de déco",
+          "12 styles de déco",
           "HD+ inclus (2048px)",
           "Usage commercial inclus",
           "Support prioritaire",
@@ -282,7 +282,7 @@
         },
         "features": [
           "200 crédits / mois",
-          "20+ styles de déco",
+          "12 styles de déco",
           "HD+ inclus (2048px)",
           "Usage commercial illimité",
           "Support dédié",
@@ -564,7 +564,7 @@
         {
           "number": "02",
           "title": "Choisissez un style",
-          "description": "Sélectionnez parmi 20+ styles déco : Moderne, Scandinave, Japandi, Bohème, Industriel...",
+          "description": "Sélectionnez parmi 12 styles déco : Moderne, Scandinave, Japandi, Bohème, Industriel...",
           "icon": ""
         },
         {
@@ -650,7 +650,7 @@
           "description": "Un architecte d'intérieur coûte 150 €/h minimum. InstaDeco vous donne un résultat comparable pour moins d'un café."
         },
         {
-          "title": "20+ Styles, 0 Limite",
+          "title": "12 Styles, 0 Limite",
           "description": "Scandinave, Japandi, Haussmannien, Chalet Alpin... Testez tous les styles en un clic. Chez un déco, c'est 3 propositions max."
         },
         {

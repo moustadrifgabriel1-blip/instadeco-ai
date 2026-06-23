@@ -115,7 +115,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
                 </div>
                 <h3 className="prestige-display text-lg font-bold text-foreground">Innovation</h3>
                 <p className="text-sm text-muted-foreground">
-                  Nous utilisons les dernières avancées en IA générative (Flux.1 + ControlNet) pour produire des résultats photoréalistes qui respectent la structure réelle de votre pièce, pas de templates génériques.
+                  Nous utilisons les dernières avancées en IA générative pour produire des résultats photoréalistes qui respectent la structure réelle de votre pièce, pas de templates génériques.
                 </p>
               </CardContent>
             </Card>
@@ -201,7 +201,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
           <div className="prestige-rule w-16 mb-8" aria-hidden="true" />
           <div className="prestige-body prose prose-sm max-w-none text-muted-foreground space-y-4">
             <p>
-              InstaDeco utilise <strong>Flux.1</strong>, l&apos;un des modèles d&apos;IA générative les plus avancés, couplé à <strong>ControlNet</strong> pour respecter la structure réelle de votre pièce. Contrairement aux outils qui génèrent des images &quot;à partir de rien&quot;, notre technologie analyse vos murs, fenêtres, portes et volumes pour appliquer le style choisi en conservant la géométrie exacte de votre espace.
+              InstaDeco s&apos;appuie sur une <strong>IA générative de pointe</strong> pour respecter la structure réelle de votre pièce. Contrairement aux outils qui génèrent des images &quot;à partir de rien&quot;, notre technologie part de votre photo et analyse vos murs, fenêtres, portes et volumes pour appliquer le style choisi en conservant la géométrie exacte de votre espace.
             </p>
             <p>
               Le résultat : des rendus photoréalistes en 30 secondes que vous pouvez télécharger en HD (1024×1024) ou en ultra-HD (2048×2048). <Link href="/styles" className="text-[var(--gold)] hover:underline">12 styles de décoration</Link> sont disponibles, applicables à <Link href="/pieces" className="text-[var(--gold)] hover:underline">8 types de pièces</Link>, soit 96 combinaisons possibles.

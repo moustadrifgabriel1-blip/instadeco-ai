@@ -30,6 +30,10 @@ export function generateOrganizationSchema() {
     image: getFullUrl(SEO_CONFIG.ogImage),
     description: SEO_CONFIG.siteDescription,
     foundingDate: SEO_CONFIG.organization.foundingDate,
+    founder: {
+      '@type': 'Person',
+      name: 'Gabriel Moustadrif',
+    },
     email: SEO_CONFIG.email,
     sameAs: [
       `https://twitter.com/${SEO_CONFIG.twitterHandle.replace('@', '')}`,
@@ -110,7 +114,7 @@ export function generateSoftwareAppSchema() {
     featureList: [
       'Décoration par Intelligence Artificielle',
       'Home staging virtuel',
-      'Plus de 20 styles de décoration',
+      '12 styles de décoration',
       'Résultat en ~30 secondes',
       'Export haute définition',
     ],

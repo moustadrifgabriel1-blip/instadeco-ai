@@ -631,7 +631,7 @@ export default function EssaiPage() {
                 <div className="mt-4 flex flex-wrap items-center justify-center gap-4 text-[12px] text-muted-foreground">
                   <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-emerald-400" /> 3 crédits offerts</span>
                   <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-emerald-400" /> Sans engagement</span>
-                  <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-emerald-400" /> 20+ styles</span>
+                  <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-emerald-400" /> 12 styles</span>
                 </div>
               </div>
 

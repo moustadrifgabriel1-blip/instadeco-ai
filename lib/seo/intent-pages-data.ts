@@ -76,7 +76,7 @@ export const INTENT_PAGES: IntentPageData[] = [
     },
     solution: {
       title: 'Le home staging virtuel par IA change la donne',
-      description: 'InstaDeco transforme vos photos de pièces vides en intérieurs meublés et décorés en 30 secondes grâce à l\'intelligence artificielle Flux.1.',
+      description: 'InstaDeco transforme vos photos de pièces vides en intérieurs meublés et décorés en 30 secondes grâce à l\'intelligence artificielle.',
       benefits: [
         { icon: 'clock', title: '30 secondes', description: 'Résultat instantané, pas de délai d\'attente' },
         { icon: 'euro', title: 'Dès 1€/image', description: '50x moins cher que le staging physique' },

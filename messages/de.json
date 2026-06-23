@@ -93,7 +93,7 @@
     "faq": [
       {
         "question": "Wie funktioniert InstaDeco mit KI-Deko?",
-        "answer": "Foto aufnehmen, einen von 20+ Stilen wählen (Modern, Skandinavisch, Japandi, Boho …) und unsere KI liefert in ~30 Sekunden ein fotorealistisches Redesign, Struktur (Wände, Fenster, Volumen) bleibt erhalten."
+        "answer": "Foto aufnehmen, einen von 12 Stilen wählen (Modern, Skandinavisch, Japandi, Boho …) und unsere KI liefert in ~30 Sekunden ein fotorealistisches Redesign, Struktur (Wände, Fenster, Volumen) bleibt erhalten."
       },
       {
         "question": "Was kostet InstaDeco im Vergleich zu einem Innenarchitekten?",
@@ -109,11 +109,11 @@
       },
       {
         "question": "Sind die Bilder realistisch?",
-        "answer": "Flux.1 mit ControlNet erfasst die Raumstruktur für fotorealistische Ergebnisse. HD-Download zum Teilen oder Drucken."
+        "answer": "Unsere KI erfasst die Raumstruktur (Wände, Fenster, Volumen) für fotorealistische Ergebnisse, die sie bewahren. HD-Download zum Teilen oder Drucken."
       }
     ],
     "stylesSectionTitle": "Unsere Deko-Stile entdecken",
-    "stylesSectionSubtitle": "Jedes Zuhause verdient den passenden Stil. Über 20 Looks, finden Sie Ihren.",
+    "stylesSectionSubtitle": "Jedes Zuhause verdient den passenden Stil. 12 Looks, finden Sie Ihren.",
     "viewAllStyles": "Alle Stile",
     "roomsSectionTitle": "Jeden Raum gestalten",
     "roomsSectionSubtitle": "Wohnzimmer, Schlafzimmer, Küche oder Büro, unsere KI passt sich an.",
@@ -228,7 +228,7 @@
         },
         "features": [
           "30 Credits / Monat",
-          "20+ Deko-Stile",
+          "12 Deko-Stile",
           "Unbegrenzte Downloads",
           "Kommerzielle Nutzung inklusive",
           "E-Mail-Support"
@@ -251,7 +251,7 @@
         },
         "features": [
           "80 Credits / Monat",
-          "20+ Deko-Stile",
+          "12 Deko-Stile",
           "HD+ inklusive (2048px)",
           "Kommerzielle Nutzung inklusive",
           "Prioritäts-Support",
@@ -275,7 +275,7 @@
         },
         "features": [
           "200 Credits / Monat",
-          "20+ Deko-Stile",
+          "12 Deko-Stile",
           "HD+ inklusive (2048px)",
           "Unbegrenzte kommerzielle Nutzung",
           "Dedizierter Support",
@@ -557,7 +557,7 @@
         {
           "number": "02",
           "title": "Stil wählen",
-          "description": "Wählen Sie aus 20+ Deko-Stilen: Modern, Skandinavisch, Japandi, Boho, Industrial …",
+          "description": "Wählen Sie aus 12 Deko-Stilen: Modern, Skandinavisch, Japandi, Boho, Industrial …",
           "icon": ""
         },
         {
@@ -643,7 +643,7 @@
           "description": "Innenarchitekten verrechnen oft ab 150 €/h. InstaDeco liefert ein vergleichbares Bild für weniger als einen Kaffee."
         },
         {
-          "title": "20+ Stile, keine Grenzen",
+          "title": "12 Stile, keine Grenzen",
           "description": "Skandinavisch, Japandi, Haussmann, Chalet … probieren Sie jeden Look mit einem Klick. Beim Dekorateur gibt es höchstens drei Varianten."
         },
         {

@@ -93,7 +93,7 @@
     "faq": [
       {
         "question": "How does InstaDeco’s AI décor work?",
-        "answer": "Take a photo of your room, pick one of 20+ styles (Modern, Scandinavian, Japandi, Bohemian…), and our AI returns a photorealistic redesign in ~30 seconds while preserving your layout (walls, windows, volumes)."
+        "answer": "Take a photo of your room, pick one of 12 styles (Modern, Scandinavian, Japandi, Bohemian…), and our AI returns a photorealistic redesign in ~30 seconds while preserving your layout (walls, windows, volumes)."
       },
       {
         "question": "How does pricing compare to an interior designer?",
@@ -109,11 +109,11 @@
       },
       {
         "question": "Are the generated images realistic?",
-        "answer": "We use Flux.1 with ControlNet to respect your room’s structure and deliver photorealistic results. Images are downloadable in HD for sharing or print."
+        "answer": "Our AI analyzes your room’s structure (walls, windows, volumes) to deliver photorealistic results that preserve it. Images are downloadable in HD for sharing or print."
       }
     ],
     "stylesSectionTitle": "Explore our décor styles",
-    "stylesSectionSubtitle": "Every home deserves a style that fits. Browse 20+ curated looks and find yours.",
+    "stylesSectionSubtitle": "Every home deserves a style that fits. Browse 12 curated looks and find yours.",
     "viewAllStyles": "See all styles",
     "roomsSectionTitle": "Design every room",
     "roomsSectionSubtitle": "Living room, bedroom, kitchen or office, our AI adapts to each space.",
@@ -228,7 +228,7 @@
         },
         "features": [
           "30 credits / month",
-          "20+ décor styles",
+          "12 décor styles",
           "Unlimited downloads",
           "Commercial use included",
           "Email support"
@@ -251,7 +251,7 @@
         },
         "features": [
           "80 credits / month",
-          "20+ décor styles",
+          "12 décor styles",
           "HD+ included (2048px)",
           "Commercial use included",
           "Priority support",
@@ -275,7 +275,7 @@
         },
         "features": [
           "200 credits / month",
-          "20+ décor styles",
+          "12 décor styles",
           "HD+ included (2048px)",
           "Unlimited commercial use",
           "Dedicated support",
@@ -557,7 +557,7 @@
         {
           "number": "02",
           "title": "Pick a style",
-          "description": "Choose from 20+ décor styles: Modern, Scandinavian, Japandi, Bohemian, Industrial…",
+          "description": "Choose from 12 décor styles: Modern, Scandinavian, Japandi, Bohemian, Industrial…",
           "icon": ""
         },
         {
@@ -643,7 +643,7 @@
           "description": "Interior designers often start around €150/h. InstaDeco delivers a comparable visual for less than a coffee."
         },
         {
-          "title": "20+ styles, zero limits",
+          "title": "12 styles, zero limits",
           "description": "Scandinavian, Japandi, Haussmann, Alpine chalet… try every look in one click. With a decorator, you get three moodboards max."
         },
         {

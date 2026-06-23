@@ -345,7 +345,7 @@ function GenerateContent() {
           </p>
           {/* Mini galerie avant/après */}
           <div className="prestige-reveal mt-6 flex items-center justify-center gap-3 flex-wrap text-[12px] text-muted-foreground" style={{ ['--reveal-d' as string]: '240ms' }}>
-            <span className="flex items-center gap-1.5"><Eye className="w-3.5 h-3.5 text-[var(--gold)]" /> 20+ styles de déco</span>
+            <span className="flex items-center gap-1.5"><Eye className="w-3.5 h-3.5 text-[var(--gold)]" /> 12 styles de déco</span>
             <span className="text-[var(--gold-line)]">•</span>
             <span className="flex items-center gap-1.5"><Zap className="w-3.5 h-3.5 text-[var(--gold)]" /> Résultat en 30s</span>
             <span className="text-[var(--gold-line)]">•</span>

@@ -550,7 +550,7 @@ function buildTrialJ1Email(name: string, email: string, style: string): string {
       <p style="margin: 0 0 8px; font-weight: 600; color: #faf8f4;">✨ Avec un compte gratuit :</p>
       <ul style="margin: 0; padding: 0 0 0 20px; color: #b3a89a; font-size: 14px; line-height: 1.8;">
         <li>3 transformations supplémentaires offertes</li>
-        <li>20+ styles de décoration (vs 6 en essai)</li>
+        <li>12 styles de décoration (vs 6 en essai)</li>
         <li>Historique de vos créations</li>
         <li>Téléchargement HD</li>
       </ul>
