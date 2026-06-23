@@ -165,6 +165,41 @@ const nextConfig = {
         destination: '/fr/blog/:slug+',
         permanent: true,
       },
+      // Pages programmatiques fr-only : 301 PERMANENT des URLs sans préfixe de locale
+      // vers /fr. Le middleware next-intl ne fait qu'un 307 (temporaire) qui n'a pas
+      // consolidé le canonical : Google indexait /solution/x au lieu de /fr/solution/x
+      // (duplicate « Google chose different canonical », mesuré sur avant-apres-decoration).
+      // Les redirects next.config priment sur le middleware (vérifié : /blog renvoie 308).
+      {
+        source: '/solution/:path*',
+        destination: '/fr/solution/:path*',
+        permanent: true,
+      },
+      {
+        source: '/architecte-interieur/:path*',
+        destination: '/fr/architecte-interieur/:path*',
+        permanent: true,
+      },
+      {
+        source: '/amenager/:path*',
+        destination: '/fr/amenager/:path*',
+        permanent: true,
+      },
+      {
+        source: '/deco/:path*',
+        destination: '/fr/deco/:path*',
+        permanent: true,
+      },
+      {
+        source: '/style/:path*',
+        destination: '/fr/style/:path*',
+        permanent: true,
+      },
+      {
+        source: '/piece/:path*',
+        destination: '/fr/piece/:path*',
+        permanent: true,
+      },
       // 301 anti-cannibalisation : les articles en double (depubliés) redirigent
       // vers l'article gardé, pour concentrer le jus SEO sur une seule URL par sujet.
       {
