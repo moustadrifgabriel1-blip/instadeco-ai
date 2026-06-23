@@ -278,6 +278,22 @@ export default async function IntentPage({ params }: PageProps) {
         </div>
       </section>
 
+      {/* ===== CONTENU DE FOND (long-forme, E-E-A-T) ===== */}
+      {page.sections && page.sections.length > 0 && (
+        <section className="py-16 prestige-reveal">
+          <div className="container px-4 md:px-6 max-w-3xl mx-auto space-y-10">
+            {page.sections.map((sec, i) => (
+              <div key={i} className="space-y-4">
+                <h2 className="prestige-display text-2xl md:text-3xl font-bold text-foreground">{sec.title}</h2>
+                {sec.body.map((para, j) => (
+                  <p key={j} className="prestige-body text-muted-foreground leading-relaxed">{para}</p>
+                ))}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* ===== CTA MILIEU ===== */}
       <section className="py-16 bg-[var(--stone-900)] border-y border-[var(--gold-line)] text-[var(--ivory)] prestige-reveal">
         <div className="container px-4 md:px-6 max-w-3xl mx-auto text-center space-y-6">

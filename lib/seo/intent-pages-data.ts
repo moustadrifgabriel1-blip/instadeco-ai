@@ -43,6 +43,8 @@ export interface IntentPageData {
   };
   /** Étapes d'utilisation */
   steps: Array<{ step: number; title: string; description: string }>;
+  /** Sections de contenu de fond (long-forme) : profondeur SEO réelle + E-E-A-T. Optionnel. */
+  sections?: Array<{ title: string; body: string[] }>;
   /** FAQ */
   faq: Array<{ question: string; answer: string }>;
   /** Keywords pour le SEO */
@@ -189,7 +191,38 @@ export const INTENT_PAGES: IntentPageData[] = [
       { step: 2, title: 'Choisissez', description: 'Sélectionnez le style de décoration souhaité' },
       { step: 3, title: 'Téléchargez', description: 'Récupérez votre image de home staging en haute résolution' },
     ],
+    sections: [
+      {
+        title: 'Le home staging virtuel à partir d\'une simple photo',
+        body: [
+          'Le principe est direct. Vous photographiez la pièce avec un smartphone, vide ou occupée, et l\'IA renvoie un rendu meublé et décoré en gardant la structure réelle : murs, fenêtres, sol et volumes sont préservés. Seuls le mobilier et la décoration changent.',
+          'Vous n\'installez aucun logiciel et ne suivez aucune formation. Une photo nette, prise avec un peu de recul, suffit pour obtenir une projection crédible que l\'acheteur reconnaît tout de suite comme la même pièce, simplement mise en valeur.',
+        ],
+      },
+      {
+        title: 'Pourquoi les agents immobiliers l\'utilisent pour vendre plus vite',
+        body: [
+          'Un bien vide ou à la décoration datée se projette mal. L\'acheteur peine à imaginer le potentiel et passe à l\'annonce suivante. En montrant la pièce habillée, vous aidez la projection dès la première photo de l\'annonce, là où se joue le clic.',
+          'Le coût change aussi la donne. Là où un home staging physique se chiffre en milliers d\'euros par bien, la version virtuelle revient à quelques euros par image et se produit en quelques minutes, sur autant de biens que nécessaire.',
+        ],
+      },
+      {
+        title: 'Home staging virtuel ou physique : lequel choisir',
+        body: [
+          'Le physique garde un intérêt quand l\'acheteur visite et touche les matières, surtout sur des biens haut de gamme. Le virtuel, lui, agit là où tout commence aujourd\'hui : les photos de l\'annonce en ligne, qui décident si une visite a lieu ou non.',
+          'Les deux ne s\'opposent pas. Beaucoup d\'agents valorisent l\'annonce en virtuel pour déclencher les visites, puis soignent la mise en scène physique pour les biens qui le justifient.',
+        ],
+      },
+      {
+        title: 'Rester transparent sur vos annonces',
+        body: [
+          'Un rendu de home staging virtuel montre un potentiel, pas l\'état réel du bien. La bonne pratique, et la déontologie immobilière, consiste à signaler clairement le caractère virtuel de la mise en scène sur l\'annonce. La confiance de l\'acheteur en sort renforcée.',
+        ],
+      },
+    ],
     faq: [
+      { question: 'Le logiciel fonctionne-t-il à partir d\'une simple photo de smartphone ?', answer: 'Oui. Une photo nette prise au smartphone suffit. L\'IA analyse la pièce et la meuble en préservant sa structure réelle. Inutile d\'avoir un appareil professionnel ou un plan en trois dimensions.' },
+      { question: 'Puis-je meubler une pièce totalement vide ?', answer: 'Oui, c\'est l\'usage principal pour l\'immobilier. À partir de la photo d\'une pièce vide, l\'IA ajoute mobilier, textiles et décoration cohérents avec l\'espace, pour montrer le potentiel du bien à l\'acheteur.' },
       { question: 'InstaDeco remplace-t-il un logiciel 3D professionnel ?', answer: 'Pour le home staging d\'annonces immobilières, oui. Pour des plans techniques d\'architecte d\'intérieur, un logiciel 3D reste nécessaire. InstaDeco excelle dans la visualisation rapide.' },
       { question: 'Quelle résolution pour les images générées ?', answer: 'Les images sont générées en résolution standard. L\'option HD est disponible pour obtenir des images en très haute résolution, parfaites pour l\'impression.' },
       { question: 'Y a-t-il un essai gratuit ?', answer: 'Oui ! Chaque nouveau compte reçoit des crédits gratuits pour tester le service. Aucune carte bancaire requise.' },
