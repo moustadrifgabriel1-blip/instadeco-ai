@@ -60,7 +60,7 @@ const LEGAL_LINKS: { href: string; key: string }[] = [
 
 const SOCIAL_LINKS: { href: string; key: string }[] = [
   { href: 'https://twitter.com/instadeco_ai', key: 'twitter' },
-  { href: 'https://instagram.com/instadeco_ai', key: 'instagram' },
+  { href: 'https://www.instagram.com/instadecoai', key: 'instagram' },
   { href: 'https://pinterest.com/instadeco_ai', key: 'pinterest' },
 ];
 

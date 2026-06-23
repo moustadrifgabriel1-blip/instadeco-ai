@@ -35,9 +35,11 @@ export function generateOrganizationSchema() {
       name: 'Gabriel Moustadrif',
     },
     email: SEO_CONFIG.email,
+    // Profils réels (entité InstaDeco). N'inclure QUE des comptes existants.
     sameAs: [
+      'https://www.instagram.com/instadecoai',
+      'https://www.facebook.com/people/InstaDeco-AI/61588194177866/',
       `https://twitter.com/${SEO_CONFIG.twitterHandle.replace('@', '')}`,
-      'https://instagram.com/instadeco_ai',
       'https://pinterest.com/instadeco_ai',
     ],
     contactPoint: {
