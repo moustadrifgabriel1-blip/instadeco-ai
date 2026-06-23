@@ -348,6 +348,27 @@ export const INTENT_PAGES: IntentPageData[] = [
       { step: 2, title: 'Explorez les styles', description: 'Moderne, scandinave, bohème, japandi, art déco...' },
       { step: 3, title: 'Trouvez VOTRE style', description: 'Comparez les rendus et trouvez celui qui vous fait vibrer' },
     ],
+    sections: [
+      {
+        title: 'Par où commencer pour décorer son salon',
+        body: [
+          'Partez de l\'usage avant de penser déco. Un salon télé, un coin lecture et une pièce qui reçoit beaucoup n\'appellent pas le même agencement. Définissez d\'abord le point central de la pièce, souvent le canapé face à une source de lumière ou à un mur fort, puis construisez autour.',
+          'Procédez par couches : les grandes pièces de mobilier d\'abord, puis les tapis et l\'éclairage qui délimitent l\'espace, enfin les textiles et objets qui donnent le caractère. C\'est cet ordre qui évite les achats impulsifs qu\'on regrette.',
+        ],
+      },
+      {
+        title: 'Adapter le style à la taille de votre salon',
+        body: [
+          'Dans un petit salon, les teintes claires, un mobilier sur pieds et peu de motifs agrandissent visuellement la pièce. Le scandinave et le minimaliste y sont à l\'aise. Dans un grand volume, vous pouvez oser des couleurs profondes, des matières chaudes et des zones distinctes pour éviter l\'effet hall vide.',
+        ],
+      },
+      {
+        title: 'Visualisez sur votre vrai salon avant d\'acheter',
+        body: [
+          'Le piège classique est de tomber amoureux d\'un style en photo, puis de découvrir qu\'il ne va pas chez soi. Tester un style directement sur la photo de votre salon lève le doute en quelques secondes, avant la moindre dépense, et vous aide à comparer plusieurs ambiances côte à côte.',
+        ],
+      },
+    ],
     faq: [
       { question: 'Quel style de décoration pour un salon moderne ?', answer: 'Le style moderne mise sur les lignes épurées, les couleurs neutres et les matériaux nobles. Le scandinave apporte chaleur et luminosité. Le japandi combine le meilleur des deux mondes.' },
       { question: 'Comment décorer un petit salon ?', answer: 'Privilégiez le scandinave ou le minimaliste : couleurs claires pour agrandir visuellement, meubles fonctionnels, pas de surcharge. Testez avec InstaDeco pour valider !' },

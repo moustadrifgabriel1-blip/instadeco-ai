@@ -48,6 +48,7 @@ const SOLUTION_LINKS: { href: string; key: string }[] = [
   { href: '/solution/simulateur-decoration-interieur', key: 'solSimulator' },
   { href: '/solution/logiciel-home-staging', key: 'solSoftware' },
   { href: '/solution/avant-apres-decoration', key: 'solAvantApres' },
+  { href: '/solution/home-staging-virtuel-agents-immobiliers', key: 'solAgentsImmo' },
 ];
 
 const LEGAL_LINKS: { href: string; key: string }[] = [
