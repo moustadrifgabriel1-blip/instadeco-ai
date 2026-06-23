@@ -39,8 +39,7 @@ export function generateOrganizationSchema() {
     sameAs: [
       'https://www.instagram.com/instadecoai',
       'https://www.facebook.com/people/InstaDeco-AI/61588194177866/',
-      `https://twitter.com/${SEO_CONFIG.twitterHandle.replace('@', '')}`,
-      'https://pinterest.com/instadeco_ai',
+      'https://www.pinterest.com/InstadecoApp/',
     ],
     contactPoint: {
       '@type': 'ContactPoint',
