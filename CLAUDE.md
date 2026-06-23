@@ -106,6 +106,15 @@ Principe directeur : si une tactique cherche à « tromper » Google plutôt qu'
 
 ## Migrations / actions en attente
 
+### Session 23/06/2026 (déployée sur main) — SEO suite (maillage, enrichissement, canonical)
+- ✅ **PR6 maillage** : les articles blog tagués « home staging » routent leur CTA vers `/pro` (équité + funnel agents immo), via `BlogCtaBanner` (`89cd549`). Mesure : les money pages étaient déjà liées (Header/Footer), pas orphelines ; le seul trou était blog→/pro.
+- ✅ **Délai 30s propagé** sur tout le domaine (60 occurrences fr/en/de, `1e1ccdc`) : résout la mémoire `delai-generation-incoherent`. Les commentaires de timeout code NON touchés.
+- ✅ **Enrichissement contenu** : nouveau champ optionnel `sections` (long-forme) sur `IntentPageData`, rendu dans le template `/solution` (entre étapes et CTA). `/solution/logiciel-home-staging` enrichie (~300→~750 mots, 4 sections + 2 FAQ citables, `3c38c7b`) et `decoration-salon` (3 sections, `8912e1d`). **Mécanisme réutilisable** sur les autres pages indexées.
+- ✅ **Fix duplicate canonical (mesuré URL Inspection)** : `/solution/avant-apres-decoration` était « Duplicate, Google chose different canonical » car Google indexait `/solution/x` (SANS `/fr`). Cause : le middleware next-intl ne fait qu'un **307 temporaire** sur les URLs sans locale. Fix : **redirects 301 PERMANENTS** dans `next.config.js` pour `/solution`, `/architecte-interieur`, `/amenager`, `/deco`, `/style`, `/piece` → `/fr` (`3f0bc98`). Vérifié : les redirects next.config priment sur le middleware (`/blog` renvoie 308). Corrige + prévient le même duplicate partout.
+- ✅ **Money page agents immo** : `/solution/home-staging-virtuel-agents-immobiliers` était « inconnue de Google » et liée nulle part. Ajoutée au **Footer** (+ i18n fr/en/de) pour la découverte (`8912e1d`).
+- 📊 **Mesures clés** : parmi les 9 pages `/solution`, seules **logiciel-home-staging + decoration-salon** proprement indexées ; les autres + `/pro` = « inconnu/alternate ». Crawl rare (site jeune). `/pro` indexation demandée manuellement (toi).
+- ⏳ **Restant (non-code surtout)** : Request Indexing manuel sur les money pages inconnues ; **autorité/backlinks** (vrai frein) ; cluster contenu agents immo ; CWV (clé PageSpeed) ; re-mesure J+30 (~19/07). NE PLUS churner les titres.
+
 ### Session 22/06/2026 (déployée sur main) — AUDIT SEO (cadre v2, données GSC réelles)
 - ✅ **Accès GSC live activé** depuis le Mac via les ADC gcloud de l'user (scope `webmasters.readonly` ajouté par `gcloud auth application-default login`). Voit `sc-domain:instadeco.app` ET `sc-domain:wefamapp.ch`. Procédure (venv + libs Google) dans la mémoire `gsc-live-access`. Le compte de service du VPS reste la source des crons ; en local on passe par les ADC.
 - 📊 **Baseline GSC mesurée (28 j, fin 19/06)** : 7 clics / 305 impr / CTR 2,3 % / pos 18,5. Sitemap = 233 URLs (dont 158 programmatiques : blog 83, amenager 56, deco 19). Re-mesure prévue J+30, NE PAS retoucher les titres entre-temps (Google a besoin de stabilité).
