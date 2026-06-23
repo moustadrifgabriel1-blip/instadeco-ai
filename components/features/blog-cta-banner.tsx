@@ -10,7 +10,8 @@ interface BlogCtaBannerProps {
 }
 
 // Mapping des tags vers des CTA contextuels
-const TAG_CTA_MAP: Record<string, { title: string; description: string; style?: string }> = {
+type CtaEntry = { title: string; description: string; style?: string; href?: string; cta?: string };
+const TAG_CTA_MAP: Record<string, CtaEntry> = {
   'salon': {
     title: 'Transformez votre salon avec l\'IA',
     description: 'Uploadez une photo de votre salon et découvrez-le transformé en 30 secondes.',
@@ -72,8 +73,10 @@ const TAG_CTA_MAP: Record<string, { title: string; description: string; style?: 
     style: 'art-deco',
   },
   'home staging': {
-    title: 'Home staging virtuel par IA',
-    description: 'Valorisez votre bien immobilier avec notre IA de home staging.',
+    title: 'Home staging virtuel pour vendre plus vite',
+    description: 'Meublez et décorez une pièce vide à partir d\'une photo. L\'offre Pro est pensée pour les agents immobiliers et les home stagers.',
+    href: '/pro',
+    cta: 'Découvrir l\'offre Pro',
   },
   'rénovation': {
     title: 'Visualisez avant de rénover',
@@ -98,7 +101,7 @@ const TAG_CTA_MAP: Record<string, { title: string; description: string; style?: 
 };
 
 // CTA par défaut
-const DEFAULT_CTA = {
+const DEFAULT_CTA: CtaEntry = {
   title: 'Testez ces idées sur vos propres photos',
   description: 'Uploadez une photo de votre pièce et découvrez-la transformée par l\'IA en 30 secondes.',
 };
@@ -118,9 +121,16 @@ function findBestCta(tags: string[]) {
 
 export function BlogCtaBanner({ tags, variant = 'inline' }: BlogCtaBannerProps) {
   const cta = findBestCta(tags);
-  const href = cta && 'style' in cta && cta.style 
-    ? `/essai?style=${cta.style}` 
+  // Les articles à intention immobilière (tag « home staging ») routent vers la money
+  // page Pro : équité de lien interne vers /pro et funnel agents immo. Le reste garde
+  // l'essai gratuit grand public.
+  const href = cta.href
+    ? cta.href
+    : 'style' in cta && cta.style
+    ? `/essai?style=${cta.style}`
     : '/essai';
+  const buttonLabel = cta.cta ?? 'Essayer gratuitement';
+  const isMoneyCta = Boolean(cta.href);
 
   if (variant === 'sticky') {
     return (
@@ -137,7 +147,7 @@ export function BlogCtaBanner({ tags, variant = 'inline' }: BlogCtaBannerProps) 
           </div>
           <Link href={href}>
             <Button size="sm" className="rounded-full px-6 whitespace-nowrap shadow-md shadow-primary/20">
-              Essayer gratuitement
+              {buttonLabel}
               <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
             </Button>
           </Link>
@@ -178,7 +188,7 @@ export function BlogCtaBanner({ tags, variant = 'inline' }: BlogCtaBannerProps) 
       </div>
       
       <p className="relative z-10 mt-4 text-xs text-muted-foreground/80 text-center sm:text-left inline-flex items-center gap-1.5">
-        <Sparkles className="w-3.5 h-3.5 shrink-0" />Gratuit • Sans inscription • Résultat en 30 secondes
+        <Sparkles className="w-3.5 h-3.5 shrink-0" />{isMoneyCta ? 'Offre Pro • Essai gratuit • Sans engagement' : 'Gratuit • Sans inscription • Résultat en 30 secondes'}
       </p>
     </div>
   );
