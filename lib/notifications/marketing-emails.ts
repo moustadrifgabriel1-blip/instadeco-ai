@@ -462,3 +462,51 @@ export async function sendSubscriptionConfirmationEmail(
     return { success: false, error: err instanceof Error ? err.message : 'Unknown error' };
   }
 }
+
+// ============================================
+// 6. RELANCE PAIEMENT ÉCHOUÉ (dunning)
+// ============================================
+function buildPaymentFailedEmail(planName: string): string {
+  return emailWrapper(`
+    <h1 style="font-family:${SERIF}; color:${IVORY}; font-size:26px; line-height:1.25; margin:0 0 16px; text-align:center; font-weight:normal;">
+      Un souci avec votre paiement.
+    </h1>
+    <p style="color:${MIST}; line-height:1.7; font-size:15px; margin:0 0 26px; text-align:center;">
+      Le renouvellement de votre abonnement <strong style="color:${GOLD};">${planName}</strong> n'a pas pu
+      être prélevé. Pour ne pas perdre l'accès illimité, mettez à jour votre moyen de paiement.
+    </p>
+    <div style="text-align:center; margin:26px 0;">
+      ${primaryButton('https://instadeco.app/dashboard', 'Mettre à jour ma carte')}
+    </div>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${SURFACE}; border:1px solid ${LINE}; border-radius:12px; padding:18px; margin:26px 0 0; text-align:center;">
+      <tr><td>
+        <p style="margin:0; color:${MIST}; font-size:14px; line-height:1.6;">
+          Pas d'inquiétude : nous retentons le prélèvement automatiquement les jours suivants.
+          Votre abonnement reprend dès que le paiement passe.
+        </p>
+      </td></tr>
+    </table>
+  `, `Paiement de votre abonnement ${planName} en échec, mettez à jour votre carte.`);
+}
+
+/** Email de relance après un échec de prélèvement (dunning). */
+export async function sendPaymentFailedEmail(
+  email: string,
+  planName: string,
+): Promise<{ success: boolean; error?: string }> {
+  const resend = getResend();
+  if (!resend) return { success: false, error: 'RESEND_API_KEY not configured' };
+  try {
+    const { error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: [email],
+      subject: `Action requise : le paiement de votre abonnement ${planName} a échoué`,
+      html: buildPaymentFailedEmail(planName),
+    });
+    if (error) return { success: false, error: error.message };
+    console.log(`[Dunning Email] Relance envoyée à ${email}`);
+    return { success: true };
+  } catch (err) {
+    return { success: false, error: err instanceof Error ? err.message : 'Unknown error' };
+  }
+}

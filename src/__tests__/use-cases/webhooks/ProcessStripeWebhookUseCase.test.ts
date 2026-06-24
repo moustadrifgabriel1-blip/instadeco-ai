@@ -301,6 +301,17 @@ describe('ProcessStripeWebhookUseCase — abonnements', () => {
     eventId: 'evt_del', type: 'customer.subscription.deleted', sessionId: '', customerId: 'cus_pro',
     customerEmail: '', amountTotal: 0, metadata: {}, subscriptionId: 'sub_pro_1',
   };
+  const INVOICE_FAILED_PRO = {
+    eventId: 'evt_inv_failed', type: 'invoice.payment_failed', sessionId: '', customerId: 'cus_pro',
+    customerEmail: 'agent@x.com', amountTotal: 4900, metadata: {}, subscriptionId: 'sub_pro_1',
+  };
+  const SUB_UPDATED_PASTDUE = {
+    eventId: 'evt_upd_pastdue', type: 'customer.subscription.updated', sessionId: '', customerId: 'cus_pro',
+    customerEmail: '', amountTotal: 0, metadata: {}, subscriptionId: 'sub_pro_1',
+    subscriptionStatus: 'past_due', periodEnd: 1790000000,
+  };
+  const SUB_UPDATED_ACTIVE = { ...SUB_UPDATED_PASTDUE, eventId: 'evt_upd_active', subscriptionStatus: 'active' };
+  const SUB_UPDATED_INCOMPLETE = { ...SUB_UPDATED_PASTDUE, eventId: 'evt_upd_incomplete', subscriptionStatus: 'incomplete' };
 
   it('active un abonnement Pro illimité SANS créditer', async () => {
     const userRepo = createMockUserRepository();
@@ -383,5 +394,55 @@ describe('ProcessStripeWebhookUseCase — abonnements', () => {
     const r = await make(SUB_PRO, undefined).execute({ payload: '{}', signature: 's' });
     expect(r.success).toBe(false);
     expect(mockProcessedEventRepo.unmarkProcessed).toHaveBeenCalledWith('evt_sub_pro');
+  });
+
+  it('invoice.payment_failed → past_due + email de relance', async () => {
+    const userRepo = createMockUserRepository({
+      findByStripeSubscriptionId: vi.fn().mockResolvedValue(success(makeUser({ id: 'user-pro', email: 'agent@x.com', proPlan: 'pro', proStatus: 'active', stripeSubscriptionId: 'sub_pro_1' }))),
+    });
+    const r = await make(INVOICE_FAILED_PRO, userRepo).execute({ payload: '{}', signature: 's' });
+    expect(r.success).toBe(true);
+    if (r.success) {
+      expect(r.data.action).toBe('subscription_past_due');
+      expect(r.data.confirmationEmail).toEqual(expect.objectContaining({ kind: 'payment_failed', to: 'agent@x.com' }));
+    }
+    expect(userRepo.update).toHaveBeenCalledWith('user-pro', { proStatus: 'past_due' });
+    expect(mockCreditRepo.addCredits).not.toHaveBeenCalled();
+  });
+
+  it('invoice.payment_failed sans profil mappé → unmapped (aucune maj)', async () => {
+    const userRepo = createMockUserRepository({ findByStripeSubscriptionId: vi.fn().mockResolvedValue(success(null)) });
+    const r = await make(INVOICE_FAILED_PRO, userRepo).execute({ payload: '{}', signature: 's' });
+    expect(r.success).toBe(true);
+    if (r.success) expect(r.data.action).toBe('unmapped');
+    expect(userRepo.update).not.toHaveBeenCalled();
+  });
+
+  it('customer.subscription.updated (past_due) resynchronise pro_status', async () => {
+    const userRepo = createMockUserRepository({
+      findByStripeSubscriptionId: vi.fn().mockResolvedValue(success(makeUser({ id: 'user-pro', proPlan: 'pro', proStatus: 'active', stripeSubscriptionId: 'sub_pro_1' }))),
+    });
+    const r = await make(SUB_UPDATED_PASTDUE, userRepo).execute({ payload: '{}', signature: 's' });
+    expect(r.success).toBe(true);
+    if (r.success) expect(r.data.action).toBe('subscription_status_past_due');
+    expect(userRepo.update).toHaveBeenCalledWith('user-pro', expect.objectContaining({ proStatus: 'past_due' }));
+  });
+
+  it('customer.subscription.updated (active) repasse en actif (reprise après impayé)', async () => {
+    const userRepo = createMockUserRepository({
+      findByStripeSubscriptionId: vi.fn().mockResolvedValue(success(makeUser({ id: 'user-pro', proPlan: 'pro', proStatus: 'past_due', stripeSubscriptionId: 'sub_pro_1' }))),
+    });
+    const r = await make(SUB_UPDATED_ACTIVE, userRepo).execute({ payload: '{}', signature: 's' });
+    expect(r.success).toBe(true);
+    if (r.success) expect(r.data.action).toBe('subscription_status_active');
+    expect(userRepo.update).toHaveBeenCalledWith('user-pro', expect.objectContaining({ proStatus: 'active' }));
+  });
+
+  it('customer.subscription.updated (statut transitoire) est ignoré sans toucher au profil', async () => {
+    const userRepo = createMockUserRepository();
+    const r = await make(SUB_UPDATED_INCOMPLETE, userRepo).execute({ payload: '{}', signature: 's' });
+    expect(r.success).toBe(true);
+    if (r.success) expect(r.data.action).toBe('status_ignored_incomplete');
+    expect(userRepo.update).not.toHaveBeenCalled();
   });
 });

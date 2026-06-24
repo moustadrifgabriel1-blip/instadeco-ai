@@ -56,6 +56,12 @@ export interface PaymentWebhookEvent {
   billingReason?: string;
   /** Fin de la période courante (epoch s) — pour pro_renews_at. */
   periodEnd?: number;
+  /**
+   * customer.subscription.updated : statut Stripe de l'abonnement
+   * ('active' | 'past_due' | 'unpaid' | 'canceled' | 'trialing' | ...).
+   * Sert à resynchroniser pro_status (dunning + changements d'état).
+   */
+  subscriptionStatus?: string;
 }
 
 /**

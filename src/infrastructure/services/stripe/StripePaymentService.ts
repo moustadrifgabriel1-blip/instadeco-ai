@@ -228,6 +228,34 @@ export class StripePaymentService implements IPaymentService {
         });
       }
 
+      // Paiement de renouvellement échoué (dunning) : Stripe relance ensuite la carte.
+      if (event.type === 'invoice.payment_failed') {
+        const invoice = event.data.object as Stripe.Invoice;
+        const sub = (invoice as unknown as { subscription?: string | { id: string } }).subscription;
+        const subscriptionId = typeof sub === 'string' ? sub : sub?.id;
+        return success({
+          ...base,
+          customerId: (invoice.customer as string) || '',
+          customerEmail: invoice.customer_email || '',
+          amountTotal: invoice.amount_due || 0,
+          metadata: (invoice.metadata || {}) as Record<string, string>,
+          subscriptionId: subscriptionId || undefined,
+        });
+      }
+
+      // Changement d'état d'abonnement (resync) : active / past_due / unpaid / canceled...
+      if (event.type === 'customer.subscription.updated') {
+        const sub = event.data.object as Stripe.Subscription;
+        return success({
+          ...base,
+          customerId: (sub.customer as string) || '',
+          metadata: (sub.metadata || {}) as Record<string, string>,
+          subscriptionId: sub.id,
+          subscriptionStatus: sub.status,
+          periodEnd: (sub as unknown as { current_period_end?: number }).current_period_end,
+        });
+      }
+
       // Autres events : ignorés en amont (use-case), event minimal pour l'idempotence.
       return success(base);
 

@@ -33,7 +33,7 @@ export interface ProcessWebhookOutput {
    */
   confirmationEmail?: {
     to: string;
-    kind: 'credits' | 'subscription';
+    kind: 'credits' | 'subscription' | 'payment_failed';
     credits?: number;
     planName?: string;
   };
@@ -113,6 +113,12 @@ export class ProcessStripeWebhookUseCase {
 
       case 'invoice.paid':
         return this.withIdempotency(event, () => this.handleInvoicePaid(event));
+
+      case 'invoice.payment_failed':
+        return this.withIdempotency(event, () => this.handleInvoicePaymentFailed(event));
+
+      case 'customer.subscription.updated':
+        return this.withIdempotency(event, () => this.handleSubscriptionUpdated(event));
 
       case 'customer.subscription.deleted':
         return this.withIdempotency(event, () => this.handleSubscriptionDeleted(event));
@@ -446,6 +452,116 @@ export class ProcessStripeWebhookUseCase {
 
     this.logger.info('Abonnement renouvelé', { userId: user.id, plan: user.proPlan, reason: event.billingReason });
     return success({ processed: true, eventType: event.type, action: `subscription_renewed_${user.proPlan}` });
+  }
+
+  /**
+   * Paiement de renouvellement échoué (invoice.payment_failed).
+   * On passe l'abonné en `past_due` (coupe l'illimité, cf. isUnlimitedPro) et on
+   * l'invite à mettre à jour sa carte. Stripe continue ses relances automatiques ;
+   * si tout échoue, customer.subscription.deleted finira par annuler.
+   */
+  private async handleInvoicePaymentFailed(
+    event: PaymentWebhookEvent,
+  ): Promise<Result<ProcessWebhookOutput, DomainError>> {
+    if (!this.userRepo) {
+      return failure(new PaymentError('Service utilisateur indisponible'));
+    }
+    if (!event.subscriptionId) {
+      return success({ processed: false, eventType: event.type, action: 'no_subscription' });
+    }
+
+    const found = await this.userRepo.findByStripeSubscriptionId(event.subscriptionId);
+    if (!found.success) {
+      return failure(new PaymentError('Échec lecture abonnement'));
+    }
+    const user = found.data;
+    if (!user || !user.proPlan) {
+      this.logger.info('invoice.payment_failed sans profil mappé (ignoré)', { subscriptionId: event.subscriptionId });
+      return success({ processed: false, eventType: event.type, action: 'unmapped' });
+    }
+
+    const upd = await this.userRepo.update(user.id, { proStatus: 'past_due' });
+    if (!upd.success) {
+      this.logger.error('Échec passage en past_due', upd.error as Error, { userId: user.id });
+      return failure(new PaymentError('Échec de la mise à jour du statut'));
+    }
+
+    // Agence : dégrader l'organisation (les membres perdent l'illimité pendant l'impayé).
+    if (user.proPlan === 'agence' && this.orgRepo) {
+      const org = await this.orgRepo.findBySubscriptionId(event.subscriptionId);
+      if (org.success && org.data) {
+        await this.orgRepo.update(org.data.id, { status: 'past_due' });
+      }
+    }
+
+    const to = (event.customerEmail || user.email || '').trim();
+    this.logger.warn('Abonnement en impayé (past_due)', { userId: user.id, plan: user.proPlan });
+    return success({
+      processed: true,
+      eventType: event.type,
+      action: 'subscription_past_due',
+      confirmationEmail: to
+        ? { to, kind: 'payment_failed', planName: PLAN_LABEL[user.proPlan] ?? user.proPlan }
+        : undefined,
+    });
+  }
+
+  /**
+   * Changement d'état d'abonnement (customer.subscription.updated) : resynchronise
+   * `pro_status` depuis le statut Stripe. Filet de sécurité couvrant les transitions
+   * non capturées par les autres events (reprise après impayé, suspension, etc.).
+   */
+  private async handleSubscriptionUpdated(
+    event: PaymentWebhookEvent,
+  ): Promise<Result<ProcessWebhookOutput, DomainError>> {
+    if (!this.userRepo) {
+      return failure(new PaymentError('Service utilisateur indisponible'));
+    }
+    if (!event.subscriptionId) {
+      return success({ processed: false, eventType: event.type, action: 'no_subscription' });
+    }
+
+    // Mapping statut Stripe → statut interne ; null = état transitoire, on ne touche à rien.
+    const s = event.subscriptionStatus;
+    const mapped: 'active' | 'past_due' | 'canceled' | null =
+      s === 'active' || s === 'trialing' ? 'active'
+      : s === 'past_due' || s === 'unpaid' ? 'past_due'
+      : s === 'canceled' ? 'canceled'
+      : null;
+
+    if (!mapped) {
+      return success({ processed: false, eventType: event.type, action: `status_ignored_${s ?? 'unknown'}` });
+    }
+
+    const found = await this.userRepo.findByStripeSubscriptionId(event.subscriptionId);
+    if (!found.success) {
+      return failure(new PaymentError('Échec lecture abonnement'));
+    }
+    const user = found.data;
+    if (!user || !user.proPlan) {
+      return success({ processed: false, eventType: event.type, action: 'unmapped' });
+    }
+
+    const renewsAt = event.periodEnd ? new Date(event.periodEnd * 1000) : undefined;
+    const upd = await this.userRepo.update(user.id, {
+      proStatus: mapped,
+      ...(renewsAt ? { proRenewsAt: renewsAt } : {}),
+    });
+    if (!upd.success) {
+      this.logger.error('Échec resync statut abonnement', upd.error as Error, { userId: user.id });
+      return failure(new PaymentError('Échec de la resynchronisation du statut'));
+    }
+
+    // Agence : refléter le statut sur l'organisation.
+    if (user.proPlan === 'agence' && this.orgRepo) {
+      const org = await this.orgRepo.findBySubscriptionId(event.subscriptionId);
+      if (org.success && org.data) {
+        await this.orgRepo.update(org.data.id, { status: mapped, ...(renewsAt ? { renewsAt } : {}) });
+      }
+    }
+
+    this.logger.info('Statut abonnement resynchronisé', { userId: user.id, plan: user.proPlan, status: mapped });
+    return success({ processed: true, eventType: event.type, action: `subscription_status_${mapped}` });
   }
 
   /** Annulation (customer.subscription.deleted) → statut canceled. */
