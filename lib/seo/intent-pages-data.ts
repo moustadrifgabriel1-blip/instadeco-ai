@@ -424,7 +424,7 @@ export const INTENT_PAGES: IntentPageData[] = [
     metaTitle: 'Avant Après Décoration : transformez vos pièces par IA',
     metaDescription: 'Créez des avant/après impressionnants de décoration intérieure avec l\'IA. Montrez le potentiel de vos pièces en 30 secondes.',
     hero: {
-      headline: 'Avant / Après en 10 Secondes',
+      headline: 'Avant / Après en 30 Secondes',
       subheadline: 'Transformez n\'importe quelle pièce et créez des comparaisons avant/après bluffantes. Idéal pour les pros de l\'immobilier et les passionnés de déco.',
       cta: 'Créer mon avant/après',
       ctaLink: '/generate',

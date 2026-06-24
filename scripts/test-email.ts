@@ -40,7 +40,7 @@ async function main() {
         category: 'presse',
         domain_authority: 70,
         priority: 1,
-        pitch_generated: 'Subject: [Nouveauté] Une IA suisse transforme votre intérieur en 10 secondes\n\nBonjour,\n\nUn salon daté des années 90...',
+        pitch_generated: 'Subject: [Nouveauté] Une IA suisse transforme votre intérieur en 30 secondes\n\nBonjour,\n\nUn salon daté des années 90...',
       },
       {
         site_name: 'Product Hunt',
