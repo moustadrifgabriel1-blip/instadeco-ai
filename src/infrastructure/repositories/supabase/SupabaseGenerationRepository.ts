@@ -281,4 +281,19 @@ export class SupabaseGenerationRepository implements IGenerationRepository {
 
     return success(count ?? 0);
   }
+
+  async countByUserSince(userId: string, sinceIso: string): Promise<Result<number>> {
+    const { count, error } = await this.supabase
+      .from('generations')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .eq('status', 'completed')
+      .gte('created_at', sinceIso);
+
+    if (error) {
+      return failure(new Error(`Failed to count generations since ${sinceIso}: ${error.message}`));
+    }
+
+    return success(count ?? 0);
+  }
 }

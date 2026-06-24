@@ -63,4 +63,10 @@ export interface IGenerationRepository {
    * Compte le nombre de générations d'un utilisateur
    */
   countByUserId(userId: string): Promise<Result<number>>;
+
+  /**
+   * Compte les générations 'completed' d'un utilisateur depuis une date (ISO).
+   * Sert au plafond d'usage équitable (fair-use) de l'abonnement illimité.
+   */
+  countByUserSince(userId: string, sinceIso: string): Promise<Result<number>>;
 }

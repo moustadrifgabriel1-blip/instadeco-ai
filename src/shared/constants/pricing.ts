@@ -47,3 +47,15 @@ export const CREDIT_COSTS = {
  * Crédits offerts à l'inscription
  */
 export const SIGNUP_BONUS_CREDITS = 3;
+
+/**
+ * Plafond d'usage équitable (fair-use) des abonnements illimités (Pro/Agence),
+ * par utilisateur et par période glissante de 30 jours. Volontairement généreux :
+ * un agent immobilier actif n'y arrive pas, mais il borne le COGS et rend le
+ * fair-use des CGV opposable (cf. CGV Art. 4 bis.4). Au-delà, génération bloquée
+ * avec un message invitant à nous contacter (pas un quota commercial affiché).
+ */
+export const FAIR_USE_MONTHLY_CAP = 1000;
+
+/** Fenêtre du plafond fair-use (jours glissants). */
+export const FAIR_USE_WINDOW_DAYS = 30;

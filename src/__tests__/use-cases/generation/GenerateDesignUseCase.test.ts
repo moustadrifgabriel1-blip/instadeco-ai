@@ -10,6 +10,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GenerateDesignUseCase } from '@/src/application/use-cases/generation/GenerateDesignUseCase';
 import { InsufficientCreditsError } from '@/src/domain/errors/InsufficientCreditsError';
 import { ImageGenerationError } from '@/src/domain/errors/ImageGenerationError';
+import { FairUseLimitError } from '@/src/domain/errors/FairUseLimitError';
 import { success, failure } from '@/src/shared/types/Result';
 import {
   createMockCreditRepository,
@@ -269,5 +270,39 @@ describe('GenerateDesignUseCase — abonné illimité (Pro/Agence)', () => {
     const result = await useCase.execute(baseInput);
     expect(result.success).toBe(true);
     expect(creditRepo.deductCredits).toHaveBeenCalled();
+  });
+
+  it('Pro illimité au-delà du plafond fair-use : bloque avec FairUseLimitError (sans appeler l\'IA)', async () => {
+    const userRepo = createMockUserRepository({
+      findById: vi.fn().mockResolvedValue(success(makeUser({ proStatus: 'active', proPlan: 'pro' }))),
+    });
+    const generationRepo = createMockGenerationRepository({
+      countByUserSince: vi.fn().mockResolvedValue(success(1000)),
+    });
+    const imageGenerator = createMockImageGenerator();
+    const useCase = new GenerateDesignUseCase(
+      generationRepo, createMockCreditRepository(), imageGenerator, createMockStorage(), createMockLogger(), userRepo,
+    );
+
+    const result = await useCase.execute(baseInput);
+
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.error).toBeInstanceOf(FairUseLimitError);
+    expect(imageGenerator.generate).not.toHaveBeenCalled();
+  });
+
+  it('Pro illimité + comptage fair-use en échec : fail-open, génère quand même', async () => {
+    const userRepo = createMockUserRepository({
+      findById: vi.fn().mockResolvedValue(success(makeUser({ proStatus: 'active', proPlan: 'pro' }))),
+    });
+    const generationRepo = createMockGenerationRepository({
+      countByUserSince: vi.fn().mockResolvedValue(failure(new Error('db down'))),
+    });
+    const useCase = new GenerateDesignUseCase(
+      generationRepo, createMockCreditRepository(), createMockImageGenerator(), createMockStorage(), createMockLogger(), userRepo,
+    );
+
+    const result = await useCase.execute(baseInput);
+    expect(result.success).toBe(true);
   });
 });

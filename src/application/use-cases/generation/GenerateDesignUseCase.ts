@@ -26,8 +26,9 @@ import { IStorageService } from '@/src/domain/ports/services/IStorageService';
 import { ILoggerService } from '@/src/domain/ports/services/ILoggerService';
 import { InsufficientCreditsError } from '@/src/domain/errors/InsufficientCreditsError';
 import { ImageGenerationError } from '@/src/domain/errors/ImageGenerationError';
+import { FairUseLimitError } from '@/src/domain/errors/FairUseLimitError';
 import { DomainError } from '@/src/domain/errors/DomainError';
-import { CREDIT_COSTS } from '@/src/shared/constants/pricing';
+import { CREDIT_COSTS, FAIR_USE_MONTHLY_CAP, FAIR_USE_WINDOW_DAYS } from '@/src/shared/constants/pricing';
 import { IUserRepository } from '@/src/domain/ports/repositories/IUserRepository';
 import { IOrganizationRepository } from '@/src/domain/ports/repositories/IOrganizationRepository';
 import { isUnlimitedPro } from '@/src/domain/entities/User';
@@ -175,6 +176,23 @@ export class GenerateDesignUseCase {
           userId: input.userId,
           orgId: org.data.id,
         });
+      }
+    }
+
+    // 0bis. Plafond d'usage équitable (fair-use) sur le chemin illimité uniquement.
+    //       Borne le COGS et rend opposable le fair-use des CGV (Art. 4 bis.4).
+    //       Fail-open : si le comptage échoue (incident DB), on NE bloque PAS un
+    //       abonné payant (on ne punit jamais le client pour un souci d'infra).
+    if (!chargesCredits) {
+      const since = new Date(Date.now() - FAIR_USE_WINDOW_DAYS * 24 * 60 * 60 * 1000).toISOString();
+      const used = await this.generationRepo.countByUserSince(input.userId, since);
+      if (used.success && used.data >= FAIR_USE_MONTHLY_CAP) {
+        this.logger.warn('Plafond fair-use atteint', {
+          userId: input.userId,
+          used: used.data,
+          cap: FAIR_USE_MONTHLY_CAP,
+        });
+        return failure(new FairUseLimitError(used.data, FAIR_USE_MONTHLY_CAP));
       }
     }
 
