@@ -40,6 +40,9 @@ const DEMO_GALLERY_USER = 'f88c9b68-eda4-4d67-bfb4-f631d21b37c6';
 const GRAPH_VERSION = 'v21.0'; // aligne sur la route image (validee en prod)
 const GRAPH = `https://graph.facebook.com/${GRAPH_VERSION}`;
 const FFMPEG = process.env.FFMPEG_PATH || 'ffmpeg';
+// Fond musical libre de droits (genere maison, cf. assets/social/social-music.m4a).
+// Override possible via SOCIAL_MUSIC_PATH. Absent => piste silencieuse.
+const MUSIC = process.env.SOCIAL_MUSIC_PATH || path.resolve(process.cwd(), 'assets/social/social-music.m4a');
 const VIDEO_BUCKET = 'social-video';
 const W = 1080;
 const H = 1350; // 4:5
@@ -109,33 +112,41 @@ async function download(url: string, dest: string): Promise<void> {
 // ---------------------------------------------------------------------------
 // Encodage ffmpeg (volet dore -> fallback crossfade)
 // ---------------------------------------------------------------------------
-function filterGraph(transition: 'wiperight' | 'fade'): string {
+function filterGraph(transition: 'wiperight' | 'fade', hasMusic: boolean): string {
   const base =
     `[0:v]scale=${W}:${H}:force_original_aspect_ratio=increase,crop=${W}:${H},setsar=1,fps=30,format=yuv420p[b];` +
     `[1:v]scale=${W}:${H}:force_original_aspect_ratio=increase,crop=${W}:${H},setsar=1,fps=30,format=yuv420p[a];` +
     `[b][a]xfade=transition=${transition}:duration=2:offset=1.5[xf]`;
-  if (transition === 'wiperight') {
-    // Barre doree (#C9A24A) qui suit le front du volet, puis correctif full-range->tv.
-    return (
-      base +
-      `;color=c=0xC9A24A:s=6x${H}:d=6.5[bar];` +
-      `[xf][bar]overlay=x='(t-1.5)/2*${W}-3':y=0:eval=frame:shortest=1,` +
-      `scale=out_range=tv:out_color_matrix=bt709,format=yuv420p[v]`
-    );
-  }
-  return base + `;[xf]scale=out_range=tv:out_color_matrix=bt709,format=yuv420p[v]`;
+  const video =
+    transition === 'wiperight'
+      ? // Barre doree (#C9A24A) qui suit le front du volet, puis correctif full-range->tv.
+        base +
+        `;color=c=0xC9A24A:s=6x${H}:d=6.5[bar];` +
+        `[xf][bar]overlay=x='(t-1.5)/2*${W}-3':y=0:eval=frame:shortest=1,` +
+        `scale=out_range=tv:out_color_matrix=bt709,format=yuv420p[v]`
+      : base + `;[xf]scale=out_range=tv:out_color_matrix=bt709,format=yuv420p[v]`;
+  // Musique : on cale sur 6,5s avec un fondu de sortie propre.
+  const audio = hasMusic
+    ? `;[2:a]atrim=0:6.5,asetpts=PTS-STARTPTS,afade=t=out:st=5.3:d=1.2[aout]`
+    : '';
+  return video + audio;
 }
 
 function runFfmpeg(beforePath: string, afterPath: string, outPath: string, transition: 'wiperight' | 'fade'): Promise<void> {
+  const hasMusic = fs.existsSync(MUSIC);
+  const audioInput = hasMusic
+    ? ['-i', MUSIC]
+    : ['-f', 'lavfi', '-t', '7', '-i', 'anullsrc=channel_layout=stereo:sample_rate=44100'];
+  const audioMap = hasMusic ? '[aout]' : '2:a';
   const ff = [
     '-y', '-hide_banner', '-loglevel', 'error',
     '-loop', '1', '-t', '3.5', '-i', beforePath,
     '-loop', '1', '-t', '5.0', '-i', afterPath,
-    '-f', 'lavfi', '-t', '7', '-i', 'anullsrc=channel_layout=stereo:sample_rate=44100',
-    '-filter_complex', filterGraph(transition),
-    '-map', '[v]', '-map', '2:a', '-t', '6.5',
+    ...audioInput,
+    '-filter_complex', filterGraph(transition, hasMusic),
+    '-map', '[v]', '-map', audioMap, '-t', '6.5',
     '-c:v', 'libx264', '-profile:v', 'high', '-level', '4.0', '-pix_fmt', 'yuv420p', '-color_range', 'tv',
-    '-c:a', 'aac', '-b:a', '128k', '-ac', '2', '-ar', '44100', '-movflags', '+faststart',
+    '-c:a', 'aac', '-b:a', '160k', '-ac', '2', '-ar', '44100', '-movflags', '+faststart',
     outPath,
   ];
   return new Promise((resolve, reject) => {
