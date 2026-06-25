@@ -12,5 +12,7 @@
 0 9   * * *     /opt/instadeco/run-cron.sh check-milestones
 0 9   * * *     /opt/instadeco/run-cron.sh blog-monitor
 0 10  * * *     /opt/instadeco/run-cron.sh email-nurturing
-0 14  * * 1,3,5 /opt/instadeco/run-cron.sh pinterest-post
 0 2   * * *     /opt/instadeco/run-cron.sh pseo-publish
+# Reseaux sociaux (scripts dedies, contenu avant/apres). Horaires distincts, tournus d'heure.
+0 17  * * *     /opt/instadeco/instadeco-ai/scripts/cron/run-social-video.sh 36600
+7 10  * * *     /opt/instadeco/instadeco-ai/scripts/cron/run-social-pinterest.sh 28800

@@ -29,6 +29,17 @@ export type CaptionInput = {
   room_type_slug: string | null;
 };
 
+/**
+ * Titre court pour un pin Pinterest (limite 100 caracteres). Zero emoji, zero tiret.
+ */
+export function buildPinterestTitle(gen: CaptionInput): string {
+  const style = (gen.style_slug && STYLE_LABELS[gen.style_slug]) || gen.style_slug || '';
+  const room = (gen.room_type_slug && ROOM_LABELS[gen.room_type_slug]) || gen.room_type_slug || 'pièce';
+  const styleBit = style ? ` en style ${style}` : '';
+  const title = `Home staging virtuel pour ${room}${styleBit}`;
+  return title.length > 100 ? title.slice(0, 99).trimEnd() : title;
+}
+
 export function buildCaption(gen: CaptionInput): string {
   const style = (gen.style_slug && STYLE_LABELS[gen.style_slug]) || gen.style_slug || '';
   const room = (gen.room_type_slug && ROOM_LABELS[gen.room_type_slug]) || gen.room_type_slug || 'pièce';
