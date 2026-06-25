@@ -28,7 +28,13 @@ import { spawn } from 'child_process';
 import { createClient } from '@supabase/supabase-js';
 import { buildCaption } from '../lib/social/caption';
 
+// Local : .env.local du repo. VPS : fichier d'env dedie (root-only) via SOCIAL_ENV_FILE,
+// charge par dotenv (parseur robuste, contrairement au sourcing shell qui casse sur les
+// caracteres speciaux des tokens).
 dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
+if (process.env.SOCIAL_ENV_FILE) {
+  dotenv.config({ path: process.env.SOCIAL_ENV_FILE, override: true });
+}
 
 const DEMO_GALLERY_USER = 'f88c9b68-eda4-4d67-bfb4-f631d21b37c6';
 const GRAPH_VERSION = 'v21.0'; // aligne sur la route image (validee en prod)

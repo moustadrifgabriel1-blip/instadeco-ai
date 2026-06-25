@@ -24,7 +24,7 @@ DELAY="$(shuf -i 0-"${MAX_DELAY}" -n 1 2>/dev/null || echo 0)"
 echo "$(date -u +%FT%TZ) [social-video] tournus : sleep ${DELAY}s avant publication"
 sleep "${DELAY}"
 
-set -a; [ -f "${ENV_FILE}" ] && . "${ENV_FILE}"; set +a
 cd "${APP_DIR}" || { echo "APP_DIR introuvable: ${APP_DIR}"; exit 1; }
 echo "$(date -u +%FT%TZ) [social-video] publication"
-FFMPEG_PATH="${FFMPEG_BIN}" exec node_modules/.bin/tsx scripts/social-video-publish.ts
+# Le script charge les secrets via dotenv (SOCIAL_ENV_FILE), pas par sourcing shell.
+SOCIAL_ENV_FILE="${ENV_FILE}" FFMPEG_PATH="${FFMPEG_BIN}" exec node_modules/.bin/tsx scripts/social-video-publish.ts
