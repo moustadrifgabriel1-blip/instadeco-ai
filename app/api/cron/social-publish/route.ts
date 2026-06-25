@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/admin-client';
+import { composeBeforeAfter } from './compose';
+import { buildCaption } from '@/lib/social/caption';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,42 +27,35 @@ export const dynamic = 'force-dynamic';
 const DEMO_GALLERY_USER = 'f88c9b68-eda4-4d67-bfb4-f631d21b37c6';
 const GRAPH = 'https://graph.facebook.com/v21.0';
 
-const STYLE_LABELS: Record<string, string> = {
-  moderne: 'moderne', minimaliste: 'minimaliste', boheme: 'bohème',
-  industriel: 'industriel', classique: 'classique', japandi: 'japandi',
-  midcentury: 'mid-century', coastal: 'coastal', scandinave: 'scandinave',
-  artdeco: 'art déco', luxe: 'luxe', haussmannien: 'haussmannien', contemporain: 'contemporain',
-};
-const ROOM_LABELS: Record<string, string> = {
-  salon: 'salon', chambre: 'chambre', cuisine: 'cuisine',
-  'salle-de-bain': 'salle de bain', bureau: 'bureau',
-  'salle-a-manger': 'salle à manger', entree: 'entrée', terrasse: 'terrasse',
-};
-const HASHTAGS = [
-  '#homestaging', '#homestagingvirtuel', '#immobilier', '#decoration',
-  '#decorationinterieur', '#avantapres', '#agentimmobilier', '#instadeco',
-];
-
 type GenRow = {
   id: string;
   style_slug: string | null;
   room_type_slug: string | null;
+  input_image_url: string | null;
   output_image_url: string | null;
 };
 
-function buildCaption(gen: GenRow): string {
-  const style = (gen.style_slug && STYLE_LABELS[gen.style_slug]) || gen.style_slug || '';
-  const room = (gen.room_type_slug && ROOM_LABELS[gen.room_type_slug]) || gen.room_type_slug || 'pièce';
-  const styleBit = style ? ` en style ${style}` : '';
-  return [
-    `Home staging virtuel${styleBit} pour ${room}.`,
-    '',
-    'Une photo, un style, un rendu prêt pour votre annonce en 30 secondes. Le home staging virtuel par IA, pensé pour les agents immobiliers.',
-    '',
-    'Essai gratuit sur instadeco.app',
-    '',
-    HASHTAGS.join(' '),
-  ].join('\n');
+/**
+ * Construit l'image a publier : un visuel avant/apres (piece vide + rendu) si l'image
+ * source est dispo, sinon le rendu seul. Le composite est uploade dans le bucket public
+ * `output-images` (dossier social/) pour que Meta puisse le recuperer par URL.
+ * Toute erreur de composition/upload retombe sur le rendu seul (jamais de post bloque).
+ */
+async function buildShareImageUrl(gen: GenRow): Promise<string> {
+  const fallback = gen.output_image_url as string;
+  if (!gen.input_image_url || !gen.output_image_url) return fallback;
+  try {
+    const composite = await composeBeforeAfter(gen.input_image_url, gen.output_image_url);
+    const path = `social/${gen.id}.jpg`;
+    const { error } = await supabaseAdmin.storage
+      .from('output-images')
+      .upload(path, composite, { contentType: 'image/jpeg', upsert: true });
+    if (error) throw new Error(error.message);
+    return supabaseAdmin.storage.from('output-images').getPublicUrl(path).data.publicUrl;
+  } catch (e) {
+    console.error('[social-publish] composition avant/apres indisponible, fallback rendu seul:', e);
+    return fallback;
+  }
 }
 
 async function postForm(url: string, params: Record<string, string>) {
@@ -120,7 +115,7 @@ export async function GET(req: Request) {
     // Candidats : rendus démo publics complétés. On exclut ceux déjà publiés sur Instagram.
     const { data: candidates, error } = await supabaseAdmin
       .from('generations')
-      .select('id, style_slug, room_type_slug, output_image_url')
+      .select('id, style_slug, room_type_slug, input_image_url, output_image_url')
       .eq('status', 'completed')
       .eq('user_id', DEMO_GALLERY_USER)
       .not('output_image_url', 'is', null)
@@ -154,12 +149,13 @@ export async function GET(req: Request) {
 
     for (const gen of toPost) {
       const caption = buildCaption(gen);
-      const imageUrl = gen.output_image_url as string;
 
       if (!configured) {
         results.push({ generationId: gen.id, dryRun: true, caption });
         continue;
       }
+
+      const imageUrl = await buildShareImageUrl(gen);
 
       const ig = await publishInstagram(igUserId as string, token as string, imageUrl, caption);
       const fb = await publishFacebook(fbPageId as string, token as string, imageUrl, caption);
