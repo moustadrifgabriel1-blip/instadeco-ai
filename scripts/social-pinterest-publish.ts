@@ -127,19 +127,12 @@ async function getValidAccessToken(): Promise<string> {
 // ---------------------------------------------------------------------------
 // Appels API Pinterest (Bearer)
 // ---------------------------------------------------------------------------
-async function pinGet(token: string, pathname: string): Promise<{ ok: boolean; status: number; json: any }> {
+// GET si pas de body, POST JSON sinon.
+async function pinFetch(token: string, pathname: string, body?: unknown): Promise<{ ok: boolean; status: number; json: any }> {
   const res = await fetch(`${API}${pathname}`, {
-    headers: { Authorization: `Bearer ${token}` },
-    signal: AbortSignal.timeout(30_000),
-  });
-  return { ok: res.ok, status: res.status, json: await res.json().catch(() => ({})) };
-}
-
-async function pinPost(token: string, pathname: string, body: unknown): Promise<{ ok: boolean; status: number; json: any }> {
-  const res = await fetch(`${API}${pathname}`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
+    method: body ? 'POST' : 'GET',
+    headers: { Authorization: `Bearer ${token}`, ...(body ? { 'Content-Type': 'application/json' } : {}) },
+    body: body ? JSON.stringify(body) : undefined,
     signal: AbortSignal.timeout(30_000),
   });
   return { ok: res.ok, status: res.status, json: await res.json().catch(() => ({})) };
@@ -150,12 +143,12 @@ async function pinPost(token: string, pathname: string, body: unknown): Promise<
 // ---------------------------------------------------------------------------
 async function resolveBoardId(token: string): Promise<string> {
   if (process.env.PINTEREST_BOARD_ID) return process.env.PINTEREST_BOARD_ID;
-  const list = await pinGet(token, '/boards?page_size=25');
+  const list = await pinFetch(token, '/boards?page_size=25');
   if (!list.ok) throw new Error(`liste boards ${list.status}: ${JSON.stringify(list.json)}`);
   const wanted = 'Home staging virtuel';
   const existing = (list.json.items || []).find((b: { name?: string }) => b.name === wanted);
   if (existing?.id) return existing.id as string;
-  const created = await pinPost(token, '/boards', { name: wanted, privacy: 'PUBLIC' });
+  const created = await pinFetch(token, '/boards', { name: wanted, privacy: 'PUBLIC' });
   if (!created.ok || !created.json.id) throw new Error(`creation board ${created.status}: ${JSON.stringify(created.json)}`);
   return created.json.id as string;
 }
@@ -217,7 +210,7 @@ async function finalize(genId: string, platform: string, ok: boolean, externalId
 async function publishImagePin(token: string, boardId: string, gen: GenRow, imageUrl: string) {
   const room = gen.room_type_slug || 'piece';
   const style = gen.style_slug || '';
-  const res = await pinPost(token, '/pins', {
+  const res = await pinFetch(token, '/pins', {
     board_id: boardId,
     media_source: { source_type: 'image_url', url: imageUrl },
     title: buildPinterestTitle(gen),
