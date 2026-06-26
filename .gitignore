@@ -57,3 +57,8 @@ next-env.d.ts
 
 # Config locale du serveur de preview (valeurs d'env factices pour la QA visuelle).
 .claude/launch.json
+
+# Kit outbound (assets avant/apres + listes prospects + emails = PII).
+# Repo PUBLIC -> jamais versionner. Restent en local uniquement.
+/outbound-kit/
+/scripts/data/prospects*.json
