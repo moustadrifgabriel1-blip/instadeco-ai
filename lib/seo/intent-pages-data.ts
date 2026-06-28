@@ -505,6 +505,35 @@ export const INTENT_PAGES: IntentPageData[] = [
       { step: 2, title: 'Choisissez la mise en scène', description: 'Sélectionnez le style et le mobilier adaptés à votre cible.' },
       { step: 3, title: "Publiez l'annonce", description: 'Récupérez le rendu en haute définition et intégrez-le à votre annonce.' },
     ],
+    sections: [
+      {
+        title: 'Un outil pour tout votre portefeuille, pas seulement les biens de prestige',
+        body: [
+          "La plupart des solutions de mise en scène visent les mandats haut de gamme, ceux qui justifient un gros budget. InstaDeco prend le problème par l'autre bout. Comme un rendu coûte quelques euros et revient en quelques secondes, vous habillez chaque bien, du studio à rafraîchir au quatre pièces vide, sans choisir entre les annonces qui méritent un effort et les autres.",
+          "Vos négociateurs s'en servent seuls, sans passer par un prestataire. Une photo prise pendant l'estimation, un style choisi en deux clics, et l'annonce part avec des visuels qui donnent envie. Le mandataire indépendant dispose alors du même atout qu'une grande agence équipée d'un studio.",
+        ],
+      },
+      {
+        title: "Tout se joue sur la première photo de l'annonce",
+        body: [
+          "Un acheteur trie ses recherches en faisant défiler des miniatures. Une pièce vide paraît plus petite et plus froide, et se fait doubler par l'annonce voisine. Une pièce habillée raconte une vie possible, déclenche le clic, puis la demande de visite. C'est là, sur le portail, que le home staging virtuel agit, bien avant la rencontre physique.",
+          "Vous gardez la main sur le message. Selon le quartier et la cible, vous orientez le rendu vers une ambiance familiale, une déco épurée ou un esprit résidence secondaire, pour que l'acheteur visé se projette en premier.",
+        ],
+      },
+      {
+        title: 'Depuis le terrain, entre deux visites',
+        body: [
+          "InstaDeco fonctionne dans le navigateur, sur mobile comme sur ordinateur, sans rien installer. Vous préparez les visuels d'un bien depuis votre téléphone, juste après l'estimation, pendant que la pièce est encore en tête. Le rendu vous attend au moment de rédiger l'annonce.",
+          "Cette légèreté compte dans un métier où le temps manque. Pas de licence lourde, pas de poste dédié, pas de fichier à confier à un graphiste. L'agence garde la main et publie plus vite.",
+        ],
+      },
+      {
+        title: "Rester transparent, c'est protéger la vente",
+        body: [
+          "Un rendu virtuel montre un potentiel d'aménagement, pas l'état du bien le jour de la visite. La règle est simple, et la déontologie immobilière la rejoint : indiquez sur l'annonce que les pièces sont meublées virtuellement. L'acheteur arrive averti, sans impression de décalage, et votre crédibilité reste entière.",
+        ],
+      },
+    ],
     faq: [
       {
         question: 'Puis-je utiliser ces images dans mes annonces immobilières ?',
@@ -547,6 +576,109 @@ export const INTENT_PAGES: IntentPageData[] = [
       { slug: 'photos-annonce-immobiliere-qui-font-visiter', title: "Les photos d'annonce qui déclenchent les visites" },
       { slug: 'vendre-bien-vide-ou-meuble-virtuellement', title: 'Vendre un bien vide ou le meubler virtuellement : que choisir ?' },
       { slug: 'home-staging-virtuel-mentions-legales', title: 'Home staging virtuel : ce que dit la loi sur les photos retouchées' },
+    ],
+  },
+  {
+    slug: 'home-staging-virtuel-prix',
+    title: 'Prix du home staging virtuel',
+    metaTitle: 'Home staging virtuel : prix, coût par photo et abonnement',
+    metaDescription: "Combien coûte le home staging virtuel ? Comparaison honnête entre le paiement à la photo des prestataires et l'abonnement illimité d'InstaDeco. De quoi choisir la formule la plus rentable pour une agence.",
+    hero: {
+      headline: 'Combien coûte le home staging virtuel',
+      subheadline:
+        "Du paiement à la photo à l'abonnement illimité, voici comment se compare le coût réel selon votre volume d'annonces. Pour un agent qui publie chaque semaine, le calcul est vite fait.",
+      cta: 'Voir les offres Pro',
+      ctaLink: '/pro',
+    },
+    problem: {
+      title: 'Le coût à la photo grimpe vite quand on a du volume',
+      points: [
+        'Les prestataires de home staging virtuel facturent souvent à la photo, ce qui devient lourd sur un portefeuille entier.',
+        'Le home staging physique reste hors budget pour la majorité des mandats.',
+        "Difficile de prévoir la dépense quand chaque bien et chaque pièce se paient à l'unité.",
+        'Tester plusieurs ambiances double la facture si chaque essai est facturé.',
+      ],
+    },
+    solution: {
+      title: "L'abonnement illimité change la logique de coût",
+      description:
+        "Plutôt que de payer chaque image, vous réglez un forfait mensuel et vous traitez autant de biens que nécessaire, en usage raisonnable. Plus vous publiez, plus le coût par annonce baisse, jusqu'à devenir négligeable.",
+      benefits: [
+        { icon: 'euro', title: 'Forfait clair', description: 'Un montant fixe par mois, sans surprise à la photo.' },
+        { icon: 'layers', title: 'Volume illimité', description: 'Traitez tout votre portefeuille, pas seulement les beaux mandats.' },
+        { icon: 'palette', title: 'Essais inclus', description: 'Testez plusieurs styles sur une même pièce sans payer chaque rendu.' },
+        { icon: 'trending-up', title: 'Coût décroissant', description: 'Le prix par annonce baisse à mesure que vous publiez.' },
+      ],
+    },
+    comparison: {
+      title: 'Coût du home staging selon la formule',
+      alternatives: [
+        { name: 'Home staging physique', price: '2 000 à 15 000 € par bien', time: '2 à 4 semaines', quality: 'Excellent' },
+        { name: 'Prestataire virtuel à la photo', price: 'Environ 30 à 200 € par photo', time: '1 à 3 jours', quality: 'Très bon' },
+        { name: 'InstaDeco (abonnement illimité)', price: 'Dès 19 €/mois, Pro 49 €', time: 'Quelques secondes', quality: 'Professionnel', isUs: true },
+      ],
+    },
+    steps: [
+      { step: 1, title: 'Estimez votre volume', description: 'Comptez le nombre de biens et de pièces que vous publiez chaque mois.' },
+      { step: 2, title: 'Comparez au coût à la photo', description: 'Multipliez ce volume par un tarif à la photo pour voir la dépense réelle.' },
+      { step: 3, title: 'Choisissez le forfait', description: "Dès quelques biens par mois, l'abonnement illimité revient moins cher." },
+    ],
+    sections: [
+      {
+        title: 'Payer à la photo ou par abonnement : comment trancher',
+        body: [
+          "Le paiement à la photo a du sens si vous mettez en scène un ou deux biens de temps en temps. Dès que le rythme augmente, la facture suit, car chaque pièce et chaque variante se paient séparément. Pour une agence active, le total mensuel dépasse vite le prix d'un forfait.",
+          "L'abonnement inverse la logique. Le coût est fixe et connu d'avance, et chaque annonce supplémentaire ne coûte rien de plus. Le seuil de bascule arrive tôt : quelques biens habillés dans le mois suffisent souvent à rentabiliser le forfait.",
+        ],
+      },
+      {
+        title: 'Le vrai point de comparaison reste le home staging physique',
+        body: [
+          "Une mise en scène physique se chiffre en milliers d'euros par bien, entre la location de mobilier, le stager et la logistique. Réservée aux mandats de prestige, elle reste inaccessible sur l'ensemble d'un portefeuille.",
+          "Le virtuel ne cherche pas à la remplacer partout. Il rend son bénéfice principal, aider l'acheteur à se projeter dès la photo de l'annonce, accessible sur chaque bien et pour une fraction du coût.",
+        ],
+      },
+      {
+        title: 'Ce que comprend votre abonnement',
+        body: [
+          "Le forfait couvre la génération des rendus, l'accès aux styles et la possibilité de tester plusieurs ambiances par pièce. Vous gardez la main sur le rythme et publiez quand vous voulez, sans valider un devis à chaque image.",
+          'Les paliers suivent votre activité, du mandataire seul à l\'agence en équipe. Vous trouverez le détail des formules et des conditions sur la page des offres Pro.',
+        ],
+      },
+    ],
+    faq: [
+      {
+        question: 'Combien coûte le home staging virtuel chez InstaDeco ?',
+        answer:
+          "Les offres démarrent à 19 € par mois, et l'offre Pro à 49 € par mois donne un usage illimité raisonnable. Vous traitez autant de biens que nécessaire sans payer à la photo.",
+      },
+      {
+        question: 'Est-ce moins cher que de payer à la photo ?',
+        answer:
+          "Dès que vous publiez plusieurs biens par mois, oui. Le coût à la photo grimpe avec le volume, alors que le forfait reste fixe. Le seuil de rentabilité arrive en général après quelques annonces.",
+      },
+      {
+        question: 'Puis-je tester avant de payer ?',
+        answer:
+          "Oui. Un essai gratuit vous permet de juger la qualité des rendus sur vos propres photos avant de vous abonner, sans carte bancaire.",
+      },
+      {
+        question: 'Le tarif couvre-t-il plusieurs styles par pièce ?',
+        answer:
+          "Oui. Vous pouvez générer plusieurs ambiances pour une même pièce et garder celle qui parle le mieux à votre cible, sans payer chaque essai.",
+      },
+    ],
+    keywords: [
+      'home staging virtuel prix',
+      'home staging virtuel tarif',
+      'prix home staging virtuel',
+      'coût home staging virtuel',
+      'home staging virtuel pas cher',
+      'abonnement home staging virtuel',
+    ],
+    relatedArticles: [
+      { slug: 'home-staging-virtuel-ou-physique-comparatif', title: 'Home staging virtuel ou physique : lequel choisir pour vendre un bien ?' },
+      { slug: 'home-staging-vend-il-plus-vite', title: 'Le home staging fait-il vraiment vendre plus vite ?' },
     ],
   },
 ];
