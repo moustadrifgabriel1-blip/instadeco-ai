@@ -681,6 +681,200 @@ export const INTENT_PAGES: IntentPageData[] = [
       { slug: 'home-staging-vend-il-plus-vite', title: 'Le home staging fait-il vraiment vendre plus vite ?' },
     ],
   },
+  {
+    slug: 'home-staging-virtuel-belgique',
+    title: 'Home staging virtuel en Belgique',
+    metaTitle: 'Home staging virtuel en Belgique pour agents immobiliers',
+    metaDescription: "Le home staging virtuel par IA pour les agences belges. Transformez la photo d'un bien vide ou à rafraîchir en intérieur désirable, prêt à publier sur Immoweb. Pensé pour Bruxelles et la Wallonie.",
+    hero: {
+      headline: 'Home staging virtuel pour les agences belges',
+      subheadline:
+        "Sur un marché où l'acheteur compare des dizaines d'annonces sur Immoweb, une pièce vide se fait oublier. InstaDeco habille vos biens à partir d'une simple photo, en quelques secondes, pour que chaque annonce donne envie de visiter.",
+      cta: 'Voir les offres Pro',
+      ctaLink: '/pro',
+    },
+    problem: {
+      title: 'Beaucoup de biens belges se présentent vides ou à rafraîchir',
+      points: [
+        'Une grande partie du parc, des appartements bruxellois aux maisons wallonnes, se visite vide ou avec une décoration datée.',
+        'Le home staging physique reste réservé à de rares mandats, vu son coût et ses délais.',
+        "Sur Immoweb, l'acheteur fait défiler vite : une photo terne et l'annonce passe à la trappe.",
+        "Mandater un photographe pour chaque bien pèse sur la marge de l'agence.",
+      ],
+    },
+    solution: {
+      title: 'Mettez chaque bien en valeur avant la première visite',
+      description:
+        "InstaDeco habille vos pièces par intelligence artificielle, à partir d'une photo prise au smartphone. Vous récupérez un rendu meublé et photoréaliste, prêt à publier sur Immoweb ou votre vitrine, pour une fraction du coût d'une mise en scène physique.",
+      benefits: [
+        { icon: 'clock', title: 'En quelques secondes', description: 'Le rendu revient vite, pas en plusieurs semaines.' },
+        { icon: 'euro', title: 'Sans le budget staging', description: "Une fraction du coût d'une mise en scène physique, sur autant de biens que vous voulez." },
+        { icon: 'layers', title: 'Plusieurs ambiances', description: "Adaptez le style au quartier et au type d'acheteur visé." },
+        { icon: 'camera', title: 'Prêt pour Immoweb', description: 'Des rendus haute définition, directement publiables sur les portails belges.' },
+      ],
+    },
+    comparison: {
+      title: 'Home staging virtuel ou physique pour une agence belge',
+      alternatives: [
+        { name: 'Home staging physique', price: '2 000 à 15 000 € par bien', time: '2 à 4 semaines', quality: 'Excellent' },
+        { name: 'Photographe immobilier', price: 'Plusieurs centaines € par reportage', time: 'Quelques jours', quality: 'Très bon' },
+        { name: 'InstaDeco (abonnement)', price: 'Dès 19 €/mois, Pro 49 €', time: 'Quelques secondes', quality: 'Professionnel', isUs: true },
+      ],
+    },
+    steps: [
+      { step: 1, title: 'Photographiez le bien', description: 'Une photo par pièce suffit, même vide.' },
+      { step: 2, title: 'Choisissez le style', description: "Sélectionnez l'ambiance adaptée à votre acheteur." },
+      { step: 3, title: 'Publiez sur Immoweb', description: 'Intégrez le rendu haute définition à votre annonce.' },
+    ],
+    sections: [
+      {
+        title: "Sortir du lot sur Immoweb",
+        body: [
+          "En Belgique, la recherche d'un bien commence presque toujours en ligne, sur Immoweb en tête. L'acheteur parcourt les vignettes et s'arrête sur celles qui racontent une vie possible. Une pièce vide, elle, paraît petite et froide, et se fait dépasser par l'annonce suivante.",
+          "En montrant le bien habillé dès la première photo, vous gagnez le clic, puis la demande de visite. C'est là, sur le portail, que le home staging virtuel agit, bien avant la rencontre sur place.",
+        ],
+      },
+      {
+        title: 'Du studio bruxellois à la maison wallonne',
+        body: [
+          "Le parc belge est varié : petits appartements à Bruxelles, maisons de rangée, biens à rénover en Wallonie. Tous ne justifient pas une mise en scène physique, mais tous gagnent à être présentés sous leur meilleur jour sur l'annonce.",
+          "Comme un rendu coûte quelques euros et revient en quelques secondes, vous traitez l'ensemble de votre portefeuille, du compromis rapide au bien qui traîne, sans arbitrer entre les annonces qui méritent un effort et les autres.",
+        ],
+      },
+      {
+        title: 'Transparence et déontologie en Belgique',
+        body: [
+          "Un rendu virtuel montre un potentiel d'aménagement, pas l'état du bien le jour de la visite. La déontologie de l'agent immobilier belge invite à une information loyale de l'acheteur : indiquez clairement sur l'annonce que les pièces sont meublées virtuellement.",
+          "Cette transparence protège votre relation de confiance et évite le sentiment de décalage à la visite. Bien utilisé, le home staging virtuel valorise le bien sans tromper personne.",
+        ],
+      },
+    ],
+    faq: [
+      {
+        question: 'Puis-je utiliser ces rendus sur Immoweb et mes annonces ?',
+        answer:
+          "Oui. Les images sont en haute définition et conviennent à Immoweb comme à votre vitrine. Indiquez simplement dans l'annonce que la pièce a fait l'objet d'un home staging virtuel.",
+      },
+      {
+        question: 'Est-ce que ça marche sur un bien à rénover ?',
+        answer:
+          "Oui. À partir de la photo d'une pièce vide ou démodée, l'IA propose un aménagement meublé et cohérent qui aide l'acheteur à voir le potentiel, sans masquer un défaut structurel.",
+      },
+      {
+        question: 'Combien de biens puis-je traiter par mois ?',
+        answer:
+          "L'offre Pro est pensée pour un usage quotidien en agence, en usage illimité raisonnable. De quoi soigner tout votre portefeuille belge, pas seulement les mandats de prestige.",
+      },
+    ],
+    keywords: [
+      'home staging virtuel belgique',
+      'home staging virtuel bruxelles',
+      'home staging virtuel agent immobilier belgique',
+      'staging virtuel immoweb',
+      'home staging virtuel wallonie',
+    ],
+    relatedArticles: [
+      { slug: 'home-staging-virtuel-ou-physique-comparatif', title: 'Home staging virtuel ou physique : lequel choisir pour vendre un bien ?' },
+      { slug: 'photos-annonce-immobiliere-qui-font-visiter', title: "Les photos d'annonce qui déclenchent les visites" },
+    ],
+  },
+  {
+    slug: 'home-staging-virtuel-suisse-romande',
+    title: 'Home staging virtuel en Suisse romande',
+    metaTitle: 'Home staging virtuel en Suisse romande pour agents immobiliers',
+    metaDescription: "Le home staging virtuel par IA pour les agences de Suisse romande. Habillez vos biens à partir d'une photo, prêt pour Homegate et ImmoScout24. Genève, Lausanne, Valais, sans le coût d'un photographe à la pièce.",
+    hero: {
+      headline: 'Home staging virtuel pour les agences romandes',
+      subheadline:
+        "En Suisse romande, faire shooter un bien coûte cher et l'acheteur compare tout sur Homegate. InstaDeco habille vos pièces à partir d'une simple photo, en quelques secondes, pour présenter chaque bien sous son meilleur jour sans exploser le budget.",
+      cta: 'Voir les offres Pro',
+      ctaLink: '/pro',
+    },
+    problem: {
+      title: 'En Romandie, la mise en valeur revient cher',
+      points: [
+        "Faire intervenir un photographe immobilier se chiffre souvent autour de 90 à 150 CHF par pièce, à multiplier par chaque bien.",
+        'Le home staging physique reste réservé aux biens haut de gamme de Genève ou Lausanne.',
+        "Sur Homegate et ImmoScout24, l'acheteur compare vite et écarte les annonces ternes.",
+        "Un appartement vide ou un chalet à rafraîchir se projette mal en photo.",
+      ],
+    },
+    solution: {
+      title: 'Valorisez chaque bien sans le coût à la pièce',
+      description:
+        "InstaDeco habille vos pièces par intelligence artificielle, à partir d'une photo prise au smartphone. Vous obtenez un rendu meublé et photoréaliste, prêt pour Homegate ou ImmoScout24, pour une fraction du coût d'un reportage à la pièce.",
+      benefits: [
+        { icon: 'clock', title: 'En quelques secondes', description: 'Le rendu revient vite, sans rendez-vous photo à caler.' },
+        { icon: 'euro', title: 'En francs maîtrisés', description: "Un forfait clair plutôt que des dizaines de francs par photo." },
+        { icon: 'layers', title: 'Styles adaptés', description: "De l'appartement urbain au chalet, ajustez l'ambiance à la région." },
+        { icon: 'camera', title: 'Prêt pour Homegate', description: 'Des rendus haute définition, directement publiables sur les portails suisses.' },
+      ],
+    },
+    comparison: {
+      title: 'Coût de la mise en valeur en Suisse romande',
+      alternatives: [
+        { name: 'Home staging physique', price: 'Plusieurs milliers de CHF par bien', time: '2 à 4 semaines', quality: 'Excellent' },
+        { name: 'Photographe immobilier', price: 'Environ 90 à 150 CHF par pièce', time: 'Quelques jours', quality: 'Très bon' },
+        { name: 'InstaDeco (abonnement)', price: 'Forfait mensuel, usage illimité', time: 'Quelques secondes', quality: 'Professionnel', isUs: true },
+      ],
+    },
+    steps: [
+      { step: 1, title: 'Photographiez le bien', description: 'Une photo par pièce suffit, prise au smartphone.' },
+      { step: 2, title: "Choisissez l'ambiance", description: 'Urbain genevois, cosy lausannois ou esprit chalet.' },
+      { step: 3, title: 'Publiez sur Homegate', description: 'Intégrez le rendu haute définition à votre annonce.' },
+    ],
+    sections: [
+      {
+        title: 'Un marché où la photo coûte cher',
+        body: [
+          "En Suisse romande, soigner les visuels d'une annonce passe souvent par un photographe, à un tarif qui se compte par pièce. Sur un portefeuille entier, l'addition grimpe vite et freine la mise en valeur des biens les plus ordinaires.",
+          "InstaDeco renverse ce calcul. Un forfait mensuel couvre autant de rendus que nécessaire, ce qui rend la mise en scène accessible sur chaque bien, pas seulement sur les mandats de prestige de Cologny ou d'Ouchy.",
+        ],
+      },
+      {
+        title: "De l'appartement genevois au chalet valaisan",
+        body: [
+          "La Romandie couvre des biens très différents : appartements urbains à Genève et Lausanne, maisons familiales sur la côte, chalets et résidences en Valais ou dans les Alpes vaudoises. Chacun appelle une ambiance propre.",
+          "Vous choisissez le style qui parle à l'acheteur visé, du contemporain épuré à l'esprit montagne chaleureux, et vous récupérez un rendu cohérent avec le volume réel de la pièce.",
+        ],
+      },
+      {
+        title: 'Rester transparent sur Homegate et ImmoScout24',
+        body: [
+          "Un rendu virtuel illustre un potentiel, pas l'état du bien le jour de la visite. La loyauté envers l'acheteur, attendue de la profession en Suisse, invite à signaler clairement sur l'annonce que les pièces sont meublées virtuellement.",
+          "Cette franchise renforce la confiance et évite toute déception à la visite. Le home staging virtuel valorise alors le bien sans induire l'acheteur en erreur.",
+        ],
+      },
+    ],
+    faq: [
+      {
+        question: 'Combien coûte le home staging virtuel par rapport à un photographe ?',
+        answer:
+          "Là où un reportage se facture souvent autour de 90 à 150 CHF par pièce, InstaDeco fonctionne au forfait mensuel, en usage illimité raisonnable. Plus vous publiez de biens, plus le coût par annonce devient négligeable.",
+      },
+      {
+        question: 'Les rendus conviennent-ils à Homegate et ImmoScout24 ?',
+        answer:
+          "Oui. Les images sont en haute définition et adaptées aux portails suisses. Pensez à indiquer dans l'annonce que la pièce a fait l'objet d'un home staging virtuel.",
+      },
+      {
+        question: 'Est-ce que ça marche pour un chalet ou une résidence de montagne ?',
+        answer:
+          "Oui. Vous choisissez un style chaleureux adapté à la montagne, et l'IA meuble la pièce en respectant sa structure réelle, poutres et volumes compris.",
+      },
+    ],
+    keywords: [
+      'home staging virtuel suisse',
+      'home staging virtuel suisse romande',
+      'home staging virtuel genève',
+      'home staging virtuel lausanne',
+      'home staging virtuel agent immobilier suisse',
+    ],
+    relatedArticles: [
+      { slug: 'home-staging-virtuel-ou-physique-comparatif', title: 'Home staging virtuel ou physique : lequel choisir pour vendre un bien ?' },
+      { slug: 'home-staging-vend-il-plus-vite', title: 'Le home staging fait-il vraiment vendre plus vite ?' },
+    ],
+  },
 ];
 
 export function getIntentPageBySlug(slug: string): IntentPageData | undefined {

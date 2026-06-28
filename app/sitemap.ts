@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next';
 import { SEO_CONFIG } from '@/lib/seo/config';
 import { isPseoContentIndexable } from '@/lib/seo/pseo-quality';
+import { INTENT_PAGES } from '@/lib/seo/intent-pages-data';
 
 export const revalidate = 3600;
 
@@ -257,17 +258,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }),
   );
 
-  const solutionPages: MetadataRoute.Sitemap = [
-    'home-staging-virtuel',
-    'simulateur-decoration-interieur',
-    'logiciel-home-staging',
-    'idee-amenagement-studio',
-    'simulateur-peinture',
-    'decoration-salon',
-    'decoration-chambre',
-    'avant-apres-decoration',
-    'home-staging-virtuel-agents-immobiliers',
-  ].flatMap((slug) =>
+  // Dérivé de INTENT_PAGES pour que toute nouvelle page /solution entre au sitemap sans oubli.
+  const solutionPages: MetadataRoute.Sitemap = INTENT_PAGES.map((p) => p.slug).flatMap((slug) =>
     frOnlySitemap(`/solution/${slug}`, {
       lastModified: now,
       changeFrequency: 'monthly' as const,
