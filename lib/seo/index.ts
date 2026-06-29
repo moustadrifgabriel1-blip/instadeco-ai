@@ -9,5 +9,5 @@
  */
 
 export { JsonLd, type JsonLdProps } from './json-ld';
-export { generateBreadcrumbSchema, generateOrganizationSchema, generateWebSiteSchema, generateSoftwareAppSchema, generateFAQSchema, generateProductSchema, generateServiceSchema, generateBlogPostingSchema, generateArticleSchema, generateBreadcrumbList, generateWebPageSchema } from './schemas';
+export { generateBreadcrumbSchema, generateOrganizationSchema, generateWebSiteSchema, generateSoftwareAppSchema, generateFAQSchema, generateProductSchema, generateServiceSchema, generateBlogPostingSchema, generateArticleSchema, generateBreadcrumbList, generateWebPageSchema, generateHowToSchema, generateProSubscriptionSchema } from './schemas';
 export { SEO_CONFIG, getCanonicalUrl, getFullUrl } from './config';

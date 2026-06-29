@@ -51,11 +51,14 @@ export interface IntentPageData {
   keywords: string[];
   /** Articles de blog liés (maillage hub-and-spoke : le pillar pointe vers ses spokes). */
   relatedArticles?: Array<{ slug: string; title: string }>;
+  /** Émettre un schema HowTo (flux photo vers style vers rendu) sur les pages de type guide. */
+  howTo?: boolean;
 }
 
 export const INTENT_PAGES: IntentPageData[] = [
   {
     slug: 'home-staging-virtuel',
+    howTo: true,
     title: 'Home Staging Virtuel par IA',
     metaTitle: 'Home Staging Virtuel par IA : meublez vos pièces en 30 secondes',
     metaDescription: 'Home staging virtuel par intelligence artificielle. Meublez et décorez vos pièces vides en 30 secondes. Alternative 50x moins chère au home staging physique.',
@@ -150,6 +153,7 @@ export const INTENT_PAGES: IntentPageData[] = [
   },
   {
     slug: 'logiciel-home-staging',
+    howTo: true,
     title: 'Logiciel de Home Staging en Ligne',
     metaTitle: 'Logiciel de home staging à partir d\'une photo',
     metaDescription: 'Logiciel de home staging virtuel à partir d\'une photo. Aucune installation : uploadez la photo d\'une pièce, l\'IA la meuble et la décore pour vos annonces immobilières. Essai gratuit.',
@@ -462,6 +466,7 @@ export const INTENT_PAGES: IntentPageData[] = [
   },
   {
     slug: 'home-staging-virtuel-agents-immobiliers',
+    howTo: true,
     title: 'Home staging virtuel pour agents immobiliers',
     metaTitle: 'Home staging virtuel pour agents immobiliers',
     metaDescription: "Le home staging virtuel par IA pensé pour les agences immobilières. Transformez la photo d'un bien vide ou daté en intérieur désirable, prêt à publier, en quelques secondes. Soignez chaque annonce de votre portefeuille.",

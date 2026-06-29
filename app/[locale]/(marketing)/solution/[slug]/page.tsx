@@ -25,7 +25,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { JsonLd } from '@/lib/seo/json-ld';
-import { generateFAQSchema, generateBreadcrumbList, generateWebPageSchema } from '@/lib/seo/schemas';
+import { generateFAQSchema, generateBreadcrumbList, generateWebPageSchema, generateHowToSchema } from '@/lib/seo/schemas';
 import { getCanonicalUrl, getLocalizedCanonicalUrl, withLocalePath, frOnlyProgrammaticMeta } from '@/lib/seo/config';
 import { INTENT_PAGES, getIntentPageBySlug } from '@/lib/seo/intent-pages-data';
 import { LeadCaptureLazy } from '@/components/features/lead-capture-lazy';
@@ -129,6 +129,7 @@ export default async function IntentPage({ params }: PageProps) {
           home: { name: 'Accueil', url: withLocalePath(locale, '/') },
         }),
         generateFAQSchema(page.faq),
+        ...(page.howTo ? [generateHowToSchema()] : []),
       ]} />
 
       {/* ===== HERO ===== */}

@@ -105,8 +105,10 @@ export function generateSoftwareAppSchema() {
     url: getCanonicalUrl('/generate'),
     offers: {
       '@type': 'AggregateOffer',
-      lowPrice: '9.90',
-      highPrice: '34.90',
+      // Prix d'abonnement Pro reels (Solo 19, Pro 49, Agence 99 EUR/mois).
+      // Avant : anciens prix credits B2C (9,90 a 34,90) qui desinformaient les moteurs IA.
+      lowPrice: '19',
+      highPrice: '99',
       priceCurrency: 'EUR',
       offerCount: 3,
       priceValidUntil,
@@ -262,6 +264,53 @@ export function generateHowToSchema() {
         url: `${SEO_CONFIG.siteUrl}/fr/generate`,
       },
     ],
+  };
+}
+
+/**
+ * Schema Product/Offer de l'abonnement Pro (money page /pro).
+ * Exprime les paliers mensuels REELS (Solo/Pro/Agence) en UnitPriceSpecification
+ * mensuelle, pour que les moteurs de reponse repondent juste a "combien coute InstaDeco Pro".
+ * Les prix viennent de la source partagee pro-data, jamais inventes.
+ */
+export function generateProSubscriptionSchema(
+  plans: Array<{ name: string; monthly: number }>,
+) {
+  const priceValidUntil = new Date(
+    new Date().getFullYear() + 1,
+    new Date().getMonth(),
+    new Date().getDate(),
+  )
+    .toISOString()
+    .split('T')[0];
+
+  return {
+    '@type': 'Product',
+    '@id': `${SEO_CONFIG.siteUrl}/fr/pro#product`,
+    name: 'InstaDeco Pro',
+    description:
+      "Abonnement de home staging virtuel par IA pour agents immobiliers : rendus illimites en usage raisonnable, qualite HD, prets pour les annonces.",
+    brand: { '@type': 'Brand', name: SEO_CONFIG.siteName },
+    image: getFullUrl(SEO_CONFIG.ogImage),
+    offers: plans.map((plan) => ({
+      '@type': 'Offer',
+      name: `InstaDeco ${plan.name}`,
+      priceCurrency: 'EUR',
+      price: plan.monthly.toString(),
+      priceValidUntil,
+      availability: 'https://schema.org/InStock',
+      url: getCanonicalUrl('/pro'),
+      priceSpecification: {
+        '@type': 'UnitPriceSpecification',
+        price: plan.monthly.toString(),
+        priceCurrency: 'EUR',
+        referenceQuantity: {
+          '@type': 'QuantitativeValue',
+          value: 1,
+          unitCode: 'MON',
+        },
+      },
+    })),
   };
 }
 

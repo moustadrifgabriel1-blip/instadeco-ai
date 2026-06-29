@@ -1,5 +1,8 @@
 import { Metadata } from 'next';
 import { getCanonicalUrl, getLocalizedCanonicalUrl, frOnlyProgrammaticMeta } from '@/lib/seo/config';
+import { JsonLd } from '@/lib/seo/json-ld';
+import { generateProSubscriptionSchema, generateFAQSchema } from '@/lib/seo/schemas';
+import { PRO_FAQ, PRO_PRICING } from './pro-data';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -37,5 +40,17 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 }
 
 export default function ProLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return (
+    <>
+      <JsonLd
+        data={[
+          // Offre d'abonnement reelle (Solo/Pro/Agence) + FAQ, depuis la source partagee
+          // pro-data pour garantir la parite avec ce que la page affiche.
+          generateProSubscriptionSchema(PRO_PRICING),
+          generateFAQSchema(PRO_FAQ.map((f) => ({ question: f.q, answer: f.a }))),
+        ]}
+      />
+      {children}
+    </>
+  );
 }
