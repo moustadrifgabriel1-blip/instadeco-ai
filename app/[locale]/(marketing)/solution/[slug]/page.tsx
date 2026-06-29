@@ -98,7 +98,22 @@ export default async function IntentPage({ params }: PageProps) {
   const page = getIntentPageBySlug(slug);
   if (!page) notFound();
 
-  const relatedPages = INTENT_PAGES.filter((p) => p.slug !== page.slug).slice(0, 3);
+  // Maillage interne par proximite de slug : on met en avant les pages du meme cluster
+  // (ex home-staging-virtuel-*) plutot que les 3 premieres. A score egal, on departage par
+  // distance circulaire pour distribuer les liens et garantir que chaque page (meme la
+  // derniere ajoutee) recoive des liens internes, ce qui aide la decouverte par Google.
+  const pageTokens = page.slug.split('-');
+  const selfIdx = INTENT_PAGES.findIndex((p) => p.slug === page.slug);
+  const total = INTENT_PAGES.length;
+  const relatedPages = INTENT_PAGES.map((p, i) => ({
+    p,
+    i,
+    score: p.slug.split('-').filter((t) => pageTokens.includes(t)).length,
+  }))
+    .filter((x) => x.p.slug !== page.slug)
+    .sort((a, b) => b.score - a.score || ((a.i - selfIdx + total) % total) - ((b.i - selfIdx + total) % total))
+    .slice(0, 3)
+    .map((s) => s.p);
 
   return (
     <div className="min-h-[100dvh] bg-background">
