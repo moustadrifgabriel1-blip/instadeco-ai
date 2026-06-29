@@ -880,6 +880,99 @@ export const INTENT_PAGES: IntentPageData[] = [
       { slug: 'home-staging-vend-il-plus-vite', title: 'Le home staging fait-il vraiment vendre plus vite ?' },
     ],
   },
+  {
+    slug: 'home-staging-virtuel-legal',
+    title: 'Le home staging virtuel est-il légal',
+    metaTitle: 'Home staging virtuel : est-ce légal et faut-il le mentionner',
+    metaDescription: "Le home staging virtuel est-il légal et faut-il l'indiquer sur l'annonce ? La règle simple, c'est la transparence. Ce qu'un agent immobilier doit savoir, avec une mention prête à copier.",
+    hero: {
+      headline: 'Le home staging virtuel est-il légal',
+      subheadline:
+        "Oui, à une condition simple : la transparence. Présenter un bien avec un home staging virtuel est permis tant que l'annonce indique clairement que les pièces sont meublées virtuellement. Voici ce qu'un agent doit savoir.",
+      cta: 'Voir les offres Pro',
+      ctaLink: '/pro',
+    },
+    problem: {
+      title: "La crainte de tromper l'acheteur freine les agents",
+      points: [
+        "Beaucoup d'agents hésitent à meubler virtuellement, de peur de paraître malhonnêtes.",
+        'Un acheteur qui découvre un bien vide après une annonce meublée peut se sentir trompé.',
+        "Les règles sur la publicité loyale s'appliquent aussi aux photos d'annonces.",
+        "Sans repère clair, on ne sait pas quoi écrire ni où l'indiquer.",
+      ],
+    },
+    solution: {
+      title: 'La transparence règle la question',
+      description:
+        "Le home staging virtuel est une mise en scène, comme un plan meublé. Rien ne l'interdit, à condition de l'annoncer. En indiquant que les photos sont des projections virtuelles, vous restez loyal envers l'acheteur et vous vous protégez. La confiance en sort renforcée.",
+      benefits: [
+        { icon: 'shield', title: 'Loyauté préservée', description: "L'acheteur sait à quoi s'attendre, aucune mauvaise surprise à la visite." },
+        { icon: 'check', title: 'Mention simple', description: "Une phrase courte sur l'annonce suffit à être en règle." },
+        { icon: 'layers', title: 'Comme un plan meublé', description: "Montrer un potentiel d'aménagement est une pratique reconnue." },
+        { icon: 'award', title: 'Crédibilité renforcée', description: 'La transparence valorise votre sérieux auprès des acquéreurs.' },
+      ],
+    },
+    steps: [
+      { step: 1, title: 'Générez le rendu', description: 'Meublez la pièce virtuellement à partir de sa photo.' },
+      { step: 2, title: 'Ajoutez la mention', description: "Indiquez sur l'annonce que les photos sont des projections virtuelles." },
+      { step: 3, title: 'Publiez sereinement', description: "Votre annonce est attractive et loyale envers l'acheteur." },
+    ],
+    sections: [
+      {
+        title: 'En bref',
+        body: [
+          "Le home staging virtuel est légal en France, en Belgique et en Suisse. La seule règle qui s'impose est la transparence : indiquez clairement, sur l'annonce, que les pièces sont meublées virtuellement. Une annonce qui laisserait croire qu'un bien vide est meublé pourrait être jugée trompeuse.",
+        ],
+      },
+      {
+        title: 'Une mention prête à copier',
+        body: [
+          "Pas besoin d'une formule compliquée. Une phrase courte placée dans la description ou sur les visuels suffit, par exemple : Photos meublées virtuellement à titre d'illustration, le bien est actuellement vide.",
+          "L'essentiel est que l'information soit visible et non noyée. L'acheteur arrive averti, et la visite ne crée aucun sentiment de décalage.",
+        ],
+      },
+      {
+        title: 'Pourquoi la transparence vous sert',
+        body: [
+          "Annoncer le caractère virtuel n'affaiblit pas votre annonce, au contraire. Vous montrez un potentiel d'aménagement tout en restant honnête, ce qui renforce votre crédibilité. Le home staging virtuel reste alors un atout, jamais un risque.",
+          "Cette page décrit un principe général de loyauté, pas un avis juridique. Pour une situation précise, rapprochez-vous de votre chambre professionnelle ou d'un conseil qualifié.",
+        ],
+      },
+    ],
+    faq: [
+      {
+        question: 'Le home staging virtuel est-il légal en France ?',
+        answer:
+          "Oui. Rien n'interdit de présenter un bien avec un home staging virtuel, à condition d'indiquer clairement sur l'annonce que les pièces sont meublées virtuellement, pour ne pas induire l'acheteur en erreur.",
+      },
+      {
+        question: 'Faut-il mentionner que les photos sont virtuelles ?',
+        answer:
+          "Oui, c'est la règle de transparence. Une phrase courte sur l'annonce, indiquant que les photos sont des projections virtuelles et que le bien est vide, suffit à informer loyalement l'acheteur.",
+      },
+      {
+        question: "Quelle mention écrire sur l'annonce ?",
+        answer:
+          "Par exemple : Photos meublées virtuellement à titre d'illustration, le bien est actuellement vide. L'important est que la mention soit visible et compréhensible.",
+      },
+      {
+        question: 'Est-ce différent en Belgique et en Suisse ?',
+        answer:
+          "Le principe est le même : la loyauté envers l'acheteur et l'absence de publicité trompeuse. Indiquer le caractère virtuel des photos est la bonne pratique partout.",
+      },
+    ],
+    keywords: [
+      'home staging virtuel légal',
+      'home staging virtuel mention obligatoire',
+      'photos virtuelles annonce immobilière',
+      'home staging virtuel est-ce légal',
+      'mention home staging virtuel annonce',
+    ],
+    relatedArticles: [
+      { slug: 'home-staging-virtuel-mentions-legales', title: 'Home staging virtuel : ce que dit la loi sur les photos retouchées' },
+      { slug: 'home-staging-virtuel-ou-physique-comparatif', title: 'Home staging virtuel ou physique : lequel choisir pour vendre un bien ?' },
+    ],
+  },
 ];
 
 export function getIntentPageBySlug(slug: string): IntentPageData | undefined {
