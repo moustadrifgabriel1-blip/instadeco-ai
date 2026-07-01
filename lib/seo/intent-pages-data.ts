@@ -232,6 +232,9 @@ export const INTENT_PAGES: IntentPageData[] = [
       { question: 'Y a-t-il un essai gratuit ?', answer: 'Oui ! Chaque nouveau compte reçoit des crédits gratuits pour tester le service. Aucune carte bancaire requise.' },
     ],
     keywords: ['logiciel home staging', 'logiciel home staging gratuit', 'application home staging', 'outil home staging virtuel', 'logiciel meublage virtuel'],
+    relatedArticles: [
+      { slug: 'meilleur-logiciel-home-staging-virtuel-2026', title: 'Meilleur logiciel de home staging virtuel : comparatif 2026' },
+    ],
   },
   {
     slug: 'idee-amenagement-studio',
@@ -576,6 +579,7 @@ export const INTENT_PAGES: IntentPageData[] = [
       'logiciel home staging agent immobilier',
     ],
     relatedArticles: [
+      { slug: 'meilleur-logiciel-home-staging-virtuel-2026', title: 'Meilleur logiciel de home staging virtuel : comparatif 2026' },
       { slug: 'home-staging-virtuel-ou-physique-comparatif', title: 'Home staging virtuel ou physique : lequel choisir pour vendre un bien ?' },
       { slug: 'home-staging-vend-il-plus-vite', title: 'Le home staging fait-il vraiment vendre plus vite ?' },
       { slug: 'photos-annonce-immobiliere-qui-font-visiter', title: "Les photos d'annonce qui déclenchent les visites" },
@@ -682,6 +686,7 @@ export const INTENT_PAGES: IntentPageData[] = [
       'abonnement home staging virtuel',
     ],
     relatedArticles: [
+      { slug: 'meilleur-logiciel-home-staging-virtuel-2026', title: 'Meilleur logiciel de home staging virtuel : comparatif 2026' },
       { slug: 'home-staging-virtuel-ou-physique-comparatif', title: 'Home staging virtuel ou physique : lequel choisir pour vendre un bien ?' },
       { slug: 'home-staging-vend-il-plus-vite', title: 'Le home staging fait-il vraiment vendre plus vite ?' },
     ],

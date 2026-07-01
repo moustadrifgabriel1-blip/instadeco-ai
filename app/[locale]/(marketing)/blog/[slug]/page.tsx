@@ -26,7 +26,8 @@ import { useCases } from '@/src/infrastructure/config/di-container';
 import { BlogArticleMapper } from '@/src/application/mappers/BlogArticleMapper';
 import { withRetry } from '@/lib/utils/retry';
 import { SEO_CONFIG, getCanonicalUrl, getLocalizedCanonicalUrl } from '@/lib/seo/config';
-import { generateBreadcrumbSchema } from '@/lib/seo/schemas';
+import { generateBreadcrumbSchema, generateFAQSchema } from '@/lib/seo/schemas';
+import { extractFaqItems } from '@/lib/seo/faq-from-markdown';
 
 const SITE_URL = SEO_CONFIG.siteUrl.replace(/\/$/, '');
 
@@ -401,6 +402,8 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
   const mainTag = article.tags[0] || 'decoration';
   const heroImageUrl = getBlogImageUrl(mainTag, article.slug, 1200, 600);
+  // FAQPage JSON-LD : émis seulement si l'article contient une vraie section FAQ (>= 2 questions).
+  const faqItems = extractFaqItems(article.content);
 
   return (
     <div className="min-h-[100dvh] bg-background pb-20">
@@ -597,6 +600,19 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           }),
         }}
       />
+
+      {/* FAQPage : réponses citables pour Google et les moteurs IA (AI Overviews). */}
+      {faqItems.length >= 2 && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: sanitizeJsonLd({
+              '@context': 'https://schema.org',
+              ...generateFAQSchema(faqItems),
+            }),
+          }}
+        />
+      )}
     </div>
   );
 }
