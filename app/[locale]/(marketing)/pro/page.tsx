@@ -9,7 +9,7 @@ import { createSubscriptionSession } from '@/src/presentation/api/client';
 import { trackBeginCheckout } from '@/lib/analytics/gtag';
 import { fbTrackInitiateCheckout, fbTrackViewContent } from '@/lib/analytics/fb-pixel';
 import { PrestigeCompare } from '@/components/prestige/prestige-compare';
-import { PRO_FAQ } from './pro-data';
+import { PRO_FAQ, REAL_RENDERS } from './pro-data';
 import {
   Building2, Camera, Check, ArrowRight,
   Shield, ChevronDown, Home,
@@ -158,31 +158,8 @@ const USE_CASES = [
   },
 ];
 
-// Rendus réels (compte démo propriétaire, conformes RGPD pour page indexée).
-// Chaque paire provient d'UNE même ligne de la table `generations` (input vide +
-// output meublé), donc l'avant/après est garanti être la même pièce.
-const REAL_RENDERS = [
-  {
-    before:
-      'https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/input-images/f88c9b68-eda4-4d67-bfb4-f631d21b37c6/gallery30-4030028-japandi.jpg',
-    after:
-      'https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/output-images/gemini/1782047046789-mee0h.jpg',
-    beforeAlt: 'Salon vide avant home staging virtuel',
-    afterAlt: 'Salon meublé style japandi après home staging virtuel par IA',
-    eyebrow: 'Salon, style japandi',
-    caption: 'La même pièce, meublée pour séduire un acheteur',
-  },
-  {
-    before:
-      'https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/input-images/f88c9b68-eda4-4d67-bfb4-f631d21b37c6/gallery30-6835102-midcentury.jpg',
-    after:
-      'https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/output-images/gemini/1782047014810-s1f7n.jpg',
-    beforeAlt: 'Salon vide avant home staging virtuel',
-    afterAlt: 'Salon meublé style midcentury après home staging virtuel par IA',
-    eyebrow: 'Salon, style midcentury',
-    caption: 'Le même espace, prêt pour vos visites',
-  },
-];
+// Rendus réels : déplacés vers ./pro-data (source unique partagée avec le schema
+// ImageObject du layout, même logique que PRO_FAQ / PRO_PRICING).
 
 // FAQ deplacee vers ./pro-data (source unique partagee avec le schema FAQPage du layout,
 // pour garantir la parite entre la FAQ affichee et les donnees structurees).

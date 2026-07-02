@@ -1,5 +1,7 @@
 import { Metadata } from 'next';
 import { getCanonicalUrl, getLocalizedCanonicalUrl } from '@/lib/seo/config';
+import { JsonLd } from '@/lib/seo/json-ld';
+import { generateWebPageSchema, generateBreadcrumbList, generateHowToSchema } from '@/lib/seo/schemas';
 
 export async function generateMetadata({
   params,
@@ -41,5 +43,25 @@ export async function generateMetadata({
 }
 
 export default function EssaiLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return (
+    <>
+      <JsonLd
+        data={[
+          generateWebPageSchema({
+            title: 'Essai gratuit : testez la transformation IA',
+            description:
+              "Testez gratuitement la transformation de votre pièce par IA. Une photo, un style, un résultat en 30 secondes, sans inscription.",
+            url: getLocalizedCanonicalUrl('fr', '/essai'),
+          }),
+          // Le HowTo décrit le flux réel de la page (photo -> style -> rendu).
+          generateHowToSchema(),
+          generateBreadcrumbList(
+            [{ label: 'Essai gratuit', path: getLocalizedCanonicalUrl('fr', '/essai') }],
+            { home: { name: 'Accueil', url: getLocalizedCanonicalUrl('fr', '/') } },
+          ),
+        ]}
+      />
+      {children}
+    </>
+  );
 }

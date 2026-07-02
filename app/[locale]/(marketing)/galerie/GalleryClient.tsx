@@ -168,6 +168,8 @@ export function GalleryClient({ initialItems, initialTotal }: GalleryClientProps
                   alt={`${ROOM_LABELS[item.room_type_slug] || item.room_type_slug} style ${STYLE_LABELS[item.style_slug] || item.style_slug}, Décoration IA`}
                   fill
                   sizePreset="gallery"
+                  // Les 4 premières cartes sont au-dessus de la ligne de flottaison : préchargées (LCP).
+                  priority={index < 4}
                   className="object-cover transition-transform duration-500 ease group-hover:scale-105"
                 />
 

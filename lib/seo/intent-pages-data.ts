@@ -568,6 +568,11 @@ export const INTENT_PAGES: IntentPageData[] = [
         answer:
           "Oui, à condition de l'indiquer. Le home staging virtuel montre le potentiel d'aménagement d'un volume, comme un plan meublé. La transparence dans l'annonce protège votre relation de confiance.",
       },
+      {
+        question: 'Quel est le meilleur logiciel de home staging pour un agent immobilier ?',
+        answer:
+          "Cela dépend du volume traité. Pour quelques photos par an, un prestataire à l'image suffit. Dès plusieurs biens par mois, un abonnement illimité comme InstaDeco Pro devient plus rentable. Notre comparatif 2026 passe en revue les principaux outils du marché, prix vérifiés à l'appui.",
+      },
     ],
     keywords: [
       'home staging virtuel agents immobiliers',
@@ -656,6 +661,11 @@ export const INTENT_PAGES: IntentPageData[] = [
       },
     ],
     faq: [
+      {
+        question: 'Combien coûte le home staging virtuel en général ?',
+        answer:
+          "Un prestataire à la photo facture environ 30 à 200 € par visuel. Les logiciels par abonnement, comme InstaDeco, vont d'environ 20 à 50 € par mois. À comparer au home staging physique, qui démarre autour de 1 800 € HT pour un bien vide en France.",
+      },
       {
         question: 'Combien coûte le home staging virtuel chez InstaDeco ?',
         answer:
@@ -761,6 +771,11 @@ export const INTENT_PAGES: IntentPageData[] = [
     ],
     faq: [
       {
+        question: 'Le home staging virtuel est-il légal en Belgique ?',
+        answer:
+          "Oui. Aucune loi belge ne l'interdit ni ne l'encadre spécifiquement. Le Code de droit économique interdit les pratiques trompeuses, et la déontologie IPI exige une information loyale : indiquer sur l'annonce que les photos sont meublées virtuellement reste la pratique la plus sûre.",
+      },
+      {
         question: 'Puis-je utiliser ces rendus sur Immoweb et mes annonces ?',
         answer:
           "Oui. Les images sont en haute définition et conviennent à Immoweb comme à votre vitrine. Indiquez simplement dans l'annonce que la pièce a fait l'objet d'un home staging virtuel.",
@@ -857,6 +872,11 @@ export const INTENT_PAGES: IntentPageData[] = [
       },
     ],
     faq: [
+      {
+        question: 'Le home staging virtuel est-il légal en Suisse ?',
+        answer:
+          "Oui. Aucune règle suisse ne vise spécifiquement les photos retouchées. La loi contre la concurrence déloyale (LCD) interdit les indications fallacieuses sur un bien : signaler que l'aménagement est un rendu virtuel est donc la pratique recommandée pour rester loyal envers l'acheteur.",
+      },
       {
         question: 'Combien coûte le home staging virtuel par rapport à un photographe ?',
         answer:

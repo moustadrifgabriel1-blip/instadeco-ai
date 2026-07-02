@@ -33,7 +33,7 @@ export const SEO_CONFIG = {
     name: 'InstaDeco AI',
     legalName: 'InstaDeco AI',
     foundingDate: '2025',
-    founders: ['InstaDeco Team'],
+    founders: ['Gabriel Moustadrif'],
   },
   
   // SEO Technique

@@ -175,6 +175,13 @@ const nextConfig = {
         destination: '/fr/solution/:path*',
         permanent: true,
       },
+      // Money page fr-only : sans ce 301, le middleware ne fait qu'un 307 et Google
+      // choisissait /pro comme canonical au lieu de /fr/pro (page jamais indexée).
+      {
+        source: '/pro',
+        destination: '/fr/pro',
+        permanent: true,
+      },
       {
         source: '/architecte-interieur/:path*',
         destination: '/fr/architecte-interieur/:path*',

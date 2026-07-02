@@ -33,6 +33,8 @@ export function generateOrganizationSchema() {
     founder: {
       '@type': 'Person',
       name: 'Gabriel Moustadrif',
+      jobTitle: "Fondateur d'InstaDeco",
+      url: `${SEO_CONFIG.siteUrl}/fr/a-propos`,
     },
     email: SEO_CONFIG.email,
     // Profils réels (entité InstaDeco). N'inclure QUE des comptes existants.

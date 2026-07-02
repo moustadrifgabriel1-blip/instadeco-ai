@@ -36,3 +36,30 @@ export const PRO_PRICING = [
   { name: 'Pro', monthly: 49 },
   { name: 'Agence', monthly: 99 },
 ];
+
+// Rendus réels (compte démo propriétaire, conformes RGPD pour page indexée).
+// Chaque paire provient d'UNE même ligne de la table `generations` (input vide +
+// output meublé), donc l'avant/après est garanti être la même pièce.
+// Partagé entre le rendu (page.tsx) et le schema ImageObject (layout.tsx).
+export const REAL_RENDERS = [
+  {
+    before:
+      'https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/input-images/f88c9b68-eda4-4d67-bfb4-f631d21b37c6/gallery30-4030028-japandi.jpg',
+    after:
+      'https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/output-images/gemini/1782047046789-mee0h.jpg',
+    beforeAlt: 'Salon vide avant home staging virtuel',
+    afterAlt: 'Salon meublé style japandi après home staging virtuel par IA',
+    eyebrow: 'Salon, style japandi',
+    caption: 'La même pièce, meublée pour séduire un acheteur',
+  },
+  {
+    before:
+      'https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/input-images/f88c9b68-eda4-4d67-bfb4-f631d21b37c6/gallery30-6835102-midcentury.jpg',
+    after:
+      'https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/output-images/gemini/1782047014810-s1f7n.jpg',
+    beforeAlt: 'Salon vide avant home staging virtuel',
+    afterAlt: 'Salon meublé style midcentury après home staging virtuel par IA',
+    eyebrow: 'Salon, style midcentury',
+    caption: 'Le même espace, prêt pour vos visites',
+  },
+];

@@ -2,108 +2,112 @@
 
 > Tableau de bord central. Écrit par `seo-chief` après chaque audit. Source de vérité partagée.
 > Statut système : **ACTIF (Google-safe, croissance progressive)** — installé le 2026-06-14.
-> Dernier audit : **2026-06-22** (cadre v2, données GSC **live** via ADC, voir mémoire `gsc-live-access`).
+> Dernier audit : **2026-07-02** (audit COMPLET, 11 escouades Diagnostic + Sémantique en parallèle, GSC live via ADC + URL Inspection API).
 
-## Audit 2026-06-22 (cadre v2, GSC live)
-- **Baseline (28 j, fin 19/06)** : 7 clics / 305 impr / CTR 2,3 % / pos 18,5. Sitemap = 233 URLs. Re-mesure J+30, ne pas retoucher les titres d'ici là.
-- **Opportunité money confirmée** : « logiciel home staging à partir d'une photo » pos ~11, page `/solution/logiciel-home-staging` indexée. Title recentré sur cette requête.
-- **Déployé** : CTR titles 8 villes indexées, `/pro` fr-only, pivot intention villes (H1 home staging), double suffixe de marque retiré, H1 /pro réparé, tirets cadratins purgés, claim ControlNet corrigé, E-E-A-T blog (auteur Gabriel Moustadrif, schema Person), barrière qualité pSEO /amenager (noindex < 120 mots).
-- **Findings critiques (URL Inspection)** : `/fr/pro` NON indexée (alternate, crawl pré-fix, forcer Request Indexing) ; articles blog « inconnus de Google » (découverte faible) ; /amenager jamais indexées (noindex = 0 coût) ; crawl ~2 à 4 sem.
-- **À suivre** : PR6 maillage money pages ; cluster contenu agents immo ; Option 2 pSEO dépriorisée (pas de demande). Aucun spam/abus (corrections only, empreinte réduite).
+## Audit 2026-07-02 (complet, GSC live + URL Inspection)
 
-## KPIs (28 jours glissants — GSC réel, période 2026-05-19 → 2026-06-15)
-| métrique | valeur | cible | trend | source |
+### KPIs mesurés (GSC réel, 28 j glissants, période 2026-06-04 → 2026-07-01)
+| métrique | valeur | période préc. (07/05→03/06) | baseline 19/06 | source |
 |---|---|---|---|---|
-| Clics organiques (GSC) | **8** | ↗ | nouveau (1er relevé) | gsc_2026-06-18 |
-| Impressions (GSC) | **299** | ↗ | nouveau | gsc_2026-06-18 |
-| CTR moyen | **2.7%** | >3% | nouveau | gsc_2026-06-18 |
-| Position moyenne | **19.6** | <15 | nouveau | gsc_2026-06-18 |
-| Pages indexées | ~228 URLs au sitemap (dont 57 villes fr) | =sitemap | — | sitemap.xml live |
-| Drift on-page (10 pages clés) | 0 anomalie | 0 | stable | drift_2026-06-18 |
-| Citations LLM (mentions) | non mesuré | ↗ | — | seo-geo-citation (dormant) |
-| Articles blog publiés (fr/en/de) | 38 / 0 / 0 | parité | — | code |
+| Clics organiques | **10** | 8 | 7 | GSC searchanalytics |
+| Impressions | **416** | 245 | 305 | GSC searchanalytics |
+| CTR moyen | **2.4%** | 3.27% | 2.3% | GSC |
+| Position moyenne | **9.73** | 24.46 | 18.5 | GSC |
 
-### Lecture des KPIs
-- **Site jeune** : 8 clics réels. Les clics vont à `/fr` (5), `/quiz` (2), `/solution/avant-apres-decoration` (1). Aucune page ville ne convertit en clic.
-- **Marque** : « instadeco » pos 7.5, « insta deco » pos 2.7 — la marque émerge.
-- **Poche pSEO « architecte d'intérieur » identifiée** : 57 pages villes indexées, impressions réelles, **0 clic**. Deux régimes :
-  - Bonnes positions sous-exploitées (CTR 0) : Amiens 4.2, Annecy 5.0, Uccle 6.7, Nice 7.7, Neuchâtel 9.5, Louvain-la-Neuve 9.9, Liège 10.3, Yverdon 10.5 → impressions mais 0 clic = **problème de title/CTR + intention**.
-  - Poche profonde mal classée : tout le cluster « architecte d'intérieur Genève » est en **position 79–85** (14 impressions sur la requête principale) malgré une page dédiée → **mismatch d'intention + page trop faible pour une requête concurrentielle**.
+Lecture : croissance saine et Google-safe (impressions +70%, position moyenne 24,5→9,7). Tirée par la marque (« instadeco » pos 6, « insta deco » pos 2.1) et le contenu déco générique, **PAS** par le cluster Pro. Le CTR baisse mécaniquement (plus d'impressions longue-traîne). Aucune retouche de titre avant la re-mesure J+30 (~19/07) : le gel est justifié, la tendance est positive.
+
+### Indexation money pages (URL Inspection API, autoritaire)
+| page | statut | note |
+|---|---|---|
+| `/fr/pro` | **NON indexée** — « Duplicate, Google chose different canonical » vers `/pro` (sans /fr) | crawl 23/06, avant pleine propagation du fix fr-only. **Cause racine identifiée cet audit : `/pro` fait un 307 temporaire, pas un 301 permanent.** |
+| `/solution/home-staging-virtuel-agents-immobiliers` | **indexée (PASS)** | hub du cluster, seule page Pro indexée |
+| `/solution/home-staging-virtuel-prix` | URL unknown to Google | publiée 28/06, jamais crawlée (site jeune, crawl 2-4 sem) |
+| `/solution/home-staging-virtuel-belgique` | URL unknown | idem |
+| `/solution/home-staging-virtuel-suisse-romande` | URL unknown | idem |
+| `/solution/home-staging-virtuel-legal` | URL unknown | idem |
+| `/blog/meilleur-logiciel-home-staging-virtuel-2026` | crawlée, 8 impr dès le 01/07 | fraîcheur OK |
+
+Money pages GSC : **0 impression, 0 clic** sur toutes (/fr/pro, 4×/solution/home-staging-virtuel-*, /essai). Seule requête thématique active : « logiciel home staging à partir d'une photo » pos 11.2 sur `/solution/logiciel-home-staging` (0 clic).
+
+### Diagnostic synthétique par axe
+
+**Technique** — Socle sain (robots, sitemap, headers sécurité, 301 clusters déjà posés, hreflang réciproques HTML corrects). Trou majeur : `/pro` sans 301 permanent (oublié du fix du 23/06 qui a couvert /solution, /architecte-interieur, etc.). Header HTTP `Link` hreflang (généré par next-intl) contredit la stratégie fr-only de /pro (annonce en/de + x-default vers /pro bare) alors que le `<head>` HTML est correct : signal contradictoire, risque modéré (pages en/de/pro portent noindex).
+
+**Contenu / E-E-A-T** — Bon socle (auteur Gabriel Moustadrif en Person, disclaimer de conflit d'intérêt dans le comparatif = signal de confiance rare à préserver). Trous : (1) `/pro` affiche les prix en EUR seulement alors que le marché CH est ciblé (page suisse-romande cite des CHF) → friction ; (2) zéro preuve sociale sur /pro (`generation_ratings` = 0 ligne, confirmé DB, donc AUCUN AggregateRating autorisé) ; (3) plusieurs réponses FAQ < 40 mots, sous-optimales pour la citation LLM autonome.
+
+**Maillage / autorité** — Le VRAI frein reste l'autorité off-site (0 backlink méritant, 0 profil tiers). En interne : 5 `relatedArticles` du hub agents-immobiliers pointent vers des slugs blog dont 4 ne sont PAS encore écrits (liens morts en attente de contenu, cf. P0 contenu). Risque de cannibalisation entre `/solution/home-staging-virtuel` (générique, intention B2C, CTA /generate) et `home-staging-virtuel-agents-immobiliers` (pro, CTA /pro) sur le mot-clé pivot exact.
+
+**GEO / AEO / citations LLM** — llms.txt orienté agents immo OK, FAQPage sur /pro et articles blog OK. Gaps citabilité : passages Q→R 40-60 mots autonomes manquants sur (a) le prix, (b) la légalité par pays (BE et CH restent génériques, non différenciés), (c) le comparatif « meilleur logiciel pour agent immo ». Les 8 pages /solution sont 100% texte : rien à indexer sur Google Images / AI Overviews visuels. Citation réelle jamais mesurée (relève de seo-geo-citation, dormant, cap 1.50 CHF).
+
+**Local / geo FR-BE-CH** — Pages Belgique/Suisse romande créées mais ancrage local générique (pas de spécificité vérifiable par marché). Prix /pro non converti en CHF. Pas de Google Business Profile.
+
+**Entité / marque** — sameAs = 3 profils réels (Instagram, Facebook, Pinterest) sur 10 visés, aucun profil B2B (LinkedIn, Product Hunt, Crunchbase). `founder = ['InstaDeco Team']` (string générique) incohérent avec la byline Gabriel Moustadrif ET avec le copy /a-propos qui évoque un couple fondateur (à trancher). `areaServed` absent du schema Organization. `twitterHandle` configuré mais absent de sameAs (compte à vérifier). Wikidata : notabilité insuffisante aujourd'hui, à revisiter dans 2-3 mois.
+
+**Images** — Socle solide (AVIF/WebP, sitemap-images propre, unoptimized bien confiné aux previews). Gaps GEO : avant/après de /pro sans ImageObject, 8 pages /solution sans aucune image, alt des rendus peu descriptifs pour « home staging virtuel », galerie sans `priority` sur le LCP.
+
+**Concurrence** — HOQI (hoqi.app) : 19,99€/mois (moins cher que notre Pro 49€), multilingue natif, feature image→vidéo absente chez nous, preuve sociale nommée (logos Century21/Efficity/Noovimo). Styldod/Virtual Staging AI couvrent la disclosure légale IA et le ROI chiffré.
+
+**Drift** — Aucune régression on-page. Deux points de veille : « June 2026 spam update » (24/06) chevauche la fenêtre des commits cluster (corréler à la re-mesure du 19/07) ; hreflang absent sur les nouveaux articles blog fr-only (confirmer que c'est voulu).
+
+## Issues priorisées — 2026-07-02
+
+### P0 — impact money direct, exécutable maintenant (code/DB), Google-safe
+| # | issue | owner | fix | google_risk | ETA |
+|---|---|---|---|---|---|
+| A1 | `/pro` (bare) = 307 temporaire, pas 301 permanent → Google canonicalise vers `/pro` et laisse `/fr/pro` NON indexée. Cause racine du non-index de la money page n°1. | seo-technical (next.config.js) | ajouter `{source:'/pro',destination:'/fr/pro',permanent:true}` dans le bloc redirects existant | low | 15 min |
+| A2 | 4 `relatedArticles` du hub pointent vers slugs blog non écrits (liens morts) : home-staging-virtuel-ou-physique-comparatif, home-staging-vend-il-plus-vite, photos-annonce-immobiliere-qui-font-visiter, vendre-bien-vide-ou-meuble-virtuellement | seo-content + humain (relecture) | écrire les articles (1-2/sem max, gate anti-IA, angle unique, pas de stat inventée) OU retirer temporairement les liens non résolus | med (scaled content si dump) | échelonné |
+| A3 | Passages Q→R 40-60 mots autonomes manquants : prix, légalité BE, légalité CH, « meilleur logiciel pour agent immo ». Gain citation LLM direct. | seo-content (intent-pages-data.ts corps FAQ, PAS les titles) | ajouter 1 passage citable par gap, entité complète dans la réponse | low | 1-2 h |
+
+### P1 — schema / entité / images, exécutable maintenant
+| # | issue | owner | fix | google_risk |
+|---|---|---|---|---|
+| B1 | `founder = ['InstaDeco Team']` incohérent (Person Gabriel Moustadrif ailleurs) + copy /a-propos évoque un couple | seo-schema + humain | trancher 1 ou 2 fondateurs réels, émettre `founder` Person(s) | low |
+| B2 | `areaServed` absent du schema Organization | seo-schema | ajouter Country FR/CH/BE (DE seulement si marché actif confirmé) | low |
+| B3 | /pro sans BreadcrumbList ; /essai sans aucun JSON-LD | seo-schema | ajouter BreadcrumbList /pro + BreadcrumbList/WebPage /essai | low |
+| B4 | avant/après de /pro sans ImageObject (modèle réutilisable existe sur /g/[id]) | seo-images | ajouter ImageObject par rendu de REAL_RENDERS | none |
+| B5 | galerie sans `priority` sur les 2-4 premières cartes (LCP) ; alt peu descriptifs pour « home staging virtuel » | seo-images | priority index<4 + alt fidèle enrichi | none |
+| B6 | HowTo sur 3/9 pages solution seulement | seo-schema | flip `howTo:true` au cas par cas si le flux est réellement décrit (pas en masse) | low |
+
+### P1 — off-site (LE vrai levier d'autorité, actions humaines)
+| # | action | angle | rythme |
+|---|---|---|---|
+| C1 | Créer profils B2B réels : LinkedIn company, Product Hunt, Crunchbase (P0 entité) | présence entité + sameAs | 1/semaine |
+| C2 | Se faire lister dans les listicles « meilleur logiciel home staging virtuel » (cf. plan off-site) | outil FR/BE/CH pour agents immo | 1 pitch utile/site/mois |
+| C3 | Google Business Profile si adresse pro dispo | local FR/CH | 1× |
+| C4 | Trustpilot/Capterra/G2 : SÉQUENCER après avoir de vrais clients Pro (profil vide = signal négatif) | preuve sociale | P2 |
+
+### P2 — à planifier APRÈS la re-mesure du 19/07 (gel des titres)
+| # | item |
+|---|---|
+| D1 | Réévaluer CTA + hiérarchie hub/spoke de `/solution/home-staging-virtuel` (cannibalisation avec agents-immobiliers) une fois l'intention SERP dominante confirmée |
+| D2 | Ajouter affichage CHF sur /pro pour le marché suisse (friction conversion, pas SEO) |
+| D3 | Preuve sociale sur /pro dès qu'il y a de vrais avis (`generation_ratings`) |
+| D4 | Nouveaux spokes : workflow agence multi-mandats, comparatif nommé vs HOQI (revérifier prix à la rédaction), location, extérieur (valider capacité produit avant) |
+| D5 | Enrichir sitemap-images (visuels /solution + /g/[id]) ; noms de fichiers parlants pour NOUVELLES images marketing |
+| D6 | Header HTTP hreflang contradictoire sur /pro (investiguer next-intl) |
+
+### Infra
+| # | item |
+|---|---|
+| E1 | **Pipeline GSC (gsc_daily) n'a rien écrit depuis le 18/06 (17 j de trou)** : cron VPS possiblement cassé (CRON_SECRET désynchro ou erreur silencieuse). À réparer sinon la détection de drift/decay reste aveugle. Accès local via ADC gcloud OK (mécanisme validé). |
 
 ## Dépenses (CHF/mois) — total ≤ 2 CHF
 | poste | coût | budget | statut |
 |---|---|---|---|
 | Agents (Claude Code) | 0 | — | inclus abo |
-| APIs Google (GSC/PSI/CrUX/GA4) | 0 | 0 | gratuit |
-| Cron (VPS Hetzner mutualisé) | 0 | 0 | déjà payé, partagé 3 projets |
-| Scraping SERP/concurrents | 0 | 0 | bande passante |
-| **Monitoring citations LLM** | 0 | 1.50 | seul poste payant (dormant) |
+| APIs Google (GSC/Inspection via ADC) | 0 | 0 | gratuit |
+| Cron VPS Hetzner | 0 | 0 | déjà payé |
+| Monitoring citations LLM | 0 | 1.50 | dormant, pas lancé cet audit |
 | **TOTAL** | **0** | **2.00** | sous budget |
 
-## Triggers d'upgrade (budget piloté par le revenu SEO)
-| seuil revenu SEO/mois | nouveau plafond budget | débloque |
-|---|---|---|
-| > 200 CHF | 5 CHF | citations + fréquentes, + prompts |
-| > 500 CHF | 15 CHF | API SERP payante (rangs précis) |
-| > 1000 CHF | 30 CHF | VPS cron dédié, monitoring temps réel |
-
-## Issues — état réel au 2026-06-18
-
-### Closes depuis l'audit du 14/06 (vérifiées vivantes/mortes ce jour)
-| # | issue | statut 18/06 | preuve |
-|---|---|---|---|
-| 1 | Sitemap malformé (`\n` dans `<loc>`) | **FERMÉ** | sitemap.xml live : 228 `<loc>` propres, 0 `\n` |
-| 2 | /fr/essai canonical → home | **FERMÉ** | corrigé code, déployé |
-| 3 | /fr/blog = 404 | **FERMÉ** | blog déployé, /fr/blog répond 200 |
-| 4 | og-image 404 | **FERMÉ** | route /api/og en place |
-| 5 | canonicals programmatiques sans locale | **FERMÉ** (template ville) | `frOnlyProgrammaticMeta` : canonical fr + noindex en/de |
-| 6 | FAQ schema neutralisée par sanitizer | **FERMÉ** | FAQPage live sur /fr (5 Q/R) + pages villes (2 Q/R) |
-| 7 | BlogPosting url/@id vides | **FERMÉ** | aucun url/@id vide détecté live |
-| 8 | SoftwareApplication injecté 2× | **FERMÉ** | dédup par @id stable dans le @graph |
-
-### P0 — pSEO, money-critical (chantier business n°1)
-| # | issue | preuve | fix proposé | google_risk |
-|---|---|---|---|---|
-| P0-1 | **57 pages villes = thin / quasi-duplicate** : ~0 mot réellement unique. Contenu 100% statique + nom de ville interpolé. Le paragraphe « local » = 1 texte parmi 6 partagé par archStyle (cases `brick`/`timber` n'injectent même pas le nom de ville). Risque index bloat + dévaluation site entier. | `cities.ts` = 6 champs (name, slug, region, zip générique, country, archStyle). `getArchitectureContent` = switch 6 cas. | Barrière qualité AVANT toute nouvelle page (voir Plan pSEO). Enrichir données par ville (vraies données locales) OU noindex la longue traîne faible et ne garder en index qu'une 1re vague qualifiée. | **HIGH si on ne corrige pas** |
-| P0-2 | **0 clic malgré impressions** : titles avec tiret de séparation + intention mismatch. La requête « architecte d'intérieur Genève » cherche un PRO local ; on sert un SaaS IA → faible CTR + Google enfonce (pos 80+). | title = `Architecte d'intérieur IA à {ville} ({zip}) - Rénovation & Déco`. | Réécrire title/meta orientés intention réelle + bénéfice (voir plan). Reframe la promesse : « visualisez avant de payer un architecte ». | med |
-| P0-3 | **Tiret de séparation dans les `<title>`** des villes ET du hub | `... ({zip}) - Rénovation` et `Ville - IA & Décoration \| InstaDeco` | remplacer ` - ` par ` : ` ou `\|` (règle projet zéro tiret, marqueur IA) | low |
-| P0-4 | **Page hub `/architecte-interieur` sans noindex en/de ni canonical localisé** : `/en/architecte-interieur` et `/de/architecte-interieur` servent du FR mais sont indexables. Sitemap les déclare en 3 locales (`withAlternatesForAllLocales`). | `export const metadata` statique, canonical `https://instadeco.app/architecte-interieur` sans `/fr`. | Appliquer `frOnlyProgrammaticMeta` au hub + `frOnlySitemap`. | med |
-
-### P1 — pSEO maillage + schema
-| # | issue | fix proposé | google_risk |
-|---|---|---|---|
-| P1-1 | **Maillage inter-villes faible** : liens uniquement intra-région. Villes seules dans leur région = quasi-orphelines. | maillage par proximité géo + cross-pays limité, + lien hub→ville réciproque renforcé. | low |
-| P1-2 | **URL du `Service` schema fausse** pour villes à accents/tirets (recalcule slug depuis `name`) : Genève→`genève`, Saint-Étienne, Liège, Nîmes, Besançon, Neuchâtel, Yverdon, Orléans. | utiliser `city.slug` au lieu de `name.toLowerCase().replace()`. | low |
-| P1-3 | **Prix générique « 150€–300€ » identique partout**, y compris villes CH (devise affichée CHF). Incohérence = signal de qualité faible + risque crédibilité. | retirer le prix chiffré inventé OU le rendre réel par pays. **Pas d'invention de chiffres.** | med |
-| P1-4 | **Emojis drapeaux** dans le copy du hub (`France 🇫🇷`...) | remplacer par icônes/texte (règle zéro emoji). | low |
-
-### P1 — GEO (préparation citabilité IA)
-| # | issue | fix proposé | google_risk |
-|---|---|---|---|
-| G-1 | **`llms.txt` absent** (404 live, aucune route code) | créer `app/llms.txt/route.ts` ou `public/llms.txt` : index des pages clés + 1 phrase de description par page. | low |
-| G-2 | **`sameAs` = 3** (Twitter, Instagram, Pinterest) vs cible ≥10 | ajouter profils RÉELS uniquement (LinkedIn, Facebook, YouTube, Product Hunt, etc. créés). Pas de profil fictif. | low |
-| G-3 | **Articles blog sans `FAQPage`** : 38 articles FR = gros gisement citable non structuré | ajouter FAQPage (2-3 Q/R, réponses 40-60 mots) en fin d'article, sur vrai contenu. | low |
-| G-4 | **`availableLanguage` figé `["French"]`** sur /en /de (Organization + Service) | propager la locale (déjà fait pour `inLanguage`). | low |
-| G-5 | **Pas de `HowTo`** (workflow photo→style→rendu) | ajouter HowTo sur /generate ou home (4 étapes réelles). | low |
-| G-6 | Réponses FAQ souvent <40 mots ; home n'expose que 5 Q/R | viser 40-60 mots, format Q→réponse directe, sur pages money. | low |
-
-### P2 — hérité du 14/06 (encore à traiter, hors pSEO/GEO immédiat)
-| # | issue | fix |
-|---|---|---|
-| 11 | Blog → /pricing : 0 lien interne | CTA blog→/pricing |
-| 12 | `InternalLinksService` casse l'i18n + ne cible jamais /essai | préfixer locale + cibler /essai |
-| 13 | /parrainage orpheline | 1 lien Footer |
-| 14 | Cannibalisations (home staging Genève ×2, plantes ×2, home office ×2) | fusion + 301 |
-| 16 | en/de blog vide mais indexable | backfill (runbook) ou noindex temporaire |
-| 17 | Claim « 20+ styles » vs 11 documentés | vérifier catalogue réel |
-| 18 | AggregateRating interdit (table vide) — comportement actuel correct | préserver, brancher quand vrais avis |
-
-> Points solides confirmés live : robots.txt n'entrave aucun crawler IA, sitemap propre (228 URLs), `inLanguage` localisé, @graph dédupliqué par @id, ImageObject avant/après réel sur `/g/[id]`, page `/fr/architecte-interieur/geneve` a un @graph riche et valide (Service + City + FAQPage + ImageObject), aucun AggregateRating factice.
+## Prompts LLM proposés pour le futur batch seo-geo-citation (20, fr, marché immo)
+Voir serp-targets.md (mis à jour par seo-geo-serp). Prioritaires : meilleur logiciel home staging virtuel agent immo 2026 ; légal FR/BE/CH ; combien coûte ; virtuel ou physique ; moins cher pour agence ; InstaDeco fiable pro.
 
 ## Historique des audits
 | date | agents lancés | findings | patchs appliqués |
 |---|---|---|---|
-| 2026-06-14 | technical, content, schema, cluster, link-graph (sans GSC) | 18 issues (5 P0, 5 P1, 8 P2) | P0 #1,2,4,5 + P1 #6,7,8 appliqués (code). |
-| 2026-06-18 | seo-chief + 2 explorations (pSEO deep-dive + GEO/schema), sur GSC réel | 8 issues du 14/06 fermées. Nouveau focus : pSEO (P0-1→P0-4, P1-1→P1-4) + GEO (G-1→G-6). | aucun (audit lecture seule, patchs proposés au human). |
-| 2026-06-22 | audit cadre v2 sur GSC **live** (ADC) + curl prod + URL Inspection. Workflows multi-agents partiels (limites de session), mesures faites en direct par le lead. | CTR titles villes, /pro fr-only, pivot intention, double suffixe marque, H1 /pro, E-E-A-T blog (auteur humain), barrière qualité /amenager. Findings : /pro non indexée, blog inconnu de Google. | 8 commits déployés (344616d→30082da). STOP, re-mesure J+30. |
-| 2026-06-23 | suite, sur GSC live + URL Inspection. | PR6 maillage blog→/pro, délai 30s propagé, enrichissement contenu (`sections` sur logiciel-home-staging + decoration-salon), fix duplicate canonical (301 permanents routes programmatiques), money page agents immo ajoutée au Footer. Mesure : seules 2 pages /solution proprement indexées, crawl rare. | 5 commits (89cd549→8912e1d). Reste : request indexing manuel + autorité/backlinks. |
+| 2026-06-14 | technical, content, schema, cluster, link-graph | 18 issues | P0 #1,2,4,5 + P1 #6,7,8 (code). |
+| 2026-06-18 | seo-chief + 2 explorations, GSC réel | 8 fermées, focus pSEO+GEO | aucun (lecture seule). |
+| 2026-06-22 | audit cadre v2, GSC live | CTR titles, /pro fr-only, pivot intention, E-E-A-T blog | 8 commits (344616d→30082da). |
+| 2026-06-23 | suite, GSC live | PR6 maillage, 30s, enrichissement, fix duplicate canonical, money page au Footer | 5 commits (89cd549→8912e1d). |
+| 2026-07-02 | **audit COMPLET : technical, google, drift, sxo-decay, competitor, content, cluster, schema, geo-serp, entity-graph, images (11 escouades parallèles)** | GSC +70% impr / pos 9,7 (sain, tiré par la marque). /pro toujours non indexée (307 au lieu de 301 = cause racine). Cluster Pro quasi non crawlé (jeune). Gaps : liens blog morts, passages Q→R BE/CH/prix, founder incohérent, sameAs 3/10, /pro sans preuve sociale ni CHF, images absentes des /solution. Pipeline GSC muet depuis le 18/06. | aucun (audit lecture seule, patchs proposés au human ci-dessous). |

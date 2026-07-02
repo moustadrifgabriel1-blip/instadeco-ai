@@ -1,8 +1,9 @@
 import { Metadata } from 'next';
 import { getCanonicalUrl, getLocalizedCanonicalUrl, frOnlyProgrammaticMeta } from '@/lib/seo/config';
 import { JsonLd } from '@/lib/seo/json-ld';
-import { generateProSubscriptionSchema, generateFAQSchema } from '@/lib/seo/schemas';
-import { PRO_FAQ, PRO_PRICING } from './pro-data';
+import { generateProSubscriptionSchema, generateFAQSchema, generateBreadcrumbList } from '@/lib/seo/schemas';
+import { getLocalizedCanonicalUrl as canonical } from '@/lib/seo/config';
+import { PRO_FAQ, PRO_PRICING, REAL_RENDERS } from './pro-data';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -48,6 +49,21 @@ export default function ProLayout({ children }: { children: React.ReactNode }) {
           // pro-data pour garantir la parite avec ce que la page affiche.
           generateProSubscriptionSchema(PRO_PRICING),
           generateFAQSchema(PRO_FAQ.map((f) => ({ question: f.q, answer: f.a }))),
+          // Fil d'ariane : aide Google à situer la money page dans le site.
+          generateBreadcrumbList(
+            [{ label: 'InstaDeco Pro', path: canonical('fr', '/pro') }],
+            { home: { name: 'Accueil', url: canonical('fr', '/') } },
+          ),
+          // Avant/après réels de la page (compte démo RGPD) : ImageObject pour
+          // Google Images et les moteurs IA. Parité garantie avec le rendu visible.
+          ...REAL_RENDERS.map((r) => ({
+            '@type': 'ImageObject' as const,
+            name: r.eyebrow,
+            description: r.afterAlt,
+            contentUrl: r.after,
+            url: canonical('fr', '/pro'),
+            creator: { '@type': 'Organization' as const, name: 'InstaDeco AI', url: 'https://instadeco.app' },
+          })),
         ]}
       />
       {children}
