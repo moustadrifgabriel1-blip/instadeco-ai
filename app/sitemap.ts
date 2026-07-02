@@ -124,8 +124,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let articlePages: MetadataRoute.Sitemap = [];
 
   try {
-    const { createClient } = await import('@/lib/supabase/server');
-    const supabase = await createClient();
+    // Client admin SANS cookies : le client serveur (cookies()) forçait la route en
+    // dynamique, donc zéro cache ISR et ~3,6 s par requête. Googlebot tombait en
+    // timeout (« erreur de traitement temporaire ») et ne relisait plus le sitemap.
+    const { getSupabaseAdmin } = await import('@/lib/supabase/admin-client');
+    const supabase = getSupabaseAdmin();
 
     const { data: articles } = await supabase
       .from('blog_articles')
