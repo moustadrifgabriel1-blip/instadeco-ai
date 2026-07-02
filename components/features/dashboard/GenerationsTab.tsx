@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { SmartGenerationCard } from '@/components/features/smart-generation-card';
 import { ShareButtons } from '@/components/features/share-buttons';
+import { RatingStars } from '@/components/features/RatingStars';
 import { Sparkles, ImageIcon, Filter, Download } from 'lucide-react';
 import type { GenerationDTO } from '@/src/application/dtos/GenerationDTO';
 import type { FilterStatus } from './types';
@@ -107,6 +108,8 @@ export function GenerationsTab({ generations, refetchGenerations, referralCode }
                         referralCode={referralCode || undefined}
                         variant="compact"
                       />
+                      {/* Notation a posteriori : alimente generation_ratings (preuve sociale). */}
+                      <RatingStars generationId={gen.id} />
                     </>
                   )}
                 </div>

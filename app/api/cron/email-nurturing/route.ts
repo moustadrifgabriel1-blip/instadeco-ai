@@ -35,7 +35,7 @@ export async function GET(req: Request) {
     }
 
     const now = new Date();
-    const results = { j3: 0, j7: 0, j14: 0, quiz: 0, trial_j1: 0, trial_j3: 0, trial_j7: 0, errors: 0 };
+    const results = { j3: 0, j7: 0, j14: 0, quiz: 0, trial_j1: 0, trial_j3: 0, trial_j7: 0, avis: 0, errors: 0 };
 
     // ========================================
     // CAP QUOTIDIEN GLOBAL D'ENVOIS (cost-004)
@@ -296,7 +296,64 @@ export async function GET(req: Request) {
       }
     }
 
-    console.log(`[Email Nurturing] ✅ J3: ${results.j3}, J7: ${results.j7}, J14: ${results.j14}, Quiz: ${results.quiz}, Trial-J1: ${results.trial_j1}, Trial-J3: ${results.trial_j3}, Trial-J7: ${results.trial_j7}, Errors: ${results.errors}`);
+    // ========================================
+    // AVIS : demande de notation J+2 a J+7 apres une generation reussie
+    // Alimente generation_ratings (preuve sociale, prerequis AggregateRating).
+    // Un SEUL envoi par utilisateur a vie (profiles.rating_request_sent_at).
+    // ========================================
+    const twoDaysAgo = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000);
+    // Cohorte RGPD : les comptes crees avant le 11/02/2026 ont un consent_marketing
+    // DEFAULT true jamais confirme (re-consentement en attente) : on les exclut.
+    const CONSENT_COHORT_START = '2026-02-11T00:00:00Z';
+
+    const { data: recentGens } = await supabaseAdmin
+      .from('generations')
+      .select('user_id, created_at')
+      .eq('status', 'completed')
+      .gte('created_at', sevenDaysAgo.toISOString())
+      .lt('created_at', twoDaysAgo.toISOString())
+      .limit(200);
+
+    const candidateUserIds = [...new Set((recentGens || []).map((g) => g.user_id).filter(Boolean))].slice(0, 40);
+
+    for (const userId of candidateUserIds) {
+      const { data: profile } = await supabaseAdmin
+        .from('profiles')
+        .select('id, email, full_name, consent_marketing, rating_request_sent_at, created_at')
+        .eq('id', userId)
+        .maybeSingle();
+
+      if (!profile?.email) continue;
+      // RGPD : opt-in strict + cohorte au consentement explicite uniquement.
+      if (profile.consent_marketing !== true) continue;
+      if (profile.created_at && profile.created_at < CONSENT_COHORT_START) continue;
+      // Idempotence : jamais deux demandes d'avis au meme utilisateur.
+      if (profile.rating_request_sent_at) continue;
+
+      // Deja note spontanement ? Rien a demander.
+      const { count: ratingCount } = await supabaseAdmin
+        .from('generation_ratings')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', userId);
+      if ((ratingCount || 0) > 0) {
+        // On marque quand meme pour ne plus jamais re-evaluer ce profil.
+        await supabaseAdmin.from('profiles').update({ rating_request_sent_at: now.toISOString() }).eq('id', userId);
+        continue;
+      }
+
+      if (await sendCapped({
+        from: FROM_EMAIL,
+        to: [profile.email],
+        subject: 'Vos rendus déco valent-ils le coup ? Dites-le en 2 clics',
+        html: buildRatingRequestEmail(profile.full_name || 'là', profile.email),
+      }) === 'sent') {
+        results.avis++;
+        // Marquage APRES envoi reussi : un echec d'envoi laisse le profil re-eligible.
+        await supabaseAdmin.from('profiles').update({ rating_request_sent_at: now.toISOString() }).eq('id', userId);
+      }
+    }
+
+    console.log(`[Email Nurturing] ✅ J3: ${results.j3}, J7: ${results.j7}, J14: ${results.j14}, Quiz: ${results.quiz}, Trial-J1: ${results.trial_j1}, Trial-J3: ${results.trial_j3}, Trial-J7: ${results.trial_j7}, Avis: ${results.avis}, Errors: ${results.errors}`);
     console.log(`[Email Nurturing] 📊 Envoyes: ${sentCount}/${DAILY_EMAIL_CAP} (cap quotidien). Reportes au prochain run: ${deferredCount}`);
     if (deferredCount > 0) {
       console.warn(`[Email Nurturing] ⚠️ Cap quotidien Resend atteint (${DAILY_EMAIL_CAP}). ${deferredCount} email(s) reporte(s) au prochain run pour rester sur le free tier.`);
@@ -523,6 +580,35 @@ function buildQuizFollowUpEmail(name: string, email: string, styleName: string):
     
     <p style="color: #8c8478; font-size: 13px; text-align: center; margin: 16px 0 0;">
       Votre essai gratuit n'expire jamais.
+    </p>
+  `, unsubUrl);
+}
+
+function buildRatingRequestEmail(name: string, email: string): string {
+  const unsubUrl = buildUnsubscribeUrl(email);
+  return emailWrapper(`
+    <h2 style="color: #faf8f4; font-size: 22px; margin: 0 0 16px;">Un avis sur vos rendus, ${name} ?</h2>
+
+    <p style="color: #b3a89a; line-height: 1.6; margin: 0 0 16px;">
+      Vous avez transformé une ou plusieurs pièces avec InstaDeco ces derniers jours.
+      Le rendu vous a plu ? Il vous a déçu ? Dans les deux cas, votre note nous aide
+      vraiment : c'est elle qui guide l'amélioration du moteur.
+    </p>
+
+    <p style="color: #b3a89a; line-height: 1.6; margin: 0 0 24px;">
+      Deux clics suffisent : ouvrez votre tableau de bord et notez vos créations avec les étoiles,
+      directement sous chaque image.
+    </p>
+
+    <div style="text-align: center; margin: 24px 0;">
+      <a href="https://instadeco.app/fr/dashboard"
+         style="display: inline-block; background: linear-gradient(135deg, #c8a24d, #a8842f); color: #0c0a09; text-decoration: none; padding: 14px 32px; border-radius: 50px; font-weight: 600; font-size: 16px;">
+        Noter mes créations →
+      </a>
+    </div>
+
+    <p style="color: #8c8478; font-size: 13px; text-align: center; margin: 16px 0 0;">
+      Une remarque plus détaillée ? Répondez simplement à cet email, il arrive directement chez nous.
     </p>
   `, unsubUrl);
 }
