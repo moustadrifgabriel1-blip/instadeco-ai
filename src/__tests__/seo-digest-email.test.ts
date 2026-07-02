@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { renderDigestEmail } from '@/app/api/cron/seo-digest/route';
+import { renderDigestEmail } from '@/lib/seo/digest-email';
 
 const GSC = {
   date: '2026-07-02',
