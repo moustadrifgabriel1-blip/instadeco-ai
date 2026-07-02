@@ -132,14 +132,14 @@ def _extract_seo_fields(page: str) -> dict[str, str]:
     }
 
 
-def _diff_fields(baseline: dict[str, str], current: dict[str, str]) -> list[str]:
-    """Retourne la liste des écarts (champ: ancien -> nouveau)."""
-    diffs: list[str] = []
+def _diff_fields(baseline: dict[str, str], current: dict[str, str]) -> list[dict[str, str]]:
+    """Retourne les écarts structurés : [{field, old, new}, ...]."""
+    diffs: list[dict[str, str]] = []
     for field in TRACKED_FIELDS:
         old = baseline.get(field)
         new = current.get(field)
         if old != new:
-            diffs.append(f"- **{field}** : `{old}` -> `{new}`")
+            diffs.append({"field": field, "old": old or "", "new": new or ""})
     return diffs
 
 
@@ -152,6 +152,27 @@ def _write_report(sections: list[str]) -> Path:
     return path
 
 
+def _write_summary(
+    today: str,
+    anomalies: int,
+    regressions: list[dict],
+    unavailable: list[dict],
+    baselines_created: list[str],
+) -> None:
+    """Résumé structuré pour le digest email. Consommé par seo-digest.sh."""
+    summary = {
+        "date": today,
+        "pages_checked": len(PAGES),
+        "anomalies": anomalies,
+        "regressions": regressions,
+        "unavailable": unavailable,
+        "baselines_created": baselines_created,
+    }
+    (_REPORTS_DIR / f"drift_{today}.summary.json").write_text(
+        json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+
+
 def run() -> tuple[Path, int]:
     """Compare chaque page à sa baseline et écrit le rapport.
 
@@ -161,6 +182,9 @@ def run() -> tuple[Path, int]:
     _BASELINES_DIR.mkdir(parents=True, exist_ok=True)
     sections: list[str] = []
     anomalies = 0
+    regressions: list[dict] = []
+    unavailable: list[dict] = []
+    baselines_created: list[str] = []
 
     for page in PAGES:
         try:
@@ -168,18 +192,22 @@ def run() -> tuple[Path, int]:
         except PageFetchError as exc:
             anomalies += 1
             sections.append(f"## {page} — INDISPONIBLE\n- {exc}\n")
+            unavailable.append({"page": page, "error": str(exc)})
             continue
 
         bpath = _baseline_path(page)
         if not bpath.exists():
             bpath.write_text(json.dumps(current, ensure_ascii=False, indent=2), encoding="utf-8")
             sections.append(f"## {page}\nBaseline créée (aucune comparaison ce run).\n")
+            baselines_created.append(page)
             continue
         baseline = json.loads(bpath.read_text(encoding="utf-8"))
         diffs = _diff_fields(baseline, current)
         if diffs:
             anomalies += 1
-            sections.append(f"## {page} — RÉGRESSIONS DÉTECTÉES\n" + "\n".join(diffs) + "\n")
+            diff_lines = [f"- **{d['field']}** : `{d['old']}` -> `{d['new']}`" for d in diffs]
+            sections.append(f"## {page} — RÉGRESSIONS DÉTECTÉES\n" + "\n".join(diff_lines) + "\n")
+            regressions.append({"page": page, "changes": diffs})
         else:
             sections.append(f"## {page}\nAucun changement.\n")
 
@@ -188,6 +216,8 @@ def run() -> tuple[Path, int]:
         if anomalies
         else f"Aucune anomalie sur {len(PAGES)} pages surveillées.\n"
     )
+    today = _dt.date.today().isoformat()
+    _write_summary(today, anomalies, regressions, unavailable, baselines_created)
     return _write_report([header] + sections), anomalies
 
 

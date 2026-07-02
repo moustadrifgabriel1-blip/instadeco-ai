@@ -150,6 +150,40 @@ def _fmt_rows(rows: list[dict], label: str) -> list[str]:
     return out
 
 
+def _write_summary(data: dict, today: str) -> None:
+    """Résumé compact (top 5) pour le digest email, distinct du snapshot machine
+    complet (data/gsc_*.json, jusqu'à GSC_ROW_LIMIT lignes, consommé par
+    rank_tracker/drift). Consommé par seo-digest.sh."""
+
+    def _trim(rows: list[dict], key: str) -> list[dict]:
+        return [
+            {
+                key: (r.get("keys") or ["?"])[0],
+                "clicks": int(r.get("clicks", 0)),
+                "impressions": int(r.get("impressions", 0)),
+                "ctr": round(r.get("ctr", 0.0) * 100, 1),
+                "position": round(r.get("position", 0.0), 1),
+            }
+            for r in rows[:5]
+        ]
+
+    summary = {
+        "date": today,
+        "window_days": data["window_days"],
+        "totals": {
+            "clicks": int(data["totals"]["clicks"]),
+            "impressions": int(data["totals"]["impressions"]),
+            "ctr": round(data["totals"]["ctr"] * 100, 1),
+            "position": round(data["totals"]["position"], 1),
+        },
+        "top_queries": _trim(data["top_queries"], "query"),
+        "top_pages": _trim(data["top_pages"], "page"),
+    }
+    (_REPORTS_DIR / f"gsc_{today}.summary.json").write_text(
+        _json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+
+
 def _write_report(data: dict) -> Path:
     _REPORTS_DIR.mkdir(parents=True, exist_ok=True)
     _DATA_DIR.mkdir(parents=True, exist_ok=True)
@@ -159,6 +193,7 @@ def _write_report(data: dict) -> Path:
     (_DATA_DIR / f"gsc_{today}.json").write_text(
         _json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8"
     )
+    _write_summary(data, today)
 
     t = data["totals"]
     lines = [

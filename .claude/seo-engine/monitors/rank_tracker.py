@@ -81,6 +81,7 @@ def _write_report(current: dict[str, dict], previous: dict[str, dict] | None) ->
     ordered = sorted(current.items(), key=lambda kv: -kv[1]["impressions"])
 
     movers: list[str] = []
+    movers_struct: list[dict] = []
     rows: list[str] = ["| requête | position | évolution | clics | impressions |", "|---|---:|:--:|---:|---:|"]
     for kw, cur in ordered:
         delta_txt = "nouveau"
@@ -94,6 +95,12 @@ def _write_report(current: dict[str, dict], previous: dict[str, dict] | None) ->
                 if abs(delta) >= _MOVE_THRESHOLD:
                     sens = "gagne" if delta > 0 else "perd"
                     movers.append(f"- `{kw}` {sens} {abs(delta):.1f} (pos {cur['position']})")
+                    movers_struct.append({
+                        "query": kw,
+                        "delta": round(abs(delta), 1),
+                        "direction": "up" if delta > 0 else "down",
+                        "position": cur["position"],
+                    })
         rows.append(
             f"| {kw} | {cur['position']} | {delta_txt} | {cur['clicks']} | {cur['impressions']} |"
         )
@@ -109,6 +116,20 @@ def _write_report(current: dict[str, dict], previous: dict[str, dict] | None) ->
     lines += rows
     path = _REPORTS_DIR / f"rank_{today}.md"
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    top5 = [
+        {"query": kw, "position": cur["position"], "clicks": cur["clicks"], "impressions": cur["impressions"]}
+        for kw, cur in ordered[:5]
+    ]
+    summary = {
+        "date": today,
+        "queries_tracked": len(current),
+        "movers": movers_struct,
+        "top_by_impressions": top5,
+    }
+    (_REPORTS_DIR / f"rank_{today}.summary.json").write_text(
+        json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
     return path
 
 

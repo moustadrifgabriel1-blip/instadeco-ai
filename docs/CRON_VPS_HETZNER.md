@@ -123,6 +123,35 @@ Une fois le run vert, pour que `seo-chief` lise les chiffres réels :
    case « Allow write access ») ou un token, et `git remote set-url` en SSH dans `REPO_DIR`.
 2. Passer `PUSH_REPORTS=1` dans `/etc/instadeco-seo.env`.
 
+## Digest email hebdo
+Chaque monitor (`gsc_daily`, `drift_check`, `rank_tracker`, `ctr_optimizer`) écrit désormais,
+en plus de son rapport `.md`, un résumé structuré `reports/<job>_YYYY-MM-DD.summary.json`
+(top 5, pas de dump complet). `scripts/seo-engine/seo-digest.sh` ramasse le dernier résumé de
+chaque type et POSTe le tout à `/api/cron/seo-digest`, qui envoie un email HTML dans la DA
+prestige du site (nuit + or, stats en encarts, pas un mur de texte brut).
+
+```bash
+# Installer le script (même pattern que run-seo-engine.sh)
+sudo cp /opt/instadeco/instadeco-ai/scripts/seo-engine/seo-digest.sh /opt/instadeco/seo-digest.sh
+sudo chmod +x /opt/instadeco/seo-digest.sh
+
+# Variables supplémentaires requises dans /etc/instadeco-seo.env (en plus de celles ci-dessus) :
+#   INSTADECO_BASE_URL=https://instadeco.app
+#   CRON_SECRET=...            # même secret que les crons app (/etc/instadeco-cron.env)
+
+# Test manuel (doit répondre {"success":true,...})
+/opt/instadeco/seo-digest.sh
+```
+
+⚠️ Le digest doit tourner **après** les 4 jobs, notamment `ctr_optimizer` (08:00 lundi), sinon
+il envoie un résumé CTR périmé (celui de la semaine précédente). D'où `15 8 * * 1` dans le
+crontab ci-dessous, jamais plus tôt.
+
+Après une modification de `app/api/cron/seo-digest/route.ts` ou de
+`scripts/seo-engine/seo-digest.sh`, re-copier le script sur le VPS (`git pull` + `sudo cp`
+comme ci-dessus) : contrairement au code Next.js (déployé automatiquement par Vercel au push),
+ce fichier shell est une copie statique sur le VPS.
+
 ## Planifier (crontab)
 ```bash
 crontab scripts/seo-engine/seo-engine.crontab.example   # adapte les chemins si ≠ /opt/instadeco

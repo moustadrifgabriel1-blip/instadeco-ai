@@ -275,6 +275,16 @@ def _write_report(candidates: list[dict], post_result: str) -> Path:
     lines.append("")
     path = _REPORTS_DIR / f"ctr_{today}.md"
     path.write_text("\n".join(lines), encoding="utf-8")
+
+    summary = {
+        "date": today,
+        "candidates_count": len(candidates),
+        "candidates": candidates[:5],
+        "applied": post_result,
+    }
+    (_REPORTS_DIR / f"ctr_{today}.summary.json").write_text(
+        _json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
     return path
 
 
