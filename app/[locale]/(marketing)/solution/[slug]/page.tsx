@@ -103,7 +103,7 @@ const CHROME_LABELS = {
     howItWorks: 'Comment ça marche ?', tryNow: 'Essayer maintenant',
     ctaTitle: 'Prêt à transformer votre intérieur ?', ctaSub: 'Essai gratuit. Aucune carte bancaire requise.',
     startFree: 'Commencer gratuitement', faq: 'Questions fréquentes',
-    guides: 'Nos guides pour aller plus loin', discoverAlso: 'Découvrez aussi',
+    guides: 'Nos guides pour aller plus loin', discoverAlso: 'Découvrez aussi', learnMore: 'En savoir plus',
   },
   de: {
     home: 'Startseite', seePricing: 'Preise ansehen', result30s: 'Ergebnis in 30 Sekunden',
@@ -112,7 +112,7 @@ const CHROME_LABELS = {
     howItWorks: 'So funktioniert es', tryNow: 'Jetzt ausprobieren',
     ctaTitle: 'Bereit, Ihre Immobilie ins beste Licht zu rücken?', ctaSub: 'Kostenlos testen. Keine Kreditkarte erforderlich.',
     startFree: 'Kostenlos starten', faq: 'Häufige Fragen',
-    guides: 'Weiterführende Guides', discoverAlso: 'Ebenfalls entdecken',
+    guides: 'Weiterführende Guides', discoverAlso: 'Ebenfalls entdecken', learnMore: 'Mehr erfahren',
   },
 } as const;
 
@@ -128,10 +128,13 @@ export default async function IntentPage({ params }: PageProps) {
   // (ex home-staging-virtuel-*) plutot que les 3 premieres. A score egal, on departage par
   // distance circulaire pour distribuer les liens et garantir que chaque page (meme la
   // derniere ajoutee) recoive des liens internes, ce qui aide la decouverte par Google.
+  // On ne maille qu'entre pages de la MÊME locale d'indexation (une page DE lie vers
+  // des pages DE, pas vers du FR) : pas de lien cross-langue dans le cluster.
+  const sameLocalePages = INTENT_PAGES.filter((p) => (p.indexLocale ?? 'fr') === (page.indexLocale ?? 'fr'));
   const pageTokens = page.slug.split('-');
-  const selfIdx = INTENT_PAGES.findIndex((p) => p.slug === page.slug);
-  const total = INTENT_PAGES.length;
-  const relatedPages = INTENT_PAGES.map((p, i) => ({
+  const selfIdx = sameLocalePages.findIndex((p) => p.slug === page.slug);
+  const total = sameLocalePages.length;
+  const relatedPages = sameLocalePages.map((p, i) => ({
     p,
     i,
     score: p.slug.split('-').filter((t) => pageTokens.includes(t)).length,
@@ -401,8 +404,8 @@ export default async function IntentPage({ params }: PageProps) {
         </section>
       )}
 
-      {/* ===== PAGES LIÉES (masquées sur la page DE : elles pointent vers du FR) ===== */}
-      {page.indexLocale !== 'de' && (
+      {/* ===== PAGES LIÉES (même locale uniquement : cluster FR->FR ou DE->DE) ===== */}
+      {relatedPages.length > 0 && (
         <section className="py-12 border-t border-border prestige-reveal">
           <div className="container px-4 md:px-6 max-w-4xl mx-auto">
             <h3 className="prestige-display text-xl font-bold mb-6 text-foreground">{L.discoverAlso}</h3>
@@ -416,7 +419,7 @@ export default async function IntentPage({ params }: PageProps) {
                   <h4 className="font-semibold text-foreground group-hover:text-[var(--gold)] transition-colors">{rp.title}</h4>
                   <p className="text-xs text-muted-foreground mt-2 line-clamp-2">{rp.metaDescription}</p>
                   <span className="text-xs text-[var(--gold)] mt-3 inline-flex items-center gap-1">
-                    En savoir plus <ChevronRight className="w-3 h-3" />
+                    {L.learnMore} <ChevronRight className="w-3 h-3" />
                   </span>
                 </Link>
               ))}
