@@ -64,8 +64,12 @@ function SignupForm() {
       });
 
       if (signUpError) {
+        // Anti-énumération : ne jamais confirmer qu'un email a déjà un compte.
+        // Un message neutre empêche de tester une liste d'adresses.
         if (signUpError.message.includes('already registered')) {
-          setError('Cet email est déjà utilisé');
+          setError(
+            'Si cette adresse n\'a pas encore de compte, vous allez recevoir un email de confirmation. Sinon, connectez-vous.'
+          );
         } else {
           setError(signUpError.message);
         }
