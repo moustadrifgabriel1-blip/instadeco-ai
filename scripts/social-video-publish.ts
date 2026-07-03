@@ -112,27 +112,31 @@ async function download(url: string, dest: string): Promise<void> {
 // ---------------------------------------------------------------------------
 // Encodage ffmpeg (volet dore -> fallback crossfade)
 // ---------------------------------------------------------------------------
-function filterGraph(transition: 'wiperight' | 'fade', hasMusic: boolean): string {
+// Fenetre du fondu (offset/duree en s) : plus longue et decalee tot pour un rendu doux.
+const XFADE_OFFSET = 1.3;
+const XFADE_DURATION = 2.3;
+
+function filterGraph(transition: 'smoothright' | 'fade', hasMusic: boolean): string {
   const base =
     `[0:v]scale=${W}:${H}:force_original_aspect_ratio=increase,crop=${W}:${H},setsar=1,fps=30,format=yuv420p[b];` +
     `[1:v]scale=${W}:${H}:force_original_aspect_ratio=increase,crop=${W}:${H},setsar=1,fps=30,format=yuv420p[a];` +
-    `[b][a]xfade=transition=${transition}:duration=2:offset=1.5[xf]`;
+    `[b][a]xfade=transition=${transition}:duration=${XFADE_DURATION}:offset=${XFADE_OFFSET}[xf]`;
   const video =
-    transition === 'wiperight'
-      ? // Barre doree (#C9A24A) qui suit le front du volet, puis correctif full-range->tv.
+    transition === 'smoothright'
+      ? // Volet dore (#C9A24A) flouté (halo doux) qui suit le fondu, puis correctif full-range->tv.
         base +
-        `;color=c=0xC9A24A:s=6x${H}:d=6.5[bar];` +
-        `[xf][bar]overlay=x='(t-1.5)/2*${W}-3':y=0:eval=frame:shortest=1,` +
+        `;color=c=0xC9A24A:s=26x${H}:d=6.5,gblur=sigma=6[bar];` +
+        `[xf][bar]overlay=x='(t-${XFADE_OFFSET})/${XFADE_DURATION}*${W}-13':y=0:eval=frame:shortest=1,` +
         `scale=out_range=tv:out_color_matrix=bt709,format=yuv420p[v]`
       : base + `;[xf]scale=out_range=tv:out_color_matrix=bt709,format=yuv420p[v]`;
-  // Musique : on cale sur 6,5s avec un fondu de sortie propre.
+  // Musique : fondu d'entree doux + fondu de sortie plus long, cale sur 6,5s.
   const audio = hasMusic
-    ? `;[2:a]atrim=0:6.5,asetpts=PTS-STARTPTS,afade=t=out:st=5.3:d=1.2[aout]`
+    ? `;[2:a]atrim=0:6.5,asetpts=PTS-STARTPTS,afade=t=in:d=0.25,afade=t=out:st=5.1:d=1.4[aout]`
     : '';
   return video + audio;
 }
 
-function runFfmpeg(beforePath: string, afterPath: string, outPath: string, transition: 'wiperight' | 'fade'): Promise<void> {
+function runFfmpeg(beforePath: string, afterPath: string, outPath: string, transition: 'smoothright' | 'fade'): Promise<void> {
   const hasMusic = fs.existsSync(MUSIC);
   const audioInput = hasMusic
     ? ['-i', MUSIC]
@@ -140,7 +144,7 @@ function runFfmpeg(beforePath: string, afterPath: string, outPath: string, trans
   const audioMap = hasMusic ? '[aout]' : '2:a';
   const ff = [
     '-y', '-hide_banner', '-loglevel', 'error',
-    '-loop', '1', '-t', '3.5', '-i', beforePath,
+    '-loop', '1', '-t', '3.8', '-i', beforePath,
     '-loop', '1', '-t', '5.0', '-i', afterPath,
     ...audioInput,
     '-filter_complex', filterGraph(transition, hasMusic),
@@ -158,10 +162,10 @@ function runFfmpeg(beforePath: string, afterPath: string, outPath: string, trans
   });
 }
 
-async function renderVideo(beforePath: string, afterPath: string, outPath: string): Promise<'wiperight' | 'fade'> {
+async function renderVideo(beforePath: string, afterPath: string, outPath: string): Promise<'smoothright' | 'fade'> {
   try {
-    await runFfmpeg(beforePath, afterPath, outPath, 'wiperight');
-    return 'wiperight';
+    await runFfmpeg(beforePath, afterPath, outPath, 'smoothright');
+    return 'smoothright';
   } catch (e) {
     console.warn('  volet dore indisponible, fallback crossfade:', (e as Error).message);
     await runFfmpeg(beforePath, afterPath, outPath, 'fade');

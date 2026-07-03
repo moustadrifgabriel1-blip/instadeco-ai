@@ -53,6 +53,12 @@ export interface IntentPageData {
   relatedArticles?: Array<{ slug: string; title: string }>;
   /** Émettre un schema HowTo (flux photo vers style vers rendu) sur les pages de type guide. */
   howTo?: boolean;
+  /**
+   * Locale d'indexation. Défaut 'fr' (le contenu ci-dessus est en français, indexé sur /fr,
+   * noindex ailleurs). Mettre 'de' UNIQUEMENT si le contenu de la page est réellement écrit
+   * en allemand : la page est alors indexée sur /de (canonical → /de, hreflang de-CH).
+   */
+  indexLocale?: 'fr' | 'de';
 }
 
 export const INTENT_PAGES: IntentPageData[] = [
@@ -903,6 +909,277 @@ export const INTENT_PAGES: IntentPageData[] = [
     relatedArticles: [
       { slug: 'home-staging-virtuel-ou-physique-comparatif', title: 'Home staging virtuel ou physique : lequel choisir pour vendre un bien ?' },
       { slug: 'home-staging-vend-il-plus-vite', title: 'Le home staging fait-il vraiment vendre plus vite ?' },
+    ],
+  },
+  {
+    // Page CH alémanique : contenu ALLEMAND, indexée sur /de (cf. indexLocale).
+    slug: 'virtuelles-home-staging-schweiz',
+    indexLocale: 'de',
+    title: 'Virtuelles Home Staging in der Schweiz',
+    metaTitle: 'Virtuelles Home Staging Schweiz für Immobilienmakler',
+    metaDescription:
+      'Virtuelles Home Staging mit KI für Schweizer Maklerinnen und Makler. Möblieren Sie leere Räume ab einem einzigen Foto, bereit für Homegate und ImmoScout24, ohne Fotografenkosten pro Raum.',
+    hero: {
+      headline: 'Virtuelles Home Staging für Schweizer Maklerbüros',
+      subheadline:
+        'In der Schweiz kostet ein Fotoshooting pro Raum, und Käuferinnen vergleichen jedes Inserat auf Homegate. InstaDeco möbliert Ihre Räume ab einem einfachen Foto in wenigen Sekunden, damit jede Immobilie im besten Licht erscheint, ohne das Budget zu sprengen.',
+      cta: 'Pro-Angebote ansehen',
+      ctaLink: '/pro',
+    },
+    problem: {
+      title: 'Die Aufwertung eines Objekts ist in der Schweiz teuer',
+      points: [
+        'Ein Immobilienfotograf kostet oft rund 90 bis 150 CHF pro Raum, und das für jedes einzelne Objekt.',
+        'Physisches Home Staging bleibt teuren Objekten in Zürich oder Genf vorbehalten.',
+        'Auf Homegate und ImmoScout24 vergleicht die Käuferin schnell und übergeht blasse Inserate.',
+        'Eine leere Wohnung oder ein zu renovierendes Haus wirkt auf Fotos wenig einladend.',
+      ],
+    },
+    solution: {
+      title: 'Jedes Objekt aufwerten, ohne Kosten pro Raum',
+      description:
+        'InstaDeco möbliert Ihre Räume mit künstlicher Intelligenz, ausgehend von einem Foto vom Smartphone. Sie erhalten ein möbliertes, fotorealistisches Ergebnis, bereit für Homegate oder ImmoScout24, zu einem Bruchteil der Kosten eines Shootings pro Raum.',
+      benefits: [
+        { icon: 'clock', title: 'In wenigen Sekunden', description: 'Das Ergebnis kommt schnell, ganz ohne Fototermin.' },
+        { icon: 'zap', title: 'Planbare Kosten', description: 'Ein klarer Abopreis statt Dutzende Franken pro Foto.' },
+        { icon: 'layers', title: 'Passende Stile', description: 'Von der Stadtwohnung bis zum Chalet, stimmen Sie die Stimmung auf die Region ab.' },
+        { icon: 'camera', title: 'Bereit für Homegate', description: 'Hochauflösende Bilder, direkt auf den Schweizer Portalen publizierbar.' },
+      ],
+    },
+    comparison: {
+      title: 'Kosten der Aufwertung in der Schweiz',
+      alternatives: [
+        { name: 'Physisches Home Staging', price: 'Mehrere Tausend CHF pro Objekt', time: '2 bis 4 Wochen', quality: 'Ausgezeichnet' },
+        { name: 'Immobilienfotograf', price: 'Rund 90 bis 150 CHF pro Raum', time: 'Einige Tage', quality: 'Sehr gut' },
+        { name: 'InstaDeco (Abo)', price: 'Monatliches Abo, unbegrenzte Nutzung', time: 'Wenige Sekunden', quality: 'Professionell', isUs: true },
+      ],
+    },
+    steps: [
+      { step: 1, title: 'Objekt fotografieren', description: 'Ein Foto pro Raum genügt, direkt vom Smartphone.' },
+      { step: 2, title: 'Stimmung wählen', description: 'Urbanes Zürich, gemütliches Bern oder Chalet-Charakter.' },
+      { step: 3, title: 'Auf Homegate publizieren', description: 'Fügen Sie das hochauflösende Ergebnis in Ihr Inserat ein.' },
+    ],
+    sections: [
+      {
+        title: 'Ein Markt, in dem Fotos teuer sind',
+        body: [
+          'In der Schweiz führt die Aufwertung eines Inserats oft über einen Fotografen, dessen Tarif pro Raum berechnet wird. Über ein ganzes Portfolio hinweg summiert sich das rasch und bremst die Inszenierung gerade der gewöhnlichen Objekte.',
+          'InstaDeco kehrt diese Rechnung um. Ein Monatsabo deckt so viele Ergebnisse ab wie nötig, was die Inszenierung für jedes Objekt zugänglich macht, nicht nur für die Prestigemandate in Zürich oder Genf.',
+        ],
+      },
+      {
+        title: 'Von der Stadtwohnung bis zum Chalet',
+        body: [
+          'Die Schweiz umfasst sehr unterschiedliche Objekte: urbane Wohnungen in Zürich, Basel und Bern, Einfamilienhäuser im Umland, Chalets und Residenzen in den Alpen. Jedes verlangt nach einer eigenen Stimmung.',
+          'Sie wählen den Stil, der die anvisierte Käuferschaft anspricht, vom klaren Zeitgenössischen bis zum warmen Bergcharakter, und erhalten ein Ergebnis, das dem realen Volumen des Raums entspricht.',
+        ],
+      },
+      {
+        title: 'Auf Homegate und ImmoScout24 transparent bleiben',
+        body: [
+          'Ein virtuelles Ergebnis zeigt ein Potenzial, nicht den Zustand des Objekts am Besichtigungstag. Die Lauterkeit gegenüber der Käuferschaft, die in der Schweiz erwartet wird, legt nahe, im Inserat klar zu vermerken, dass die Räume virtuell möbliert sind.',
+          'Das Bundesgesetz gegen den unlauteren Wettbewerb (UWG) untersagt irreführende Angaben zu einem Objekt. Ein deutlicher Hinweis auf das virtuelle Home Staging bleibt somit die empfohlene Praxis und stärkt das Vertrauen, statt es zu gefährden.',
+        ],
+      },
+    ],
+    faq: [
+      {
+        question: 'Ist virtuelles Home Staging in der Schweiz legal?',
+        answer:
+          'Ja. Keine Schweizer Vorschrift verbietet bearbeitete Fotos ausdrücklich. Das Gesetz gegen den unlauteren Wettbewerb (UWG) untersagt irreführende Angaben zu einem Objekt. Deshalb ist der klare Hinweis, dass die Möblierung virtuell ist, die empfohlene Praxis, um gegenüber der Käuferschaft lauter zu bleiben.',
+      },
+      {
+        question: 'Was kostet virtuelles Home Staging im Vergleich zu einem Fotografen?',
+        answer:
+          'Wo ein Shooting oft rund 90 bis 150 CHF pro Raum kostet, arbeitet InstaDeco mit einem Monatsabo bei fairer unbegrenzter Nutzung. Je mehr Objekte Sie publizieren, desto vernachlässigbarer werden die Kosten pro Inserat.',
+      },
+      {
+        question: 'Eignen sich die Ergebnisse für Homegate und ImmoScout24?',
+        answer:
+          'Ja. Die Bilder sind hochauflösend und für die Schweizer Portale geeignet. Vermerken Sie im Inserat, dass der Raum virtuell möbliert wurde.',
+      },
+      {
+        question: 'Funktioniert das auch für ein Chalet oder eine Bergresidenz?',
+        answer:
+          'Ja. Sie wählen einen warmen, bergtauglichen Stil, und die KI möbliert den Raum unter Wahrung seiner realen Struktur, Balken und Volumen inbegriffen.',
+      },
+    ],
+    keywords: [
+      'virtuelles home staging schweiz',
+      'home staging schweiz',
+      'virtuelles home staging zürich',
+      'home staging immobilienmakler schweiz',
+      'immobilien home staging schweiz',
+    ],
+  },
+  {
+    // Cluster de-CH : page coûts/prix (allemand, indexée sur /de).
+    slug: 'virtuelles-home-staging-kosten-schweiz',
+    indexLocale: 'de',
+    title: 'Was kostet virtuelles Home Staging in der Schweiz',
+    metaTitle: 'Virtuelles Home Staging Kosten Schweiz für Makler',
+    metaDescription:
+      'Was kostet virtuelles Home Staging in der Schweiz? Vergleich mit Fotograf und physischem Staging, in CHF. Ein Monatsabo statt Kosten pro Raum, für Maklerinnen und Makler.',
+    hero: {
+      headline: 'Was kostet virtuelles Home Staging in der Schweiz',
+      subheadline:
+        'Statt pro Raum zu zahlen wie beim Fotografen, deckt ein Monatsabo so viele Ergebnisse ab wie nötig. So wird die Aufwertung auf jedem Objekt bezahlbar, nicht nur auf den Prestigemandaten.',
+      cta: 'Pro-Angebote ansehen',
+      ctaLink: '/pro',
+    },
+    problem: {
+      title: 'Warum die klassische Aufwertung ins Geld geht',
+      points: [
+        'Ein Immobilienfotograf berechnet oft 90 bis 150 CHF pro Raum, für jedes Objekt neu.',
+        'Physisches Home Staging kostet rasch mehrere Tausend Franken pro Objekt.',
+        'Über ein ganzes Portfolio summieren sich diese Kosten und bremsen die Inszenierung.',
+        'Gerade gewöhnliche Objekte bleiben so oft ohne ansprechende Bilder.',
+      ],
+    },
+    solution: {
+      title: 'Ein planbarer Abopreis statt Kosten pro Raum',
+      description:
+        'InstaDeco arbeitet mit einem klaren Monatsabo bei fairer unbegrenzter Nutzung. Je mehr Objekte Sie publizieren, desto vernachlässigbarer werden die Kosten pro Inserat.',
+      benefits: [
+        { icon: 'zap', title: 'Planbar', description: 'Ein fester Monatspreis, keine Überraschung pro Foto.' },
+        { icon: 'layers', title: 'Unbegrenzt', description: 'So viele Räume und Stile wie nötig, im fairen Rahmen.' },
+        { icon: 'clock', title: 'Sofort', description: 'Kein Fototermin, das Ergebnis kommt in Sekunden.' },
+        { icon: 'shield', title: 'Ohne Risiko', description: 'Kostenlos testen, keine Kreditkarte erforderlich.' },
+      ],
+    },
+    comparison: {
+      title: 'Kostenvergleich in der Schweiz',
+      alternatives: [
+        { name: 'Physisches Home Staging', price: 'Mehrere Tausend CHF pro Objekt', time: '2 bis 4 Wochen', quality: 'Ausgezeichnet' },
+        { name: 'Immobilienfotograf', price: 'Rund 90 bis 150 CHF pro Raum', time: 'Einige Tage', quality: 'Sehr gut' },
+        { name: 'InstaDeco (Abo)', price: 'Monatliches Abo, unbegrenzte Nutzung', time: 'Wenige Sekunden', quality: 'Professionell', isUs: true },
+      ],
+    },
+    steps: [
+      { step: 1, title: 'Objekt fotografieren', description: 'Ein Foto pro Raum genügt.' },
+      { step: 2, title: 'Stil wählen', description: 'Die Stimmung passend zur Käuferschaft.' },
+      { step: 3, title: 'Publizieren', description: 'Das Ergebnis direkt ins Inserat einfügen.' },
+    ],
+    sections: [
+      {
+        title: 'Warum das Abo günstiger ausfällt',
+        body: [
+          'Beim Fotografen zahlen Sie pro Raum, unabhängig davon, wie viele Objekte Sie im Jahr betreuen. Bei einem aktiven Portfolio wächst diese Summe schnell und trifft gerade die Objekte, bei denen jeder Franken zählt.',
+          'Mit einem Monatsabo entkoppeln Sie die Kosten von der Anzahl Räume. Ob Sie zwei oder zwanzig Objekte inszenieren, der Preis bleibt planbar, was die Aufwertung auf dem gesamten Portfolio wirtschaftlich macht.',
+        ],
+      },
+      {
+        title: 'Ein Rechenbeispiel',
+        body: [
+          'Angenommen, Sie bereiten monatlich fünf Objekte mit je vier Räumen auf. Bei 90 bis 150 CHF pro Raum liegt allein die Fotoaufbereitung bei mehreren Hundert Franken pro Monat.',
+          'Ein festes Abo deckt dieselben Räume ab, ohne Aufpreis pro Bild. Der Vorteil wächst mit jedem zusätzlichen Objekt, das Sie publizieren.',
+        ],
+      },
+    ],
+    faq: [
+      {
+        question: 'Was kostet virtuelles Home Staging in der Schweiz konkret?',
+        answer:
+          'InstaDeco arbeitet mit einem Monatsabo bei fairer unbegrenzter Nutzung, statt pro Raum abzurechnen. Ein Immobilienfotograf kostet dagegen oft 90 bis 150 CHF pro Raum. Je mehr Objekte Sie publizieren, desto günstiger wird der Preis pro Inserat.',
+      },
+      {
+        question: 'Gibt es versteckte Kosten pro Bild?',
+        answer:
+          'Nein. Der Abopreis ist fest und deckt die Nutzung im fairen Rahmen ab. Es fällt kein zusätzlicher Betrag pro erzeugtem Bild an.',
+      },
+      {
+        question: 'Kann ich vor dem Abschluss kostenlos testen?',
+        answer:
+          'Ja. Sie können das Ergebnis kostenlos und ohne Kreditkarte ausprobieren, bevor Sie sich für ein Abo entscheiden.',
+      },
+    ],
+    keywords: [
+      'virtuelles home staging kosten schweiz',
+      'home staging kosten schweiz',
+      'home staging preise schweiz',
+      'virtuelles home staging preis',
+      'home staging fotograf kosten schweiz',
+    ],
+  },
+  {
+    // Cluster de-CH : page juridique (UWG), fort potentiel AEO/citation.
+    slug: 'virtuelles-home-staging-rechtlich-schweiz',
+    indexLocale: 'de',
+    title: 'Ist virtuelles Home Staging in der Schweiz rechtlich erlaubt',
+    metaTitle: 'Virtuelles Home Staging Schweiz: rechtlich erlaubt und UWG',
+    metaDescription:
+      'Ist virtuelles Home Staging in der Schweiz erlaubt und muss man es im Inserat angeben? Die einfache Regel ist Transparenz. Was Maklerinnen und Makler zum UWG wissen sollten.',
+    hero: {
+      headline: 'Ist virtuelles Home Staging in der Schweiz rechtlich erlaubt',
+      subheadline:
+        'Ja, unter einer einfachen Bedingung: Transparenz. Ein Objekt mit virtuellem Home Staging zu präsentieren ist zulässig, solange das Inserat klar vermerkt, dass die Räume virtuell möbliert sind.',
+      cta: 'Pro-Angebote ansehen',
+      ctaLink: '/pro',
+    },
+    problem: {
+      title: 'Die Sorge, die Käuferschaft zu täuschen',
+      points: [
+        'Viele Maklerinnen zögern beim virtuellen Möblieren, aus Angst, unlauter zu wirken.',
+        'Wer ein leeres Objekt nach einem möblierten Inserat entdeckt, kann sich getäuscht fühlen.',
+        'Unklare Angaben schaden dem Vertrauen und dem Ruf des Maklerbüros.',
+        'Ohne klare Regel bleibt Unsicherheit, was erlaubt ist und was nicht.',
+      ],
+    },
+    solution: {
+      title: 'Die Regel ist einfach: klar kennzeichnen',
+      description:
+        'Das Bundesgesetz gegen den unlauteren Wettbewerb (UWG) untersagt irreführende Angaben zu einem Objekt. Ein deutlicher Hinweis auf das virtuelle Home Staging genügt, um lauter und rechtlich sauber zu bleiben.',
+      benefits: [
+        { icon: 'shield', title: 'UWG-konform', description: 'Ein klarer Hinweis erfüllt die Anforderung der Lauterkeit.' },
+        { icon: 'eye', title: 'Transparent', description: 'Die Käuferschaft weiß, dass die Möblierung virtuell ist.' },
+        { icon: 'heart', title: 'Vertrauensbildend', description: 'Offenheit stärkt den Ruf statt ihn zu gefährden.' },
+        { icon: 'layers', title: 'Einfach umzusetzen', description: 'Eine kurze, kopierbare Zeile im Inserat genügt.' },
+      ],
+    },
+    steps: [
+      { step: 1, title: 'Virtuell möblieren', description: 'Erzeugen Sie das Home-Staging-Bild.' },
+      { step: 2, title: 'Hinweis einfügen', description: 'Vermerken Sie klar die virtuelle Möblierung.' },
+      { step: 3, title: 'Lauter publizieren', description: 'Das Inserat bleibt transparent und UWG-konform.' },
+    ],
+    sections: [
+      {
+        title: 'Was das UWG verlangt',
+        body: [
+          'Das Bundesgesetz gegen den unlauteren Wettbewerb (UWG) untersagt in Artikel 3 irreführende Angaben über Waren oder Leistungen. Auf ein Immobilieninserat übertragen bedeutet das: Die Darstellung darf nicht den falschen Eindruck erwecken, ein leeres Objekt sei möbliert übergeben.',
+          'Kein Schweizer Text verbietet bearbeitete Fotos ausdrücklich. Entscheidend ist, dass die Bearbeitung nicht täuscht. Ein klarer Hinweis auf das virtuelle Home Staging räumt genau dieses Risiko aus.',
+        ],
+      },
+      {
+        title: 'Ein kopierbarer Hinweis',
+        body: [
+          'Eine kurze Zeile im Inserat reicht, zum Beispiel: Die Innenräume wurden virtuell möbliert und dienen der Veranschaulichung. Der tatsächliche Zustand kann abweichen.',
+          'So bleibt die Erwartung der Käuferschaft realistisch, und die Besichtigung führt nicht zu Enttäuschung. Transparenz ist hier zugleich rechtliche Absicherung und Vertrauensfaktor.',
+        ],
+      },
+    ],
+    faq: [
+      {
+        question: 'Ist virtuelles Home Staging in der Schweiz rechtlich erlaubt?',
+        answer:
+          'Ja. Keine Schweizer Vorschrift verbietet bearbeitete Immobilienfotos ausdrücklich. Das Gesetz gegen den unlauteren Wettbewerb (UWG) untersagt jedoch irreführende Angaben. Ein klarer Hinweis, dass die Möblierung virtuell ist, macht die Darstellung zulässig und lauter.',
+      },
+      {
+        question: 'Muss ich das virtuelle Home Staging im Inserat angeben?',
+        answer:
+          'Es gibt keine ausdrückliche gesetzliche Formvorschrift, aber der Hinweis ist die empfohlene und sichere Praxis. Er verhindert, dass die Darstellung als irreführend im Sinne des UWG gilt, und schützt das Vertrauen der Käuferschaft.',
+      },
+      {
+        question: 'Wie formuliere ich den Hinweis am besten?',
+        answer:
+          'Eine kurze, klare Zeile genügt, etwa: Die Innenräume wurden virtuell möbliert und dienen der Veranschaulichung. Der tatsächliche Zustand kann abweichen.',
+      },
+    ],
+    keywords: [
+      'virtuelles home staging rechtlich schweiz',
+      'home staging erlaubt schweiz',
+      'home staging UWG',
+      'immobilienfotos bearbeiten erlaubt schweiz',
+      'virtuelles home staging kennzeichnen',
     ],
   },
   {

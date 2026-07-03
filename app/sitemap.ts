@@ -44,8 +44,22 @@ function frOnlySitemap(
   path: string,
   meta: Omit<MetadataRoute.Sitemap[number], 'url' | 'alternates'>,
 ): MetadataRoute.Sitemap {
-  const fr = `${BASE_URL}/fr${path}`;
-  return [{ url: fr, ...meta, alternates: { languages: { 'fr-FR': fr, 'x-default': fr } } }];
+  return localeOnlySitemap('fr', path, meta);
+}
+
+/**
+ * Émet une seule URL, sous la locale d'indexation réelle de la page (fr ou de),
+ * cohérent avec programmaticMeta. Pour les pages dont le contenu est écrit en
+ * allemand (ex : page CH alémanique), on émet l'URL /de, pas /fr.
+ */
+function localeOnlySitemap(
+  indexLocale: 'fr' | 'de',
+  path: string,
+  meta: Omit<MetadataRoute.Sitemap[number], 'url' | 'alternates'>,
+): MetadataRoute.Sitemap {
+  const url = `${BASE_URL}/${indexLocale}${path}`;
+  const hreflang = indexLocale === 'de' ? 'de-CH' : 'fr-FR';
+  return [{ url, ...meta, alternates: { languages: { [hreflang]: url, 'x-default': url } } }];
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -262,8 +276,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   );
 
   // Dérivé de INTENT_PAGES pour que toute nouvelle page /solution entre au sitemap sans oubli.
-  const solutionPages: MetadataRoute.Sitemap = INTENT_PAGES.map((p) => p.slug).flatMap((slug) =>
-    frOnlySitemap(`/solution/${slug}`, {
+  // On émet chaque page sous sa locale d'indexation réelle (fr par défaut, de si contenu allemand).
+  const solutionPages: MetadataRoute.Sitemap = INTENT_PAGES.flatMap((p) =>
+    localeOnlySitemap(p.indexLocale ?? 'fr', `/solution/${p.slug}`, {
       lastModified: now,
       changeFrequency: 'monthly' as const,
       priority: 0.7,
