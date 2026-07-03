@@ -224,7 +224,12 @@ export default function EssaiPage() {
             setStep('trial-used');
             return;
           }
-          throw new Error(data.error || 'Erreur lors de la génération');
+          // 400 validation : le backend renvoie le vrai motif (image trop lourde,
+          // format non supporté) dans details ; on le remonte au lieu du générique.
+          const fieldError = data?.details
+            ? (Object.values(data.details).flat().find(Boolean) as string | undefined)
+            : undefined;
+          throw new Error(fieldError || data.error || 'Erreur lors de la génération');
         }
 
         // L'API retourne directement l'image (appel synchrone fal.ai)
@@ -414,6 +419,9 @@ export default function EssaiPage() {
               {error && (
                 <div className="text-center py-2" role="alert">
                   <p className="text-destructive text-[14px]">{error}</p>
+                  <p className="text-muted-foreground text-[12px] mt-1">
+                    Votre essai gratuit n&apos;a pas été décompté. Vous pouvez réessayer.
+                  </p>
                 </div>
               )}
 
