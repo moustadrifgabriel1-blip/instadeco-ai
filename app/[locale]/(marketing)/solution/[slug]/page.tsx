@@ -26,7 +26,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { generateFAQSchema, generateBreadcrumbList, generateWebPageSchema, generateHowToSchema } from '@/lib/seo/schemas';
-import { getCanonicalUrl, getLocalizedCanonicalUrl, withLocalePath, frOnlyProgrammaticMeta } from '@/lib/seo/config';
+import { getCanonicalUrl, getLocalizedCanonicalUrl, withLocalePath, programmaticMeta } from '@/lib/seo/config';
 import { INTENT_PAGES, getIntentPageBySlug } from '@/lib/seo/intent-pages-data';
 import { LeadCaptureLazy } from '@/components/features/lead-capture-lazy';
 
@@ -44,6 +44,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!page) return { title: 'Page non trouvée' };
 
   const path = `/solution/${page.slug}`;
+  const indexLocale = page.indexLocale ?? 'fr';
 
   return {
     title: page.metaTitle,
@@ -53,7 +54,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: page.metaTitle,
       description: page.metaDescription,
       type: 'website',
-      url: getLocalizedCanonicalUrl(locale, path),
+      url: getLocalizedCanonicalUrl(indexLocale, path),
       images: [getCanonicalUrl('/og-image.png')],
     },
     twitter: {
@@ -61,7 +62,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: page.title,
       description: page.metaDescription,
     },
-    ...frOnlyProgrammaticMeta(locale, path),
+    ...programmaticMeta(indexLocale, locale, path),
   };
 }
 
@@ -93,10 +94,35 @@ const iconMap: Record<string, React.ReactNode> = {
   split: <Layers className="w-6 h-6" />,
 };
 
+/** Libellés de "chrome" du template (hors contenu éditorial, qui vit dans la data). */
+const CHROME_LABELS = {
+  fr: {
+    home: 'Accueil', seePricing: 'Voir les tarifs', result30s: 'Résultat en 30 secondes',
+    styles12: '12 styles disponibles', freeTrial: 'Essai gratuit', solution: 'Solution',
+    price: 'Prix', delay: 'Délai', quality: 'Qualité', recommended: 'Recommandé',
+    howItWorks: 'Comment ça marche ?', tryNow: 'Essayer maintenant',
+    ctaTitle: 'Prêt à transformer votre intérieur ?', ctaSub: 'Essai gratuit. Aucune carte bancaire requise.',
+    startFree: 'Commencer gratuitement', faq: 'Questions fréquentes',
+    guides: 'Nos guides pour aller plus loin', discoverAlso: 'Découvrez aussi',
+  },
+  de: {
+    home: 'Startseite', seePricing: 'Preise ansehen', result30s: 'Ergebnis in 30 Sekunden',
+    styles12: '12 Stile verfügbar', freeTrial: 'Kostenlos testen', solution: 'Lösung',
+    price: 'Preis', delay: 'Dauer', quality: 'Qualität', recommended: 'Empfohlen',
+    howItWorks: 'So funktioniert es', tryNow: 'Jetzt ausprobieren',
+    ctaTitle: 'Bereit, Ihre Immobilie ins beste Licht zu rücken?', ctaSub: 'Kostenlos testen. Keine Kreditkarte erforderlich.',
+    startFree: 'Kostenlos starten', faq: 'Häufige Fragen',
+    guides: 'Weiterführende Guides', discoverAlso: 'Ebenfalls entdecken',
+  },
+} as const;
+
 export default async function IntentPage({ params }: PageProps) {
   const { locale, slug } = await params;
   const page = getIntentPageBySlug(slug);
   if (!page) notFound();
+
+  // Contenu éditorial en allemand (page CH alémanique) : on localise aussi le chrome.
+  const L = CHROME_LABELS[page.indexLocale === 'de' ? 'de' : 'fr'];
 
   // Maillage interne par proximite de slug : on met en avant les pages du meme cluster
   // (ex home-staging-virtuel-*) plutot que les 3 premieres. A score egal, on departage par
@@ -126,7 +152,7 @@ export default async function IntentPage({ params }: PageProps) {
         generateBreadcrumbList([
           { label: page.title, path: withLocalePath(locale, `/solution/${page.slug}`) },
         ], {
-          home: { name: 'Accueil', url: withLocalePath(locale, '/') },
+          home: { name: L.home, url: withLocalePath(locale, '/') },
         }),
         generateFAQSchema(page.faq),
         ...(page.howTo ? [generateHowToSchema()] : []),
@@ -154,7 +180,7 @@ export default async function IntentPage({ params }: PageProps) {
             </Button>
             <Button size="lg" variant="outline" className="rounded-full border-[var(--gold-line)] text-[var(--ivory)] hover:bg-[rgba(200,162,77,0.12)] hover:text-[var(--gold)] px-8" asChild>
               <Link href="/pricing">
-                Voir les tarifs
+                {L.seePricing}
               </Link>
             </Button>
           </div>
@@ -162,10 +188,10 @@ export default async function IntentPage({ params }: PageProps) {
           <div className="flex items-center justify-center gap-6 pt-6 text-sm text-muted-foreground">
             <span className="flex items-center gap-1">
               <Zap className="w-4 h-4 text-[var(--gold)]" />
-              Résultat en 30 secondes
+              {L.result30s}
             </span>
-            <span>12 styles disponibles</span>
-            <span>Essai gratuit</span>
+            <span>{L.styles12}</span>
+            <span>{L.freeTrial}</span>
           </div>
         </div>
       </section>
@@ -221,10 +247,10 @@ export default async function IntentPage({ params }: PageProps) {
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="border-b border-border">
-                    <th className="text-left py-4 px-4 font-semibold text-foreground">Solution</th>
-                    <th className="text-center py-4 px-4 font-semibold text-foreground">Prix</th>
-                    <th className="text-center py-4 px-4 font-semibold text-foreground">Délai</th>
-                    <th className="text-center py-4 px-4 font-semibold text-foreground">Qualité</th>
+                    <th className="text-left py-4 px-4 font-semibold text-foreground">{L.solution}</th>
+                    <th className="text-center py-4 px-4 font-semibold text-foreground">{L.price}</th>
+                    <th className="text-center py-4 px-4 font-semibold text-foreground">{L.delay}</th>
+                    <th className="text-center py-4 px-4 font-semibold text-foreground">{L.quality}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -234,7 +260,7 @@ export default async function IntentPage({ params }: PageProps) {
                       className={`border-b border-border ${alt.isUs ? 'bg-[rgba(200,162,77,0.08)] font-semibold' : ''}`}
                     >
                       <td className="py-4 px-4 text-foreground">
-                        {alt.isUs && <Badge className="bg-[var(--gold)] text-[#0c0a09] mr-2 text-xs">Recommandé</Badge>}
+                        {alt.isUs && <Badge className="bg-[var(--gold)] text-[#0c0a09] mr-2 text-xs">{L.recommended}</Badge>}
                         {alt.name}
                       </td>
                       <td className="text-center py-4 px-4 text-muted-foreground">{alt.price}</td>
@@ -252,13 +278,13 @@ export default async function IntentPage({ params }: PageProps) {
                 <Card key={i} className={alt.isUs ? 'bg-card border-[var(--gold)] ring-1 ring-[var(--gold)]' : 'bg-card border border-border'}>
                   <CardContent className="pt-4 space-y-2">
                     <div className="flex items-center gap-2">
-                      {alt.isUs && <Badge className="bg-[var(--gold)] text-[#0c0a09] text-xs">Recommandé</Badge>}
+                      {alt.isUs && <Badge className="bg-[var(--gold)] text-[#0c0a09] text-xs">{L.recommended}</Badge>}
                       <h3 className="font-bold text-foreground">{alt.name}</h3>
                     </div>
                     <div className="grid grid-cols-3 gap-2 text-sm text-foreground">
-                      <div><span className="text-muted-foreground">Prix:</span> {alt.price}</div>
-                      <div><span className="text-muted-foreground">Délai:</span> {alt.time}</div>
-                      <div><span className="text-muted-foreground">Qualité:</span> {alt.quality}</div>
+                      <div><span className="text-muted-foreground">{L.price}:</span> {alt.price}</div>
+                      <div><span className="text-muted-foreground">{L.delay}:</span> {alt.time}</div>
+                      <div><span className="text-muted-foreground">{L.quality}:</span> {alt.quality}</div>
                     </div>
                   </CardContent>
                 </Card>
@@ -271,7 +297,7 @@ export default async function IntentPage({ params }: PageProps) {
       {/* ===== ÉTAPES ===== */}
       <section className="py-16 bg-muted/20 prestige-reveal">
         <div className="container px-4 md:px-6 max-w-4xl mx-auto space-y-10">
-          <h2 className="prestige-display text-3xl font-bold text-center">Comment ça marche ?</h2>
+          <h2 className="prestige-display text-3xl font-bold text-center">{L.howItWorks}</h2>
           <div className="grid md:grid-cols-3 gap-8">
             {page.steps.map((step) => (
               <div key={step.step} className="text-center space-y-4">
@@ -286,7 +312,7 @@ export default async function IntentPage({ params }: PageProps) {
           <div className="text-center pt-4">
             <Button size="lg" className="rounded-full bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)] px-8" asChild>
               <Link href="/generate">
-                Essayer maintenant
+                {L.tryNow}
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Link>
             </Button>
@@ -313,20 +339,20 @@ export default async function IntentPage({ params }: PageProps) {
       {/* ===== CTA MILIEU ===== */}
       <section className="py-16 bg-[var(--stone-900)] border-y border-[var(--gold-line)] text-[var(--ivory)] prestige-reveal">
         <div className="container px-4 md:px-6 max-w-3xl mx-auto text-center space-y-6">
-          <h2 className="prestige-display text-3xl font-bold">Prêt à transformer votre intérieur ?</h2>
+          <h2 className="prestige-display text-3xl font-bold">{L.ctaTitle}</h2>
           <p className="prestige-body text-muted-foreground text-lg">
-            Essai gratuit. Aucune carte bancaire requise.
+            {L.ctaSub}
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Button size="lg" className="rounded-full px-8 bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)]" asChild>
               <Link href="/generate">
-                Commencer gratuitement
+                {L.startFree}
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Link>
             </Button>
             <Button size="lg" variant="outline" className="rounded-full px-8 border-[var(--gold-line)] text-[var(--ivory)] hover:bg-[rgba(200,162,77,0.12)] hover:text-[var(--gold)]" asChild>
               <Link href="/pricing">
-                Voir les tarifs
+                {L.seePricing}
               </Link>
             </Button>
           </div>
@@ -336,7 +362,7 @@ export default async function IntentPage({ params }: PageProps) {
       {/* ===== FAQ ===== */}
       <section className="py-16 bg-muted/20 prestige-reveal">
         <div className="container px-4 md:px-6 max-w-3xl mx-auto space-y-8">
-          <h2 className="prestige-display text-3xl font-bold text-center">Questions fréquentes</h2>
+          <h2 className="prestige-display text-3xl font-bold text-center">{L.faq}</h2>
           <div className="space-y-4">
             {page.faq.map((item, i) => (
               <details key={i} className="group border border-border rounded-xl bg-card p-6">
@@ -357,7 +383,7 @@ export default async function IntentPage({ params }: PageProps) {
       {page.relatedArticles && page.relatedArticles.length > 0 && (
         <section className="py-12 border-t border-border prestige-reveal">
           <div className="container px-4 md:px-6 max-w-3xl mx-auto">
-            <h2 className="prestige-display text-2xl font-bold mb-6 text-foreground">Nos guides pour aller plus loin</h2>
+            <h2 className="prestige-display text-2xl font-bold mb-6 text-foreground">{L.guides}</h2>
             <ul className="space-y-3">
               {page.relatedArticles.map((a) => (
                 <li key={a.slug}>
@@ -375,27 +401,29 @@ export default async function IntentPage({ params }: PageProps) {
         </section>
       )}
 
-      {/* ===== PAGES LIÉES ===== */}
-      <section className="py-12 border-t border-border prestige-reveal">
-        <div className="container px-4 md:px-6 max-w-4xl mx-auto">
-          <h3 className="prestige-display text-xl font-bold mb-6 text-foreground">Découvrez aussi</h3>
-          <div className="grid sm:grid-cols-3 gap-4">
-            {relatedPages.map((rp) => (
-              <Link
-                key={rp.slug}
-                href={`/solution/${rp.slug}`}
-                className="block p-5 border border-border rounded-xl hover:border-[var(--gold-line)] transition-colors bg-card group"
-              >
-                <h4 className="font-semibold text-foreground group-hover:text-[var(--gold)] transition-colors">{rp.title}</h4>
-                <p className="text-xs text-muted-foreground mt-2 line-clamp-2">{rp.metaDescription}</p>
-                <span className="text-xs text-[var(--gold)] mt-3 inline-flex items-center gap-1">
-                  En savoir plus <ChevronRight className="w-3 h-3" />
-                </span>
-              </Link>
-            ))}
+      {/* ===== PAGES LIÉES (masquées sur la page DE : elles pointent vers du FR) ===== */}
+      {page.indexLocale !== 'de' && (
+        <section className="py-12 border-t border-border prestige-reveal">
+          <div className="container px-4 md:px-6 max-w-4xl mx-auto">
+            <h3 className="prestige-display text-xl font-bold mb-6 text-foreground">{L.discoverAlso}</h3>
+            <div className="grid sm:grid-cols-3 gap-4">
+              {relatedPages.map((rp) => (
+                <Link
+                  key={rp.slug}
+                  href={`/solution/${rp.slug}`}
+                  className="block p-5 border border-border rounded-xl hover:border-[var(--gold-line)] transition-colors bg-card group"
+                >
+                  <h4 className="font-semibold text-foreground group-hover:text-[var(--gold)] transition-colors">{rp.title}</h4>
+                  <p className="text-xs text-muted-foreground mt-2 line-clamp-2">{rp.metaDescription}</p>
+                  <span className="text-xs text-[var(--gold)] mt-3 inline-flex items-center gap-1">
+                    En savoir plus <ChevronRight className="w-3 h-3" />
+                  </span>
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Lead Capture */}
       <LeadCaptureLazy variant="banner" delay={8000} />

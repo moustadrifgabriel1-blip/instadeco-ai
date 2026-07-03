@@ -109,13 +109,24 @@ export function getLocalizedCanonicalUrl(locale: string, path: string): string {
  * À remplacer par de vraies traductions (getTranslations) le jour où le contenu est localisé.
  */
 export function frOnlyProgrammaticMeta(locale: string, path: string) {
-  const frUrl = getLocalizedCanonicalUrl('fr', path);
+  return programmaticMeta('fr', locale, path);
+}
+
+/**
+ * Variante localisée : indexe la page sous une SEULE locale (`indexLocale`), consolide
+ * tout le reste vers elle. Sert aux pages programmatiques dont le contenu est réellement
+ * écrit dans cette langue (ex : page CH alémanique en allemand, indexée sur /de).
+ * Les autres locales servent le même contenu mais sont noindex + canonical → indexLocale.
+ */
+export function programmaticMeta(indexLocale: 'fr' | 'de', currentLocale: string, path: string) {
+  const url = getLocalizedCanonicalUrl(indexLocale, path);
+  const hreflang = indexLocale === 'de' ? 'de-CH' : 'fr-FR';
   return {
     alternates: {
-      canonical: frUrl,
-      languages: { 'fr-FR': frUrl, 'x-default': frUrl },
+      canonical: url,
+      languages: { [hreflang]: url, 'x-default': url },
     },
-    robots: locale === 'fr' ? undefined : { index: false, follow: true },
+    robots: currentLocale === indexLocale ? undefined : { index: false, follow: true },
   } as const;
 }
 
