@@ -28,6 +28,21 @@ import {
   TRIAL_PERSISTENT_WINDOW_HOURS,
 } from '@/src/shared/constants/trial';
 
+const IS_PROD = process.env.NODE_ENV === 'production';
+
+/**
+ * Masque une IP pour les logs (RGPD) : on ne garde que le préfixe réseau.
+ * IPv4 → deux premiers octets ; IPv6 → deux premiers groupes. Le reste devient `.x`.
+ */
+function maskIp(ip: string): string {
+  if (ip.includes(':')) {
+    const parts = ip.split(':');
+    return `${parts.slice(0, 2).join(':')}:x`;
+  }
+  const parts = ip.split('.');
+  return parts.length === 4 ? `${parts[0]}.${parts[1]}.x.x` : 'x';
+}
+
 /**
  * Schéma de validation pour l'essai gratuit
  */
@@ -59,7 +74,7 @@ async function hasTrialBeenUsed(ip: string, fingerprint?: string): Promise<boole
   try {
     // Compter les essais par IP (dernières TRIAL_PERSISTENT_WINDOW_HOURS heures)
     const since = new Date(Date.now() - TRIAL_PERSISTENT_WINDOW_HOURS * 60 * 60 * 1000).toISOString();
-    console.log(`[Trial] 🔍 Checking trial usage for IP: ${ip}, fingerprint: ${fingerprint?.substring(0, 8) || 'none'} (max=${TRIAL_MAX_GENERATIONS})`);
+    console.log(`[Trial] 🔍 Checking trial usage for IP: ${maskIp(ip)}, fingerprint: ${fingerprint?.substring(0, 8) || 'none'} (max=${TRIAL_MAX_GENERATIONS})`);
 
     const { count: ipCount, error: ipError } = await supabaseAdmin
       .from('trial_usage')
@@ -68,12 +83,14 @@ async function hasTrialBeenUsed(ip: string, fingerprint?: string): Promise<boole
       .gte('created_at', since);
 
     if (ipError) {
-      console.warn(`[Trial] ⚠️ Supabase IP check error (table may not exist):`, ipError.message, ipError.code);
-      return false; // Fallback: pas de blocage si table absente
+      // FAIL-CLOSED : une erreur DB ne doit PAS ouvrir l'essai illimité (COGS = argent).
+      // On bloque prudemment et on logge en erreur pour détection rapide de l'incident.
+      console.error(`[Trial] 🛑 Supabase IP check error — fail-closed (blocage prudent):`, ipError.message, ipError.code);
+      return true;
     }
 
     if ((ipCount ?? 0) >= TRIAL_MAX_GENERATIONS) {
-      console.log(`[Trial] ⛔ IP ${ip} reached trial quota (${ipCount}/${TRIAL_MAX_GENERATIONS})`);
+      console.log(`[Trial] ⛔ IP ${maskIp(ip)} reached trial quota (${ipCount}/${TRIAL_MAX_GENERATIONS})`);
       return true;
     }
 
@@ -85,8 +102,8 @@ async function hasTrialBeenUsed(ip: string, fingerprint?: string): Promise<boole
         .eq('fingerprint', fingerprint);
 
       if (fpError) {
-        console.warn(`[Trial] ⚠️ Supabase fingerprint check error:`, fpError.message);
-        return false;
+        console.error(`[Trial] 🛑 Supabase fingerprint check error — fail-closed:`, fpError.message);
+        return true;
       }
 
       if ((fpCount ?? 0) >= TRIAL_MAX_GENERATIONS) {
@@ -98,9 +115,9 @@ async function hasTrialBeenUsed(ip: string, fingerprint?: string): Promise<boole
     console.log(`[Trial] ✅ Trial quota available`);
     return false;
   } catch (error: any) {
-    // En cas d'erreur DB (ex: table n'existe pas encore), on fallback sur le rate limiter mémoire
-    console.warn('[Trial] ⚠️ DB check failed, falling back to memory rate limiter:', error?.message || error);
-    return false;
+    // FAIL-CLOSED sur exception DB : on bloque plutôt que d'offrir l'essai illimité.
+    console.error('[Trial] 🛑 DB check threw — fail-closed (blocage prudent):', error?.message || error);
+    return true;
   }
 }
 
@@ -109,7 +126,7 @@ async function hasTrialBeenUsed(ip: string, fingerprint?: string): Promise<boole
  */
 async function recordTrialUsage(ip: string, fingerprint?: string, style?: string, roomType?: string): Promise<void> {
   try {
-    console.log(`[Trial] 💾 Recording trial usage: IP=${ip}, fp=${fingerprint?.substring(0, 8) || 'none'}`);
+    console.log(`[Trial] 💾 Recording trial usage: IP=${maskIp(ip)}, fp=${fingerprint?.substring(0, 8) || 'none'}`);
     const { error } = await supabaseAdmin
       .from('trial_usage')
       .insert({
@@ -160,7 +177,7 @@ export async function POST(req: Request) {
     });
 
     if (!rateLimitResult.success) {
-      console.warn(`[Trial] ⛔ Rate limit exceeded for IP: ${clientIP}`);
+      console.warn(`[Trial] ⛔ Rate limit exceeded for IP: ${maskIp(clientIP)}`);
       return NextResponse.json(
         {
           error: 'Vous avez déjà utilisé votre essai gratuit. Créez un compte pour continuer !',
@@ -188,7 +205,7 @@ export async function POST(req: Request) {
     // Couche 2 : Vérification persistante Supabase (IP + fingerprint)
     const alreadyUsed = devMode ? false : await hasTrialBeenUsed(clientIP, fingerprint);
     if (alreadyUsed) {
-      console.warn(`[Trial] ⛔ Persistent check: trial already used for IP: ${clientIP}, fp: ${fingerprint?.substring(0, 8)}...`);
+      console.warn(`[Trial] ⛔ Persistent check: trial already used for IP: ${maskIp(clientIP)}, fp: ${fingerprint?.substring(0, 8)}...`);
       return NextResponse.json(
         {
           error: 'Vous avez déjà utilisé votre essai gratuit. Créez un compte pour continuer !',
@@ -205,7 +222,11 @@ export async function POST(req: Request) {
     if (!result.success) {
       console.error('[Trial] ❌ Generation failed:', (result.error as Error)?.message);
       return NextResponse.json(
-        { error: 'Erreur lors de la génération. Réessayez.', detail: (result.error as Error)?.message },
+        {
+          error: 'Erreur lors de la génération. Réessayez.',
+          // Détail interne exposé UNIQUEMENT hors prod (fuite de détails provider sinon).
+          ...(IS_PROD ? {} : { detail: (result.error as Error)?.message }),
+        },
         { status: 500 }
       );
     }
@@ -227,7 +248,10 @@ export async function POST(req: Request) {
   } catch (error: any) {
     console.error('[Trial] ❌ Unhandled error:', error?.message || error, error?.stack?.split('\n').slice(0, 3).join(' | '));
     return NextResponse.json(
-      { error: 'Erreur lors de la génération. Réessayez.', detail: error?.message },
+      {
+        error: 'Erreur lors de la génération. Réessayez.',
+        ...(IS_PROD ? {} : { detail: error?.message }),
+      },
       { status: 500 }
     );
   }

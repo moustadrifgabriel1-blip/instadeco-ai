@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
+import { Check } from 'lucide-react';
 import { useSupabaseBrowser } from '@/hooks/use-supabase-browser';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
@@ -16,6 +17,7 @@ function SignupForm() {
   const [referralCode, setReferralCode] = useState('');
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [acceptMarketing, setAcceptMarketing] = useState(false);
+  const [showReferral, setShowReferral] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -23,7 +25,10 @@ function SignupForm() {
   const redirectTo = searchParams.get('redirect') || '/generate';
   useEffect(() => {
     const ref = searchParams.get('ref');
-    if (ref) setReferralCode(ref.toUpperCase());
+    if (ref) {
+      setReferralCode(ref.toUpperCase());
+      setShowReferral(true); // code fourni via lien : on montre le champ pré-rempli
+    }
   }, [searchParams]);
 
   const handleEmailSignup = async (e: React.FormEvent) => {
@@ -64,8 +69,12 @@ function SignupForm() {
       });
 
       if (signUpError) {
+        // Anti-énumération : ne jamais confirmer qu'un email a déjà un compte.
+        // Un message neutre empêche de tester une liste d'adresses.
         if (signUpError.message.includes('already registered')) {
-          setError('Cet email est déjà utilisé');
+          setError(
+            'Si cette adresse n\'a pas encore de compte, vous allez recevoir un email de confirmation. Sinon, connectez-vous.'
+          );
         } else {
           setError(signUpError.message);
         }
@@ -158,7 +167,7 @@ function SignupForm() {
           <form onSubmit={handleEmailSignup} className="space-y-5">
             <div>
               <label htmlFor="signup-fullname" className="prestige-eyebrow block !text-[12px] !tracking-[.1em] text-muted-foreground mb-2">
-                Nom complet
+                Nom complet <span className="text-muted-foreground font-normal lowercase">(optionnel)</span>
               </label>
               <input
                 id="signup-fullname"
@@ -167,7 +176,6 @@ function SignupForm() {
                 onChange={(e) => setFullName(e.target.value)}
                 className="w-full px-4 py-3 rounded-[12px] border border-border bg-background text-foreground text-[17px] placeholder:text-muted-foreground focus:outline-none focus:border-[var(--gold)] transition-colors"
                 placeholder="John Doe"
-                required
               />
             </div>
 
@@ -200,23 +208,58 @@ function SignupForm() {
                 required
                 minLength={8}
               />
+              {/* Force du mot de passe en temps réel (moins d'allers-retours d'erreur) */}
+              {password.length > 0 && (
+                <ul className="mt-2 space-y-1" aria-live="polite">
+                  {[
+                    { ok: password.length >= 8, label: 'Au moins 8 caractères' },
+                    { ok: /[A-Z]/.test(password) && /[a-z]/.test(password), label: 'Une majuscule et une minuscule' },
+                    { ok: /[0-9]/.test(password), label: 'Un chiffre' },
+                  ].map((c) => (
+                    <li
+                      key={c.label}
+                      className={`flex items-center gap-2 text-[12px] ${c.ok ? 'text-emerald-400' : 'text-muted-foreground'}`}
+                    >
+                      <span
+                        className={`flex items-center justify-center w-4 h-4 rounded-full border ${
+                          c.ok ? 'bg-emerald-500/20 border-emerald-500/40' : 'border-border'
+                        }`}
+                      >
+                        {c.ok && <Check className="w-2.5 h-2.5" />}
+                      </span>
+                      {c.label}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
 
-            {/* Code parrainage */}
-            <div>
-              <label htmlFor="signup-referral" className="prestige-eyebrow block !text-[12px] !tracking-[.1em] text-muted-foreground mb-2">
-                Code parrainage <span className="text-[var(--gold)] font-normal lowercase">(optionnel • 3 crédits bonus)</span>
-              </label>
-              <input
-                id="signup-referral"
-                type="text"
-                value={referralCode}
-                onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
-                className="w-full px-4 py-3 rounded-[12px] border border-border bg-background text-foreground text-[17px] placeholder:text-muted-foreground focus:outline-none focus:border-[var(--gold)] transition-colors font-mono tracking-widest uppercase"
-                placeholder="EX: A1B2C3D4"
-                maxLength={8}
-              />
-            </div>
+            {/* Code parrainage, replié par défaut (peu d'inscrits en ont un) */}
+            {showReferral ? (
+              <div>
+                <label htmlFor="signup-referral" className="prestige-eyebrow block !text-[12px] !tracking-[.1em] text-muted-foreground mb-2">
+                  Code parrainage <span className="text-[var(--gold)] font-normal lowercase">(optionnel • 3 crédits bonus)</span>
+                </label>
+                <input
+                  id="signup-referral"
+                  type="text"
+                  value={referralCode}
+                  onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                  className="w-full px-4 py-3 rounded-[12px] border border-border bg-background text-foreground text-[17px] placeholder:text-muted-foreground focus:outline-none focus:border-[var(--gold)] transition-colors font-mono tracking-widest uppercase"
+                  placeholder="EX: A1B2C3D4"
+                  maxLength={8}
+                  autoFocus
+                />
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setShowReferral(true)}
+                className="text-[13px] text-[var(--gold)] hover:underline"
+              >
+                J&apos;ai un code de parrainage
+              </button>
+            )}
 
             {/* Consentement RGPD obligatoire */}
             <div className="flex items-start gap-3">
@@ -275,8 +318,9 @@ function SignupForm() {
 
           <button
             onClick={handleGoogleSignup}
-            disabled={loading}
-            className="w-full py-3 bg-transparent text-foreground border-2 border-[var(--gold-line)] rounded-full text-[17px] font-medium hover:border-[var(--gold)] hover:bg-[var(--gold-soft)]/10 transition-colors disabled:opacity-50 flex items-center justify-center gap-3"
+            disabled={loading || !acceptTerms}
+            aria-describedby={!acceptTerms ? 'google-terms-hint' : undefined}
+            className="w-full py-3 bg-transparent text-foreground border-2 border-[var(--gold-line)] rounded-full text-[17px] font-medium hover:border-[var(--gold)] hover:bg-[var(--gold-soft)]/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -286,6 +330,11 @@ function SignupForm() {
             </svg>
             Continuer avec Google
           </button>
+          {!acceptTerms && (
+            <p id="google-terms-hint" className="mt-2 text-center text-[12px] text-muted-foreground">
+              Cochez les conditions ci-dessus pour continuer avec Google.
+            </p>
+          )}
 
           <p className="mt-6 text-center text-[14px] text-muted-foreground">
             Déjà un compte ?{' '}

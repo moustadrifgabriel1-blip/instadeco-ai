@@ -24,6 +24,27 @@ export function fileToDataUrl(file: Blob): Promise<string> {
   });
 }
 
+/**
+ * Reconstruit un File à partir d'un data URI (base64). Sert à réhydrater une
+ * photo transférée entre pages via sessionStorage (carry-over essai → generate).
+ * Retourne null si le data URI est invalide.
+ */
+export function dataUrlToFile(dataUrl: string, filename = 'photo.jpg'): File | null {
+  try {
+    const match = dataUrl.match(/^data:(image\/[a-zA-Z+]+);base64,(.+)$/);
+    if (!match) return null;
+    const mime = match[1];
+    const binary = atob(match[2]);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    const ext = mime.split('/')[1]?.replace('jpeg', 'jpg') || 'jpg';
+    const name = filename.replace(/\.[^.]+$/, '') + '.' + ext;
+    return new File([bytes], name, { type: mime });
+  } catch {
+    return null;
+  }
+}
+
 function canvasToDataUrl(
   canvas: HTMLCanvasElement,
   quality: number,

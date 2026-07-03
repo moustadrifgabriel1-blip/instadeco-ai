@@ -33,6 +33,7 @@ import { RatingStars } from '@/components/features/RatingStars';
 import { STYLE_CATEGORIES_WITH_STYLES, ROOM_TYPES } from '@/src/shared/constants';
 import { fbTrackUploadPhoto, fbTrackStartGeneration } from '@/lib/analytics/fb-pixel';
 import { trackCTAClick } from '@/lib/analytics/gtag';
+import { dataUrlToFile, compressImageToDataUrl } from '@/lib/image/compress-client';
 
 const LOADING_MESSAGES = [
   { threshold: 0, text: 'Analyse de l’espace et de la lumière…' },
@@ -94,6 +95,7 @@ function GenerateContent() {
   const [showPromptDetails, setShowPromptDetails] = useState(false);
   const resultRef = useRef<HTMLDivElement>(null);
   const optionsRef = useRef<HTMLDivElement>(null);
+  const carryAppliedRef = useRef(false);
 
   // Hooks de la couche Presentation
   const { generate, state: generateState, reset: resetGenerate } = useGenerate();
@@ -190,6 +192,46 @@ function GenerateContent() {
     }
   }, [generateState.data?.id]);
 
+  // Carry-over depuis /essai (ou depuis un retour d'inscription) : on réhydrate
+  // la photo + le style + la pièce déjà choisis pour que l'utilisateur ne reparte
+  // pas de zéro juste après avoir créé son compte. Lu une seule fois, puis effacé.
+  useEffect(() => {
+    if (carryAppliedRef.current || loading) return;
+    let raw: string | null = null;
+    try {
+      raw = sessionStorage.getItem('instadeco_carryover');
+    } catch {
+      raw = null;
+    }
+    if (!raw) return;
+    carryAppliedRef.current = true;
+    try {
+      const data = JSON.parse(raw) as {
+        style?: string;
+        roomType?: string;
+        mode?: string;
+        imageDataUrl?: string;
+      };
+      if (data.style) setSelectedStyle(data.style);
+      if (data.roomType) setSelectedRoomType(data.roomType);
+      if (data.mode) setSelectedMode(data.mode);
+      if (data.imageDataUrl) {
+        const file = dataUrlToFile(data.imageDataUrl);
+        if (file) {
+          setImageFile(file);
+          setImagePreview(URL.createObjectURL(file));
+        }
+      }
+    } catch {
+      /* payload corrompu : on ignore */
+    }
+    try {
+      sessionStorage.removeItem('instadeco_carryover');
+    } catch {
+      /* no-op */
+    }
+  }, [loading]);
+
   // Upload d'image avec drag & drop
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
@@ -213,7 +255,11 @@ function GenerateContent() {
       'image/*': ['.jpeg', '.jpg', '.png', '.webp'],
     },
     maxFiles: 1,
-    maxSize: 4 * 1024 * 1024, // 4 Mo max (la limite Vercel body est ~4.5 Mo en base64)
+    // 10 Mo comme sur /essai : la photo est compressée client (compressImageToDataUrl,
+    // ~1600px JPEG) AVANT l'envoi, donc le body POST reste bien sous la limite Vercel.
+    // Plafonner à 4 Mo ici faisait échouer l'upload d'une photo de téléphone juste
+    // après l'inscription (régression de capacité au pire moment du funnel).
+    maxSize: 10 * 1024 * 1024,
   });
 
   const removeImage = () => {
@@ -227,15 +273,27 @@ function GenerateContent() {
   const handleGenerate = async () => {
     if (!imageFile) return;
     
-    // Si l'utilisateur n'est pas connecté, afficher le prompt d'inscription
+    // Si l'utilisateur n'est pas connecté, afficher le prompt d'inscription.
+    // On stocke le contexte (même clé que le carry-over /essai) pour le restaurer
+    // au retour d'inscription. La photo est incluse si on peut la sérialiser.
     if (!user) {
       setShowAuthPrompt(true);
-      // Sauvegarder les choix dans sessionStorage pour après le login
-      sessionStorage.setItem('instadeco_pending_generate', JSON.stringify({
-        style: selectedStyle,
-        roomType: selectedRoomType,
-        mode: selectedMode,
-      }));
+      try {
+        let imageDataUrl: string | undefined;
+        try {
+          imageDataUrl = await compressImageToDataUrl(imageFile);
+        } catch {
+          imageDataUrl = undefined;
+        }
+        sessionStorage.setItem('instadeco_carryover', JSON.stringify({
+          style: selectedStyle,
+          roomType: selectedRoomType,
+          mode: selectedMode,
+          imageDataUrl,
+        }));
+      } catch {
+        /* quota sessionStorage dépassé : on ignore */
+      }
       return;
     }
     
@@ -379,7 +437,7 @@ function GenerateContent() {
                   {isDragActive ? 'Déposez votre image' : 'Ajouter une photo de votre pièce'}
                 </p>
                 <p className="mt-2 text-[12px] text-muted-foreground tracking-[.007em]">
-                  Glissez-déposez ou cliquez · PNG, JPG, WEBP · max 4&nbsp;Mo
+                  Glissez-déposez ou cliquez · PNG, JPG, WEBP · max 10&nbsp;Mo
                 </p>
                 <div className="mt-6 flex items-center justify-center gap-3 sm:gap-6 flex-wrap text-[11px] text-muted-foreground">
                   <span className="flex items-center gap-1"><Zap className="w-3 h-3 text-[var(--gold)]" /> Rendu en ~30&nbsp;s</span>
