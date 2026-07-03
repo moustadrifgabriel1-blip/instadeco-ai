@@ -16,6 +16,7 @@ function SignupForm() {
   const [referralCode, setReferralCode] = useState('');
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [acceptMarketing, setAcceptMarketing] = useState(false);
+  const [showReferral, setShowReferral] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -23,7 +24,10 @@ function SignupForm() {
   const redirectTo = searchParams.get('redirect') || '/generate';
   useEffect(() => {
     const ref = searchParams.get('ref');
-    if (ref) setReferralCode(ref.toUpperCase());
+    if (ref) {
+      setReferralCode(ref.toUpperCase());
+      setShowReferral(true); // code fourni via lien : on montre le champ pré-rempli
+    }
   }, [searchParams]);
 
   const handleEmailSignup = async (e: React.FormEvent) => {
@@ -206,21 +210,32 @@ function SignupForm() {
               />
             </div>
 
-            {/* Code parrainage */}
-            <div>
-              <label htmlFor="signup-referral" className="prestige-eyebrow block !text-[12px] !tracking-[.1em] text-muted-foreground mb-2">
-                Code parrainage <span className="text-[var(--gold)] font-normal lowercase">(optionnel • 3 crédits bonus)</span>
-              </label>
-              <input
-                id="signup-referral"
-                type="text"
-                value={referralCode}
-                onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
-                className="w-full px-4 py-3 rounded-[12px] border border-border bg-background text-foreground text-[17px] placeholder:text-muted-foreground focus:outline-none focus:border-[var(--gold)] transition-colors font-mono tracking-widest uppercase"
-                placeholder="EX: A1B2C3D4"
-                maxLength={8}
-              />
-            </div>
+            {/* Code parrainage, replié par défaut (peu d'inscrits en ont un) */}
+            {showReferral ? (
+              <div>
+                <label htmlFor="signup-referral" className="prestige-eyebrow block !text-[12px] !tracking-[.1em] text-muted-foreground mb-2">
+                  Code parrainage <span className="text-[var(--gold)] font-normal lowercase">(optionnel • 3 crédits bonus)</span>
+                </label>
+                <input
+                  id="signup-referral"
+                  type="text"
+                  value={referralCode}
+                  onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                  className="w-full px-4 py-3 rounded-[12px] border border-border bg-background text-foreground text-[17px] placeholder:text-muted-foreground focus:outline-none focus:border-[var(--gold)] transition-colors font-mono tracking-widest uppercase"
+                  placeholder="EX: A1B2C3D4"
+                  maxLength={8}
+                  autoFocus
+                />
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setShowReferral(true)}
+                className="text-[13px] text-[var(--gold)] hover:underline"
+              >
+                J&apos;ai un code de parrainage
+              </button>
+            )}
 
             {/* Consentement RGPD obligatoire */}
             <div className="flex items-start gap-3">
@@ -279,8 +294,9 @@ function SignupForm() {
 
           <button
             onClick={handleGoogleSignup}
-            disabled={loading}
-            className="w-full py-3 bg-transparent text-foreground border-2 border-[var(--gold-line)] rounded-full text-[17px] font-medium hover:border-[var(--gold)] hover:bg-[var(--gold-soft)]/10 transition-colors disabled:opacity-50 flex items-center justify-center gap-3"
+            disabled={loading || !acceptTerms}
+            aria-describedby={!acceptTerms ? 'google-terms-hint' : undefined}
+            className="w-full py-3 bg-transparent text-foreground border-2 border-[var(--gold-line)] rounded-full text-[17px] font-medium hover:border-[var(--gold)] hover:bg-[var(--gold-soft)]/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -290,6 +306,11 @@ function SignupForm() {
             </svg>
             Continuer avec Google
           </button>
+          {!acceptTerms && (
+            <p id="google-terms-hint" className="mt-2 text-center text-[12px] text-muted-foreground">
+              Cochez les conditions ci-dessus pour continuer avec Google.
+            </p>
+          )}
 
           <p className="mt-6 text-center text-[14px] text-muted-foreground">
             Déjà un compte ?{' '}
