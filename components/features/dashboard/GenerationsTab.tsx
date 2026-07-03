@@ -65,20 +65,56 @@ export function GenerationsTab({ generations, refetchGenerations, referralCode }
         </div>
       </div>
 
-      {filteredGenerations.length === 0 ? (
-        <Card>
-          <CardContent className="py-12 text-center">
-            <ImageIcon className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-            <p className="text-muted-foreground">Aucune création pour le moment</p>
-            <Link
-              href="/generate"
-              className="inline-flex items-center gap-2 mt-4 px-6 py-2 bg-primary text-primary-foreground rounded-full hover:opacity-90 transition-opacity"
-            >
-              <Sparkles className="w-4 h-4" />
-              Créer ma première image
-            </Link>
-          </CardContent>
-        </Card>
+      {generations.length === 0 ? (
+        /* Nouvel utilisateur : accueil guidé en DA prestige (or/nuit). */
+        <div className="rounded-[24px] border border-[var(--gold-line)] bg-card p-8 sm:p-10 text-center shadow-[0_2px_24px_rgba(0,0,0,0.25)]">
+          <div className="w-16 h-16 mx-auto mb-5 rounded-full bg-[rgba(200,162,77,0.12)] border border-[var(--gold-line)] flex items-center justify-center">
+            <Sparkles className="w-7 h-7 text-[var(--gold)]" />
+          </div>
+          <h2 className="prestige-display text-[24px] sm:text-[28px] font-semibold tracking-[-0.02em] text-foreground">
+            Bienvenue dans votre studio
+          </h2>
+          <p className="mt-2 text-[15px] text-muted-foreground max-w-md mx-auto leading-relaxed">
+            Vos <span className="font-semibold text-[var(--gold)]">3 crédits offerts</span> vous attendent.
+            Transformez votre première pièce en une trentaine de secondes.
+          </p>
+
+          <div className="mt-7 grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-lg mx-auto text-left">
+            {[
+              { n: '1', t: 'Importez une photo', d: 'Une pièce, même vide' },
+              { n: '2', t: 'Choisissez un style', d: '12 directions au choix' },
+              { n: '3', t: 'Recevez le rendu', d: 'Photoréaliste, prêt à partager' },
+            ].map((s) => (
+              <div key={s.n} className="rounded-[16px] border border-border bg-background p-4">
+                <span className="prestige-eyebrow inline-flex items-center justify-center w-6 h-6 rounded-full border border-[var(--gold-line)] text-[var(--gold)] text-[12px] mb-2">
+                  {s.n}
+                </span>
+                <p className="prestige-display text-[14px] font-semibold text-foreground">{s.t}</p>
+                <p className="text-[12px] text-muted-foreground mt-0.5">{s.d}</p>
+              </div>
+            ))}
+          </div>
+
+          <Link
+            href="/generate"
+            className="group mt-8 inline-flex items-center gap-2 bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] px-7 py-3.5 rounded-full text-[15px] font-semibold hover:bg-transparent hover:text-[var(--gold)] transition-all duration-200 shadow-lg active:scale-95"
+          >
+            <Sparkles className="w-4 h-4" />
+            Créer ma première transformation
+          </Link>
+        </div>
+      ) : filteredGenerations.length === 0 ? (
+        /* Des créations existent, mais le filtre courant ne renvoie rien. */
+        <div className="rounded-[20px] border border-border bg-card py-12 text-center">
+          <ImageIcon className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+          <p className="text-muted-foreground text-[15px]">Aucune création dans ce filtre</p>
+          <button
+            onClick={() => setFilterStatus('all')}
+            className="mt-3 text-[14px] text-[var(--gold)] hover:underline"
+          >
+            Voir toutes mes créations
+          </button>
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredGenerations.map((gen) => (
