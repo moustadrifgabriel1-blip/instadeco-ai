@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
+import { Check } from 'lucide-react';
 import { useSupabaseBrowser } from '@/hooks/use-supabase-browser';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
@@ -166,7 +167,7 @@ function SignupForm() {
           <form onSubmit={handleEmailSignup} className="space-y-5">
             <div>
               <label htmlFor="signup-fullname" className="prestige-eyebrow block !text-[12px] !tracking-[.1em] text-muted-foreground mb-2">
-                Nom complet
+                Nom complet <span className="text-muted-foreground font-normal lowercase">(optionnel)</span>
               </label>
               <input
                 id="signup-fullname"
@@ -175,7 +176,6 @@ function SignupForm() {
                 onChange={(e) => setFullName(e.target.value)}
                 className="w-full px-4 py-3 rounded-[12px] border border-border bg-background text-foreground text-[17px] placeholder:text-muted-foreground focus:outline-none focus:border-[var(--gold)] transition-colors"
                 placeholder="John Doe"
-                required
               />
             </div>
 
@@ -208,6 +208,30 @@ function SignupForm() {
                 required
                 minLength={8}
               />
+              {/* Force du mot de passe en temps réel (moins d'allers-retours d'erreur) */}
+              {password.length > 0 && (
+                <ul className="mt-2 space-y-1" aria-live="polite">
+                  {[
+                    { ok: password.length >= 8, label: 'Au moins 8 caractères' },
+                    { ok: /[A-Z]/.test(password) && /[a-z]/.test(password), label: 'Une majuscule et une minuscule' },
+                    { ok: /[0-9]/.test(password), label: 'Un chiffre' },
+                  ].map((c) => (
+                    <li
+                      key={c.label}
+                      className={`flex items-center gap-2 text-[12px] ${c.ok ? 'text-emerald-400' : 'text-muted-foreground'}`}
+                    >
+                      <span
+                        className={`flex items-center justify-center w-4 h-4 rounded-full border ${
+                          c.ok ? 'bg-emerald-500/20 border-emerald-500/40' : 'border-border'
+                        }`}
+                      >
+                        {c.ok && <Check className="w-2.5 h-2.5" />}
+                      </span>
+                      {c.label}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
 
             {/* Code parrainage, replié par défaut (peu d'inscrits en ont un) */}
