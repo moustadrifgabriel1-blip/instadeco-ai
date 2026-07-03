@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useState, useEffect, useRef } from 'react';
+import { useLocale } from 'next-intl';
 import { useDropzone } from 'react-dropzone';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -57,6 +58,7 @@ const LOADING_MESSAGES = [
 ];
 
 export default function EssaiPage() {
+  const locale = useLocale();
   const [step, setStep] = useState<'upload' | 'options' | 'generating' | 'result' | 'trial-used'>('upload');
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -70,7 +72,27 @@ export default function EssaiPage() {
   const [emailError, setEmailError] = useState('');
   const [emailUnlocked, setEmailUnlocked] = useState(false);
   const [trialsUsed, setTrialsUsed] = useState(0);
+  // Base64 compressé de la dernière photo essayée, gardé pour le carry-over vers
+  // /generate après inscription (le visiteur ne repart pas de zéro).
+  const [carryImageData, setCarryImageData] = useState<string | null>(null);
   const resultRef = useRef<HTMLDivElement>(null);
+
+  // Transmet la photo + le style + la pièce à /generate via sessionStorage, pour
+  // que l'utilisateur retrouve son contexte juste après avoir créé son compte.
+  const stashCarryover = useCallback(() => {
+    try {
+      sessionStorage.setItem(
+        'instadeco_carryover',
+        JSON.stringify({
+          style: selectedStyle,
+          roomType: selectedRoom,
+          imageDataUrl: carryImageData || undefined,
+        }),
+      );
+    } catch {
+      /* quota sessionStorage dépassé : on ignore, l'inscription reste possible */
+    }
+  }, [selectedStyle, selectedRoom, carryImageData]);
 
   const remainingTrials = Math.max(0, TRIAL_MAX_GENERATIONS - trialsUsed);
 
@@ -162,6 +184,7 @@ export default function EssaiPage() {
     try {
       // Convertir en base64
       const imageBase64 = await fileToBase64(imageFile);
+      setCarryImageData(imageBase64); // conservé pour le carry-over vers /generate
       const fingerprint = getFingerprint();
 
       console.log(`[Trial] 🚀 Starting generation: style=${selectedStyle}, room=${selectedRoom}, fingerprint=${fingerprint.substring(0, 8)}...`);
@@ -590,7 +613,7 @@ export default function EssaiPage() {
                   <span className="prestige-display text-[14px] font-semibold text-foreground">Montrez votre transformation à vos proches</span>
                 </div>
                 <ShareButtons
-                  url="https://instadeco.app/essai"
+                  url={`https://instadeco.app/${locale}/essai`}
                   title={`Regardez ma transformation déco en style ${selectedStyleInfo?.name} ! Testez gratuitement :`}
                   description="J'ai transformé ma pièce avec l'IA en 30 secondes. Testez gratuitement !"
                   imageUrl={generatedImage}
@@ -620,6 +643,7 @@ export default function EssaiPage() {
                 <div className="mt-5 flex flex-col sm:flex-row items-center justify-center gap-4">
                   <Link
                     href="/signup"
+                    onClick={stashCarryover}
                     className="group inline-flex items-center gap-2 bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] px-7 py-3.5 rounded-full text-[15px] font-semibold hover:bg-transparent hover:text-[var(--gold)] transition-all duration-200 shadow-lg active:scale-95"
                   >
                     <UserPlus className="w-4 h-4" />
@@ -669,6 +693,7 @@ export default function EssaiPage() {
               <div className="mt-8 flex flex-col items-center gap-4">
                 <Link
                   href="/signup"
+                  onClick={stashCarryover}
                   className="group inline-flex items-center gap-2 bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] px-8 py-4 rounded-full text-[17px] font-semibold hover:bg-transparent hover:text-[var(--gold)] transition-all duration-200 shadow-lg shadow-[var(--gold-soft)]/20 active:scale-95"
                 >
                   <UserPlus className="w-5 h-5" />
