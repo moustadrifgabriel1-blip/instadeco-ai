@@ -55,6 +55,29 @@ export default async function BudgetEstimatorPage({ params }: { params: Promise<
   const { locale } = await params;
   setRequestLocale(locale);
 
+  const webAppSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: 'Estimateur de budget déco par pièce',
+    url: getLocalizedCanonicalUrl('fr', PATH),
+    applicationCategory: 'LifestyleApplication',
+    operatingSystem: 'Web',
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
+    description: "Outil gratuit qui estime une fourchette de budget déco par pièce selon la surface et le niveau d'ambition.",
+    inLanguage: 'fr',
+  };
+
+  const howToSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: 'Estimer un budget déco par pièce',
+    step: [
+      { '@type': 'HowToStep', position: 1, name: 'Choisissez la pièce', text: 'Sélectionnez la pièce à redécorer (salon, chambre, cuisine…).' },
+      { '@type': 'HowToStep', position: 2, name: 'Indiquez la surface', text: 'Réglez la surface en m² avec le curseur.' },
+      { '@type': 'HowToStep', position: 3, name: "Choisissez l'ambition", text: 'Sélectionnez le niveau (rafraîchissement, relooking, rénovation) pour obtenir la fourchette.' },
+    ],
+  };
+
   const faqSchema = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
@@ -116,6 +139,8 @@ export default async function BudgetEstimatorPage({ params }: { params: Promise<
         </div>
       </section>
 
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webAppSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
     </>

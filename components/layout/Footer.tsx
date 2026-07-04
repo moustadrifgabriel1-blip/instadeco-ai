@@ -15,6 +15,7 @@ const PRODUCT_LINKS: { href: string; key: string }[] = [
   { href: '/generate', key: 'generate' },
   { href: '/galerie', key: 'gallery' },
   { href: '/quiz', key: 'quiz' },
+  { href: '/outils', key: 'tools' },
   { href: '/exemples', key: 'examples' },
   { href: '/pricing', key: 'pricing' },
   { href: '/blog', key: 'blog' },

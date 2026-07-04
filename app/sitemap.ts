@@ -99,7 +99,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     }),
     // Outils gratuits (lead magnets), contenu fr → pas de hreflang en/de.
+    ...frOnlySitemap('/outils', {
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    }),
     ...frOnlySitemap('/outils/calculateur-home-staging', {
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    }),
+    ...frOnlySitemap('/outils/generateur-annonce-immobiliere', {
       lastModified: now,
       changeFrequency: 'monthly',
       priority: 0.7,
