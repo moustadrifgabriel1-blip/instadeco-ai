@@ -5,6 +5,7 @@ import { OptimizedRemoteImage } from '@/components/ui/optimized-image';
 import Link from 'next/link';
 import { ArrowRight, ArrowLeft, Sparkles, Check, Star, Share2, ChevronRight, Home, Lightbulb, Gem, Palette, Leaf, Building2, Trees, LayoutGrid, Landmark, Armchair, Waves, Sun, type LucideIcon } from 'lucide-react';
 import { ShareButtons } from '@/components/features/share-buttons';
+import { WelcomeOffer } from '@/components/features/welcome-offer';
 
 // ============================================
 // TYPES
@@ -671,6 +672,11 @@ export function QuizInteractive() {
                   <Check className="w-3.5 h-3.5" /> Gratuit, sans inscription, résultat en 30s
                 </span>
               </p>
+            </div>
+
+            {/* Offre de bienvenue (l'email a déjà été capturé à l'étape précédente) */}
+            <div className="mt-8">
+              <WelcomeOffer />
             </div>
 
             {/* Refaire le quiz */}

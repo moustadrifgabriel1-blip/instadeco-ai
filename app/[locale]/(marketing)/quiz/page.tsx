@@ -169,6 +169,8 @@ export default async function QuizPage({ params }: { params: Promise<{ locale: s
             <Link href="/styles" className="text-[var(--gold)] underline-offset-4 hover:underline">Tous les styles de déco</Link>
             <Link href="/exemples" className="text-[var(--gold)] underline-offset-4 hover:underline">Exemples avant/après</Link>
             <Link href="/galerie" className="text-[var(--gold)] underline-offset-4 hover:underline">Galerie de rendus</Link>
+            <Link href="/outils/estimateur-budget-deco" className="text-[var(--gold)] underline-offset-4 hover:underline">Estimateur de budget déco</Link>
+            <Link href="/outils/calculateur-home-staging" className="text-[var(--gold)] underline-offset-4 hover:underline">Calculateur ROI home staging</Link>
             <Link href="/generate" className="text-[var(--gold)] underline-offset-4 hover:underline">Transformer ma pièce</Link>
           </div>
         </div>

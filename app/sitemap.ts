@@ -98,6 +98,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly',
       priority: 0.8,
     }),
+    // Outils gratuits (lead magnets), contenu fr → pas de hreflang en/de.
+    ...frOnlySitemap('/outils/calculateur-home-staging', {
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    }),
+    ...frOnlySitemap('/outils/estimateur-budget-deco', {
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    }),
     ...withAlternatesForAllLocales('/galerie', {
       lastModified: now,
       changeFrequency: 'daily',
