@@ -39,7 +39,8 @@
     "freeTrial": "Kostenlos testen",
     "home": "Start",
     "openMenu": "Menü öffnen",
-    "closeMenu": "Menü schließen"
+    "closeMenu": "Menü schließen",
+    "tools": "Tools"
   },
   "Footer": {
     "tagline": "Verwandeln Sie Ihre Räume mit künstlicher Intelligenz.",
@@ -84,7 +85,8 @@
       "about": "Über uns",
       "twitter": "Twitter",
       "instagram": "Instagram",
-      "pinterest": "Pinterest"
+      "pinterest": "Pinterest",
+      "tools": "Kostenlose Tools"
     }
   },
   "Home": {

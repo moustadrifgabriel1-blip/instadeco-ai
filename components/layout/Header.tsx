@@ -22,6 +22,7 @@ import {
   Building2,
   Eye,
   Star,
+  Wrench,
 } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -36,6 +37,7 @@ const NAV_KEYS = [
   { href: '/galerie', key: 'gallery' as const, icon: Eye },
   { href: '/exemples', key: 'examples' as const, icon: LayoutGrid },
   { href: '/quiz', key: 'quiz' as const, icon: Star },
+  { href: '/outils', key: 'tools' as const, icon: Wrench },
   { href: '/blog', key: 'blog' as const, icon: BookOpen },
   { href: '/pricing', key: 'pricing' as const, icon: CreditCard },
   { href: '/pro', key: 'pros' as const, icon: Building2 },

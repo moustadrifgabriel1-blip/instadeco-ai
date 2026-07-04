@@ -57,6 +57,29 @@ export default async function RoiCalculatorPage({ params }: { params: Promise<{ 
   const { locale } = await params;
   setRequestLocale(locale);
 
+  const webAppSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: 'Calculateur ROI home staging virtuel',
+    url: getLocalizedCanonicalUrl('fr', PATH),
+    applicationCategory: 'BusinessApplication',
+    operatingSystem: 'Web',
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
+    description: "Outil gratuit qui compare le coût du home staging physique à un abonnement illimité, sur les chiffres de l'utilisateur.",
+    inLanguage: 'fr',
+  };
+
+  const howToSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: "Calculer le ROI du home staging virtuel",
+    step: [
+      { '@type': 'HowToStep', position: 1, name: 'Nombre d’annonces', text: 'Indiquez le nombre d’annonces mises en scène par mois.' },
+      { '@type': 'HowToStep', position: 2, name: 'Coût du staging physique', text: 'Renseignez le coût moyen d’un home staging physique par bien.' },
+      { '@type': 'HowToStep', position: 3, name: 'Lisez votre économie', text: 'L’outil affiche l’économie mensuelle et annuelle face à un abonnement illimité.' },
+    ],
+  };
+
   const faqSchema = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
@@ -119,6 +142,8 @@ export default async function RoiCalculatorPage({ params }: { params: Promise<{ 
         </div>
       </section>
 
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webAppSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
     </>

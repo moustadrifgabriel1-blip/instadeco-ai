@@ -43,6 +43,13 @@ export function GET() {
 - [Home staging virtuel en Belgique](${BASE}/fr/solution/home-staging-virtuel-belgique) : pour les agences belges, prêt pour Immoweb.
 - [Home staging virtuel en Suisse romande](${BASE}/fr/solution/home-staging-virtuel-suisse-romande) : pour les agences romandes, prêt pour Homegate et ImmoScout24.
 
+## Outils gratuits
+- [Tous les outils gratuits](${BASE}/fr/outils) : calculateurs et générateurs gratuits, sans inscription, pour la déco et l'immobilier.
+- [Calculateur ROI home staging](${BASE}/fr/outils/calculateur-home-staging) : compare le coût du home staging physique à l'abonnement illimité, sur les chiffres de l'agent.
+- [Générateur d'annonce immobilière](${BASE}/fr/outils/generateur-annonce-immobiliere) : rédige un brouillon de description d'annonce à partir du type de bien et de ses atouts.
+- [Estimateur de budget déco](${BASE}/fr/outils/estimateur-budget-deco) : donne une fourchette de budget indicative pour redécorer une pièce selon sa surface.
+- [Quiz de style de décoration](${BASE}/fr/quiz) : identifie le style de décoration dominant en 8 questions visuelles.
+
 ## Décoration par ville
 - [Architecte d'intérieur par ville](${BASE}/fr/architecte-interieur) : pages locales pour la France, la Belgique et la Suisse, avec l'angle architectural propre à chaque région.
 

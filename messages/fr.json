@@ -46,7 +46,8 @@
     "freeTrial": "Essai gratuit",
     "home": "Accueil",
     "openMenu": "Ouvrir le menu",
-    "closeMenu": "Fermer le menu"
+    "closeMenu": "Fermer le menu",
+    "tools": "Outils"
   },
   "Footer": {
     "tagline": "Transformez vos intérieurs grâce à l'intelligence artificielle.",
@@ -91,7 +92,8 @@
       "about": "À propos",
       "twitter": "Twitter",
       "instagram": "Instagram",
-      "pinterest": "Pinterest"
+      "pinterest": "Pinterest",
+      "tools": "Outils gratuits"
     }
   },
   "Home": {

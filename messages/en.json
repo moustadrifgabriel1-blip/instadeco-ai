@@ -39,7 +39,8 @@
     "freeTrial": "Free trial",
     "home": "Home",
     "openMenu": "Open menu",
-    "closeMenu": "Close menu"
+    "closeMenu": "Close menu",
+    "tools": "Tools"
   },
   "Footer": {
     "tagline": "Transform your interiors with artificial intelligence.",
@@ -84,7 +85,8 @@
       "about": "About",
       "twitter": "Twitter",
       "instagram": "Instagram",
-      "pinterest": "Pinterest"
+      "pinterest": "Pinterest",
+      "tools": "Free tools"
     }
   },
   "Home": {
