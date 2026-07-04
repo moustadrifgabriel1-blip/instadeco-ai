@@ -7,7 +7,7 @@
  */
 
 /** Nombre de générations gratuites autorisées par IP/fingerprint sur la fenêtre ci-dessous. */
-export const TRIAL_MAX_GENERATIONS = 2;
+export const TRIAL_MAX_GENERATIONS = 3;
 
 /** Fenêtre du rate limit en secondes (24h). */
 export const TRIAL_WINDOW_SECONDS = 86_400;

@@ -58,7 +58,7 @@ export function VisiteExperience() {
           </>
         }
         body="Le home staging classique, c'est des semaines, des camions, des milliers d'euros par bien. Ici, c'est une photo, un clic, et le rendu revient en quelques secondes. Vous mettez en scène autant de biens que vous voulez, autant de fois que vous voulez, pour une fraction du coût. La qualité d'une agence de luxe, à l'échelle."
-        image="https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/output-images/f88c9b68-eda4-4d67-bfb4-f631d21b37c6/a529f606-f9ed-4c0e-b757-9bf2bb53bbce.jpg"
+        image="https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/output-images/gemini/1782046791638-lmu8e.jpg"
         alt="Chambre épurée mise en scène, rendu IA livré instantanément"
         reverse
       />

@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { Link } from '@/i18n/navigation';
 import { useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -70,7 +71,7 @@ export function PrestigeHero() {
       <div className="absolute inset-0">
         <div data-hero-img className="prestige-hero-img absolute inset-0 will-change-transform">
           <Image
-            src="https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/output-images/f88c9b68-eda4-4d67-bfb4-f631d21b37c6/8cf082e3-f460-4d66-b76a-6a4741cfe8e2.jpg"
+            src="https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/output-images/gemini/1782047136338-go59pd.jpg"
             alt="Séjour contemporain mis en scène par home staging virtuel IA"
             fill
             priority
@@ -121,12 +122,24 @@ export function PrestigeHero() {
 
         {/* CTA fort + filet or */}
         <div
-          className="prestige-anim mt-10 flex flex-col items-start gap-6 sm:flex-row sm:items-center"
+          className="prestige-anim mt-10 flex flex-col items-start gap-5 sm:flex-row sm:items-center sm:gap-7"
           style={{ ['--d' as string]: '720ms' }}
         >
+          <Link
+            href="/essai"
+            className="group inline-flex min-h-[52px] items-center gap-3 rounded-full border border-[var(--gold)] bg-[var(--gold)] px-8 py-3.5 text-sm font-medium uppercase tracking-[0.18em] text-[#0c0a09] transition-[transform,background-color,color] duration-500 ease-[var(--ease-slow)] hover:bg-transparent hover:text-[var(--gold)] focus-visible:bg-transparent focus-visible:text-[var(--gold)]"
+          >
+            Testez gratuitement
+            <span
+              aria-hidden
+              className="transition-transform duration-500 ease-[var(--ease-slow)] group-hover:translate-x-1"
+            >
+              →
+            </span>
+          </Link>
           <a
             href="#parcours"
-            className="group inline-flex min-h-[52px] items-center gap-3 rounded-full border border-[var(--gold)] bg-[var(--gold)] px-8 py-3.5 text-sm font-medium uppercase tracking-[0.18em] text-[#0c0a09] transition-[transform,background-color,color] duration-500 ease-[var(--ease-slow)] hover:bg-transparent hover:text-[var(--gold)] focus-visible:bg-transparent focus-visible:text-[var(--gold)]"
+            className="group inline-flex min-h-[52px] items-center gap-2.5 text-sm font-light uppercase tracking-[0.24em] text-[var(--mist)] transition-colors duration-500 ease-[var(--ease-slow)] hover:text-[var(--ivory)] focus-visible:text-[var(--ivory)]"
           >
             Voir le service en action
             <span
@@ -136,10 +149,10 @@ export function PrestigeHero() {
               →
             </span>
           </a>
-          <span className="text-xs font-light uppercase tracking-[0.32em] text-[var(--mist)]">
-            Rendu prêt en quelques secondes
-          </span>
         </div>
+        <p className="prestige-anim mt-5 text-xs font-light uppercase tracking-[0.32em] text-[var(--mist)]" style={{ ['--d' as string]: '820ms' }}>
+          Sans inscription · Rendu prêt en quelques secondes
+        </p>
       </div>
 
       {/* Méta verticale à droite, équilibre la composition et habille le vide */}

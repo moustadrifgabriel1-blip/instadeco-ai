@@ -109,7 +109,7 @@ export function PrestigeClimax() {
       <div className="absolute inset-0">
         <div data-climax-img className="absolute inset-0 will-change-transform">
           <Image
-            src="https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/output-images/f88c9b68-eda4-4d67-bfb4-f631d21b37c6/25b57a45-973e-4628-85ec-ad46b9cec7dd.jpg"
+            src="https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/output-images/gemini/1782047276535-qdemla.jpg"
             alt="Séjour mis en scène au crépuscule, ambiance chaleureuse et habitée"
             fill
             sizes="100vw"

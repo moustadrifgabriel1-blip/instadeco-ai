@@ -3,10 +3,12 @@
 // visible et les donnees structurees (regle Google sur FAQPage et Offer).
 // Les prix doivent rester identiques a PRO_PLANS de page.tsx (Solo 19, Pro 49, Agence 99).
 
+import { FAIR_USE_MONTHLY_CAP, FAIR_USE_WINDOW_DAYS } from '@/src/shared/constants/pricing';
+
 export const PRO_FAQ = [
   {
     q: 'Que signifie « illimité » exactement ?',
-    a: "Les plans Pro et Agence permettent de générer autant d'images que nécessaire pour votre activité, sans quota mensuel. Une politique d'usage équitable (fair-use) s'applique pour prévenir les abus (revente, automatisation non autorisée). Le plan Solo, lui, inclut 40 images/mois.",
+    a: `Les plans Pro et Agence permettent de générer autant d'images que nécessaire pour votre activité, sans quota mensuel fixe. Une politique d'usage équitable (fair-use) s'applique au-delà d'un plafond volontairement très élevé (${FAIR_USE_MONTHLY_CAP.toLocaleString('fr-FR')} images sur ${FAIR_USE_WINDOW_DAYS} jours glissants, bien au-dessus d'un usage d'agence normal), uniquement pour prévenir les abus (revente, automatisation non autorisée). Le plan Solo, lui, inclut 40 images/mois.`,
   },
   {
     q: 'Les images générées sont-elles utilisables commercialement ?',
