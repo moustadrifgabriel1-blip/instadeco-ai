@@ -93,7 +93,9 @@ export async function POST(req: Request) {
       description: 'Bonus de bienvenue (parrainage)',
     });
 
-    console.log(`[Referral] ✅ ${referrerEmail} → new user ${newUserId} (${referrerBonus}+${referredBonus} crédits)`);
+    // PII : ne jamais logger l'email en clair (RGPD), on masque la partie locale.
+    const maskedReferrer = referrerEmail.replace(/^(.{2}).*(@.*)$/, '$1***$2');
+    console.log(`[Referral] ✅ ${maskedReferrer} → new user ${newUserId} (${referrerBonus}+${referredBonus} crédits)`);
 
     // Notifier le parrain par email (en arrière-plan).
     sendReferralNotificationEmail(
