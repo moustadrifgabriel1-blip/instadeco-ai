@@ -15,11 +15,11 @@ const U = 'f88c9b68-eda4-4d67-bfb4-f631d21b37c6';
  * qualité du service. Les avant/après complets sont les deux comparateurs.
  */
 const GALLERY = [
-  { src: `${OUT}/${U}/8cf082e3-f460-4d66-b76a-6a4741cfe8e2.jpg`, label: 'Contemporain · Séjour', alt: 'Séjour contemporain mis en scène par IA' },
+  { src: `${OUT}/gemini/1782047014810-s1f7n.jpg`, label: 'Mid-century · Séjour', alt: 'Séjour mid-century mis en scène par IA' },
   { src: `${OUT}/gemini/1781863553799-atz5u.jpg`, label: 'Minimaliste · Séjour', alt: 'Séjour minimaliste mis en scène par IA' },
-  { src: `${OUT}/${U}/a529f606-f9ed-4c0e-b757-9bf2bb53bbce.jpg`, label: 'Minimaliste · Chambre', alt: 'Chambre minimaliste mise en scène par IA' },
-  { src: `${OUT}/${U}/7a770405-faef-4d16-9822-1a76e7748741.jpg`, label: 'Bohème · Salle à manger', alt: 'Salle à manger bohème mise en scène par IA' },
-  { src: `${OUT}/${U}/4068c5cc-d422-4b9b-8b9f-a0870cac5572.jpg`, label: 'Bohème · Chambre', alt: 'Chambre bohème mise en scène par IA' },
+  { src: `${OUT}/gemini/1782046791638-lmu8e.jpg`, label: 'Minimaliste · Chambre', alt: 'Chambre minimaliste mise en scène par IA' },
+  { src: `${OUT}/gemini/1782047083348-x6lthy.jpg`, label: 'Bohème · Séjour', alt: 'Séjour bohème mis en scène par IA' },
+  { src: `${OUT}/gemini/1782046724114-gruqrj.jpg`, label: 'Japandi · Chambre', alt: 'Chambre japandi mise en scène par IA' },
   { src: '/images/after-chambre-1.jpg', label: 'Chaleureux · Chambre', alt: 'Chambre chaleureuse mise en scène par IA' },
 ];
 

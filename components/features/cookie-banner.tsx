@@ -32,36 +32,31 @@ export function CookieBanner() {
   if (!visible) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 px-4 pt-4 sm:px-6 sm:pt-6 pb-[max(1.25rem,env(safe-area-inset-bottom))] pl-safe pr-safe animate-in slide-in-from-bottom duration-300">
-      <div className="max-w-3xl mx-auto bg-[#0c0a09] rounded-2xl shadow-[0_8px_40px_rgba(0,0,0,0.5)] border border-[var(--gold-line)] p-5 sm:p-6">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <div className="flex-1">
-            <p className="text-[14px] text-[var(--mist)] leading-relaxed">
-              <span className="inline-flex items-center gap-1.5 font-semibold text-[var(--ivory)]">
-                <Cookie className="h-4 w-4 text-[var(--gold)]" aria-hidden="true" />
-                Cookies et mesure d&apos;audience.
-              </span>{' '}
-              Avec votre accord, nous utilisons Google Analytics et Meta Pixel pour mesurer notre audience.
-              Rien n&apos;est activé sans votre choix.{' '}
-              <Link href="/legal/privacy" className="text-[var(--gold)] hover:underline">
-                En savoir plus
-              </Link>
-            </p>
-          </div>
-          <div className="flex flex-shrink-0 gap-2">
-            <button
-              onClick={() => choose('denied')}
-              className="px-5 py-2.5 border border-[var(--gold-line)] text-[var(--ivory)] text-[14px] font-medium rounded-full hover:bg-[rgba(250,248,244,0.06)] transition-colors"
-            >
-              Refuser
-            </button>
-            <button
-              onClick={() => choose('granted')}
-              className="px-6 py-2.5 bg-[var(--gold)] text-[#0c0a09] text-[14px] font-semibold rounded-full hover:bg-[#d4b15f] transition-colors"
-            >
-              Accepter
-            </button>
-          </div>
+    <div className="fixed bottom-0 left-0 right-0 z-50 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pl-safe pr-safe sm:left-auto sm:right-6 sm:bottom-6 sm:px-0 animate-in slide-in-from-bottom duration-300">
+      <div className="mx-auto sm:mx-0 w-full sm:max-w-sm bg-[#0c0a09]/95 backdrop-blur-sm rounded-2xl shadow-[0_8px_40px_rgba(0,0,0,0.5)] border border-[var(--gold-line)] p-4 sm:p-5">
+        <p className="text-[13px] text-[var(--mist)] leading-relaxed">
+          <span className="inline-flex items-center gap-1.5 font-semibold text-[var(--ivory)]">
+            <Cookie className="h-4 w-4 text-[var(--gold)]" aria-hidden="true" />
+            Cookies et mesure d&apos;audience.
+          </span>{' '}
+          Avec votre accord : Google Analytics et Meta Pixel. Rien sans votre choix.{' '}
+          <Link href="/legal/privacy" className="text-[var(--gold)] hover:underline">
+            En savoir plus
+          </Link>
+        </p>
+        <div className="mt-3 flex gap-2">
+          <button
+            onClick={() => choose('denied')}
+            className="flex-1 px-4 py-2 border border-[var(--gold-line)] text-[var(--ivory)] text-[13px] font-medium rounded-full hover:bg-[rgba(250,248,244,0.06)] transition-colors"
+          >
+            Refuser
+          </button>
+          <button
+            onClick={() => choose('granted')}
+            className="flex-1 px-4 py-2 bg-[var(--gold)] text-[#0c0a09] text-[13px] font-semibold rounded-full hover:bg-[#d4b15f] transition-colors"
+          >
+            Accepter
+          </button>
         </div>
       </div>
     </div>

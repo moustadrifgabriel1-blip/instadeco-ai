@@ -31,7 +31,7 @@ function SuccessContent() {
   useEffect(() => {
     cancelled.current = false;
     let tries = 0;
-    const MAX = 10; // ~20s d'attente active de l'activation par le webhook
+    const MAX = 30; // ~60s d'attente active (le webhook Stripe peut prendre 10-30s en prod)
 
     const poll = async () => {
       tries += 1;
