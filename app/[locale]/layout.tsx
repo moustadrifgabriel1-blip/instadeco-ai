@@ -16,6 +16,7 @@ import {
 } from '@/lib/seo/schemas';
 import { SEO_CONFIG, getLocalizedCanonicalUrl } from '@/lib/seo/config';
 import { MetaPixel } from '@/components/features/meta-pixel';
+import { Clarity } from '@/components/features/clarity';
 import { routing } from '@/i18n/routing';
 
 const inter = Inter({
@@ -199,6 +200,7 @@ export default async function LocaleLayout({
             <GoogleAnalytics />
             <AdTracker />
             <MetaPixel />
+            <Clarity />
           </div>
         </NextIntlClientProvider>
       </body>
