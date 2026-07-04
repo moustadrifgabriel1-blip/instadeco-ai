@@ -18,7 +18,6 @@ import {
   Zap,
   UserPlus,
   Eye,
-  Users,
   Info,
   LayoutGrid,
   Armchair,
@@ -26,8 +25,12 @@ import {
   Palette,
   Lock,
 } from 'lucide-react';
+import { useLocale } from 'next-intl';
 import { useAuth } from '@/hooks/use-auth';
 import { useGenerate } from '@/src/presentation/hooks/useGenerate';
+import { usePurchaseCredits } from '@/src/presentation/hooks/usePurchaseCredits';
+import { CREDIT_PRICES } from '@/src/shared/constants/pricing';
+import type { CreditPackId } from '@/src/presentation/types';
 import { useGenerationStatus } from '@/src/presentation/hooks/useGenerationStatus';
 import { RatingStars } from '@/components/features/RatingStars';
 import { STYLE_CATEGORIES_WITH_STYLES, ROOM_TYPES } from '@/src/shared/constants';
@@ -93,6 +96,27 @@ function GenerateContent() {
   const [generationId, setGenerationId] = useState<string | null>(null);
   const [showAuthPrompt, setShowAuthPrompt] = useState(false);
   const [showPromptDetails, setShowPromptDetails] = useState(false);
+  const [showCreditsModal, setShowCreditsModal] = useState(false);
+  const [buyingPack, setBuyingPack] = useState<CreditPackId | null>(null);
+  const locale = useLocale();
+  const { purchase, isLoading: isPurchasing } = usePurchaseCredits();
+
+  const handleBuyPack = useCallback(
+    async (packId: CreditPackId) => {
+      setBuyingPack(packId);
+      const url = await purchase({
+        packId,
+        successUrl: `${window.location.origin}/${locale}/dashboard?payment=success`,
+        cancelUrl: `${window.location.origin}/${locale}/generate`,
+      });
+      if (url) {
+        window.location.href = url;
+      } else {
+        setBuyingPack(null);
+      }
+    },
+    [purchase, locale]
+  );
   const resultRef = useRef<HTMLDivElement>(null);
   const optionsRef = useRef<HTMLDivElement>(null);
   const carryAppliedRef = useRef(false);
@@ -370,16 +394,12 @@ function GenerateContent() {
           Studio virtuel InstaDeco
         </p>
         <p className="text-[12px] sm:text-[13px] font-normal flex items-center justify-center gap-2 flex-wrap text-foreground">
-          <Users className="w-3.5 h-3.5 text-[var(--gold)]" />
-          <span><strong>10 000+</strong> planches créées</span>
-          <span className="hidden sm:inline text-muted-foreground">·</span>
-          <span className="hidden sm:inline">Rendu soigné en une trentaine de secondes</span>
+          <Lock className="w-3.5 h-3.5 text-[var(--gold)]" />
+          <span>Structure du bien préservée</span>
           <span className="text-muted-foreground">·</span>
-          <span className="flex items-center gap-0.5" aria-hidden>
-            {[1, 2, 3, 4, 5].map((i) => (
-              <Star key={i} className="w-3 h-3 fill-[var(--gold)] text-[var(--gold)]" />
-            ))}
-          </span>
+          <span>Rendu soigné en une trentaine de secondes</span>
+          <span className="hidden sm:inline text-muted-foreground">·</span>
+          <span className="hidden sm:inline">HD prêt pour vos annonces</span>
         </p>
       </div>
 
@@ -612,9 +632,13 @@ function GenerateContent() {
                   </button>
                   {user ? (
                     (credits ?? 0) < 1 ? (
-                      <span className="text-[12px] text-destructive">
-                        Plus de crédits. <Link href="/credits" className="underline hover:text-[var(--gold)]">Recharger</Link>
-                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setShowCreditsModal(true)}
+                        className="text-[12px] text-destructive underline underline-offset-2 hover:text-[var(--gold)] transition-colors"
+                      >
+                        Plus de crédits. Recharger en un clic
+                      </button>
                     ) : (
                       <span className="text-[12px] text-muted-foreground">
                         1 crédit sera utilisé • {credits} crédit{(credits ?? 0) > 1 ? 's' : ''} disponible{(credits ?? 0) > 1 ? 's' : ''}
@@ -671,6 +695,86 @@ function GenerateContent() {
                     >
                       ← Modifier mes options
                     </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Modal crédits épuisés : recharge en un clic (packs directs) */}
+              {showCreditsModal && (
+                <div
+                  className="fixed inset-0 z-[60] flex items-center justify-center bg-[#0c0a09]/80 backdrop-blur-sm px-4 py-8 animate-in fade-in duration-200"
+                  onClick={() => !buyingPack && setShowCreditsModal(false)}
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="Recharger vos crédits"
+                >
+                  <div
+                    className="w-full max-w-md bg-card border border-[var(--gold-line)] rounded-[24px] p-6 sm:p-7 shadow-[0_20px_60px_rgba(0,0,0,0.5)] animate-in slide-in-from-bottom-4 duration-300"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h3 className="prestige-display text-[22px] font-bold text-foreground tracking-[-0.02em]">
+                          Rechargez vos crédits
+                        </h3>
+                        <p className="mt-1.5 text-[14px] text-muted-foreground">
+                          1 crédit = 1 rendu HD. Paiement sécurisé Stripe, sans abonnement.
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => !buyingPack && setShowCreditsModal(false)}
+                        className="ml-3 text-muted-foreground hover:text-foreground transition-colors"
+                        aria-label="Fermer"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
+
+                    <div className="mt-5 flex flex-col gap-2.5">
+                      {([CREDIT_PRICES.PACK_10, CREDIT_PRICES.PACK_25, CREDIT_PRICES.PACK_50] as const).map((pack) => {
+                        const popular = 'popular' in pack && pack.popular;
+                        const unit = (pack.price / 100 / pack.credits).toFixed(2).replace('.', ',');
+                        return (
+                          <button
+                            key={pack.id}
+                            onClick={() => handleBuyPack(pack.id as CreditPackId)}
+                            disabled={isPurchasing}
+                            className={`group flex items-center justify-between rounded-[16px] border px-4 py-3.5 text-left transition-all disabled:opacity-60 disabled:cursor-wait ${
+                              popular
+                                ? 'border-[var(--gold)] bg-[rgba(200,162,77,0.08)] hover:bg-[rgba(200,162,77,0.14)]'
+                                : 'border-[var(--gold-line)] hover:border-[var(--gold)] hover:bg-[rgba(250,248,244,0.04)]'
+                            }`}
+                          >
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <span className="text-[16px] font-semibold text-foreground">{pack.credits} crédits</span>
+                                {popular && (
+                                  <span className="rounded-full bg-[var(--gold)] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#0c0a09]">
+                                    Populaire
+                                  </span>
+                                )}
+                              </div>
+                              <span className="text-[12px] text-muted-foreground">soit {unit} € le rendu</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-[17px] font-bold text-foreground">{pack.priceDisplay}</span>
+                              {buyingPack === pack.id ? (
+                                <span className="h-4 w-4 rounded-full border-2 border-[var(--gold)] border-t-transparent animate-spin" aria-hidden />
+                              ) : (
+                                <ArrowRight className="w-4 h-4 text-[var(--gold)] group-hover:translate-x-0.5 transition-transform" />
+                              )}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    <Link
+                      href="/pricing"
+                      className="mt-4 block text-center text-[13px] text-muted-foreground hover:text-[var(--gold)] transition-colors"
+                    >
+                      Voir tous les packs et l&apos;abonnement Pro illimité
+                    </Link>
                   </div>
                 </div>
               )}
