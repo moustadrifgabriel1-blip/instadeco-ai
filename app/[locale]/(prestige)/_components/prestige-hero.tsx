@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
 import { useRef } from 'react';
+import { trackCTAClick } from '@/lib/analytics/gtag';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
@@ -127,6 +128,7 @@ export function PrestigeHero() {
         >
           <Link
             href="/essai"
+            onClick={() => trackCTAClick('hero_home_testez_gratuitement', '/essai')}
             className="group inline-flex min-h-[52px] items-center gap-3 rounded-full border border-[var(--gold)] bg-[var(--gold)] px-8 py-3.5 text-sm font-medium uppercase tracking-[0.18em] text-[#0c0a09] transition-[transform,background-color,color] duration-500 ease-[var(--ease-slow)] hover:bg-transparent hover:text-[var(--gold)] focus-visible:bg-transparent focus-visible:text-[var(--gold)]"
           >
             Testez gratuitement
