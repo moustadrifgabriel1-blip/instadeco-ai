@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { Check } from 'lucide-react';
+import { Check, Mail } from 'lucide-react';
 import { useSupabaseBrowser } from '@/hooks/use-supabase-browser';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
@@ -20,6 +20,7 @@ function SignupForm() {
   const [showReferral, setShowReferral] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
 
   // Pre-fill referral code from URL & get redirect
   const redirectTo = searchParams.get('redirect') || '/generate';
@@ -99,7 +100,14 @@ function SignupForm() {
         }
       }
       
-      router.push(redirectTo);
+      // Deux cas selon la config Supabase :
+      // - confirmation email activée → pas de session, on guide vers la boîte mail.
+      // - auto-confirm → session présente, on entre directement dans l'app.
+      if (data?.session) {
+        router.push(redirectTo);
+      } else {
+        setEmailSent(true);
+      }
     } catch (err: unknown) {
       setError('Une erreur est survenue');
     } finally {
@@ -137,6 +145,36 @@ function SignupForm() {
       setLoading(false);
     }
   };
+
+  if (emailSent) {
+    return (
+      <div className="min-h-[100dvh] bg-background flex items-center justify-center px-6 py-12">
+        <div className="w-full max-w-md text-center">
+          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--gold)]/12 border border-[var(--gold-line)]">
+            <Mail className="h-7 w-7 text-[var(--gold)]" aria-hidden="true" />
+          </div>
+          <h1 className="prestige-display text-[34px] font-semibold tracking-[-0.025em] text-foreground mb-3">
+            Vérifiez votre boîte mail
+          </h1>
+          <p className="text-[17px] text-muted-foreground leading-relaxed">
+            Nous avons envoyé un lien de confirmation à{' '}
+            <span className="text-foreground font-medium">{email}</span>. Cliquez dessus
+            pour activer votre compte et récupérer vos{' '}
+            <span className="text-[var(--gold)]">3 crédits gratuits</span>.
+          </p>
+          <p className="mt-4 text-[14px] text-muted-foreground">
+            Pas d&apos;email dans 2 minutes ? Pensez à vérifier vos spams.
+          </p>
+          <Link
+            href="/login"
+            className="mt-8 inline-flex items-center justify-center rounded-full border border-[var(--gold-line)] px-6 py-3 text-[15px] font-medium text-foreground hover:bg-[rgba(250,248,244,0.06)] transition-colors"
+          >
+            Aller à la connexion
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-[100dvh] bg-background flex items-center justify-center px-6 py-12">
