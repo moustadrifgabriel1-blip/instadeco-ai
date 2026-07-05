@@ -17,3 +17,13 @@ Alertes pré-mortem actives :
 1. (Gabriel) Finir l'email pro (DKIM/SPF/Gmail) et ENVOYER les 20 premiers emails outbound du lot 1. DoD : 20 envois loggés.
 2. (Gabriel + Claude) Vérifier le VPS : les crons seo-engine tournent-ils ? Réparer + activer un heartbeat (rapport daté < 7 j). DoD : un rapport gsc_daily daté du jour dans reports/.
 3. (Gabriel, 5 min) Poser NEXT_PUBLIC_CLARITY_ID et NEXT_PUBLIC_WELCOME_COUPON sur Vercel. DoD : Clarity enregistre, l'offre -20 % s'affiche.
+
+## 2026-07-05 — Point J+1 (moteur SEO)
+
+KPIs (réels, base) : MRR 49 € (1 Pro), 21 users, 16 leads, 2 générations/7j. **Plat** vs baseline : les 2 moteurs d'acquisition dorment, rien ne pousse.
+
+Levée d'ambiguïté cause n°2 : le « seo-engine muet depuis le 18/06 » était en partie un **faux positif de visibilité**. Les rapports sont gitignorés (repo public) donc n'apparaissent JAMAIS dans le repo, même moteur vivant. Impossible de trancher sans SSH (accès VPS refusé côté agent). Le **pipeline code est sain** : sonde GSC locale (ADC) OK → 10 clics / 505 impr / pos 9,9 sur 28j (vs 7/305/18,5 le 22/06, ça **progresse**, mais 0 requête home staging/Pro).
+
+Fix livré et MERGÉ sur main (PR #7, merge d9ef972) : heartbeat VISIBLE. Table `seo_engine_heartbeats` + route `/api/cron/seo-heartbeat` (POST run / GET verdict alive) + hook dans `run-seo-engine.sh` + alerte dans `seo-health-check` si dernier job quotidien > 48h. Vert (type-check/lint/297 tests). Reste : merge→deploy + Gabriel confirme/relance les crons VPS (SSH) et vérifie `curl .../seo-heartbeat`.
+
+Rappel règle n°1 : l'outbound (60 agents prêts, email pro DNS désormais VALIDE) prime toujours sur le code. Le heartbeat était le 2e moteur, à ne pas laisser mourir.
