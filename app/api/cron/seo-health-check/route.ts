@@ -194,6 +194,49 @@ async function checkArticleFrequency(): Promise<CheckResult> {
   }
 }
 
+/**
+ * Heartbeat du moteur SEO (crons VPS). Cause de mort n°2 du pre-mortem : un
+ * moteur qui meurt en silence. On lit seo_engine_heartbeats (ecrite par
+ * /api/cron/seo-heartbeat a chaque job) et on ALERTE si le job quotidien le plus
+ * frais date de plus de 2 jours. Table service-role only => client service role.
+ */
+async function checkSeoEngineHeartbeat(): Promise<CheckResult> {
+  const NAME = 'Moteur SEO (heartbeat VPS)';
+  try {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!url || !key) return warn(NAME, 'Supabase non configuré, heartbeat non vérifiable', 'high', 4);
+
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabase = createClient(url, key);
+    const { data, error } = await supabase
+      .from('seo_engine_heartbeats')
+      .select('job, ran_at, status')
+      .in('job', ['gsc_daily', 'drift_check'])
+      .order('ran_at', { ascending: false })
+      .limit(1);
+
+    if (error) return fail(NAME, `DB: ${error.message}`, 'high', 8);
+    if (!data || data.length === 0) {
+      return fail(NAME, 'Aucun heartbeat : les crons SEO du VPS n\'ont jamais tourné (ou n\'atteignent pas /api/cron/seo-heartbeat)', 'high', 12);
+    }
+
+    const last = data[0];
+    const ageHours = (Date.now() - new Date(last.ran_at).getTime()) / 3_600_000;
+    const ageDays = Math.round((ageHours / 24) * 10) / 10;
+
+    if (ageHours > 48) {
+      return fail(NAME, `Dernier run (${last.job}) il y a ${ageDays}j ! Crons VPS à l'arrêt ? Voir docs/CRON_VPS_HETZNER.md`, 'high', 12);
+    }
+    if (last.status === 'error') {
+      return warn(NAME, `Dernier run ${last.job} en ERREUR (il y a ${ageDays}j)`, 'high', 5);
+    }
+    return pass(NAME, `Actif : ${last.job} a tourné il y a ${ageDays}j`, 'high');
+  } catch (e) {
+    return fail(NAME, (e as Error).message, 'high', 8);
+  }
+}
+
 async function checkDuplicateTitles(): Promise<CheckResult> {
   try {
     const { createClient } = await import('@/lib/supabase/server');
@@ -497,6 +540,7 @@ export async function GET(request: NextRequest) {
     checks.push(await checkRss());
     checks.push(...(await checkKeyPages()));
     checks.push(await checkArticleFrequency());
+    checks.push(await checkSeoEngineHeartbeat());
     checks.push(await checkDuplicateTitles());
     checks.push(await checkTopArticles());
     checks.push(await checkCities());
