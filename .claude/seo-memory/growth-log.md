@@ -27,3 +27,9 @@ Levée d'ambiguïté cause n°2 : le « seo-engine muet depuis le 18/06 » étai
 Fix livré et MERGÉ sur main (PR #7, merge d9ef972) : heartbeat VISIBLE. Table `seo_engine_heartbeats` + route `/api/cron/seo-heartbeat` (POST run / GET verdict alive) + hook dans `run-seo-engine.sh` + alerte dans `seo-health-check` si dernier job quotidien > 48h. Vert (type-check/lint/297 tests). Reste : merge→deploy + Gabriel confirme/relance les crons VPS (SSH) et vérifie `curl .../seo-heartbeat`.
 
 Rappel règle n°1 : l'outbound (60 agents prêts, email pro DNS désormais VALIDE) prime toujours sur le code. Le heartbeat était le 2e moteur, à ne pas laisser mourir.
+
+## 2026-07-05 (suite) — Cause n°2 clôturée + 1er lot outbound en brouillons
+
+Cause n°2 (moteur SEO mort en silence) : **clôturée, confirmée par Gabriel** (crons VPS relancés, heartbeat vivant). Reste en fond : re-mesurer la progression GSC dans les prochaines semaines.
+
+Cause n°1 (acquisition jamais exécutée) : 1er pas concret. 20 messages (sur les 60 du kit) poussés en **brouillons Gmail**, prêts à relire/envoyer. 3 leads écartés du lot pour data sale (#4, #16 : ville vide dans `leads.csv` ; #30 : email catch-all), à corriger avant un prochain lot. Blocages avant envoi réel : (1) les brouillons sont dans le Gmail **personnel**, pas `contact@instadeco.app` (à reconfigurer en "envoyer en tant que" ou recréer depuis la boîte pro) ; (2) aucun visuel avant/après attaché (l'outil de création de brouillon ne gère pas les pièces jointes), à ajouter manuellement depuis `outbound-kit/` avant chaque envoi. DoD toujours en attente : 20 envois RÉELS loggés dans `suivi-pipeline.csv`.
