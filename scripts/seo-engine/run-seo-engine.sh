@@ -59,11 +59,33 @@ case "$job" in
   *) echo "$(ts) [seo:${job}] job inconnu" && exit 1 ;;
 esac
 
+# Heartbeat : signale au site que ce job a tourne (rend le moteur VISIBLE malgre
+# des rapports gitignores restes sur le VPS). Best-effort : ne fait JAMAIS
+# echouer le job. Cf. app/api/cron/seo-heartbeat + table seo_engine_heartbeats.
+send_heartbeat() {
+  local status="$1"
+  if [ -z "${INSTADECO_BASE_URL:-}" ] || [ -z "${CRON_SECRET:-}" ]; then
+    echo "$(ts) [seo:${job}] heartbeat ignore (INSTADECO_BASE_URL/CRON_SECRET absent)"
+    return 0
+  fi
+  if curl -sS -m 15 -X POST "$INSTADECO_BASE_URL/api/cron/seo-heartbeat" \
+      -H "Authorization: Bearer $CRON_SECRET" \
+      -H "Content-Type: application/json" \
+      --data "{\"job\":\"${job}\",\"status\":\"${status}\"}" >/dev/null 2>&1; then
+    echo "$(ts) [seo:${job}] heartbeat ${status} envoye"
+  else
+    echo "$(ts) [seo:${job}] heartbeat non envoye (endpoint injoignable)"
+  fi
+}
+
 echo "$(ts) [seo:${job}] start"
 if python ".claude/seo-engine/$script"; then
   echo "$(ts) [seo:${job}] OK"
+  send_heartbeat ok
 else
-  echo "$(ts) [seo:${job}] ECHEC (voir sortie ci-dessus)"; exit 1
+  echo "$(ts) [seo:${job}] ECHEC (voir sortie ci-dessus)"
+  send_heartbeat error
+  exit 1
 fi
 
 # Rapports : les renvoyer dans le repo pour que seo-chief les lise.

@@ -162,3 +162,31 @@ crontab -l   # vérifier
 1. Confirmer plusieurs runs verts + rapports poussés.
 2. Dans `.github/workflows/seo-engine.yml` : laisser le `workflow_dispatch` (filet de secours
    manuel), garder le `schedule:` commenté → GitHub ne planifie rien, le VPS est seul maître.
+
+## Heartbeat : savoir si le moteur est vivant (cause de mort n°2)
+
+Les rapports du moteur sont **gitignorés** (`.claude/seo-engine/reports/*`, repo public), donc
+`PUSH_REPORTS=1` ne pousse en réalité **rien** : impossible de savoir depuis le repo si les crons
+tournent encore. Un moteur peut mourir en silence pendant des semaines. Correctif : un heartbeat
+**visible en base**.
+
+Comment ça marche : `run-seo-engine.sh` POSTe, après CHAQUE job, vers
+`/api/cron/seo-heartbeat` (Bearer `CRON_SECRET`), qui upsert une ligne par job dans la table
+`seo_engine_heartbeats`. Best-effort : si l'endpoint est injoignable, le job n'échoue pas.
+
+Vérifier l'état du moteur à tout moment (aucune donnée inventée, lecture directe) :
+
+```bash
+# Depuis n'importe où, avec le CRON_SECRET :
+curl -s -H "Authorization: Bearer $CRON_SECRET" https://instadeco.app/api/cron/seo-heartbeat | jq
+# -> { alive: true/false, stale_jobs: [...], jobs: [{job, status, age_hours, stale}] }
+```
+
+`alive:false` ou `stale_jobs` non vide = les crons VPS ne tournent plus (ou n'atteignent pas
+l'endpoint). Le check de santé bimensuel (`/api/cron/seo-health-check`) lit aussi ce heartbeat et
+**alerte par email/webhook** si le dernier job quotidien date de plus de 48h.
+
+Prérequis VPS : `INSTADECO_BASE_URL=https://instadeco.app` et `CRON_SECRET` doivent être dans
+`/etc/instadeco-seo.env` (déjà requis par `ctr_optimizer`). Après un `git pull` du repo sur le VPS,
+le nouveau `run-seo-engine.sh` envoie le heartbeat automatiquement (pensez à `sudo cp` si vous avez
+copié le script hors du clone, cf. Installation).
