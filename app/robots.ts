@@ -26,6 +26,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: [
           '/api/',
           '/auth/',
+          '/outbound/',
           '/_next/',
           '/*/dashboard/',
           '/*/credits/',
