@@ -33,3 +33,10 @@ Rappel règle n°1 : l'outbound (60 agents prêts, email pro DNS désormais VALI
 Cause n°2 (moteur SEO mort en silence) : **clôturée, confirmée par Gabriel** (crons VPS relancés, heartbeat vivant). Reste en fond : re-mesurer la progression GSC dans les prochaines semaines.
 
 Cause n°1 (acquisition jamais exécutée) : 1er pas concret. 20 messages (sur les 60 du kit) poussés en **brouillons Gmail**, prêts à relire/envoyer. 3 leads écartés du lot pour data sale (#4, #16 : ville vide dans `leads.csv` ; #30 : email catch-all), à corriger avant un prochain lot. Blocages avant envoi réel : (1) les brouillons sont dans le Gmail **personnel**, pas `contact@instadeco.app` (à reconfigurer en "envoyer en tant que" ou recréer depuis la boîte pro) ; (2) aucun visuel avant/après attaché (l'outil de création de brouillon ne gère pas les pièces jointes), à ajouter manuellement depuis `outbound-kit/` avant chaque envoi. DoD toujours en attente : 20 envois RÉELS loggés dans `suivi-pipeline.csv`.
+
+## 2026-07-12 — Dernier verrou technique de l'outbound levé, kit régénéré
+
+Cause n°1 (acquisition jamais exécutée), avancée concrète côté enabler :
+- **PR #8 MERGÉE sur main (`c288858`) + déployée.** Pages visuelles avant/après hors i18n (`app/outbound/[slug]`). Vérifié en prod : `instadeco.app/outbound/salon-minimaliste` et `/salon-japandi` renvoient **200 sans redirection** sur l'URL exacte des emails (sans slash final), slug inconnu → 404, `noindex`. Un lien vers une VRAIE page (au lieu d'une pièce jointe ou d'un `.jpg` brut) supprime l'avertissement de redirection Gmail. C'était le dernier blocage technique avant envoi.
+- **Kit régénéré** (`build-outbound-kit.ts`) : 60 leads avec email, 46 premium. `messages-remplis.md` pointe désormais vers la page visuelle hébergée, la mention « en pièce jointe » a disparu. Message type relu (opt-out présent, ton OK).
+- **DoD toujours OUVERT** : 0 envoi RÉEL. Reste strictement côté Gabriel : (1) « envoyer en tant que » `contact@instadeco.app`, (2) envoyer les 20 premiers, (3) les logger dans `suivi-pipeline.csv`. Tant que ce n'est pas fait, les KPIs restent plats et la règle n°1 n'est pas honorée.
