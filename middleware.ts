@@ -6,7 +6,8 @@ export default createMiddleware(routing);
 export const config = {
   matcher: [
     '/',
-    // Localized app routes — exclude API, Next internals, static files, blog, OAuth callbacks
-    '/((?!api|_next|_vercel|blog|auth|.*\\..*).*)',
+    // Localized app routes — exclude API, Next internals, static files, blog, OAuth callbacks,
+    // et outbound (pages hors i18n, cibles de lien cold email, ne doivent PAS être redirigées).
+    '/((?!api|_next|_vercel|blog|auth|outbound|.*\\..*).*)',
   ],
 };

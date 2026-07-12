@@ -14,6 +14,10 @@ import * as path from 'path';
 const DIR = path.resolve(process.cwd(), 'outbound-kit');
 const RAW = path.join(DIR, 'leads-raw.csv');
 const LINK = 'https://instadeco.app/fr/pro?utm_source=outbound&utm_medium=email&utm_campaign=before-after';
+// Page HTML du visuel avant/après (app/outbound/[slug]) : cible de lien propre pour le
+// cold email. Un lien vers une vraie page évite l'avertissement de redirection Gmail
+// que déclenchait le lien direct vers le .jpg brut.
+const VISUAL_PAGE = 'https://instadeco.app/outbound/salon-minimaliste';
 
 function parseCSV(text: string): string[][] {
   const rows: string[][] = [];
@@ -125,7 +129,7 @@ Bonjour ${l.prenom},
 
 Vous vendez des biens sur ${lieu}. Quand une pièce est vide, l'acheteur a du mal à se projeter, et l'annonce attire moins de visites.
 
-J'ai conçu un outil qui meuble une pièce à partir d'une seule photo, en moins d'une minute. En pièce jointe, un exemple : une pièce vide devenue un séjour qui donne envie de pousser la porte.
+J'ai conçu un outil qui meuble une pièce à partir d'une seule photo, en moins d'une minute. Un exemple avant/après ici : ${VISUAL_PAGE}
 
 Vous pouvez le faire sur tous vos biens, en illimité, pour 49 € par mois. Le premier essai est gratuit et ne demande pas de carte : ${LINK}
 
