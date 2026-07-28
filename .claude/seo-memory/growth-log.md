@@ -54,3 +54,28 @@ Cause n°1 (acquisition jamais exécutée), avancée concrète côté enabler :
 - **Écart de forme résolu** : les 18 partis étaient en HTML soigné (ancre « un exemple concret ») pointant vers `salon-japandi.jpg` (image brute). Gabriel a choisi de refaire les 33 en HTML, mais pointant vers la nouvelle page `/outbound/salon-minimaliste` (l'amélioration du jour). Les 33 ont été recréés en HTML ; recréer vers le même destinataire+sujet a **remplacé** les 33 plain text (la liste Gmail faisant autorité, sans filtre, ne renvoie que 33 brouillons, tous HTML, un par destinataire, aucune page suivante). Donc pas de doublon, pas de double-envoi. NB : le search Gmail sur brouillons est défaillant ici (to:/contenu renvoient vide), fiable seulement l'opération `list`.
 - **État final Gmail** : 33 brouillons HTML prêts dans `contact@instadeco.app`, 20 envoyés (18 le 12/07 + 2 le 05/07), 7 catch-all non draftés. Total kit 60 = 20 + 33 + 7.
 - Cadence rappelée : 20/jour, relance 48h. Reste 33 à envoyer sur 2 jours.
+
+## 2026-07-28 — PIVOT : outbound abandonné, cap organique + produit
+
+Décision Gabriel (28/07) : **on arrête la prospection**. Focus = canaux organiques (SEO/pSEO,
+AEO, outils gratuits, Pinterest dès que la clé API arrive, réseaux auto) + **rendre le produit
+meilleur que les concurrents**. Pub payante (FB et autres) confirmée pour décembre 2026,
+conforme au plan (0 pub avant déc., puis 1 000/mois).
+
+Bilan outbound au moment du pivot (mesuré, pas supposé) :
+- Les 33 brouillons ne sont JAMAIS partis (toujours en brouillons le 28/07). Seuls les 18 du
+  12/07 ont été envoyés (+2 pilotes le 05/07). Le canal a donc été testé sur 18 emails, pas 51.
+- Résultat des 18 : 0 bounce (délivrabilité OK), 1 réponse (5,5 %), 0 intéressé. Sur 18 envois,
+  0 intéressé est dans la variance attendue (1 à 5 % de positifs en cold). Verdict statistique :
+  canal NON testé, abandonné par choix de fondateur (exécution pénible, pas de constance), pas
+  par preuve d'échec. Honnêteté du log : si un jour on relance, repartir de là.
+- La réponse unique (conseillère iad, 13/07) a payé l'effort : « je dispose déjà de cette
+  fonctionnalité dans mes outils ». Confirmé par l'étude concurrence : c'est HOQI (illimité
+  19,99 €, contrats-cadres iad/Efficity/BSK/l'Adresse/ERA, rachetée par La Boîte Immo 12/2025).
+- Signal produit préoccupant : dernière génération en base le 04/07 (16 j sans usage), l'unique
+  abonné Pro (49 €, inscrit 18/06) n'a jamais généré → churn probable à l'échéance du 18/08.
+
+Étude concurrence par les avis réels livrée : `docs/ETUDE_CONCURRENCE_AVIS_2026-07.md`
+(2 agents de recherche, marchés EN + FR). Backlog produit dérivé des plaintes (P1 rendu raté
+non décompté + re-roll, P2 conformité FR 1 clic, P3 retouche ciblée, P4 cohérence mobilier
+multi-pièces, P5 désencombrement) + angle marketing « facturation honnête ».
