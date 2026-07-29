@@ -1,14 +1,24 @@
 import { NextResponse } from 'next/server';
-import { useCases } from '@/src/infrastructure/config/di-container';
+import { useCases, container } from '@/src/infrastructure/config/di-container';
 import { requireAuth } from '@/lib/security/api-auth';
 import { safeFetchImage } from '@/src/shared/utils/safe-url';
+import { addLegalMention, composeLegalBeforeAfter } from '@/lib/image/compose-legal';
 
 export const dynamic = 'force-dynamic';
 
+/** Formats d'export : rendu brut, rendu avec mention légale incrustée, paire avant/après. */
+const FORMATS = ['hd', 'mention', 'avant-apres'] as const;
+type DownloadFormat = (typeof FORMATS)[number];
+
+export const maxDuration = 30;
+
 /**
- * GET /api/v2/download?id=xxx
+ * GET /api/v2/download?id=xxx&format=hd|mention|avant-apres
  *
  * Télécharge l'image d'une génération appartenant à l'utilisateur authentifié.
+ * `format=mention` incruste la mention « Image virtuellement meublée · Photos non
+ * contractuelles » dans les pixels ; `format=avant-apres` compose la paire
+ * photo d'origine / rendu avec badges + mention (export conforme pour annonces).
  *
  * Architecture (clean) :
  * - La logique métier (existence + propriété + disponibilité de l'image) est
@@ -21,10 +31,16 @@ export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const generationId = searchParams.get('id');
+    const formatParam = searchParams.get('format') ?? 'hd';
 
     if (!generationId) {
       return NextResponse.json({ error: 'ID de génération requis' }, { status: 400 });
     }
+
+    if (!FORMATS.includes(formatParam as DownloadFormat)) {
+      return NextResponse.json({ error: 'Format inconnu' }, { status: 400 });
+    }
+    const format = formatParam as DownloadFormat;
 
     // ✅ Authentification obligatoire — userId issu du token JWT.
     const auth = await requireAuth();
@@ -44,7 +60,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: message }, { status: result.error.statusCode });
     }
 
-    const { outputImageUrl, fileName } = result.data;
+    const { outputImageUrl, inputImageUrl, fileName } = result.data;
 
     // Retourner l'image originale.
     // outputImageUrl est d'origine externe (output Fal/Gemini / storage) :
@@ -55,12 +71,40 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: 'Image non disponible' }, { status: 404 });
     }
 
-    const imageBuffer = await imageResponse.arrayBuffer();
+    let imageBuffer: Buffer = Buffer.from(await imageResponse.arrayBuffer());
+    let outName = fileName;
+
+    if (format === 'mention') {
+      imageBuffer = await addLegalMention(imageBuffer);
+      outName = fileName.replace(/\.jpg$/, '-mention.jpg');
+    } else if (format === 'avant-apres') {
+      // La photo d'origine vit dans le bucket PRIVÉ input-images : l'URL stockée
+      // ne se fetch pas telle quelle, on la re-signe (1h) avant le fetch SSRF-safe.
+      let beforeUrl = inputImageUrl;
+      const pathMatch = inputImageUrl.match(/\/input-images\/(.+)$/);
+      if (pathMatch) {
+        const signed = await container.storageService.createSignedUrl(
+          'input-images',
+          decodeURIComponent(pathMatch[1]),
+          3600,
+        );
+        if (signed.success) beforeUrl = signed.data;
+      }
+
+      const beforeResponse = await safeFetchImage(beforeUrl, undefined, 10_000);
+      if (!beforeResponse.ok) {
+        return NextResponse.json({ error: 'Photo d\'origine non disponible' }, { status: 404 });
+      }
+      const beforeBuffer = Buffer.from(await beforeResponse.arrayBuffer());
+
+      imageBuffer = await composeLegalBeforeAfter(beforeBuffer, imageBuffer);
+      outName = fileName.replace(/\.jpg$/, '-avant-apres.jpg');
+    }
 
     return new NextResponse(new Uint8Array(imageBuffer), {
       headers: {
         'Content-Type': 'image/jpeg',
-        'Content-Disposition': `attachment; filename="${fileName}"`,
+        'Content-Disposition': `attachment; filename="${outName}"`,
       },
     });
 

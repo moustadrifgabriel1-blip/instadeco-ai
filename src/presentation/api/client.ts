@@ -64,6 +64,8 @@ export interface GenerateDesignRequest {
   roomType: string;
   style: string;
   transformMode?: string;
+  /** Re-roll gratuit : ID du rendu jugé raté à rejouer sans débit. */
+  rerollOf?: string;
 }
 
 export interface GenerateDesignResponse {

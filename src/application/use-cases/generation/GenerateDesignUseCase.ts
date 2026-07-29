@@ -27,6 +27,7 @@ import { ILoggerService } from '@/src/domain/ports/services/ILoggerService';
 import { InsufficientCreditsError } from '@/src/domain/errors/InsufficientCreditsError';
 import { ImageGenerationError } from '@/src/domain/errors/ImageGenerationError';
 import { FairUseLimitError } from '@/src/domain/errors/FairUseLimitError';
+import { RerollNotAllowedError } from '@/src/domain/errors/RerollNotAllowedError';
 import { DomainError } from '@/src/domain/errors/DomainError';
 import { CREDIT_COSTS, FAIR_USE_MONTHLY_CAP, FAIR_USE_WINDOW_DAYS } from '@/src/shared/constants/pricing';
 import { IUserRepository } from '@/src/domain/ports/repositories/IUserRepository';
@@ -109,6 +110,12 @@ export interface GenerateDesignInput {
   prompt: string;
   /** Mode de transformation: full_redesign, keep_layout, decor_only, home_staging */
   transformMode?: 'full_redesign' | 'keep_layout' | 'decor_only' | 'home_staging';
+  /**
+   * Re-roll gratuit : ID de la génération jugée ratée à rejouer SANS débit.
+   * Règles vérifiées ici : appartenance, statut completed, pas un re-roll
+   * lui-même, et jamais déjà refaite (1 seul re-roll gratuit par génération).
+   */
+  rerollOfGenerationId?: string;
 }
 
 /**
@@ -154,10 +161,41 @@ export class GenerateDesignUseCase {
 
     const requiredCredits = CREDIT_COSTS.GENERATION;
 
+    // 0pré. Re-roll gratuit : l'utilisateur rejoue un rendu qu'il juge raté, sans débit.
+    //       Validation stricte AVANT tout (crédits = argent) ; en cas de doute, on refuse
+    //       le gratuit (l'utilisateur peut toujours générer normalement).
+    let freeReroll = false;
+    if (input.rerollOfGenerationId) {
+      const parentResult = await this.generationRepo.findById(input.rerollOfGenerationId);
+      if (!parentResult.success || !parentResult.data || parentResult.data.userId !== input.userId) {
+        // Message identique si introuvable ou propriété d'un tiers : ne fuite pas l'existence.
+        return failure(new RerollNotAllowedError('Rendu d\'origine introuvable.'));
+      }
+      const parent = parentResult.data;
+      if (parent.status !== 'completed') {
+        return failure(new RerollNotAllowedError('Seul un rendu terminé peut être régénéré (un échec est remboursé automatiquement).'));
+      }
+      if (parent.parentGenerationId) {
+        return failure(new RerollNotAllowedError('Ce rendu est déjà une régénération gratuite.'));
+      }
+      const hasRerollResult = await this.generationRepo.hasReroll(parent.id);
+      if (!hasRerollResult.success) {
+        return failure(new RerollNotAllowedError('Vérification impossible pour le moment, réessayez dans un instant.'));
+      }
+      if (hasRerollResult.data) {
+        return failure(new RerollNotAllowedError('La régénération gratuite a déjà été utilisée pour ce rendu.'));
+      }
+      freeReroll = true;
+      this.logger.info('Re-roll gratuit accordé', {
+        userId: input.userId,
+        parentGenerationId: parent.id,
+      });
+    }
+
     // 0. Abonné Pro/Agence illimité → génération SANS débit de crédits (fair-use géré
     //    en amont par le rate-limiting). Solo + grand public passent par le ledger crédits.
-    let chargesCredits = true;
-    if (this.userRepo) {
+    let chargesCredits = !freeReroll;
+    if (chargesCredits && this.userRepo) {
       const userResult = await this.userRepo.findById(input.userId);
       if (userResult.success && userResult.data && isUnlimitedPro(userResult.data)) {
         chargesCredits = false;
@@ -183,7 +221,7 @@ export class GenerateDesignUseCase {
     //       Borne le COGS et rend opposable le fair-use des CGV (Art. 4 bis.4).
     //       Fail-open : si le comptage échoue (incident DB), on NE bloque PAS un
     //       abonné payant (on ne punit jamais le client pour un souci d'infra).
-    if (!chargesCredits) {
+    if (!chargesCredits && !freeReroll) {
       const since = new Date(Date.now() - FAIR_USE_WINDOW_DAYS * 24 * 60 * 60 * 1000).toISOString();
       const used = await this.generationRepo.countByUserSince(input.userId, since);
       if (used.success && used.data >= FAIR_USE_MONTHLY_CAP) {
@@ -243,6 +281,7 @@ export class GenerateDesignUseCase {
       roomType: input.roomType,
       inputImageUrl,
       prompt: input.prompt,
+      parentGenerationId: freeReroll ? input.rerollOfGenerationId : undefined,
     };
 
     const createResult = await this.generationRepo.create(createInput);

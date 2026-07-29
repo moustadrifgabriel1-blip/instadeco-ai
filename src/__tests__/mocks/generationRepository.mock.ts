@@ -29,6 +29,7 @@ export function createMockGenerationRepository(overrides: Partial<IGenerationRep
     markFailedIfPending: vi.fn().mockResolvedValue(
       success({ transitioned: true, generation: { ...mockGeneration, status: 'failed' } }),
     ),
+    hasReroll: vi.fn().mockResolvedValue(success(false)),
     findStuck: vi.fn().mockResolvedValue(success([])),
     findPublicGallery: vi.fn().mockResolvedValue(success({ items: [], total: 0 })),
     delete: vi.fn().mockResolvedValue(success(undefined)),

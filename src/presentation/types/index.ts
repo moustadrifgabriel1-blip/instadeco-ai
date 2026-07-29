@@ -45,6 +45,7 @@ export interface GenerateDesignInput {
   roomType: string;
   style: string;
   transformMode?: string; // Mode de transformation (full_redesign, keep_layout, decor_only)
+  rerollOf?: string; // Re-roll gratuit : ID du rendu jugé raté à rejouer sans débit
 }
 
 /**

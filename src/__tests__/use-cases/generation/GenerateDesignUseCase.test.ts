@@ -11,9 +11,11 @@ import { GenerateDesignUseCase } from '@/src/application/use-cases/generation/Ge
 import { InsufficientCreditsError } from '@/src/domain/errors/InsufficientCreditsError';
 import { ImageGenerationError } from '@/src/domain/errors/ImageGenerationError';
 import { FairUseLimitError } from '@/src/domain/errors/FairUseLimitError';
+import { RerollNotAllowedError } from '@/src/domain/errors/RerollNotAllowedError';
 import { success, failure } from '@/src/shared/types/Result';
 import {
   createMockCreditRepository,
+  createMockGeneration,
   createMockGenerationRepository,
   createMockLogger,
 } from '@/src/__tests__/mocks';
@@ -304,5 +306,117 @@ describe('GenerateDesignUseCase — abonné illimité (Pro/Agence)', () => {
 
     const result = await useCase.execute(baseInput);
     expect(result.success).toBe(true);
+  });
+
+  describe('re-roll gratuit', () => {
+    const PARENT_ID = 'gen-123'; // = id du mockGeneration par défaut (userId user-123)
+    const completedParent = createMockGeneration({ id: PARENT_ID, status: 'completed' });
+    const rerollInput = { ...baseInput, rerollOfGenerationId: PARENT_ID };
+
+    it('re-roll valide : aucun débit, génération liée au parent', async () => {
+      const creditRepo = createMockCreditRepository();
+      const generationRepo = createMockGenerationRepository({
+        findById: vi.fn().mockResolvedValue(success(completedParent)),
+      });
+      const useCase = new GenerateDesignUseCase(
+        generationRepo, creditRepo, createMockImageGenerator(), createMockStorage(), createMockLogger(),
+      );
+
+      const result = await useCase.execute(rerollInput);
+
+      expect(result.success).toBe(true);
+      expect(creditRepo.deductCredits).not.toHaveBeenCalled();
+      expect(generationRepo.create).toHaveBeenCalledWith(
+        expect.objectContaining({ parentGenerationId: PARENT_ID }),
+      );
+    });
+
+    it('refuse si le re-roll a déjà été utilisé (1 seul par génération)', async () => {
+      const creditRepo = createMockCreditRepository();
+      const generationRepo = createMockGenerationRepository({
+        findById: vi.fn().mockResolvedValue(success(completedParent)),
+        hasReroll: vi.fn().mockResolvedValue(success(true)),
+      });
+      const useCase = new GenerateDesignUseCase(
+        generationRepo, creditRepo, createMockImageGenerator(), createMockStorage(), createMockLogger(),
+      );
+
+      const result = await useCase.execute(rerollInput);
+
+      expect(result.success).toBe(false);
+      if (!result.success) expect(result.error).toBeInstanceOf(RerollNotAllowedError);
+      expect(generationRepo.create).not.toHaveBeenCalled();
+      expect(creditRepo.deductCredits).not.toHaveBeenCalled();
+    });
+
+    it('refuse si le rendu appartient à un autre utilisateur (message neutre)', async () => {
+      const generationRepo = createMockGenerationRepository({
+        findById: vi.fn().mockResolvedValue(
+          success(createMockGeneration({ id: PARENT_ID, status: 'completed', userId: 'autre-user' })),
+        ),
+      });
+      const useCase = new GenerateDesignUseCase(
+        generationRepo, createMockCreditRepository(), createMockImageGenerator(), createMockStorage(), createMockLogger(),
+      );
+
+      const result = await useCase.execute(rerollInput);
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBeInstanceOf(RerollNotAllowedError);
+        expect(result.error.message).toContain('introuvable');
+      }
+      expect(generationRepo.create).not.toHaveBeenCalled();
+    });
+
+    it('refuse de re-roller un re-roll (pas de chaîne gratuite)', async () => {
+      const generationRepo = createMockGenerationRepository({
+        findById: vi.fn().mockResolvedValue(
+          success(createMockGeneration({ id: PARENT_ID, status: 'completed', parentGenerationId: 'gen-000' })),
+        ),
+      });
+      const useCase = new GenerateDesignUseCase(
+        generationRepo, createMockCreditRepository(), createMockImageGenerator(), createMockStorage(), createMockLogger(),
+      );
+
+      const result = await useCase.execute(rerollInput);
+
+      expect(result.success).toBe(false);
+      if (!result.success) expect(result.error).toBeInstanceOf(RerollNotAllowedError);
+    });
+
+    it('refuse (fail-closed) si la vérification hasReroll échoue', async () => {
+      const generationRepo = createMockGenerationRepository({
+        findById: vi.fn().mockResolvedValue(success(completedParent)),
+        hasReroll: vi.fn().mockResolvedValue(failure(new Error('db down'))),
+      });
+      const useCase = new GenerateDesignUseCase(
+        generationRepo, createMockCreditRepository(), createMockImageGenerator(), createMockStorage(), createMockLogger(),
+      );
+
+      const result = await useCase.execute(rerollInput);
+
+      expect(result.success).toBe(false);
+      if (!result.success) expect(result.error).toBeInstanceOf(RerollNotAllowedError);
+    });
+
+    it('re-roll dont la génération IA échoue : PAS de remboursement (rien n\'a été débité)', async () => {
+      const creditRepo = createMockCreditRepository();
+      const generationRepo = createMockGenerationRepository({
+        findById: vi.fn().mockResolvedValue(success(completedParent)),
+      });
+      const imageGenerator = createMockImageGenerator({
+        generate: vi.fn().mockResolvedValue(failure(new Error('IA down'))),
+      });
+      const useCase = new GenerateDesignUseCase(
+        generationRepo, creditRepo, imageGenerator, createMockStorage(), createMockLogger(),
+      );
+
+      const result = await useCase.execute(rerollInput);
+
+      expect(result.success).toBe(false);
+      expect(creditRepo.deductCredits).not.toHaveBeenCalled();
+      expect(creditRepo.addCredits).not.toHaveBeenCalled();
+    });
   });
 });
