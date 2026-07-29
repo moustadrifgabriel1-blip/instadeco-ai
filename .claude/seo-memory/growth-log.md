@@ -79,3 +79,17 @@ Bilan outbound au moment du pivot (mesuré, pas supposé) :
 (2 agents de recherche, marchés EN + FR). Backlog produit dérivé des plaintes (P1 rendu raté
 non décompté + re-roll, P2 conformité FR 1 clic, P3 retouche ciblée, P4 cohérence mobilier
 multi-pièces, P5 désencombrement) + angle marketing « facturation honnête ».
+
+## 2026-07-29 — P1 + P2 SHIPPÉS (PR #9 mergée, prod)
+
+Premier livrable du pivot produit, dérivé direct de l'étude avis (plaintes n°5 et n°8) :
+- **Re-roll gratuit** : un rendu jugé raté se rejoue 1 fois sans débit (bouton sous le
+  résultat, validation stricte serveur, fail-closed, migration `parent_generation_id`
+  appliquée). Aucun concurrent étudié ne l'offre.
+- **Export conforme** : mention « Image virtuellement meublée · Photos non contractuelles »
+  incrustée dans les pixels (rendu seul) + paire avant/après badgée AVANT/APRÈS. Angle
+  différenciant vs HOQI : personne ne vend la conformité comme feature.
+- CI verte (type-check, lint, 303 tests), compositions vérifiées visuellement, mergé `f2b10cb`.
+- Prochaines briques du backlog : réécrire `/pro` + comparatif blog avec les différenciateurs
+  réels (facturation honnête, raté non compté, export conforme) ; P3 retouche ciblée ;
+  re-mesure GSC J+30 (échue depuis ~19/07) ; Pinterest dès que Gabriel fournit la clé API.
