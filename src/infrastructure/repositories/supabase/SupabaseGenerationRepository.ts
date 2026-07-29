@@ -130,6 +130,7 @@ export class SupabaseGenerationRepository implements IGenerationRepository {
     if (input.outputImageUrl !== undefined) updateData.output_image_url = input.outputImageUrl;
     if (input.stripeSessionId !== undefined) updateData.stripe_session_id = input.stripeSessionId;
     if (input.errorMessage !== undefined) updateData.error_message = input.errorMessage;
+    if (input.parentGenerationId !== undefined) updateData.parent_generation_id = input.parentGenerationId;
 
     // Hack: Stocker le providerId dans output_image_url si fourni et pas d'image finale
     if (input.providerId && !input.outputImageUrl) {

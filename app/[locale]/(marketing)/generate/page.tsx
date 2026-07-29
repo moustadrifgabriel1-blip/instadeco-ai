@@ -137,9 +137,16 @@ function GenerateContent() {
   } = useGenerationStatus(generationId, { enabled: !skipPolling });
 
   // États dérivés
-  // L'image est disponible dès la réponse synchrone OU via le polling
-  const generatedImage = generateState.data?.outputImageUrl || statusGeneration?.outputImageUrl || null;
-  const generatedPrompt = generateState.data?.prompt || statusGeneration?.prompt || null;
+  // L'image est disponible dès la réponse synchrone OU via le polling.
+  // Pendant un chargement, on n'affiche AUCUN ancien rendu : sinon un re-roll
+  // ferait réapparaître l'image du parent (le polling interroge encore son ID)
+  // et l'utilisateur croirait que rien ne se passe, loader et erreurs masqués.
+  const generatedImage = generateState.isLoading
+    ? null
+    : generateState.data?.outputImageUrl || statusGeneration?.outputImageUrl || null;
+  const generatedPrompt = generateState.isLoading
+    ? null
+    : generateState.data?.prompt || statusGeneration?.prompt || null;
   const isGenerating = generateState.isLoading || (generationId && !isComplete && !isFailed && !generatedImage && !skipPolling);
   const [progress, setProgress] = useState(0);
   
@@ -346,14 +353,23 @@ function GenerateContent() {
   const handleReroll = async () => {
     if (!imageFile || !generationId || generateState.isLoading) return;
     const parentId = generationId;
+    // Couper le polling sur le parent : sans ça il renverrait l'ancien rendu
+    // (completed) pendant que le nouveau se génère.
+    setGenerationId(null);
     setRerolledFromId(parentId);
-    await generate({
+    const result = await generate({
       imageFile,
       roomType: selectedRoomType,
       style: selectedStyle,
       transformMode: selectedMode,
       rerollOf: parentId,
     });
+    // Échec (réseau, refus serveur, timeout) : rien n'a été consommé côté serveur,
+    // on rend le bouton et on remet le rendu d'origine sous les yeux.
+    if (!result) {
+      setRerolledFromId(null);
+      setGenerationId(parentId);
+    }
   };
 
   const handleDownload = async (format: 'hd' | 'mention' | 'avant-apres' = 'hd') => {

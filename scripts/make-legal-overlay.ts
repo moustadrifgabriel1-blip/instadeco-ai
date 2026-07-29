@@ -1,5 +1,5 @@
 /**
- * make-legal-overlay.ts — Génère UNE fois les 2 overlays PNG de l'export conforme :
+ * make-legal-overlay.ts : génère UNE fois les 2 overlays PNG de l'export conforme.
  *   1. la bannière « mention légale » (composée en bas d'un rendu seul) ;
  *   2. le gabarit de la paire avant/après (badges AVANT/APRÈS + trait or + bannière).
  *

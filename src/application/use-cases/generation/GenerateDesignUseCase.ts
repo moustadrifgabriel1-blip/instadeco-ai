@@ -165,6 +165,10 @@ export class GenerateDesignUseCase {
     //       Validation stricte AVANT tout (crédits = argent) ; en cas de doute, on refuse
     //       le gratuit (l'utilisateur peut toujours générer normalement).
     let freeReroll = false;
+    // Le re-roll REJOUE le rendu d'origine : photo, style, pièce et prompt sont
+    // hérités du parent, jamais pris du body. Sans ça, « rerollOf » offrirait une
+    // génération gratuite sur n'importe quel sujet (remise de 50 % non voulue).
+    let rerollSource: { inputImageUrl: string; styleSlug: string; roomType: string; prompt: string | null } | null = null;
     if (input.rerollOfGenerationId) {
       const parentResult = await this.generationRepo.findById(input.rerollOfGenerationId);
       if (!parentResult.success || !parentResult.data || parentResult.data.userId !== input.userId) {
@@ -185,12 +189,26 @@ export class GenerateDesignUseCase {
       if (hasRerollResult.data) {
         return failure(new RerollNotAllowedError('La régénération gratuite a déjà été utilisée pour ce rendu.'));
       }
+      if (!parent.inputImageUrl) {
+        return failure(new RerollNotAllowedError('Photo d\'origine indisponible pour ce rendu.'));
+      }
       freeReroll = true;
+      rerollSource = {
+        inputImageUrl: parent.inputImageUrl,
+        styleSlug: parent.styleSlug,
+        roomType: parent.roomType,
+        prompt: parent.prompt,
+      };
       this.logger.info('Re-roll gratuit accordé', {
         userId: input.userId,
         parentGenerationId: parent.id,
       });
     }
+
+    // Paramètres effectifs : ceux du parent pour un re-roll, ceux du body sinon.
+    const effectiveStyleSlug = rerollSource?.styleSlug ?? input.styleSlug;
+    const effectiveRoomType = rerollSource?.roomType ?? input.roomType;
+    const effectivePrompt = rerollSource?.prompt ?? input.prompt;
 
     // 0. Abonné Pro/Agence illimité → génération SANS débit de crédits (fair-use géré
     //    en amont par le rate-limiting). Solo + grand public passent par le ledger crédits.
@@ -221,7 +239,9 @@ export class GenerateDesignUseCase {
     //       Borne le COGS et rend opposable le fair-use des CGV (Art. 4 bis.4).
     //       Fail-open : si le comptage échoue (incident DB), on NE bloque PAS un
     //       abonné payant (on ne punit jamais le client pour un souci d'infra).
-    if (!chargesCredits && !freeReroll) {
+    // Tout chemin sans débit (abonné illimité ET re-roll gratuit) est borné par le
+    // fair-use : sinon un abonné doublerait son plafond en re-rollant chaque rendu.
+    if (!chargesCredits) {
       const since = new Date(Date.now() - FAIR_USE_WINDOW_DAYS * 24 * 60 * 60 * 1000).toISOString();
       const used = await this.generationRepo.countByUserSince(input.userId, since);
       if (used.success && used.data >= FAIR_USE_MONTHLY_CAP) {
@@ -260,27 +280,34 @@ export class GenerateDesignUseCase {
     
     this.logger.info('Detected image dimensions', { imageWidth, imageHeight });
 
-    // 3. Upload l'image source
-    const uploadResult = await this.storage.uploadFromBase64(input.imageBase64, {
-      bucket: 'input-images',
-      fileName: `${input.userId}/${Date.now()}.jpg`,
-      contentType: 'image/jpeg',
-    });
+    // 3. Upload l'image source. Un re-roll réutilise la photo DÉJÀ stockée du parent :
+    //    il rejoue le même rendu, et l'image envoyée dans le body ne peut pas s'y
+    //    substituer (sinon le re-roll deviendrait une génération libre gratuite).
+    let inputImageUrl: string;
+    if (rerollSource) {
+      inputImageUrl = rerollSource.inputImageUrl;
+    } else {
+      const uploadResult = await this.storage.uploadFromBase64(input.imageBase64, {
+        bucket: 'input-images',
+        fileName: `${input.userId}/${Date.now()}.jpg`,
+        contentType: 'image/jpeg',
+      });
 
-    if (!uploadResult.success) {
-      this.logger.error('Failed to upload image', uploadResult.error as Error);
-      return failure(new ImageGenerationError('Échec de l\'upload de l\'image'));
+      if (!uploadResult.success) {
+        this.logger.error('Failed to upload image', uploadResult.error as Error);
+        return failure(new ImageGenerationError('Échec de l\'upload de l\'image'));
+      }
+
+      inputImageUrl = uploadResult.data.url;
     }
-
-    const inputImageUrl = uploadResult.data.url;
 
     // 4. Créer l'entrée en base
     const createInput: CreateGenerationInput = {
       userId: input.userId,
-      styleSlug: input.styleSlug,
-      roomType: input.roomType,
+      styleSlug: effectiveStyleSlug,
+      roomType: effectiveRoomType,
       inputImageUrl,
-      prompt: input.prompt,
+      prompt: effectivePrompt ?? input.prompt,
       parentGenerationId: freeReroll ? input.rerollOfGenerationId : undefined,
     };
 
@@ -332,11 +359,19 @@ export class GenerateDesignUseCase {
         if (signedResult.success) {
           controlImageUrl = signedResult.data;
           this.logger.info('Using signed URL for Fal.ai access');
+        } else if (rerollSource) {
+          // Sur un re-roll, le base64 du body n'est PAS une source de repli légitime
+          // (il rejouerait autre chose que le rendu d'origine). On échoue proprement.
+          this.logger.error('Signed URL failed for reroll source image', signedResult.error as Error);
+          return failure(new ImageGenerationError('Photo d\'origine temporairement inaccessible. Réessayez dans un instant.'));
         } else {
           // Fallback: envoyer le base64 directement à Fal.ai
           controlImageUrl = input.imageBase64;
           this.logger.warn('Signed URL failed, sending base64 to Fal.ai directly');
         }
+      } else if (rerollSource) {
+        this.logger.error('Could not extract path from reroll source URL', new Error(inputImageUrl));
+        return failure(new ImageGenerationError('Photo d\'origine temporairement inaccessible. Réessayez dans un instant.'));
       } else {
         // Fallback: envoyer le base64 directement
         controlImageUrl = input.imageBase64;
@@ -345,10 +380,10 @@ export class GenerateDesignUseCase {
     }
 
     const genResult = await this.imageGenerator.generate({
-      prompt: input.prompt,
+      prompt: effectivePrompt ?? input.prompt,
       controlImageUrl,
-      styleSlug: input.styleSlug,
-      roomType: input.roomType,
+      styleSlug: effectiveStyleSlug,
+      roomType: effectiveRoomType,
       transformMode: input.transformMode || 'full_redesign',
       width: imageWidth,
       height: imageHeight,
@@ -358,8 +393,15 @@ export class GenerateDesignUseCase {
       // Marquer comme failed EN PERSISTANT la cause (sinon diagnostic aveugle :
       // error_message restait NULL → impossible de savoir pourquoi en prod).
       const failureReason = (genResult.error as Error)?.message?.slice(0, 2000) ?? 'Échec génération IA (cause inconnue)';
-      await this.generationRepo.update(generation.id, { status: 'failed', errorMessage: failureReason });
-      
+      await this.generationRepo.update(generation.id, {
+        status: 'failed',
+        errorMessage: failureReason,
+        // Un re-roll gratuit qui échoue ne doit PAS consommer le droit au re-roll :
+        // on détache l'enfant raté pour que l'utilisateur puisse réessayer (l'index
+        // unique sur parent_generation_id interdirait sinon un second enfant).
+        ...(freeReroll ? { parentGenerationId: null } : {}),
+      });
+
       // 🔴 REMBOURSEMENT — l'utilisateur ne doit JAMAIS perdre un crédit pour une génération
       // ratée (sauf abonné illimité : aucun crédit n'a été débité).
       if (chargesCredits) {

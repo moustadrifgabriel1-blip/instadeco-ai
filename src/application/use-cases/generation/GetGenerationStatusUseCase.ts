@@ -115,8 +115,10 @@ export class GetGenerationStatusUseCase {
 
         // 🔴 REMBOURSEMENT — l'utilisateur ne doit JAMAIS perdre un crédit pour
         // une génération ratée. On ne rembourse QUE si CET appel a réellement
-        // effectué la transition (anti double-remboursement).
-        if (transitioned) {
+        // effectué la transition (anti double-remboursement) ET si la génération
+        // avait bien été débitée : un re-roll gratuit (parentGenerationId) n'a rien
+        // coûté, le rembourser créerait un crédit ex nihilo.
+        if (transitioned && !updatedGen.parentGenerationId) {
           const refundResult = await this.creditRepo.addCredits(
             updatedGen.userId,
             CREDIT_COSTS.GENERATION,
