@@ -68,6 +68,16 @@ export class ReconcileStuckGenerationsUseCase {
       }
 
       reconciled += 1;
+
+      // Un re-roll gratuit n'a jamais été débité : le « rembourser » fabriquerait
+      // un crédit à partir de rien. On le réconcilie (statut failed) sans crédit.
+      if (transition.data.generation.parentGenerationId) {
+        this.logger.info('Reconcile: zombie re-roll gratuit, aucun remboursement', {
+          generationId: gen.id,
+        });
+        continue;
+      }
+
       const refund = await this.creditRepo.addCredits(
         transition.data.generation.userId,
         CREDIT_COSTS.GENERATION,

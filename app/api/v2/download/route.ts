@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { useCases, container } from '@/src/infrastructure/config/di-container';
 import { requireAuth } from '@/lib/security/api-auth';
+import { checkRateLimitDistributed, getClientIP, RATE_LIMIT_CONFIGS } from '@/lib/security/rate-limiter';
 import { safeFetchImage } from '@/src/shared/utils/safe-url';
 import { addLegalMention, composeLegalBeforeAfter } from '@/lib/image/compose-legal';
 
@@ -29,6 +30,16 @@ export const maxDuration = 30;
  */
 export async function GET(req: Request) {
   try {
+    // Les formats composés décodent 2 images via sharp : sans limite de débit, une
+    // boucle d'appels suffit à saturer la fonction (CPU/mémoire).
+    const rateLimit = await checkRateLimitDistributed(getClientIP(req.headers), RATE_LIMIT_CONFIGS.generate);
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        { error: 'Trop de requêtes. Veuillez réessayer plus tard.' },
+        { status: 429, headers: { 'Retry-After': String(rateLimit.retryAfter) } },
+      );
+    }
+
     const { searchParams } = new URL(req.url);
     const generationId = searchParams.get('id');
     const formatParam = searchParams.get('format') ?? 'hd';

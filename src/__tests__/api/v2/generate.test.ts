@@ -77,7 +77,7 @@ describe('POST /api/v2/generate', () => {
     });
 
     const request = createRequest({
-      imageUrl: 'data:image/jpeg;base64,/9j/4AAQ...',
+      imageUrl: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAA',
       style: 'moderne',
       roomType: 'salon',
     });
@@ -125,7 +125,7 @@ describe('POST /api/v2/generate', () => {
     });
 
     const request = createRequest({
-      imageUrl: 'data:image/jpeg;base64,/9j/4AAQ...',
+      imageUrl: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAA',
       style: 'moderne',
       roomType: 'salon',
     });
@@ -156,7 +156,7 @@ describe('POST /api/v2/generate', () => {
     });
 
     const request = createRequest({
-      imageUrl: 'data:image/jpeg;base64,/9j/4AAQ...',
+      imageUrl: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAA',
       style: 'moderne',
       roomType: 'salon',
     });
@@ -190,7 +190,7 @@ describe('POST /api/v2/generate', () => {
     });
 
     const request = createRequest({
-      imageUrl: 'data:image/jpeg;base64,/9j/4AAQ...',
+      imageUrl: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAA',
       // pas de style ni roomType
     });
 
@@ -211,7 +211,7 @@ describe('POST /api/v2/generate', () => {
     );
 
     const request = createRequest({
-      imageUrl: 'data:image/jpeg;base64,/9j/4AAQ...',
+      imageUrl: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAA',
       style: 'moderne',
       roomType: 'salon',
     });

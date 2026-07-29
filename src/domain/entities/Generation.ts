@@ -57,4 +57,6 @@ export interface UpdateGenerationInput {
   stripeSessionId?: string;
   providerId?: string;
   errorMessage?: string | null;
+  /** Détache un re-roll raté de son parent pour rendre le droit au re-roll. */
+  parentGenerationId?: string | null;
 }

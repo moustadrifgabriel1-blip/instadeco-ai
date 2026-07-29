@@ -18,6 +18,7 @@ import { InsufficientCreditsError } from '@/src/domain/errors/InsufficientCredit
 import { checkRateLimitDistributed, getClientIP, RATE_LIMIT_CONFIGS } from '@/lib/security/rate-limiter';
 import { logRateLimitExceeded, logGenerationCreated, logAuditEvent } from '@/lib/security/audit-logger';
 import { createClient } from '@/lib/supabase/server';
+import { isSupportedImageBase64 } from '@/src/shared/utils/image-size';
 import { sendGenerationCompleteEmail } from '@/lib/notifications/marketing-emails';
 import { createClient as createSupabaseAdmin } from '@supabase/supabase-js';
 
@@ -25,10 +26,21 @@ import { createClient as createSupabaseAdmin } from '@supabase/supabase-js';
  * Schéma de validation pour la génération
  */
 const generateRequestSchema = z.object({
-  imageUrl: z.string().min(1, 'Image URL requise').refine(
-    (url) => url.startsWith('data:image/') || /^https:\/\//.test(url),
-    'Seules les URLs HTTPS ou les data URIs image sont acceptés'
-  ),
+  imageUrl: z.string().min(1, 'Image URL requise')
+    // ~10 Mo de base64 ≈ 7,5 Mo binaire. Même borne que l'essai gratuit : sans elle,
+    // un appel API direct (le plafond du dropzone est purement client) pouvait pousser
+    // une image géante jusqu'à sharp côté export → OOM.
+    .max(10_000_000, 'Image trop volumineuse (max ~7,5 Mo)')
+    .refine(
+      (url) => url.startsWith('data:image/') || /^https:\/\//.test(url),
+      'Seules les URLs HTTPS ou les data URIs image sont acceptés'
+    )
+    // Magic bytes : le préfixe data:image/ est falsifiable (les URLs https restent
+    // vérifiées plus loin par le storage/safeFetchImage).
+    .refine(
+      (url) => !url.startsWith('data:image/') || isSupportedImageBase64(url),
+      'Format non supporté (JPEG, PNG ou WEBP uniquement)'
+    ),
   roomType: z.string().max(50).regex(/^[a-z0-9-]+$/, 'Format invalide').default('salon'),
   style: z.string().max(50).regex(/^[a-z0-9-]+$/, 'Format invalide').default('moderne'),
   userId: z.string().uuid('ID utilisateur invalide').optional(), // Optionnel : on prend l'userId de la session si absent
@@ -178,7 +190,9 @@ export async function POST(req: Request) {
     // Email post-génération — envoyé ICI, au moment exact du passage à 'completed'
     // (flux synchrone). Une seule fois par génération : on ne dépend plus d'une
     // fenêtre temporelle fragile côté polling (cf. statut route).
-    if (generation.status === 'completed' && generation.outputImageUrl) {
+    // Pas d'email sur un re-roll : c'est le même rendu rejoué, l'utilisateur vient
+    // de le déclencher lui-même et a déjà reçu l'email du rendu d'origine.
+    if (generation.status === 'completed' && generation.outputImageUrl && !rerollOf) {
       // Fire-and-forget : ne bloque pas la réponse.
       sendPostGenerationEmail(
         userId,

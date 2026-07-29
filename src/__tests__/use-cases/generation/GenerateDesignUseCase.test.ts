@@ -331,6 +331,48 @@ describe('GenerateDesignUseCase — abonné illimité (Pro/Agence)', () => {
       );
     });
 
+    it('rejoue le rendu du PARENT : photo, style et pièce du body sont ignorés', async () => {
+      const parent = createMockGeneration({
+        id: PARENT_ID,
+        status: 'completed',
+        styleSlug: 'japandi',
+        roomType: 'chambre',
+        inputImageUrl: 'https://cdn.example.com/parent-input.jpg',
+        prompt: 'prompt du parent',
+      });
+      const generationRepo = createMockGenerationRepository({
+        findById: vi.fn().mockResolvedValue(success(parent)),
+      });
+      const storage = createMockStorage();
+      const imageGenerator = createMockImageGenerator();
+      const useCase = new GenerateDesignUseCase(
+        generationRepo, createMockCreditRepository(), imageGenerator, storage, createMockLogger(),
+      );
+
+      // Le body tente d'imposer une autre photo et d'autres réglages.
+      const result = await useCase.execute({
+        ...rerollInput,
+        styleSlug: 'industriel',
+        roomType: 'cuisine',
+        prompt: 'prompt injecte',
+      });
+
+      expect(result.success).toBe(true);
+      // Aucune nouvelle photo uploadée : on réutilise celle du parent.
+      expect(storage.uploadFromBase64).not.toHaveBeenCalled();
+      expect(generationRepo.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          styleSlug: 'japandi',
+          roomType: 'chambre',
+          inputImageUrl: 'https://cdn.example.com/parent-input.jpg',
+          prompt: 'prompt du parent',
+        }),
+      );
+      expect(imageGenerator.generate).toHaveBeenCalledWith(
+        expect.objectContaining({ styleSlug: 'japandi', roomType: 'chambre', prompt: 'prompt du parent' }),
+      );
+    });
+
     it('refuse si le re-roll a déjà été utilisé (1 seul par génération)', async () => {
       const creditRepo = createMockCreditRepository();
       const generationRepo = createMockGenerationRepository({
@@ -417,6 +459,43 @@ describe('GenerateDesignUseCase — abonné illimité (Pro/Agence)', () => {
       expect(result.success).toBe(false);
       expect(creditRepo.deductCredits).not.toHaveBeenCalled();
       expect(creditRepo.addCredits).not.toHaveBeenCalled();
+    });
+
+    it('re-roll raté : l\'enfant est détaché du parent (le droit au re-roll est rendu)', async () => {
+      const generationRepo = createMockGenerationRepository({
+        findById: vi.fn().mockResolvedValue(success(completedParent)),
+      });
+      const useCase = new GenerateDesignUseCase(
+        generationRepo,
+        createMockCreditRepository(),
+        createMockImageGenerator({ generate: vi.fn().mockResolvedValue(failure(new Error('IA down'))) }),
+        createMockStorage(),
+        createMockLogger(),
+      );
+
+      await useCase.execute(rerollInput);
+
+      expect(generationRepo.update).toHaveBeenCalledWith(
+        GENERATION_ID,
+        expect.objectContaining({ status: 'failed', parentGenerationId: null }),
+      );
+    });
+
+    it('le re-roll compte dans le plafond fair-use (pas de doublement du cap)', async () => {
+      const generationRepo = createMockGenerationRepository({
+        findById: vi.fn().mockResolvedValue(success(completedParent)),
+        countByUserSince: vi.fn().mockResolvedValue(success(1000)),
+      });
+      const imageGenerator = createMockImageGenerator();
+      const useCase = new GenerateDesignUseCase(
+        generationRepo, createMockCreditRepository(), imageGenerator, createMockStorage(), createMockLogger(),
+      );
+
+      const result = await useCase.execute(rerollInput);
+
+      expect(result.success).toBe(false);
+      if (!result.success) expect(result.error).toBeInstanceOf(FairUseLimitError);
+      expect(imageGenerator.generate).not.toHaveBeenCalled();
     });
   });
 });
