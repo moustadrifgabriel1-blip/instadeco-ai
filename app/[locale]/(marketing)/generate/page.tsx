@@ -24,6 +24,7 @@ import {
   Frame,
   Palette,
   Lock,
+  RefreshCw,
 } from 'lucide-react';
 import { useLocale } from 'next-intl';
 import { useAuth } from '@/hooks/use-auth';
@@ -94,6 +95,8 @@ function GenerateContent() {
   const [selectedRoomType, setSelectedRoomType] = useState('salon');
   const [selectedMode, setSelectedMode] = useState('home_staging');
   const [generationId, setGenerationId] = useState<string | null>(null);
+  // Re-roll gratuit : ID du rendu déjà refait (1 seul par génération, règle aussi côté serveur)
+  const [rerolledFromId, setRerolledFromId] = useState<string | null>(null);
   const [showAuthPrompt, setShowAuthPrompt] = useState(false);
   const [showPromptDetails, setShowPromptDetails] = useState(false);
   const [showCreditsModal, setShowCreditsModal] = useState(false);
@@ -266,6 +269,7 @@ function GenerateContent() {
       setImagePreview(URL.createObjectURL(file));
       resetGenerate();
       setGenerationId(null);
+      setRerolledFromId(null);
       setShowAuthPrompt(false);
       // Track l'upload (engagement fort pour le Pixel FB)
       fbTrackUploadPhoto();
@@ -292,6 +296,7 @@ function GenerateContent() {
     setImagePreview(null);
     resetGenerate();
     setGenerationId(null);
+    setRerolledFromId(null);
   };
 
   const handleGenerate = async () => {
@@ -327,6 +332,7 @@ function GenerateContent() {
     fbTrackStartGeneration(selectedStyle, selectedRoomType);
     
     // Utiliser le hook generate
+    setRerolledFromId(null);
     await generate({
       imageFile,
       roomType: selectedRoomType,
@@ -335,24 +341,40 @@ function GenerateContent() {
     });
   };
 
-  const handleDownload = async () => {
+  // Re-roll gratuit : rejoue le même rendu (photo + réglages identiques) sans
+  // débiter de crédit. Le serveur garantit la règle « 1 seul re-roll par rendu ».
+  const handleReroll = async () => {
+    if (!imageFile || !generationId || generateState.isLoading) return;
+    const parentId = generationId;
+    setRerolledFromId(parentId);
+    await generate({
+      imageFile,
+      roomType: selectedRoomType,
+      style: selectedStyle,
+      transformMode: selectedMode,
+      rerollOf: parentId,
+    });
+  };
+
+  const handleDownload = async (format: 'hd' | 'mention' | 'avant-apres' = 'hd') => {
     if (!generatedImage) return;
-    
+
     // Téléchargement via API serveur
     if (generationId) {
       try {
-        const downloadUrl = `/api/v2/download?id=${generationId}`;
+        const downloadUrl = `/api/v2/download?id=${generationId}&format=${format}`;
         const response = await fetch(downloadUrl);
-        
+
         if (!response.ok) {
           throw new Error('Erreur de téléchargement');
         }
-        
+
+        const suffix = format === 'hd' ? '' : `-${format}`;
         const blob = await response.blob();
         const blobUrl = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = blobUrl;
-        link.download = `instadeco-${generationId}.jpg`;
+        link.download = `instadeco-${generationId}${suffix}.jpg`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -943,7 +965,7 @@ function GenerateContent() {
               <div className="max-w-lg mx-auto prestige-reveal">
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                   <button
-                    onClick={handleDownload}
+                    onClick={() => handleDownload('hd')}
                     className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-[15px] font-semibold text-[#0c0a09] bg-[var(--gold)] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)] transition-all duration-300 shadow-lg active:scale-[0.98]"
                   >
                     <Download className="w-4 h-4" strokeWidth={2} />
@@ -956,6 +978,41 @@ function GenerateContent() {
                     Essayer un autre style
                   </button>
                 </div>
+
+                {/* Export conforme : mention légale incrustée dans les pixels, prête
+                    pour l'annonce (recommandation presse immo + art. L132-2 C. conso) */}
+                {generationId && (
+                  <div className="mt-4 flex flex-col sm:flex-row items-center justify-center gap-x-6 gap-y-2 text-center">
+                    <button
+                      onClick={() => handleDownload('mention')}
+                      className="inline-flex items-center gap-2 text-[13px] text-muted-foreground hover:text-[var(--gold)] transition-colors"
+                    >
+                      <Shield className="w-3.5 h-3.5" strokeWidth={2} />
+                      Version annonce (mention légale incrustée)
+                    </button>
+                    <button
+                      onClick={() => handleDownload('avant-apres')}
+                      className="inline-flex items-center gap-2 text-[13px] text-muted-foreground hover:text-[var(--gold)] transition-colors"
+                    >
+                      <Frame className="w-3.5 h-3.5" strokeWidth={2} />
+                      Paire avant/après (avec mention)
+                    </button>
+                  </div>
+                )}
+
+                {/* Re-roll gratuit : un rendu jugé raté ne coûte jamais un 2e crédit */}
+                {generationId && !rerolledFromId && (
+                  <div className="mt-4 text-center">
+                    <button
+                      onClick={handleReroll}
+                      disabled={generateState.isLoading}
+                      className="inline-flex items-center gap-2 text-[13px] text-muted-foreground hover:text-[var(--gold)] transition-colors disabled:opacity-50"
+                    >
+                      <RefreshCw className="w-3.5 h-3.5" strokeWidth={2} />
+                      Le rendu ne vous plaît pas ? Régénérer gratuitement
+                    </button>
+                  </div>
+                )}
 
                 {/* Feedback qualité : mesure la satisfaction par génération */}
                 {generationId && (

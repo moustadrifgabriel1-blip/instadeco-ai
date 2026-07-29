@@ -21,6 +21,11 @@ export interface GetGenerationDownloadInput {
 export interface GetGenerationDownloadOutput {
   /** URL d'origine externe (output Fal/Gemini / storage) — à fetcher via safeFetchImage. */
   outputImageUrl: string;
+  /**
+   * URL de la photo d'origine (bucket privé input-images : à re-signer côté route
+   * avant fetch). Sert à l'export avant/après avec mention légale.
+   */
+  inputImageUrl: string;
   /** Nom de fichier suggéré pour le Content-Disposition. */
   fileName: string;
 }
@@ -82,6 +87,7 @@ export class GetGenerationDownloadUseCase {
 
     return success({
       outputImageUrl: generation.outputImageUrl,
+      inputImageUrl: generation.inputImageUrl,
       fileName: `instadeco-${generation.id}.jpg`,
     });
   }

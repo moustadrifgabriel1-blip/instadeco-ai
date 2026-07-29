@@ -92,6 +92,7 @@ export interface GenerationRow {
   custom_prompt: string | null;
   stripe_session_id: string | null;
   error_message: string | null;
+  parent_generation_id: string | null;
   created_at: string;
   updated_at: string;
 }

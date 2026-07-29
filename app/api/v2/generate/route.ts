@@ -33,6 +33,8 @@ const generateRequestSchema = z.object({
   style: z.string().max(50).regex(/^[a-z0-9-]+$/, 'Format invalide').default('moderne'),
   userId: z.string().uuid('ID utilisateur invalide').optional(), // Optionnel : on prend l'userId de la session si absent
   transformMode: z.enum(['full_redesign', 'keep_layout', 'decor_only', 'home_staging']).default('home_staging'),
+  // Re-roll gratuit : ID du rendu jugé raté à rejouer sans débit (validé côté use-case).
+  rerollOf: z.string().uuid('ID de rendu invalide').optional(),
 });
 
 export const maxDuration = 60; // Set max duration to 60 seconds (Hobby limit usually 10s, Pro 300s)
@@ -107,7 +109,7 @@ export async function POST(req: Request) {
     }
 
     // Toujours utiliser l'userId de la session (jamais du body)
-    const { imageUrl, roomType, style, transformMode } = validation.data;
+    const { imageUrl, roomType, style, transformMode, rerollOf } = validation.data;
     const userId = user.id;
 
     console.log('[Generate V2] 🎨 Building prompt with mode:', transformMode);
@@ -123,6 +125,7 @@ export async function POST(req: Request) {
       imageBase64: imageUrl, // Le storage service gère base64 et URL
       prompt,
       transformMode: transformMode as 'full_redesign' | 'keep_layout' | 'decor_only' | 'home_staging',
+      rerollOfGenerationId: rerollOf,
     });
     
     const duration = Date.now() - startTime;

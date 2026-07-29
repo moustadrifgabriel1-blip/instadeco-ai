@@ -10,3 +10,4 @@ export * from './PaymentError';
 export * from './ValidationError';
 export * from './ArticleGenerationError';
 export * from './DuplicateArticleError';
+export * from './RerollNotAllowedError';

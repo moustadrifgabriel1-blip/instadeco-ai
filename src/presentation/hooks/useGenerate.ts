@@ -107,6 +107,7 @@ export function useGenerate(): UseGenerateReturn {
           roomType: input.roomType,
           style: input.style,
           transformMode: input.transformMode,
+          rerollOf: input.rerollOf,
         }, { signal: abortControllerRef.current.signal });
         
         clearTimeout(timeoutId);

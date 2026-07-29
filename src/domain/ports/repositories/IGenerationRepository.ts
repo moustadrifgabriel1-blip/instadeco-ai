@@ -22,6 +22,12 @@ export interface IGenerationRepository {
   findByUserId(userId: string, limit?: number): Promise<Result<Generation[]>>;
 
   /**
+   * Vrai si la génération a déjà été refaite gratuitement (un enfant existe).
+   * Sert à garantir la règle produit : 1 seul re-roll gratuit par génération.
+   */
+  hasReroll(parentGenerationId: string): Promise<Result<boolean>>;
+
+  /**
    * Met à jour une génération
    */
   update(id: string, input: UpdateGenerationInput): Promise<Result<Generation>>;

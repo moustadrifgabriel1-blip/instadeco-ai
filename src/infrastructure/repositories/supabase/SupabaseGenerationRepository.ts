@@ -37,6 +37,7 @@ export class SupabaseGenerationRepository implements IGenerationRepository {
       stripeSessionId: row.stripe_session_id,
       providerId: providerId,
       errorMessage: row.error_message,
+      parentGenerationId: row.parent_generation_id,
       createdAt: new Date(row.created_at),
       updatedAt: new Date(row.updated_at),
     };
@@ -62,6 +63,7 @@ export class SupabaseGenerationRepository implements IGenerationRepository {
         custom_prompt: input.prompt,
         status: 'pending',
         output_image_url: outputOverview,
+        parent_generation_id: input.parentGenerationId ?? null,
       })
       .select()
       .single();
@@ -88,6 +90,19 @@ export class SupabaseGenerationRepository implements IGenerationRepository {
     }
 
     return success(this.toEntity(data as GenerationRow));
+  }
+
+  async hasReroll(parentGenerationId: string): Promise<Result<boolean>> {
+    const { count, error } = await this.supabase
+      .from('generations')
+      .select('id', { count: 'exact', head: true })
+      .eq('parent_generation_id', parentGenerationId);
+
+    if (error) {
+      return failure(new Error(`Failed to count rerolls: ${error.message}`));
+    }
+
+    return success((count ?? 0) > 0);
   }
 
   async findByUserId(userId: string, limit = 50): Promise<Result<Generation[]>> {
