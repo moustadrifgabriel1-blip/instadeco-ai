@@ -93,3 +93,28 @@ Premier livrable du pivot produit, dérivé direct de l'étude avis (plaintes n�
 - Prochaines briques du backlog : réécrire `/pro` + comparatif blog avec les différenciateurs
   réels (facturation honnête, raté non compté, export conforme) ; P3 retouche ciblée ;
   re-mesure GSC J+30 (échue depuis ~19/07) ; Pinterest dès que Gabriel fournit la clé API.
+
+## 2026-07-29 (suite) — AUDIT de bout en bout : 1 faille CRITIQUE money fermée
+
+Audit adversarial du chantier P1+P2 (2 relecteurs indépendants + vérification directe des
+grants/policies en prod). PR #10 mergée (`0b007c8`), CI verte, 306 tests.
+
+🔴 **CRITIQUE, confirmée exploitable, fermée** : `anon`/`authenticated` avaient INSERT/UPDATE
+sur `generations` (policies d'origine du schéma). Inoffensif jusqu'ici, mais le re-roll en
+faisait un robinet : forger via `/rest/v1` une fausse ligne `completed` (0 crédit) puis la
+re-roller = **générations gratuites illimitées** (~14 400/jour/IP, ~360 €/jour de COGS face à
+49 € de MRR). Vérifié : aucune écriture client sur la table, **0 re-roll en base = aucune
+exploitation**. Migration `20260729_harden_generations_write_grants.sql` appliquée (REVOKE +
+DROP des 2 policies d'écriture, SELECT conservé).
+
+Autres correctifs : index `parent_generation_id` UNIQUE (course TOCTOU) ; remboursement zombie
+d'un re-roll = crédit créé ex nihilo ; le re-roll acceptait photo/style ARBITRAIRES (remise de
+50 % non voulue + fair-use contourné) donc il rejoue désormais le rendu DU PARENT et compte
+dans le plafond ; bug UX bloquant (le polling ressuscitait l'ancien rendu pendant un re-roll,
+loader/erreurs masqués) ; re-roll brûlé par un échec technique ; 2e email en double ; absence
+de validation taille/magic-bytes sur `/api/v2/generate` (OOM par bombe de décompression) +
+`limitInputPixels` sharp + EXIF + rate-limit sur `/api/v2/download`.
+
+**Leçon à retenir** : la feature était correcte en soi, elle a rendu exploitable une
+permissivité RLS dormante depuis la création du schéma. Toute nouvelle feature qui lit une
+table pour décider d'un DÉBIT doit d'abord vérifier qui peut ÉCRIRE dans cette table.
