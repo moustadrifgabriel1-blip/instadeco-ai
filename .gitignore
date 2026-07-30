@@ -62,3 +62,7 @@ next-env.d.ts
 # Repo PUBLIC -> jamais versionner. Restent en local uniquement.
 /outbound-kit/
 /scripts/data/prospects*.json
+
+# Kit prive local : docs de travail contenant des contacts tiers (redactions,
+# medias) ou des assets non destines au depot public.
+/kit-prive/
