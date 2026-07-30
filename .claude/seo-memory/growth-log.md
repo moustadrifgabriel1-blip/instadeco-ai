@@ -142,5 +142,22 @@ reproposer de relance sans demande explicite.
 et une réponse intéressée doit être traitée : arrêter d'émettre n'autorise pas à ignorer la
 boîte `contact@instadeco.app`. Fenêtre utile de réponses : ~2 semaines (jusqu'au ~13/08).
 
-Cap désormais 100 % organique : SEO/AEO, outils gratuits, Pinterest (clé à venir), produit
+Cap désormais 100 % organique : SEO/AEO, outils gratuits, Pinterest (cf. ci-dessous), produit
 (re-roll gratuit + export conforme livrés), pub FB en décembre.
+
+## 2026-07-30 (suite) — Pinterest : clés OK mais BLOQUÉ en accès Trial
+
+Clés posées dans `.env.local` (`PINTEREST_CLIENT_ID`/`_SECRET` renseignés, `BOARD_ID` laissé
+vide : le script résout ou crée le tableau « Home staging virtuel » tout seul). L'URL OAuth
+se génère correctement, donc les identifiants sont valides. Aucun jeton en base
+(`oauth_tokens` vide) : l'autorisation n'a pas encore été faite.
+
+🔴 **Contrainte décisive : l'app est en accès TRIAL, donc les pins sont en SANDBOX, visibles
+par le propriétaire seul.** Valeur d'acquisition réelle = ZÉRO tant que l'accès **Standard**
+n'est pas accordé (revue d'app Pinterest). Conséquence sur le plan : Pinterest n'est PAS un
+canal actif, c'est un canal en attente de validation administrative. Ne pas y investir de
+production de contenu avant l'accès Standard, et ne pas le compter dans les prévisions.
+
+Action débloquante (Gabriel, non technique) : soumettre la demande d'accès Standard sur le
+dashboard développeur Pinterest. En attendant, l'effort d'acquisition va sur le SEO/AEO et
+la réécriture de `/pro` + comparatif blog avec les différenciateurs produit livrés.
