@@ -118,3 +118,29 @@ de validation taille/magic-bytes sur `/api/v2/generate` (OOM par bombe de décom
 **Leçon à retenir** : la feature était correcte en soi, elle a rendu exploitable une
 permissivité RLS dormante depuis la création du schéma. Toute nouvelle feature qui lit une
 table pour décider d'un DÉBIT doit d'abord vérifier qui peut ÉCRIRE dans cette table.
+
+## 2026-07-30 — CANAL OUTBOUND CLÔTURÉ (définitif)
+
+Gabriel a envoyé les 33 brouillons restants (30/07 ~10h40, depuis `contact@instadeco.app`)
+« vu que c'était préparé », puis **arrête le canal pour de bon**. Zéro brouillon restant.
+
+Chiffres finaux de l'expérience outbound (source : dossier Envoyés Gmail, seule trace
+restante depuis la purge RGPD du kit) :
+- **53 prospects contactés** au total : 2 le 05/07, 18 le 12/07, 33 le 30/07.
+- **1 réponse** (Alexia Sako, iad, 13/07) : « je dispose déjà de cette fonctionnalité dans
+  mes outils » → c'est HOQI, cf. l'étude concurrence. Taux de réponse ~1,9 %.
+- **1 bounce dur** (celia@genevahomes.ch, 550 5.2.1 adresse introuvable). Les 52 autres
+  acceptés : la délivrabilité du domaine n'est pas en cause.
+- **0 intéressé, 0 essai, 0 conversion** attribuée à l'outbound.
+
+Statut : canal ABANDONNÉ par choix de fondateur (exécution pénible), pas par preuve
+statistique (53 envois restent sous le seuil de 200 à 300 nécessaire pour juger). Ne pas
+reproposer de relance sans demande explicite.
+
+⚠️ **Vigilance qui SURVIT à l'arrêt** : 53 personnes ont reçu une promesse d'opt-out
+(« répondez stop et je vous retire de ma liste »). Toute réponse « stop » doit être honorée,
+et une réponse intéressée doit être traitée : arrêter d'émettre n'autorise pas à ignorer la
+boîte `contact@instadeco.app`. Fenêtre utile de réponses : ~2 semaines (jusqu'au ~13/08).
+
+Cap désormais 100 % organique : SEO/AEO, outils gratuits, Pinterest (clé à venir), produit
+(re-roll gratuit + export conforme livrés), pub FB en décembre.
