@@ -10,7 +10,11 @@ import { Suspense } from 'react';
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get('redirect') || '/generate';
+  // Même garde que signup et auth/callback : chemin interne uniquement.
+  // Un prospect qui a déjà un compte doit pouvoir revenir sur /pro?checkout=…
+  // et voir son paiement se relancer tout seul.
+  const rawRedirect = searchParams.get('redirect');
+  const redirectTo = rawRedirect?.startsWith('/') ? rawRedirect : '/generate';
   const supabase = useSupabaseBrowser();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -173,7 +177,7 @@ function LoginForm() {
 
           <p className="mt-6 text-center text-[14px] text-muted-foreground">
             Pas encore de compte ?{' '}
-            <Link href={`/signup${redirectTo !== '/generate' ? `?redirect=${redirectTo}` : ''}`} className="text-[var(--gold)] hover:underline">
+            <Link href={`/signup${redirectTo !== '/generate' ? `?redirect=${encodeURIComponent(redirectTo)}` : ''}`} className="text-[var(--gold)] hover:underline">
               Créer un compte
             </Link>
           </p>
