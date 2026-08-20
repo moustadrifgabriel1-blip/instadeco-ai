@@ -14,6 +14,7 @@ import { useCases } from '@/src/infrastructure/config/di-container';
 import { BlogArticleMapper } from '@/src/application/mappers/BlogArticleMapper';
 import { getLocalizedCanonicalUrl } from '@/lib/seo/config';
 import { withRetry } from '@/lib/utils/retry';
+import { unstable_cache } from 'next/cache';
 
 // ISR : la liste blog change au plus une fois/heure (publication d'articles).
 // Évite un rendu SSR à chaque requête (x-vercel-cache MISS age 0 constaté en prod).
@@ -74,7 +75,7 @@ function toBlogLocale(locale: string): BlogLocale {
 }
 
 // Fonction pour récupérer les articles (filtrés par langue = locale courante)
-async function getArticles(locale: BlogLocale, page: number, tag?: string, search?: string) {
+async function fetchArticles(locale: BlogLocale, page: number, tag?: string, search?: string) {
   try {
     const result = await withRetry(() =>
       useCases.listBlogArticles.execute({
@@ -109,8 +110,20 @@ async function getArticles(locale: BlogLocale, page: number, tag?: string, searc
   }
 }
 
+/**
+ * La page lit `searchParams` (pagination, tag, recherche), ce qui la rend
+ * dynamique : Next impose alors `no-store` et le CDN ne cache rien. On cache
+ * donc la DONNÉE plutôt que le HTML. Sans ça, chaque visite et chaque passage
+ * de crawler payait deux requêtes Supabase (TTFB mesuré à 1,3 s en prod).
+ */
+const getArticles = unstable_cache(
+  fetchArticles,
+  ['blog-articles-list'],
+  { revalidate: 3600, tags: ['blog-articles'] },
+);
+
 // Fonction pour récupérer les données du sidebar (langue = locale courante)
-async function getSidebarData(locale: BlogLocale) {
+async function fetchSidebarData(locale: BlogLocale) {
   try {
     // Récupérer les 5 derniers articles pour la sidebar
     const result = await withRetry(() =>
@@ -148,6 +161,12 @@ async function getSidebarData(locale: BlogLocale) {
     return { recentArticles: [], popularTags: [] };
   }
 }
+
+const getSidebarData = unstable_cache(
+  fetchSidebarData,
+  ['blog-sidebar'],
+  { revalidate: 3600, tags: ['blog-articles'] },
+);
 
 // Composant de liste d'articles
 function ArticleGrid({ articles }: { articles: Array<{

@@ -1,30 +1,15 @@
 'use client';
 
 import { useEffect } from 'react';
-import Lenis from 'lenis';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { prefersReducedMotion, isTouchPrimary } from '@/lib/motion-preferences';
+
+// Ré-exportés pour ne pas casser les imports existants. Les nouveaux appels
+// devraient viser directement `@/lib/motion-preferences` (aucune dépendance).
+export { prefersReducedMotion, isTouchPrimary };
 
 gsap.registerPlugin(ScrollTrigger);
-
-/**
- * Détecte prefers-reduced-motion (et l'absence de matchMedia côté SSR).
- */
-export function prefersReducedMotion(): boolean {
-  if (typeof window === 'undefined' || !window.matchMedia) return false;
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-}
-
-/**
- * Détecte un appareil dont le pointeur principal est tactile (téléphones,
- * tablettes). Sur ces appareils on garde le scroll NATIF : le momentum du
- * doigt est déjà fluide, et le smoothing Lenis (pensé pour la molette) le
- * combat, ce qui donne un scroll caoutchouteux et imprécis.
- */
-export function isTouchPrimary(): boolean {
-  if (typeof window === 'undefined' || !window.matchMedia) return false;
-  return window.matchMedia('(hover: none) and (pointer: coarse)').matches;
-}
 
 /**
  * Lenis (smooth scroll cinématographique) synchronisé avec GSAP ScrollTrigger.
@@ -42,31 +27,55 @@ export function usePrestigeSmoothScroll() {
     // de fonctionner sur les events de scroll natifs, donc rien à synchroniser.
     if (isTouchPrimary()) return;
 
-    const lenis = new Lenis({
-      duration: 1.15,
-      easing: (t: number) => 1 - Math.pow(1 - t, 3.2), // lent, sortie douce
-      smoothWheel: true,
+    // Import dynamique : Lenis ne sert qu'au scroll molette, sur desktop et
+    // hors reduced-motion. En statique, il pesait dans le bundle initial de la
+    // home y compris sur mobile, où le code n'est jamais exécuté.
+    let cleanup: (() => void) | null = null;
+    let cancelled = false;
+
+    void import('lenis').then(({ default: Lenis }) => {
+      if (cancelled) return;
+      cleanup = installLenis(Lenis);
     });
 
-    // Lenis pilote ScrollTrigger
-    const onScroll = () => ScrollTrigger.update();
-    lenis.on('scroll', onScroll);
-
-    const raf = (time: number) => lenis.raf(time * 1000);
-    gsap.ticker.add(raf);
-    gsap.ticker.lagSmoothing(0);
-
-    // Au cas où des images se chargent après le mount
-    const refresh = () => ScrollTrigger.refresh();
-    const t = window.setTimeout(refresh, 300);
-    window.addEventListener('load', refresh);
-
     return () => {
-      window.clearTimeout(t);
-      window.removeEventListener('load', refresh);
-      gsap.ticker.remove(raf);
-      lenis.off('scroll', onScroll);
-      lenis.destroy();
+      cancelled = true;
+      cleanup?.();
     };
   }, []);
+}
+
+type LenisCtor = typeof import('lenis').default;
+
+/**
+ * Installe Lenis + la synchro ScrollTrigger, et renvoie son cleanup.
+ * Extrait du hook pour garder le useEffect lisible malgré le chargement async.
+ */
+function installLenis(Lenis: LenisCtor): () => void {
+  const lenis = new Lenis({
+    duration: 1.15,
+    easing: (t: number) => 1 - Math.pow(1 - t, 3.2), // lent, sortie douce
+    smoothWheel: true,
+  });
+
+  // Lenis pilote ScrollTrigger
+  const onScroll = () => ScrollTrigger.update();
+  lenis.on('scroll', onScroll);
+
+  const raf = (time: number) => lenis.raf(time * 1000);
+  gsap.ticker.add(raf);
+  gsap.ticker.lagSmoothing(0);
+
+  // Au cas où des images se chargent après le mount
+  const refresh = () => ScrollTrigger.refresh();
+  const t = window.setTimeout(refresh, 300);
+  window.addEventListener('load', refresh);
+
+  return () => {
+    window.clearTimeout(t);
+    window.removeEventListener('load', refresh);
+    gsap.ticker.remove(raf);
+    lenis.off('scroll', onScroll);
+    lenis.destroy();
+  };
 }

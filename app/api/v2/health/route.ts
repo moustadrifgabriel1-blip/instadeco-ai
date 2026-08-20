@@ -22,8 +22,13 @@ export async function GET(req: Request) {
   const checks: Record<string, { ok: boolean; detail?: string }> = {};
 
   // 1. Variables d'environnement critiques (presence seule, jamais la longueur).
+  //
+  // NB : ni FAL_KEY ni GEMINI_API_KEY ne figurent ici individuellement. Le
+  // moteur d'images est choisi par `IMAGE_PROVIDER` (defaut auto : gemini si
+  // GEMINI_API_KEY presente, sinon fal), donc exiger FAL_KEY faisait repondre
+  // 503 "unhealthy" en permanence sur une prod parfaitement saine. On verifie
+  // qu'AU MOINS UN moteur est configure (cf. check `env:IMAGE_PROVIDER` plus bas).
   const envVars = [
-    'FAL_KEY',
     'NEXT_PUBLIC_SUPABASE_URL',
     'NEXT_PUBLIC_SUPABASE_ANON_KEY',
     'SUPABASE_SERVICE_ROLE_KEY',
@@ -42,6 +47,20 @@ export async function GET(req: Request) {
       detail: value ? 'set' : 'MISSING',
     };
   }
+
+  // 1bis. Au moins un moteur de generation d'images doit etre configure.
+  const hasFal = !!(process.env.FAL_KEY || process.env.FAL_API_KEY);
+  const hasGemini = !!process.env.GEMINI_API_KEY;
+  const provider = process.env.IMAGE_PROVIDER;
+  checks['env:IMAGE_PROVIDER'] = {
+    ok:
+      provider === 'fal'
+        ? hasFal
+        : provider === 'gemini'
+          ? hasGemini
+          : hasFal || hasGemini,
+    detail: hasFal || hasGemini ? 'set' : 'MISSING',
+  };
 
   // 2. NEXT_PUBLIC_APP_URL ne doit PAS être localhost en production.
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || '';
@@ -104,11 +123,15 @@ export async function GET(req: Request) {
       };
     }
 
+    // Format de la cle FAL : verifie seulement si FAL est le moteur reellement
+    // utilise. Sinon (prod sur Gemini) l'absence de cle n'est pas une anomalie.
     const falKey = process.env.FAL_KEY || process.env.FAL_API_KEY;
-    checks['fal:key_format'] = {
-      ok: !!falKey && falKey.includes(':'),
-      detail: falKey ? 'ok' : 'MISSING',
-    };
+    if (falKey || provider === 'fal') {
+      checks['fal:key_format'] = {
+        ok: !!falKey && falKey.includes(':'),
+        detail: falKey ? 'ok' : 'MISSING',
+      };
+    }
 
     checks['vercel:region'] = { ok: true, detail: process.env.VERCEL_REGION || 'local' };
     checks['vercel:env'] = {

@@ -1,4 +1,5 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 
 /**
@@ -89,5 +90,25 @@ export async function createAdminClient() {
         },
       },
     }
+  );
+}
+
+/**
+ * Client admin SANS cookies, utilisable dans une page statique/ISR.
+ *
+ * `createAdminClient` appelle `cookies()`, ce qui bascule toute page qui
+ * l'utilise en rendu dynamique : Next impose alors `no-store` et le CDN ne
+ * cache plus rien (constaté sur /galerie, x-vercel-cache MISS malgré
+ * `revalidate = 300`). La clé service role ignore de toute façon la session,
+ * donc les cookies n'apportaient rien ici.
+ *
+ * À réserver aux lectures publiques pré-rendues. Pour tout ce qui dépend de
+ * l'utilisateur connecté, garder `createClient` / `createAdminClient`.
+ */
+export function createStaticAdminClient() {
+  return createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { persistSession: false, autoRefreshToken: false } }
   );
 }

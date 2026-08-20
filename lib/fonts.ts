@@ -13,7 +13,11 @@ export const cormorant = Cormorant_Garamond({
   style: ['normal', 'italic'],
   variable: '--font-display',
   display: 'swap',
-  preload: true,
+  // Pas de preload : Inter et Playfair (layout racine) suffisent au premier
+  // rendu. Précharger les 4 familles mettait 188 Ko de woff2 sur le chemin
+  // critique avant le premier pixel. `display: swap` fait le relais.
+  preload: false,
+  adjustFontFallback: true,
 });
 
 export const josefin = Josefin_Sans({
@@ -21,5 +25,6 @@ export const josefin = Josefin_Sans({
   weight: ['300', '400', '500'],
   variable: '--font-body',
   display: 'swap',
-  preload: true,
+  preload: false,
+  adjustFontFallback: true,
 });
