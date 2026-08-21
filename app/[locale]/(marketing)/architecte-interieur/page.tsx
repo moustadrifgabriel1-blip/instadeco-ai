@@ -96,7 +96,7 @@ export default function CitiesIndexPage() {
           Notre IA fonctionne partout, même si votre ville n&apos;est pas listée ici. 
           Essayez-la dès maintenant avec une photo de votre pièce.
         </p>
-        <Link href="/generate">
+        <Link href="/essai">
           <Button size="lg" className="rounded-full px-8">
             Commencer la transformation
             <ArrowRight className="ml-2 h-4 w-4" />

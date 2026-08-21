@@ -150,7 +150,7 @@ export default async function PiecesIndexPage({ params }: { params: Promise<{ lo
             Salon, chambre, cuisine, bureau : notre IA s&apos;adapte à chaque espace. Cliquez sur une pièce pour découvrir les styles recommandés et visualiser votre transformation.
           </p>
           <Button size="lg" className="rounded-full bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)] transition duration-300 ease" asChild>
-            <Link href="/generate">
+            <Link href="/essai">
               <Home className="w-4 h-4 mr-2" />
               Décorer ma pièce maintenant
             </Link>
@@ -259,7 +259,7 @@ export default async function PiecesIndexPage({ params }: { params: Promise<{ lo
           <h2 className="prestige-display text-2xl font-bold mb-4">Quelle pièce allez-vous <span className="text-[var(--gold)] italic">transformer</span> ?</h2>
           <p className="mb-6 text-primary-foreground/80">Prenez votre smartphone, choisissez votre pièce, et admirez le résultat.</p>
           <Button size="lg" className="rounded-full bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)] transition duration-300 ease" asChild>
-            <Link href="/generate">
+            <Link href="/essai">
               Commencer maintenant <ArrowRight className="ml-2 w-4 h-4" />
             </Link>
           </Button>

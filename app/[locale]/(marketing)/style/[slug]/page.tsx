@@ -111,7 +111,7 @@ export default async function StylePage({ params }: PageProps) {
               className="rounded-full bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)] transition duration-300 ease"
               asChild
             >
-              <Link href="/generate">
+              <Link href="/essai">
                 <Sparkles className="mr-2 w-4 h-4" />
                 Essayer le style {style.name}
               </Link>
@@ -208,7 +208,7 @@ export default async function StylePage({ params }: PageProps) {
             className="rounded-full px-8 bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)] transition duration-300 ease"
             asChild
           >
-            <Link href="/generate">
+            <Link href="/essai">
               Commencer la transformation
               <ArrowRight className="ml-2 w-4 h-4" />
             </Link>

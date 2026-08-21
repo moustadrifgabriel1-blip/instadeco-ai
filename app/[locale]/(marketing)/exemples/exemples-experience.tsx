@@ -34,7 +34,7 @@ export function ExemplesExperience() {
           InstaDeco
         </Link>
         <Link
-          href="/generate"
+          href="/essai"
           className="prestige-eyebrow !text-[0.6rem] text-[var(--mist)] transition-colors hover:text-[var(--gold)]"
         >
           Essayer le service
@@ -153,7 +153,7 @@ export function ExemplesExperience() {
         </h2>
         <div className="mt-10 flex flex-col items-center justify-center gap-5 sm:flex-row">
           <Link
-            href="/generate"
+            href="/essai"
             className="inline-flex min-h-[54px] items-center gap-3 rounded-full border border-[var(--gold)] bg-[var(--gold)] px-9 py-3.5 text-sm font-medium uppercase tracking-[0.18em] text-[#0c0a09] transition-[background-color,color] duration-500 ease-[var(--ease-slow)] hover:bg-transparent hover:text-[var(--gold)] focus-visible:bg-transparent focus-visible:text-[var(--gold)]"
           >
             Essayer le service

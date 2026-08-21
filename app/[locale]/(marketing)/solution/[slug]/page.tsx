@@ -314,7 +314,7 @@ export default async function IntentPage({ params }: PageProps) {
           </div>
           <div className="text-center pt-4">
             <Button size="lg" className="rounded-full bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)] px-8" asChild>
-              <Link href="/generate">
+              <Link href="/essai">
                 {L.tryNow}
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Link>
@@ -348,7 +348,7 @@ export default async function IntentPage({ params }: PageProps) {
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Button size="lg" className="rounded-full px-8 bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)]" asChild>
-              <Link href="/generate">
+              <Link href="/essai">
                 {L.startFree}
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Link>

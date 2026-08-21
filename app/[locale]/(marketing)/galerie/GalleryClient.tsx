@@ -148,7 +148,7 @@ export function GalleryClient({ initialItems, initialTotal }: GalleryClientProps
               Soyez le premier à créer une transformation dans ce style !
             </p>
             <Button asChild className="rounded-full bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)] transition duration-300">
-              <Link href="/generate">
+              <Link href="/essai">
                 Créer ma première transformation
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Link>
@@ -227,7 +227,7 @@ export function GalleryClient({ initialItems, initialTotal }: GalleryClientProps
               Un décorateur coûte 150 €/h. InstaDeco : <span className="font-bold text-[var(--gold)]">0,99 € en 30 secondes</span>.
             </p>
             <Button asChild size="lg" className="rounded-full bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)] transition duration-300 hover:shadow-lg hover:shadow-[var(--gold)]/20">
-              <Link href="/generate">
+              <Link href="/essai">
                 Transformer ma pièce gratuitement
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Link>

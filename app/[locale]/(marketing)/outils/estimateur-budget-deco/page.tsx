@@ -134,7 +134,7 @@ export default async function BudgetEstimatorPage({ params }: { params: Promise<
           <div className="mt-12 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[13px]">
             <Link href="/quiz" className="text-[var(--gold)] underline-offset-4 hover:underline">Quiz : votre style déco</Link>
             <Link href="/exemples" className="text-[var(--gold)] underline-offset-4 hover:underline">Exemples avant/après</Link>
-            <Link href="/generate" className="text-[var(--gold)] underline-offset-4 hover:underline">Transformer ma pièce</Link>
+            <Link href="/essai" className="text-[var(--gold)] underline-offset-4 hover:underline">Transformer ma pièce</Link>
           </div>
         </div>
       </section>

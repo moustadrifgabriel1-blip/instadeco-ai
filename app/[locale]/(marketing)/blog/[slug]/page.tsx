@@ -501,7 +501,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                 <p className="text-muted-foreground mb-8 max-w-xl mx-auto text-lg">
                   Passez de la théorie à la pratique. Testez ces idées de décoration sur vos propres photos avec notre IA.
                 </p>
-                <Link href="/generate">
+                <Link href="/essai">
                    <Button size="lg" className="rounded-full px-8 text-lg h-12 bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)] shadow-lg shadow-[rgba(200,162,77,0.25)] hover:scale-105 transition-all">
                      Créer ma décoration maintenant
                    </Button>

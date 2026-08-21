@@ -5,14 +5,26 @@ import Link from 'next/link';
 import { Flame, Clock, ArrowRight, Check, Sparkles, Gift, Zap } from 'lucide-react';
 
 interface FlashOfferProps {
-  /** URL du Stripe Payment Link pour l'offre flash */
+  /**
+   * Achat immédiat. Fourni par la page, il ouvre le paiement sans compte.
+   * Préféré à un lien : au pic d'intention (le visiteur vient de voir sa
+   * pièce transformée), chaque étape ajoutée coûte des ventes.
+   */
+  onBuy?: () => void;
+  /** Repli si `onBuy` n'est pas fourni. */
   stripePaymentUrl?: string;
   /** Durée du countdown en minutes */
   durationMinutes?: number;
   /** Prix barré (original) */
   originalPrice?: string;
-  /** Prix de l'offre flash */
+  /**
+   * Prix réellement facturé. Doit correspondre au coupon appliqué côté
+   * serveur : on n'affiche jamais une remise qu'on ne peut pas honorer.
+   * Absent, l'offre s'affiche au prix plein sans remise annoncée.
+   */
   flashPrice?: string;
+  /** Libellé de remise (ex. « -20% »), affiché seulement s'il est réel. */
+  discountLabel?: string;
   /** Nombre de crédits inclus */
   credits?: number;
   /** Callback quand l'offre expire */
@@ -22,10 +34,12 @@ interface FlashOfferProps {
 }
 
 export function FlashOffer({
+  onBuy,
   stripePaymentUrl = '/pricing',
   durationMinutes = 15,
   originalPrice = '9,90 €',
-  flashPrice = '4,99 €',
+  flashPrice,
+  discountLabel,
   credits = 10,
   onExpire,
   className = '',
@@ -115,11 +129,19 @@ export function FlashOffer({
 
         {/* Titre */}
         <h3 className="prestige-display text-center text-[24px] sm:text-[28px] font-semibold text-[var(--ivory)] tracking-[-0.02em] mb-1">
-          {credits} générations pour <span className="text-[var(--gold)]">{flashPrice}</span>
+          {credits} générations pour{' '}
+          <span className="text-[var(--gold)]">{flashPrice || originalPrice}</span>
         </h3>
-        <p className="text-center text-[15px] text-[var(--mist)] mb-5">
-          au lieu de <span className="line-through">{originalPrice}</span>, <span className="font-semibold text-[var(--gold)]">-50%</span>
-        </p>
+        {flashPrice && discountLabel ? (
+          <p className="text-center text-[15px] text-[var(--mist)] mb-5">
+            au lieu de <span className="line-through">{originalPrice}</span>,{' '}
+            <span className="font-semibold text-[var(--gold)]">{discountLabel}</span>
+          </p>
+        ) : (
+          <p className="text-center text-[15px] text-[var(--mist)] mb-5">
+            {credits} crédits pour {originalPrice}, sans abonnement
+          </p>
+        )}
 
         {/* Countdown */}
         <div className="flex justify-center mb-5">
@@ -159,14 +181,26 @@ export function FlashOffer({
 
         {/* CTA principal */}
         <div className="flex flex-col items-center gap-3">
-          <Link
-            href={stripePaymentUrl}
-            className="group w-full max-w-sm inline-flex items-center justify-center gap-2 bg-[var(--gold)] text-[#0c0a09] px-8 py-4 rounded-full text-[17px] font-bold hover:bg-[#d4b15f] transition-all duration-200 shadow-xl shadow-[var(--gold)]/20 active:scale-[0.98] hover:scale-[1.02]"
-          >
-            <Zap className="w-5 h-5" />
-            Profiter de l&apos;offre, {flashPrice}
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-          </Link>
+          {onBuy ? (
+            <button
+              type="button"
+              onClick={onBuy}
+              className="group w-full max-w-sm inline-flex items-center justify-center gap-2 bg-[var(--gold)] text-[#0c0a09] px-8 py-4 rounded-full text-[17px] font-bold hover:bg-[#d4b15f] transition-all duration-200 shadow-xl shadow-[var(--gold)]/20 active:scale-[0.98] hover:scale-[1.02]"
+            >
+              <Zap className="w-5 h-5" />
+              Profiter de l&apos;offre, {flashPrice || originalPrice}
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </button>
+          ) : (
+            <Link
+              href={stripePaymentUrl}
+              className="group w-full max-w-sm inline-flex items-center justify-center gap-2 bg-[var(--gold)] text-[#0c0a09] px-8 py-4 rounded-full text-[17px] font-bold hover:bg-[#d4b15f] transition-all duration-200 shadow-xl shadow-[var(--gold)]/20 active:scale-[0.98] hover:scale-[1.02]"
+            >
+              <Zap className="w-5 h-5" />
+              Profiter de l&apos;offre, {flashPrice || originalPrice}
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          )}
           <p className="text-[11px] text-[var(--mist)]">
             Paiement sécurisé par Stripe • Sans engagement
           </p>

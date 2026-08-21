@@ -8,11 +8,19 @@ import Link from 'next/link';
 import { Plus, ArrowRight, Sparkles, Shield, Zap, Star, Check, UserPlus, Gift, Share2, Mail, TreePine, Leaf, Wheat, Factory, Landmark, Sofa, BedDouble, CookingPot, ShowerHead, Briefcase, Utensils } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { FlashOffer } from '@/components/features/flash-offer';
+import { GuestCheckoutDialog } from '@/components/features/guest-checkout-dialog';
 import { ShareButtons } from '@/components/features/share-buttons';
 import { LeadCaptureLazy } from '@/components/features/lead-capture-lazy';
 import { trackTrialStart, trackTrialComplete, trackLeadCaptured } from '@/lib/analytics/gtag';
 import { compressImageToDataUrl } from '@/lib/image/compress-client';
 import { TRIAL_MAX_GENERATIONS } from '@/src/shared/constants/trial';
+
+/**
+ * Coupon de bienvenue appliqué au paiement. Vide tant qu'il n'est pas
+ * configuré sur Vercel : dans ce cas aucune remise n'est annoncée, plutôt
+ * qu'une promesse que Stripe ne tiendrait pas.
+ */
+const WELCOME_COUPON = (process.env.NEXT_PUBLIC_WELCOME_COUPON || '').trim();
 
 // Compteur d'essais consommés côté client (UX immédiate ; la vraie limite est serveur).
 const TRIAL_COUNT_KEY = 'instadeco_trial_count';
@@ -75,6 +83,7 @@ export default function EssaiPage() {
   // Base64 compressé de la dernière photo essayée, gardé pour le carry-over vers
   // /generate après inscription (le visiteur ne repart pas de zéro).
   const [carryImageData, setCarryImageData] = useState<string | null>(null);
+  const [guestPack, setGuestPack] = useState<string | null>(null);
   const resultRef = useRef<HTMLDivElement>(null);
 
   // Transmet la photo + le style + la pièce à /generate via sessionStorage, pour
@@ -630,11 +639,20 @@ export default function EssaiPage() {
               </div>
 
               {/* OFFRE FLASH, Conversion immédiate */}
+              {/*
+                Achat immédiat, sans compte : c'est le pic d'intention, le
+                visiteur vient de voir sa propre pièce transformée. L'ancien
+                lien envoyait créer un compte puis retombait sur /pricing au
+                tarif plein, alors que l'encart promettait 4,99 €. La remise
+                affichée est désormais celle réellement appliquée par Stripe,
+                et rien n'est annoncé si aucun coupon n'est configuré.
+              */}
               <FlashOffer
-                stripePaymentUrl="/signup?redirect=/pricing"
+                onBuy={() => setGuestPack('pack_10')}
                 durationMinutes={15}
                 originalPrice="9,90 €"
-                flashPrice="4,99 €"
+                flashPrice={WELCOME_COUPON ? '7,92 €' : undefined}
+                discountLabel={WELCOME_COUPON ? '-20%' : undefined}
                 credits={10}
               />
 
@@ -728,6 +746,16 @@ export default function EssaiPage() {
       </section>
       {/* Exit-intent popup pour capturer les emails avant départ */}
       <LeadCaptureLazy variant="popup" delay={30000} />
+
+      <GuestCheckoutDialog
+        packId={guestPack}
+        packLabel={WELCOME_COUPON ? '10 crédits, 7,92 € au lieu de 9,90 €' : '10 crédits, 9,90 €'}
+        onClose={() => setGuestPack(null)}
+        successUrl={`${typeof window !== 'undefined' ? window.location.origin : ''}/${locale}/credits/success?session_id={CHECKOUT_SESSION_ID}`}
+        cancelUrl={`${typeof window !== 'undefined' ? window.location.origin : ''}/${locale}/essai?payment=cancelled`}
+        couponId={WELCOME_COUPON || undefined}
+        loginHref={`/login?redirect=${encodeURIComponent('/pricing')}`}
+      />
     </div>
   );
 }

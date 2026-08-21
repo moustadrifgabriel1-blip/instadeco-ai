@@ -72,7 +72,7 @@ export const INTENT_PAGES: IntentPageData[] = [
       headline: 'Home Staging Virtuel par IA',
       subheadline: 'Meublez et décorez n\'importe quelle pièce en 30 secondes. Résultat photoréaliste. 50x moins cher que le home staging physique.',
       cta: 'Essayer le home staging virtuel',
-      ctaLink: '/generate',
+      ctaLink: '/essai',
     },
     problem: {
       title: 'Le home staging physique est trop cher',
@@ -123,7 +123,7 @@ export const INTENT_PAGES: IntentPageData[] = [
       headline: 'Simulateur de Décoration Intérieure',
       subheadline: 'Visualisez votre future décoration avant d\'acheter quoi que ce soit. Uploadez une photo, choisissez un style, voyez le résultat en 30 secondes.',
       cta: 'Tester le simulateur',
-      ctaLink: '/generate',
+      ctaLink: '/essai',
     },
     problem: {
       title: 'Décorer à l\'aveugle, c\'est risqué',
@@ -167,7 +167,7 @@ export const INTENT_PAGES: IntentPageData[] = [
       headline: 'Le Logiciel de Home Staging le Plus Simple',
       subheadline: 'Pas de logiciel à installer. Pas de formation nécessaire. Uploadez une photo, l\'IA fait le reste en 30 secondes.',
       cta: 'Essayer maintenant',
-      ctaLink: '/generate',
+      ctaLink: '/essai',
     },
     problem: {
       title: 'Les logiciels de home staging traditionnels sont compliqués',
@@ -251,7 +251,7 @@ export const INTENT_PAGES: IntentPageData[] = [
       headline: 'Aménagez Votre Studio avec l\'IA',
       subheadline: 'Studio de 20m², 25m² ou 30m² ? Visualisez des dizaines d\'aménagements possibles en quelques minutes. Optimisez chaque mètre carré.',
       cta: 'Visualiser mon studio',
-      ctaLink: '/generate',
+      ctaLink: '/essai',
     },
     problem: {
       title: 'Aménager un studio est un casse-tête',
@@ -293,7 +293,7 @@ export const INTENT_PAGES: IntentPageData[] = [
       headline: 'Testez les Couleurs Avant de Peindre',
       subheadline: 'Fini les échantillons de peinture ! Uploadez une photo de votre pièce et visualisez instantanément le rendu avec différentes ambiances colorées.',
       cta: 'Tester les couleurs',
-      ctaLink: '/generate',
+      ctaLink: '/essai',
     },
     problem: {
       title: 'Choisir une couleur de peinture est stressant',
@@ -335,7 +335,7 @@ export const INTENT_PAGES: IntentPageData[] = [
       headline: 'Trouvez la Déco Parfaite pour Votre Salon',
       subheadline: 'Le salon est la pièce la plus importante de votre maison. Visualisez 12 styles disponibles directement sur votre photo en 30 secondes.',
       cta: 'Redécorer mon salon',
-      ctaLink: '/generate',
+      ctaLink: '/essai',
     },
     problem: {
       title: 'Décorer son salon sans se tromper',
@@ -398,7 +398,7 @@ export const INTENT_PAGES: IntentPageData[] = [
       headline: 'Créez la Chambre de Vos Rêves',
       subheadline: 'Votre chambre est votre refuge. Visualisez-la dans un style cosy, scandinave, bohème ou tout autre ambiance en 30 secondes.',
       cta: 'Redécorer ma chambre',
-      ctaLink: '/generate',
+      ctaLink: '/essai',
     },
     problem: {
       title: 'Trouver le bon style pour sa chambre',
@@ -440,7 +440,7 @@ export const INTENT_PAGES: IntentPageData[] = [
       headline: 'Avant / Après en 30 Secondes',
       subheadline: 'Transformez n\'importe quelle pièce et créez des comparaisons avant/après bluffantes. Idéal pour les pros de l\'immobilier et les passionnés de déco.',
       cta: 'Créer mon avant/après',
-      ctaLink: '/generate',
+      ctaLink: '/essai',
     },
     problem: {
       title: 'Montrer le potentiel d\'un bien est difficile',

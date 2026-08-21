@@ -98,7 +98,7 @@ export default async function AmenagerPage({ params }: PageProps) {
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-4">
             <Button size="xl" className="h-14 px-8 text-lg rounded-full bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)]" asChild>
-              <Link href="/generate">
+              <Link href="/essai">
                 <Camera className="mr-2 w-5 h-5" /> Importer ma photo
               </Link>
             </Button>
@@ -125,10 +125,10 @@ export default async function AmenagerPage({ params }: PageProps) {
             Ne devinez plus. Visualisez le résultat sur votre vraie pièce avant le moindre achat.
           </p>
           <Button size="lg" className="rounded-full px-8 bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)]" asChild>
-            <Link href="/generate">Décorer ma pièce <Wand2 className="ml-2 w-4 h-4" /></Link>
+            <Link href="/essai">Décorer ma pièce <Wand2 className="ml-2 w-4 h-4" /></Link>
           </Button>
           <div className="pt-4">
-            <Link href="/generate" className="inline-flex items-center text-sm text-[var(--gold)] hover:underline">
+            <Link href="/essai" className="inline-flex items-center text-sm text-[var(--gold)] hover:underline">
               Voir comment ça marche <ArrowRight className="ml-1 w-3.5 h-3.5" />
             </Link>
           </div>
