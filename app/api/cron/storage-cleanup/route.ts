@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/admin-client';
+import { isProtectedDemoInput } from '@/src/shared/storage/demo-assets';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -21,6 +22,7 @@ export const maxDuration = 60;
  */
 
 const INPUT_RETENTION_DAYS = 30;
+
 const ORPHAN_RETENTION_DAYS = 30;
 const PAGE_SIZE = 1000;
 
@@ -92,6 +94,7 @@ export async function GET(req: Request) {
     // --- 1. Purge des inputs anciens ---
     const inputObjects = await listAllObjects('input-images');
     const inputsToDelete = inputObjects
+      .filter((o) => !isProtectedDemoInput(o.name))
       .filter((o) => isOlderThan(o.created_at, INPUT_RETENTION_DAYS))
       .map((o) => o.name);
     const inputsRemoved = await removeInBatches('input-images', inputsToDelete);

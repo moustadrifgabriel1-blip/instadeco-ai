@@ -233,7 +233,7 @@ export function PrestigeRoomReveal() {
           {/* AVANT, pièce vide / datée (couche du dessous) */}
           <div className="absolute inset-0">
             <Image
-              src="https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/input-images/f88c9b68-eda4-4d67-bfb4-f631d21b37c6/1781787540154.jpg"
+              src="https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/input-images/f88c9b68-eda4-4d67-bfb4-f631d21b37c6/proof-moderne-112861.jpg"
               alt="Salon vide aux murs nus, photo brute avant mise en scène"
               fill
               sizes="(min-width: 1024px) 1152px, 100vw"
@@ -252,7 +252,7 @@ export function PrestigeRoomReveal() {
             style={{ clipPath: 'inset(0 100% 0 0)' }}
           >
             <Image
-              src="https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/output-images/gemini/1781862702952-ec11kc.jpg"
+              src="https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/output-images/gemini/1787318792815-gsr2t.jpg"
               alt="Le même salon mis en scène par le service, intérieur scandinave épuré et chaleureux"
               fill
               sizes="(min-width: 1024px) 1152px, 100vw"
