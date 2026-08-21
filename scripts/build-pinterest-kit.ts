@@ -20,6 +20,7 @@ import { createClient } from '@supabase/supabase-js';
 import { writeFile, mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { config } from 'dotenv';
+import sharp from 'sharp';
 import { composeBeforeAfter } from '../app/api/cron/social-publish/compose';
 
 config({ path: '.env.local' });
@@ -40,43 +41,92 @@ const STYLES: Record<string, string> = {
   midcentury: 'mid-century',
 };
 
-const ROOMS: Record<string, string> = {
-  salon: 'salon',
-  chambre: 'chambre',
-  bureau: 'bureau',
-  cuisine: 'cuisine',
-  'salle-a-manger': 'salle à manger',
-  'salle-de-bain': 'salle de bain',
+/**
+ * Slug de la base vers slug de la page publique. Les deux divergent sur
+ * quelques styles, et « classique » n'a pas de page : dans ce cas l'épingle
+ * pointe vers l'essai plutôt que vers une 404, qui gâcherait le clic.
+ */
+const PAGE_STYLE: Record<string, string> = {
+  artdeco: 'art-deco',
+  midcentury: 'mid-century',
 };
 
+const STYLES_SANS_PAGE = new Set(['classique']);
+
+/** Nom lisible et genre, pour accorder les articles et les participes. */
+const ROOMS: Record<string, { nom: string; feminin: boolean }> = {
+  salon: { nom: 'salon', feminin: false },
+  chambre: { nom: 'chambre', feminin: true },
+  bureau: { nom: 'bureau', feminin: false },
+  cuisine: { nom: 'cuisine', feminin: true },
+  'salle-a-manger': { nom: 'salle à manger', feminin: true },
+  'salle-de-bain': { nom: 'salle de bain', feminin: true },
+};
+
+async function estAccessible(url: string): Promise<boolean> {
+  try {
+    const res = await fetch(url, { method: 'HEAD', signal: AbortSignal.timeout(10000) });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
 /**
- * Descriptions Pinterest. Pas de promesse chiffrée invérifiable, pas d'emoji,
- * pas de tiret de ponctuation : le texte doit passer la même barre que le
- * copy du site.
+ * Rendu seul, recadré au format 1080x1350 comme les composés avant/après.
+ * Les réseaux favorisent le portrait, et un kit homogène évite d'avoir à
+ * retoucher chaque visuel à la main avant publication.
  */
-function buildPin(style: string, room: string) {
+async function telecharger(url: string): Promise<Buffer> {
+  const res = await fetch(url, { signal: AbortSignal.timeout(15000) });
+  if (!res.ok) throw new Error(`fetch ${res.status}`);
+  const brut = Buffer.from(await res.arrayBuffer());
+  return sharp(brut)
+    .resize(1080, 1350, { fit: 'cover', position: 'centre' })
+    .jpeg({ quality: 86 })
+    .toBuffer();
+}
+
+/**
+ * Titre et description d'une épingle. Pas de promesse chiffrée invérifiable,
+ * pas d'emoji, pas de tiret de ponctuation : le texte passe la même barre que
+ * le copy du site.
+ */
+function buildPin(style: string, room: string, avecAvant: boolean) {
   const s = STYLES[style] ?? style;
-  const r = ROOMS[room] ?? room;
+  const piece = ROOMS[room] ?? { nom: room, feminin: false };
+  const r = piece.nom;
+  const un = piece.feminin ? 'une' : 'un';
+  const Un = piece.feminin ? 'Une' : 'Un';
+  const leMeme = piece.feminin ? 'la même' : 'le même';
+  const compose = piece.feminin ? 'composée' : 'composé';
 
   const titres = [
     `${r.charAt(0).toUpperCase() + r.slice(1)} ${s} : avant et après`,
-    `Transformer un ${r} en style ${s}`,
-    `Un ${r} vide devient un ${r} ${s}`,
+    `Transformer ${un} ${r} en style ${s}`,
+    `${Un} ${r} vide devient ${un} ${r} ${s}`,
   ];
-  const title = titres[(style.length + room.length) % titres.length];
+  const title = avecAvant
+    ? titres[(style.length + room.length) % titres.length]
+    : `${r.charAt(0).toUpperCase() + r.slice(1)} en style ${s}`;
 
-  const description =
-    `Voici le même ${r}, avant et après. Le rendu ${s} a été généré à partir ` +
-    `d'une simple photo, sans rien déplacer ni acheter. Utile pour se projeter ` +
-    `avant de choisir des meubles, une palette ou une ambiance. ` +
-    `Essai gratuit sur instadeco.app, sans créer de compte.`;
+  const description = avecAvant
+    ? `Voici ${leMeme} ${r}, avant et après. Le rendu ${s} a été généré à partir ` +
+      `d'une simple photo, sans rien déplacer ni acheter. Utile pour se projeter ` +
+      `avant de choisir des meubles, une palette ou une ambiance. ` +
+      `Essai gratuit sur instadeco.app, sans créer de compte.`
+    : `${Un} ${r} en style ${s}, ${compose} à partir de la photo d'une pièce vide. ` +
+      `De quoi tester une ambiance avant d'acheter le moindre meuble. ` +
+      `Essai gratuit sur instadeco.app, sans créer de compte.`;
 
   return {
     title,
     description,
-    // On envoie vers la page de style correspondante quand elle existe, sinon
-    // vers l'essai : dans les deux cas le visiteur peut tester sans compte.
-    link: `${SITE}/fr/style/${style}`,
+    // Page de style quand elle existe, sinon l'essai : dans les deux cas le
+    // visiteur peut tester sans créer de compte.
+    link: STYLES_SANS_PAGE.has(style)
+      ? `${SITE}/fr/essai`
+      : `${SITE}/fr/style/${PAGE_STYLE[style] ?? style}`,
   };
 }
 
@@ -135,13 +185,17 @@ async function main() {
     const nom = `${String(i + 1).padStart(2, '0')}-${room}-${style}.jpg`;
 
     try {
-      const buffer = await composeBeforeAfter(
-        row.input_image_url as string,
-        row.output_image_url as string,
-      );
+      // Beaucoup d'anciennes photos « avant » ont ete purgees du storage avant
+      // que l'exemption du compte demo n'existe. Quand la paire est
+      // incomplete, on publie le rendu seul plutot que d'inventer un « avant »
+      // qui ne serait pas la source reelle de l'image.
+      const avantVivant = await estAccessible(row.input_image_url as string);
+      const buffer = avantVivant
+        ? await composeBeforeAfter(row.input_image_url as string, row.output_image_url as string)
+        : await telecharger(row.output_image_url as string);
       await writeFile(join(OUT_DIR, nom), buffer);
 
-      const pin = buildPin(style, room);
+      const pin = buildPin(style, room, avantVivant);
       lignes.push(
         `## ${i + 1}. ${nom}`,
         '',
