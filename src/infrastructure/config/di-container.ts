@@ -51,6 +51,7 @@ import { CreateSubscriptionUseCase } from '@/src/application/use-cases/payments/
 import { CreateBillingPortalSessionUseCase } from '@/src/application/use-cases/payments/CreateBillingPortalSessionUseCase';
 import { PurchaseCreditsUseCase } from '@/src/application/use-cases/credits/PurchaseCreditsUseCase';
 import { CreateGuestCheckoutUseCase } from '@/src/application/use-cases/payments/CreateGuestCheckoutUseCase';
+import { GetCheckoutSessionStatusUseCase } from '@/src/application/use-cases/payments/GetCheckoutSessionStatusUseCase';
 import { AddCreditsUseCase } from '@/src/application/use-cases/credits/AddCreditsUseCase';
 import { GetUserCreditsUseCase } from '@/src/application/use-cases/credits/GetUserCreditsUseCase';
 import { GetCreditHistoryUseCase } from '@/src/application/use-cases/credits/GetCreditHistoryUseCase';
@@ -357,6 +358,10 @@ class DIContainer {
     );
   }
 
+  get getCheckoutSessionStatusUseCase(): GetCheckoutSessionStatusUseCase {
+    return new GetCheckoutSessionStatusUseCase(this.paymentService);
+  }
+
   get trialGenerateUseCase(): TrialGenerateUseCase {
     return new TrialGenerateUseCase(this.imageGeneratorService);
   }
@@ -471,6 +476,7 @@ export const useCases = {
   get createBillingPortal() { return container.createBillingPortalSessionUseCase; },
   get purchaseCredits() { return container.purchaseCreditsUseCase; },
   get createGuestCheckout() { return container.createGuestCheckoutUseCase; },
+  get getCheckoutSessionStatus() { return container.getCheckoutSessionStatusUseCase; },
   get addCredits() { return container.addCreditsUseCase; },
   get getUserCredits() { return container.getUserCreditsUseCase; },
   get getCreditHistory() { return container.getCreditHistoryUseCase; },

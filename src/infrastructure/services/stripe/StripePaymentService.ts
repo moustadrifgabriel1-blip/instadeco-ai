@@ -60,6 +60,13 @@ export class StripePaymentService implements IPaymentService {
         // Stripe Tax (TVA/autoliquidation B2B) : gaté par env, requiert une config
         // Stripe Tax dans le compte. Off par défaut pour ne jamais casser le checkout.
         automatic_tax: { enabled: process.env.STRIPE_TAX_ENABLED === 'true' },
+        // Panier abandonné : Stripe garde une URL de reprise valable 30 jours
+        // (coupon conservé) et, si « Recover abandoned carts » est activé dans
+        // le Dashboard, relance lui-même l'acheteur. Sans ça, une session fermée
+        // ne laissait aucune trace et l'email saisi était perdu.
+        after_expiration: { recovery: { enabled: true, allow_promotion_codes: true } },
+        // Case à cocher Stripe pour les relances marketing : base légale propre.
+        consent_collection: { promotions: 'auto' },
         metadata: {
           ...options.metadata,
           // userId absent pour un achat invité : on n'écrit pas une clé vide.
@@ -140,6 +147,7 @@ export class StripePaymentService implements IPaymentService {
     paymentStatus: string;
     customerEmail: string;
     metadata: Record<string, string>;
+    amountTotal?: number;
   }>> {
     try {
       const session = await this.stripe.checkout.sessions.retrieve(sessionId);
@@ -147,8 +155,11 @@ export class StripePaymentService implements IPaymentService {
       return success({
         id: session.id,
         paymentStatus: session.payment_status || 'unknown',
-        customerEmail: session.customer_email || '',
+        // customer_email n'est rempli que si on l'a fourni a la creation ;
+        // customer_details.email l'est des que Stripe connait l'acheteur.
+        customerEmail: session.customer_email || session.customer_details?.email || '',
         metadata: (session.metadata || {}) as Record<string, string>,
+        amountTotal: typeof session.amount_total === 'number' ? session.amount_total : undefined,
       });
 
     } catch (error) {

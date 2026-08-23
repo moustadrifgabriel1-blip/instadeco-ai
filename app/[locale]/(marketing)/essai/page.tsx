@@ -22,6 +22,9 @@ import { TRIAL_MAX_GENERATIONS } from '@/src/shared/constants/trial';
  */
 const WELCOME_COUPON = (process.env.NEXT_PUBLIC_WELCOME_COUPON || '').trim();
 
+/** Dernier résultat d'essai, pour survivre à un aller-retour vers Stripe. */
+const TRIAL_RESULT_KEY = 'instadeco_trial_result';
+
 // Compteur d'essais consommés côté client (UX immédiate ; la vraie limite est serveur).
 const TRIAL_COUNT_KEY = 'instadeco_trial_count';
 function readTrialCount(): number {
@@ -116,6 +119,41 @@ export default function EssaiPage() {
     setTrialsUsed(used);
     if (used >= TRIAL_MAX_GENERATIONS) {
       setStep('trial-used');
+    }
+  }, []);
+
+  // Retour de Stripe sans payer (`?payment=cancelled`) : on restaure le
+  // résultat et l'offre au lieu de renvoyer le visiteur sur une dropzone
+  // vide. C'est le cas d'abandon le plus fréquent (doute sur le prix, 3DS,
+  // retour arrière) et il arrivait jusqu'ici sur une page qui avait tout
+  // oublié, son rendu compris.
+  const [retourPaiement, setRetourPaiement] = useState(false);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('payment') !== 'cancelled') return;
+    try {
+      const raw = sessionStorage.getItem(TRIAL_RESULT_KEY);
+      if (!raw) return;
+      const saved = JSON.parse(raw) as {
+        generatedImage: string;
+        imagePreview: string | null;
+        style: string;
+        room: string;
+      };
+      if (!saved.generatedImage) return;
+      setGeneratedImage(saved.generatedImage);
+      setImagePreview(saved.imagePreview);
+      setSelectedStyle(saved.style);
+      setSelectedRoom(saved.room);
+      setRetourPaiement(true);
+      setStep('result');
+      // Nettoie l'URL pour qu'un rechargement ne rejoue pas le message.
+      window.history.replaceState(null, '', window.location.pathname);
+      setTimeout(() => {
+        resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 150);
+    } catch {
+      /* session illisible : on laisse le parcours normal */
     }
   }, []);
 
@@ -253,6 +291,14 @@ export default function EssaiPage() {
         clearInterval(progressInterval);
         setProgress(100);
         setGeneratedImage(imageUrl);
+        try {
+          sessionStorage.setItem(
+            TRIAL_RESULT_KEY,
+            JSON.stringify({ generatedImage: imageUrl, imagePreview, style: selectedStyle, room: selectedRoom }),
+          );
+        } catch {
+          /* quota sessionStorage : sans gravité, on perd juste la restauration */
+        }
         // Incrémenter le compteur d'essais consommés (UX immédiate).
         const newUsed = readTrialCount() + 1;
         localStorage.setItem(TRIAL_COUNT_KEY, String(newUsed));
@@ -527,33 +573,39 @@ export default function EssaiPage() {
                 </div>
               </div>
 
-              {/* Nouvel essai si quota restant (sans recharger la page) */}
-              {remainingTrials > 0 && (
-                <div className="prestige-reveal text-center">
-                  <button
-                    onClick={() => {
-                      setGeneratedImage(null);
-                      setError(null);
-                      setStep('options');
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }}
-                    className="inline-flex items-center gap-2 bg-transparent text-[var(--gold)] border border-[var(--gold)] px-6 py-3 rounded-full text-[15px] font-semibold hover:bg-[var(--gold)] hover:text-[#0c0a09] transition-all active:scale-95"
-                  >
-                    <Sparkles className="w-4 h-4" />
-                    Essayer un autre style. {remainingTrials} essai{remainingTrials > 1 ? 's' : ''} restant{remainingTrials > 1 ? 's' : ''}
-                  </button>
-                </div>
+              {/* OFFRE FLASH, Conversion immédiate */}
+              {/*
+                Achat immédiat, sans compte : c'est le pic d'intention, le
+                visiteur vient de voir sa propre pièce transformée. L'ancien
+                lien envoyait créer un compte puis retombait sur /pricing au
+                tarif plein, alors que l'encart promettait 4,99 €. La remise
+                affichée est désormais celle réellement appliquée par Stripe,
+                et rien n'est annoncé si aucun coupon n'est configuré.
+              */}
+              {retourPaiement && (
+                <p className="prestige-reveal text-center text-[14px] text-muted-foreground">
+                  Rien n&apos;a été débité. Votre rendu est toujours là, et l&apos;offre aussi.
+                </p>
               )}
+              <FlashOffer
+                onBuy={() => setGuestPack('pack_10')}
+                resetKey={generatedImage ?? undefined}
+                durationMinutes={15}
+                originalPrice="9,90 €"
+                flashPrice={WELCOME_COUPON ? '7,92 €' : undefined}
+                discountLabel={WELCOME_COUPON ? '-20%' : undefined}
+                credits={10}
+              />
 
-              {/* Email OPTIONNEL, débloque le HD sans filigrane (pas un gate) */}
+              {/* Email OPTIONNEL : garder le rendu + entrer dans la séquence de relance (pas un gate) */}
               {!emailUnlocked ? (
                 <div className="prestige-reveal bg-card rounded-[20px] border border-[var(--gold-line)] p-5 sm:p-6 shadow-sm">
                   <div className="flex items-center justify-center gap-2 mb-1.5">
                     <Mail className="w-4 h-4 text-[var(--gold)]" />
-                    <span className="prestige-display text-[15px] font-semibold text-foreground">Recevez votre image en <span className="text-[var(--gold)]">HD</span>, sans filigrane</span>
+                    <span className="prestige-display text-[15px] font-semibold text-foreground">Gardez cette <span className="text-[var(--gold)]">transformation</span></span>
                   </div>
                   <p className="text-[13px] text-muted-foreground text-center mb-4">
-                    Entrez votre email pour télécharger la version haute définition (optionnel) et recevez <span className="font-semibold text-[var(--gold)]">3 crédits offerts</span>.
+                    Laissez votre email : on vous renvoie le lien de ce rendu, et <span className="font-semibold text-[var(--gold)]">3 crédits</span> vous attendent dès que vous créez votre compte.
                   </p>
                   <form
                     onSubmit={async (e) => {
@@ -572,11 +624,15 @@ export default function EssaiPage() {
                           headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify({
                             email: trialEmail,
-                            source: 'trial_hd_unlock',
-                            metadata: { style: selectedStyle, room: selectedRoom },
+                            // Même source que la séquence de relance du cron
+                            // (J+1, J+3, J+7) : l'ancienne valeur `trial_hd_unlock`
+                            // ne correspondait à aucune requête, ces leads ne
+                            // recevaient jamais rien.
+                            source: 'trial_email_gate',
+                            metadata: { style: selectedStyle, room: selectedRoom, imageUrl: generatedImage },
                           }),
                         });
-                        trackLeadCaptured('trial_hd_unlock');
+                        trackLeadCaptured('trial_email_gate');
                         localStorage.setItem('trial_lead_email', trialEmail);
                         setEmailUnlocked(true);
                         setEmailStatus('idle');
@@ -603,7 +659,7 @@ export default function EssaiPage() {
                       {emailStatus === 'loading' ? (
                         <div className="w-5 h-5 border-2 border-[#0c0a09]/30 border-t-[#0c0a09] rounded-full animate-spin" />
                       ) : (
-                        <>Débloquer le HD</>
+                        <>Garder mon rendu</>
                       )}
                     </button>
                   </form>
@@ -618,8 +674,26 @@ export default function EssaiPage() {
                 <div className="prestige-reveal bg-[rgba(16,185,129,0.10)] rounded-[20px] border border-emerald-500/30 p-4 text-center">
                   <p className="text-[14px] font-semibold text-emerald-400 flex items-center justify-center gap-2">
                     <Check className="w-4 h-4" />
-                    Version HD envoyée, vérifiez votre boîte mail.
+                    C&apos;est noté. Vous recevrez le lien de ce rendu par email.
                   </p>
+                </div>
+              )}
+
+              {/* Nouvel essai si quota restant : lien discret, l'achat passe avant */}
+              {remainingTrials > 0 && (
+                <div className="prestige-reveal text-center">
+                  <button
+                    onClick={() => {
+                      setGeneratedImage(null);
+                      setError(null);
+                      setStep('options');
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className="inline-flex items-center gap-1.5 text-[14px] text-muted-foreground underline-offset-4 hover:text-[var(--gold)] hover:underline transition-colors"
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    Essayer un autre style gratuitement ({remainingTrials} essai{remainingTrials > 1 ? 's' : ''} restant{remainingTrials > 1 ? 's' : ''})
+                  </button>
                 </div>
               )}
 
@@ -637,24 +711,6 @@ export default function EssaiPage() {
                   variant="inline"
                 />
               </div>
-
-              {/* OFFRE FLASH, Conversion immédiate */}
-              {/*
-                Achat immédiat, sans compte : c'est le pic d'intention, le
-                visiteur vient de voir sa propre pièce transformée. L'ancien
-                lien envoyait créer un compte puis retombait sur /pricing au
-                tarif plein, alors que l'encart promettait 4,99 €. La remise
-                affichée est désormais celle réellement appliquée par Stripe,
-                et rien n'est annoncé si aucun coupon n'est configuré.
-              */}
-              <FlashOffer
-                onBuy={() => setGuestPack('pack_10')}
-                durationMinutes={15}
-                originalPrice="9,90 €"
-                flashPrice={WELCOME_COUPON ? '7,92 €' : undefined}
-                discountLabel={WELCOME_COUPON ? '-20%' : undefined}
-                credits={10}
-              />
 
               {/* OU Créer un compte gratuit */}
               <div className="bg-[var(--stone-900)] rounded-[24px] border border-[var(--gold-line)] p-6 sm:p-8 text-center">
@@ -750,6 +806,7 @@ export default function EssaiPage() {
       <GuestCheckoutDialog
         packId={guestPack}
         packLabel={WELCOME_COUPON ? '10 crédits, 7,92 € au lieu de 9,90 €' : '10 crédits, 9,90 €'}
+        montant={WELCOME_COUPON ? '7,92 €' : '9,90 €'}
         onClose={() => setGuestPack(null)}
         successUrl={`${typeof window !== 'undefined' ? window.location.origin : ''}/${locale}/credits/success?session_id={CHECKOUT_SESSION_ID}`}
         cancelUrl={`${typeof window !== 'undefined' ? window.location.origin : ''}/${locale}/essai?payment=cancelled`}

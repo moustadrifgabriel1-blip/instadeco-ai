@@ -130,9 +130,12 @@ function PricingPage() {
       return;
     }
 
+    // Page de succès dédiée plutôt que le dashboard : c'est elle qui mesure
+    // l'achat (purchase GA4 + Purchase Pixel) et attend l'arrivée des crédits.
+    const chosen = PRICING_PLANS.find((x) => x.id === planId);
     const checkoutUrl = await purchase({
       packId: planId,
-      successUrl: `${window.location.origin}/${locale}/dashboard?payment=success`,
+      successUrl: `${window.location.origin}/${locale}/credits/success?session_id={CHECKOUT_SESSION_ID}${chosen ? `&n=${chosen.credits}&v=${chosen.price}` : ''}`,
       cancelUrl: `${window.location.origin}/${locale}/pricing?payment=cancelled`,
       couponId: couponFromUrl,
     });
@@ -722,6 +725,16 @@ function PricingPage() {
                   currency: 'EUR',
                 }).format(p.price);
                 return `${p.credits} crédits, ${prix}`;
+              })()
+            : undefined
+        }
+        montant={
+          guestPack
+            ? (() => {
+                const p = PRICING_PLANS.find((x) => x.id === guestPack);
+                return p
+                  ? new Intl.NumberFormat(locale, { style: 'currency', currency: 'EUR' }).format(p.price)
+                  : undefined;
               })()
             : undefined
         }

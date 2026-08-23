@@ -16,6 +16,8 @@ interface GuestCheckoutDialogProps {
   couponId?: string;
   /** Lien de connexion pour les clients qui ont déjà un compte. */
   loginHref: string;
+  /** Montant affiché sur le bouton (ex. « 9,90 € »). Doit être le montant réellement facturé. */
+  montant?: string;
 }
 
 /**
@@ -39,6 +41,7 @@ export function GuestCheckoutDialog({
   cancelUrl,
   couponId,
   loginHref,
+  montant,
 }: GuestCheckoutDialogProps) {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
@@ -86,6 +89,13 @@ export function GuestCheckoutDialog({
         couponId,
       });
       if (res.checkoutUrl) {
+        // La page de succès s'en sert pour dire à l'acheteur, sans session,
+        // sur quelle adresse son lien de connexion est parti.
+        try {
+          sessionStorage.setItem('instadeco_guest_email', value);
+        } catch {
+          /* sans gravité */
+        }
         window.location.href = res.checkoutUrl;
         return;
       }
@@ -119,9 +129,13 @@ export function GuestCheckoutDialog({
         <h2 id="guest-checkout-title" className="prestige-display mb-2 pr-8 text-2xl">
           Où envoyons-nous vos crédits ?
         </h2>
-        <p className="mb-6 text-sm text-[var(--ivory)]/70">
-          {packLabel ? `${packLabel}. ` : ''}Pas de compte à créer. Vous payez, et vos
-          crédits vous attendent sur cette adresse.
+        <p className="mb-2 text-sm text-[var(--ivory)]/80">
+          {packLabel ? `${packLabel}. ` : ''}Des rendus en haute définition, sans filigrane,
+          téléchargeables, à utiliser quand vous voulez.
+        </p>
+        <p className="mb-6 text-sm text-[var(--ivory)]/60">
+          Pas de mot de passe à inventer : après le paiement, vous recevez sur cette adresse
+          un lien qui ouvre votre espace.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -161,7 +175,7 @@ export function GuestCheckoutDialog({
               </>
             ) : (
               <>
-                Continuer vers le paiement
+                {montant ? `Payer ${montant}` : 'Continuer vers le paiement'}
                 <ArrowRight className="h-4 w-4" />
               </>
             )}
@@ -170,7 +184,7 @@ export function GuestCheckoutDialog({
 
         <p className="mt-5 flex items-center justify-center gap-2 text-xs text-[var(--ivory)]/50">
           <ShieldCheck className="h-3.5 w-3.5" />
-          Paiement sécurisé par Stripe
+          Paiement sécurisé par Stripe. Crédits non utilisés remboursés sous 14 jours.
         </p>
 
         <p className="mt-4 text-center text-sm text-[var(--ivory)]/60">

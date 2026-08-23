@@ -341,8 +341,10 @@ export default function CGVPage() {
 
           <h3 className="prestige-display text-lg font-medium text-foreground mt-4 mb-2">6.3 Crédits non utilisés</h3>
           <p className="prestige-body text-muted-foreground">
-            Les crédits non utilisés ne sont pas remboursables après achat. Ils restent disponibles
-            sur votre compte sans limitation de durée.
+            Les crédits non utilisés peuvent être remboursés intégralement dans les 14 jours suivant
+            l&apos;achat, sur simple demande à contact@instadeco.app. Passé ce délai, ils restent
+            disponibles sur votre compte sans limitation de durée. Les crédits déjà consommés ne
+            sont pas remboursables.
           </p>
         </section>
 

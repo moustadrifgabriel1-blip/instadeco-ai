@@ -87,6 +87,8 @@ export interface IPaymentService {
     paymentStatus: string;
     customerEmail: string;
     metadata: Record<string, string>;
+    /** Montant réellement facturé, en centimes (remises déduites). */
+    amountTotal?: number;
   }>>;
 
   /**

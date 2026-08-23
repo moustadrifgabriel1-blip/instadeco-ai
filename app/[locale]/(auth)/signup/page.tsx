@@ -69,6 +69,10 @@ function SignupForm() {
         email,
         password,
         options: {
+          // Le lien de confirmation passe par /auth/callback : c'est lui qui
+          // envoie l'email de bienvenue et respecte le `redirect` demandé
+          // (ex. retour sur /pro?checkout=... pour relancer un paiement).
+          emailRedirectTo: `${window.location.origin}/auth/callback?redirect=${encodeURIComponent(redirectTo)}`,
           data: {
             full_name: fullName,
             consent_marketing: acceptMarketing,

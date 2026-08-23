@@ -35,7 +35,7 @@ export async function GET(req: Request) {
     }
 
     const now = new Date();
-    const results = { j3: 0, j7: 0, j14: 0, quiz: 0, trial_j1: 0, trial_j3: 0, trial_j7: 0, avis: 0, errors: 0 };
+    const results = { j3: 0, j7: 0, j14: 0, quiz: 0, trial_j1: 0, trial_j3: 0, trial_j7: 0, generic: 0, avis: 0, errors: 0 };
 
     // ========================================
     // CAP QUOTIDIEN GLOBAL D'ENVOIS (cost-004)
@@ -293,6 +293,69 @@ export async function GET(req: Request) {
         html: buildTrialJ7Email(lead.name || 'là', lead.email),
       }) === 'sent') {
         results.trial_j7++;
+      }
+    }
+
+    // ========================================
+    // SEQUENCE GENERIQUE PAR ETAPE : toute source non couverte ci-dessus
+    // (popup « 3 credits offerts » = lead_capture, outils gratuits...).
+    //
+    // Avant : ces leads ne matchaient aucune requete et ne recevaient JAMAIS
+    // d'email (20 leads sur 24 en base). Et les sequences par fenetre de 24 h
+    // perdaient definitivement un lead si le cron sautait un jour.
+    // Ici on avance d'une etape des que le delai minimal est ecoule, quel que
+    // soit l'age du lead : un ancien rattrape la sequence.
+    //   etape 1 : des 1 h, « vos 3 credits vous attendent » (CTA essai sans compte)
+    //   etape 2 : 3 jours apres, inspiration avant/apres
+    //   etape 3 : 7 jours apres, offre -20 % sur le premier pack
+    // ========================================
+    const SOURCES_COUVERTES = ['quiz_style_deco', 'trial_email_gate'];
+    const ETAPES: Array<{ step: number; delaiMin: number; subject: string; build: (n: string, e: string) => string }> = [
+      { step: 1, delaiMin: 60 * 60 * 1000, subject: 'Vos 3 crédits vous attendent', build: buildGenericJ0Email },
+      { step: 2, delaiMin: 3 * 24 * 60 * 60 * 1000, subject: 'La même pièce, avant et après', build: buildTrialJ3Email },
+      { step: 3, delaiMin: 7 * 24 * 60 * 60 * 1000, subject: '-20 % sur votre premier pack', build: buildTrialJ7Email },
+    ];
+
+    const { data: genericLeads } = await supabaseAdmin
+      .from('leads')
+      .select('id, email, name, source, created_at, nurture_step, last_nurtured_at, unsubscribed')
+      .not('source', 'in', `(${SOURCES_COUVERTES.join(',')})`)
+      .lt('nurture_step', ETAPES.length)
+      .limit(200);
+
+    for (const lead of (genericLeads || [])) {
+      if (!lead.email || lead.unsubscribed === true) continue;
+      const etape = ETAPES.find((e) => e.step === (lead.nurture_step ?? 0) + 1);
+      if (!etape) continue;
+
+      // Delai compte depuis le dernier envoi, ou depuis la capture pour la 1re etape.
+      const ref = new Date(lead.last_nurtured_at || lead.created_at).getTime();
+      if (now.getTime() - ref < etape.delaiMin) continue;
+
+      // Deja client ou inscrit : on arrete la sequence, il a ce qu'il faut.
+      const { count: userCount } = await supabaseAdmin
+        .from('profiles')
+        .select('id', { count: 'exact', head: true })
+        .eq('email', lead.email);
+      if ((userCount || 0) > 0) {
+        await supabaseAdmin.from('leads').update({ nurture_step: ETAPES.length }).eq('id', lead.id);
+        continue;
+      }
+
+      const statut = await sendCapped({
+        from: FROM_EMAIL,
+        to: [lead.email],
+        subject: etape.subject,
+        html: etape.build(lead.name || 'là', lead.email),
+      });
+      if (statut === 'sent') {
+        // Marque l'etape APRES l'envoi : un plantage avant ne saute rien,
+        // un plantage apres ne renvoie pas deux fois (cap quotidien + etape).
+        await supabaseAdmin
+          .from('leads')
+          .update({ nurture_step: etape.step, last_nurtured_at: now.toISOString() })
+          .eq('id', lead.id);
+        results.generic++;
       }
     }
 
@@ -651,6 +714,41 @@ function buildTrialJ1Email(name: string, email: string, style: string): string {
     
     <p style="color: #8c8478; font-size: 13px; text-align: center; margin: 16px 0 0;">
       Sans engagement • Sans carte bancaire • Inscription en 30 secondes
+    </p>
+  `, unsubUrl);
+}
+
+function buildGenericJ0Email(name: string, email: string): string {
+  const unsubUrl = buildUnsubscribeUrl(email);
+  return emailWrapper(`
+    <h2 style="color: #faf8f4; font-size: 22px; margin: 0 0 16px;">Vos 3 crédits vous attendent</h2>
+
+    <p style="color: #b3a89a; line-height: 1.6; margin: 0 0 16px;">
+      Bonjour ${name}, vous avez laissé votre adresse sur InstaDeco pour recevoir 3 crédits.
+      Ils sont réservés, et ils n'expirent pas.
+    </p>
+
+    <p style="color: #b3a89a; line-height: 1.6; margin: 0 0 24px;">
+      Avant même de créer un compte, vous pouvez voir ce que ça donne sur votre propre pièce :
+      une photo, un style, et le rendu arrive en trente secondes. Sans inscription.
+    </p>
+
+    <div style="text-align: center; margin: 24px 0;">
+      <a href="https://instadeco.app/fr/essai"
+         style="display: inline-block; background: linear-gradient(135deg, #c8a24d, #a8842f); color: #0c0a09; text-decoration: none; padding: 14px 32px; border-radius: 50px; font-weight: 600; font-size: 16px;">
+        Transformer ma pièce, gratuitement
+      </a>
+    </div>
+
+    <div style="text-align: center; margin: 0 0 16px;">
+      <a href="https://instadeco.app/fr/signup"
+         style="display: inline-block; background: transparent; color: #c8a24d; text-decoration: none; padding: 10px 24px; border-radius: 50px; font-weight: 600; font-size: 14px; border: 2px solid #c8a24d;">
+        Récupérer mes 3 crédits
+      </a>
+    </div>
+
+    <p style="color: #8c8478; font-size: 13px; text-align: center; margin: 16px 0 0;">
+      Vous ne recevrez que quelques emails, et un lien en bas de chacun suffit pour arrêter.
     </p>
   `, unsubUrl);
 }
