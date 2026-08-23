@@ -61,12 +61,16 @@ export class StripePaymentService implements IPaymentService {
         // Stripe Tax dans le compte. Off par défaut pour ne jamais casser le checkout.
         automatic_tax: { enabled: process.env.STRIPE_TAX_ENABLED === 'true' },
         // Panier abandonné : Stripe garde une URL de reprise valable 30 jours
-        // (coupon conservé) et, si « Recover abandoned carts » est activé dans
-        // le Dashboard, relance lui-même l'acheteur. Sans ça, une session fermée
-        // ne laissait aucune trace et l'email saisi était perdu.
-        after_expiration: { recovery: { enabled: true, allow_promotion_codes: true } },
-        // Case à cocher Stripe pour les relances marketing : base légale propre.
-        consent_collection: { promotions: 'auto' },
+        // et, si « Recover abandoned carts » est activé dans le Dashboard,
+        // relance lui-même l'acheteur. Sans ça, une session fermée ne laissait
+        // aucune trace et l'email saisi était perdu.
+        //
+        // Pas de `consent_collection.promotions` ici : Stripe le refuse selon le
+        // pays du compte (« not available in your country », constaté en prod,
+        // le checkout entier tombait en 402). Pas non plus de
+        // `allow_promotion_codes` sur la reprise, qui entrerait en conflit avec
+        // le coupon déjà appliqué via `discounts`.
+        after_expiration: { recovery: { enabled: true } },
         metadata: {
           ...options.metadata,
           // userId absent pour un achat invité : on n'écrit pas une clé vide.
