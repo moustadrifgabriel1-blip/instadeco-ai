@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import { useCases } from '@/src/infrastructure/config/di-container';
 import { logAuditEvent } from '@/lib/security/audit-logger';
-import { sendCreditsPurchaseEmail, sendSubscriptionConfirmationEmail, sendPaymentFailedEmail } from '@/lib/notifications/marketing-emails';
+import { sendCreditsPurchaseEmail, sendSubscriptionConfirmationEmail, sendPaymentFailedEmail, sendAbandonedCartEmail } from '@/lib/notifications/marketing-emails';
 
 /**
  * POST /api/v2/webhooks/stripe
@@ -89,6 +89,8 @@ export async function POST(req: Request) {
           await sendSubscriptionConfirmationEmail(conf.to, conf.planName);
         } else if (conf.kind === 'payment_failed' && conf.planName) {
           await sendPaymentFailedEmail(conf.to, conf.planName);
+        } else if (conf.kind === 'abandoned_cart' && conf.recoveryUrl) {
+          await sendAbandonedCartEmail(conf.to, conf.recoveryUrl, conf.credits);
         }
       } catch (e) {
         console.error('[Stripe Webhook V2] Email de confirmation non envoyé:', e);

@@ -33,9 +33,11 @@ export interface ProcessWebhookOutput {
    */
   confirmationEmail?: {
     to: string;
-    kind: 'credits' | 'subscription' | 'payment_failed';
+    kind: 'credits' | 'subscription' | 'payment_failed' | 'abandoned_cart';
     credits?: number;
     planName?: string;
+    /** abandoned_cart : URL de reprise du panier, valable 30 jours. */
+    recoveryUrl?: string;
   };
 }
 
@@ -111,6 +113,11 @@ export class ProcessStripeWebhookUseCase {
       case 'checkout.session.completed':
         return this.withIdempotency(event, () => this.handleCheckoutCompleted(event));
 
+      // Panier abandonné. Passe par le verrou d'idempotence pour qu'un rejeu
+      // Stripe ne renvoie pas une seconde relance à la même personne.
+      case 'checkout.session.expired':
+        return this.withIdempotency(event, () => this.handleCheckoutExpired(event));
+
       case 'invoice.paid':
         return this.withIdempotency(event, () => this.handleInvoicePaid(event));
 
@@ -176,6 +183,56 @@ export class ProcessStripeWebhookUseCase {
     }
 
     return result;
+  }
+
+  /**
+   * Panier abandonné : la session a expiré sans paiement.
+   *
+   * Stripe n'envoie AUCUN email de relance de lui-même, contrairement à ce que
+   * laisse croire l'expression « recover abandoned carts » : il fournit une URL
+   * de reprise valable 30 jours, et c'est à nous d'écrire au client. Il n'y a
+   * donc pas d'interrupteur à activer dans le Dashboard, seulement ce code.
+   *
+   * On ne relance que si on a une adresse ET une URL de reprise. Un abonnement
+   * abandonné n'est pas relancé ici : le message parlerait de crédits.
+   */
+  private async handleCheckoutExpired(
+    event: PaymentWebhookEvent,
+  ): Promise<Result<ProcessWebhookOutput, DomainError>> {
+    const to = (event.metadata.email || event.customerEmail || '').trim().toLowerCase();
+    const recoveryUrl = event.recoveryUrl;
+    const credits = parseInt(event.metadata.credits, 10);
+    const estAchatDeCredits =
+      event.metadata.type === 'guest_credits_purchase' || event.metadata.type === 'credits_purchase';
+
+    if (!to || !recoveryUrl || !estAchatDeCredits) {
+      this.logger.info('Panier abandonné sans relance possible', {
+        aEmail: Boolean(to),
+        aUrl: Boolean(recoveryUrl),
+        type: event.metadata.type || 'inconnu',
+      });
+      return success({
+        processed: false,
+        eventType: event.type,
+        action: 'abandoned_cart_skipped',
+      });
+    }
+
+    this.logger.info('Panier abandonné, relance préparée', {
+      credits: Number.isFinite(credits) ? credits : undefined,
+    });
+
+    return success({
+      processed: true,
+      eventType: event.type,
+      action: 'abandoned_cart_recovery_email',
+      confirmationEmail: {
+        to,
+        kind: 'abandoned_cart',
+        credits: Number.isFinite(credits) && credits > 0 ? credits : undefined,
+        recoveryUrl,
+      },
+    });
   }
 
   private async handleCheckoutCompleted(

@@ -52,6 +52,12 @@ export interface PaymentWebhookEvent {
   metadata: Record<string, string>;
   /** Abonnements : id de la subscription Stripe (sub_...) si l'event en porte une. */
   subscriptionId?: string;
+  /**
+   * checkout.session.expired : URL de reprise du panier abandonné, valable 30
+   * jours. Présente seulement si la session a été créée avec
+   * `after_expiration.recovery.enabled`.
+   */
+  recoveryUrl?: string;
   /** invoice.paid : 'subscription_create' (initial) | 'subscription_cycle' (renouvellement) | ... */
   billingReason?: string;
   /** Fin de la période courante (epoch s) — pour pro_renews_at. */
