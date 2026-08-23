@@ -41,6 +41,12 @@ export interface IntentPageData {
       isUs?: boolean;
     }>;
   };
+  /**
+   * Vrais avant/après (compte démo, RGPD), rendus sous le hero avec le
+   * comparateur. Chaque paire vient d'UNE ligne de `generations` : même pièce,
+   * l'« après » est bien issu de l'« avant ».
+   */
+  proof?: Array<{ before: string; after: string; beforeAlt: string; afterAlt: string; caption: string }>;
   /** Étapes d'utilisation */
   steps: Array<{ step: number; title: string; description: string }>;
   /** Sections de contenu de fond (long-forme) : profondeur SEO réelle + E-E-A-T. Optionnel. */
@@ -434,14 +440,33 @@ export const INTENT_PAGES: IntentPageData[] = [
   {
     slug: 'avant-apres-decoration',
     title: 'Avant/Après Décoration par IA',
-    metaTitle: 'Avant Après Décoration : transformez vos pièces par IA',
-    metaDescription: 'Créez des avant/après impressionnants de décoration intérieure avec l\'IA. Montrez le potentiel de vos pièces en 30 secondes.',
+    // C'est la page la plus visitée du site (GSC : position 12,9). Le title
+    // vise la requête réelle « avant après déco » et dit ce qui fait cliquer :
+    // à partir d'une photo, gratuit, sans compte.
+    metaTitle: 'Avant après décoration par IA, à partir d\'une photo (gratuit)',
+    metaDescription: 'Envoyez la photo de votre pièce, choisissez un style, et comparez l\'avant et l\'après en 30 secondes. Essai gratuit sans compte, exemples réels sur cette page.',
     hero: {
-      headline: 'Avant / Après en 30 Secondes',
-      subheadline: 'Transformez n\'importe quelle pièce et créez des comparaisons avant/après bluffantes. Idéal pour les pros de l\'immobilier et les passionnés de déco.',
+      headline: 'Avant/après décoration : votre pièce transformée par IA en 30 secondes',
+      subheadline: 'Une photo de la pièce telle qu\'elle est, un style, et le rendu arrive. Les exemples ci-dessous sont de vrais rendus, pas des montages.',
       cta: 'Créer mon avant/après',
       ctaLink: '/essai',
     },
+    proof: [
+      {
+        before: 'https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/input-images/f88c9b68-eda4-4d67-bfb4-f631d21b37c6/proof-japandi-115712.jpg',
+        after: 'https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/output-images/gemini/1787318759893-cbbb6o.jpg',
+        beforeAlt: 'Salon vide aux murs gris, avant décoration par IA',
+        afterAlt: 'Le même salon décoré en style japandi après transformation par IA',
+        caption: 'Salon, style japandi. Même pièce, même fenêtre, même porte.',
+      },
+      {
+        before: 'https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/input-images/f88c9b68-eda4-4d67-bfb4-f631d21b37c6/proof-midcentury-221951.jpg',
+        after: 'https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/output-images/gemini/1787318770545-ta617.jpg',
+        beforeAlt: 'Pièce vide avant décoration par IA',
+        afterAlt: 'La même pièce meublée en style mid-century après transformation par IA',
+        caption: 'Séjour, style mid-century. Rien n\'a été déplacé ni acheté.',
+      },
+    ],
     problem: {
       title: 'Montrer le potentiel d\'un bien est difficile',
       points: [

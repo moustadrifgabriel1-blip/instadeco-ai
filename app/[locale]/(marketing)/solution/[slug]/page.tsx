@@ -29,6 +29,7 @@ import { generateFAQSchema, generateBreadcrumbList, generateWebPageSchema, gener
 import { getCanonicalUrl, getLocalizedCanonicalUrl, withLocalePath, programmaticMeta } from '@/lib/seo/config';
 import { INTENT_PAGES, getIntentPageBySlug } from '@/lib/seo/intent-pages-data';
 import { LeadCaptureLazy } from '@/components/features/lead-capture-lazy';
+import { PrestigeCompare } from '@/components/prestige/prestige-compare';
 
 interface PageProps {
   params: Promise<{ locale: string; slug: string }>;
@@ -198,6 +199,28 @@ export default async function IntentPage({ params }: PageProps) {
           </div>
         </div>
       </section>
+
+      {/* ===== PREUVE : vrais avant/après, glissez pour comparer ===== */}
+      {page.proof && page.proof.length > 0 && (
+        <section className="py-12 md:py-16 px-4 bg-[var(--ink)]" aria-label="Exemples réels avant et après">
+          <div className="max-w-5xl mx-auto">
+            <p className="prestige-eyebrow text-center mb-8">Des rendus réels, glissez pour comparer</p>
+            <div className="grid md:grid-cols-2 gap-8">
+              {page.proof.map((pair, i) => (
+                <PrestigeCompare
+                  key={pair.after}
+                  before={pair.before}
+                  after={pair.after}
+                  beforeAlt={pair.beforeAlt}
+                  afterAlt={pair.afterAlt}
+                  caption={pair.caption}
+                  priority={i === 0}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ===== PROBLÈME ===== */}
       <section className="py-16 prestige-reveal">
