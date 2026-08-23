@@ -201,6 +201,26 @@ export class StripePaymentService implements IPaymentService {
         metadata: {} as Record<string, string>,
       };
 
+      // Panier abandonné : la session a expiré sans paiement. Stripe ne renvoie
+      // l'email du client que s'il a consenti aux emails promotionnels, ce que
+      // notre pays de compte ne permet pas de demander ; on se rabat donc sur
+      // l'email de nos propres métadonnées (le dialogue d'achat sans compte le
+      // collecte avant même d'ouvrir Stripe).
+      if (event.type === 'checkout.session.expired') {
+        const session = event.data.object as Stripe.Checkout.Session;
+        const meta = (session.metadata || {}) as Record<string, string>;
+        return success({
+          ...base,
+          sessionId: session.id,
+          customerId: (session.customer as string) || '',
+          customerEmail:
+            session.customer_details?.email || session.customer_email || meta.email || '',
+          amountTotal: session.amount_total || 0,
+          metadata: meta,
+          recoveryUrl: session.after_expiration?.recovery?.url || undefined,
+        });
+      }
+
       // Achat / abonnement initial : checkout.session.completed (crédits OU subscription).
       if (event.type === 'checkout.session.completed') {
         const session = event.data.object as Stripe.Checkout.Session;

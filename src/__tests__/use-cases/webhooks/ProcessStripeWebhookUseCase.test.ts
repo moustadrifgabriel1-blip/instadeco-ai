@@ -446,3 +446,122 @@ describe('ProcessStripeWebhookUseCase — abonnements', () => {
     expect(userRepo.update).not.toHaveBeenCalled();
   });
 });
+
+/**
+ * Panier abandonné. Stripe n'envoie pas de relance lui-même : il fournit une
+ * URL de reprise valable 30 jours via `checkout.session.expired`, et c'est à
+ * nous d'écrire au client. Ces tests verrouillent les deux garde-fous qui
+ * comptent : ne jamais écrire sans adresse ni URL, et ne jamais relancer deux
+ * fois la même personne sur un rejeu Stripe.
+ */
+describe('ProcessStripeWebhookUseCase — panier abandonné', () => {
+  let mockCreditRepo: ReturnType<typeof createMockCreditRepository>;
+  let mockPaymentService: ReturnType<typeof createMockPaymentService>;
+  let mockLogger: ReturnType<typeof createMockLogger>;
+  let mockGenerationRepo: ReturnType<typeof createMockGenerationRepository>;
+  let mockProcessedEventRepo: ReturnType<typeof createMockProcessedEventRepository>;
+
+  const RECOVERY_URL = 'https://buy.stripe.com/r/live_abandon123';
+
+  const EXPIRED_EVENT = {
+    eventId: 'evt_expired_1',
+    type: 'checkout.session.expired',
+    sessionId: 'cs_expired_1',
+    customerId: '',
+    customerEmail: '',
+    amountTotal: 990,
+    metadata: { type: 'guest_credits_purchase', credits: '10', email: 'hesitant@example.com' },
+    recoveryUrl: RECOVERY_URL,
+  };
+
+  function makeUseCase(): ProcessStripeWebhookUseCase {
+    return new ProcessStripeWebhookUseCase(
+      mockCreditRepo,
+      mockGenerationRepo,
+      mockPaymentService,
+      mockLogger,
+      mockProcessedEventRepo,
+    );
+  }
+
+  beforeEach(() => {
+    mockCreditRepo = createMockCreditRepository();
+    mockPaymentService = createMockPaymentService();
+    mockLogger = createMockLogger();
+    mockGenerationRepo = createMockGenerationRepository();
+    mockProcessedEventRepo = createMockProcessedEventRepository();
+  });
+
+  it('demande une relance avec l’URL de reprise et l’email des métadonnées', async () => {
+    mockPaymentService.verifyWebhook = vi.fn().mockResolvedValue(success(EXPIRED_EVENT));
+
+    const res = await makeUseCase().execute({ payload: '{}', signature: 'sig' });
+
+    expect(res.success).toBe(true);
+    if (!res.success) return;
+    expect(res.data.action).toBe('abandoned_cart_recovery_email');
+    expect(res.data.confirmationEmail).toEqual({
+      to: 'hesitant@example.com',
+      kind: 'abandoned_cart',
+      credits: 10,
+      recoveryUrl: RECOVERY_URL,
+    });
+  });
+
+  it('ne relance pas deux fois sur un rejeu du même événement', async () => {
+    mockPaymentService.verifyWebhook = vi.fn().mockResolvedValue(success(EXPIRED_EVENT));
+    const useCase = makeUseCase();
+
+    await useCase.execute({ payload: '{}', signature: 'sig' });
+    const rejeu = await useCase.execute({ payload: '{}', signature: 'sig' });
+
+    expect(rejeu.success).toBe(true);
+    if (!rejeu.success) return;
+    expect(rejeu.data.confirmationEmail).toBeUndefined();
+  });
+
+  it('n’écrit à personne sans URL de reprise', async () => {
+    mockPaymentService.verifyWebhook = vi
+      .fn()
+      .mockResolvedValue(success({ ...EXPIRED_EVENT, recoveryUrl: undefined }));
+
+    const res = await makeUseCase().execute({ payload: '{}', signature: 'sig' });
+
+    expect(res.success).toBe(true);
+    if (!res.success) return;
+    expect(res.data.action).toBe('abandoned_cart_skipped');
+    expect(res.data.confirmationEmail).toBeUndefined();
+  });
+
+  it('n’écrit à personne sans adresse email', async () => {
+    mockPaymentService.verifyWebhook = vi.fn().mockResolvedValue(
+      success({
+        ...EXPIRED_EVENT,
+        customerEmail: '',
+        metadata: { type: 'guest_credits_purchase', credits: '10' },
+      }),
+    );
+
+    const res = await makeUseCase().execute({ payload: '{}', signature: 'sig' });
+
+    expect(res.success).toBe(true);
+    if (!res.success) return;
+    expect(res.data.confirmationEmail).toBeUndefined();
+  });
+
+  it('ne relance pas un abonnement abandonné, le message parlerait de crédits', async () => {
+    mockPaymentService.verifyWebhook = vi.fn().mockResolvedValue(
+      success({
+        ...EXPIRED_EVENT,
+        metadata: { type: 'subscription', planId: 'pro', email: 'agence@example.com' },
+      }),
+    );
+
+    const res = await makeUseCase().execute({ payload: '{}', signature: 'sig' });
+
+    expect(res.success).toBe(true);
+    if (!res.success) return;
+    expect(res.data.action).toBe('abandoned_cart_skipped');
+    expect(res.data.confirmationEmail).toBeUndefined();
+  });
+});

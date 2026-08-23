@@ -22,6 +22,7 @@ import { join } from 'node:path';
 import { config } from 'dotenv';
 import sharp from 'sharp';
 import { composeBeforeAfter } from '../app/api/cron/social-publish/compose';
+import { buildPinCopy } from '../lib/social/pin-copy';
 
 config({ path: '.env.local' });
 
@@ -29,39 +30,6 @@ const DEMO_USER = 'f88c9b68-eda4-4d67-bfb4-f631d21b37c6';
 const OUT_DIR = 'pinterest-kit';
 const SITE = 'https://instadeco.app';
 
-/** Libellés lisibles. Les slugs de la base sont techniques. */
-const STYLES: Record<string, string> = {
-  moderne: 'moderne',
-  minimaliste: 'minimaliste',
-  japandi: 'japandi',
-  boheme: 'bohème',
-  coastal: 'bord de mer',
-  artdeco: 'art déco',
-  classique: 'classique',
-  midcentury: 'mid-century',
-};
-
-/**
- * Slug de la base vers slug de la page publique. Les deux divergent sur
- * quelques styles, et « classique » n'a pas de page : dans ce cas l'épingle
- * pointe vers l'essai plutôt que vers une 404, qui gâcherait le clic.
- */
-const PAGE_STYLE: Record<string, string> = {
-  artdeco: 'art-deco',
-  midcentury: 'mid-century',
-};
-
-const STYLES_SANS_PAGE = new Set(['classique']);
-
-/** Nom lisible et genre, pour accorder les articles et les participes. */
-const ROOMS: Record<string, { nom: string; feminin: boolean }> = {
-  salon: { nom: 'salon', feminin: false },
-  chambre: { nom: 'chambre', feminin: true },
-  bureau: { nom: 'bureau', feminin: false },
-  cuisine: { nom: 'cuisine', feminin: true },
-  'salle-a-manger': { nom: 'salle à manger', feminin: true },
-  'salle-de-bain': { nom: 'salle de bain', feminin: true },
-};
 
 async function estAccessible(url: string): Promise<boolean> {
   try {
@@ -87,48 +55,6 @@ async function telecharger(url: string): Promise<Buffer> {
     .toBuffer();
 }
 
-/**
- * Titre et description d'une épingle. Pas de promesse chiffrée invérifiable,
- * pas d'emoji, pas de tiret de ponctuation : le texte passe la même barre que
- * le copy du site.
- */
-function buildPin(style: string, room: string, avecAvant: boolean) {
-  const s = STYLES[style] ?? style;
-  const piece = ROOMS[room] ?? { nom: room, feminin: false };
-  const r = piece.nom;
-  const un = piece.feminin ? 'une' : 'un';
-  const Un = piece.feminin ? 'Une' : 'Un';
-  const leMeme = piece.feminin ? 'la même' : 'le même';
-  const compose = piece.feminin ? 'composée' : 'composé';
-
-  const titres = [
-    `${r.charAt(0).toUpperCase() + r.slice(1)} ${s} : avant et après`,
-    `Transformer ${un} ${r} en style ${s}`,
-    `${Un} ${r} vide devient ${un} ${r} ${s}`,
-  ];
-  const title = avecAvant
-    ? titres[(style.length + room.length) % titres.length]
-    : `${r.charAt(0).toUpperCase() + r.slice(1)} en style ${s}`;
-
-  const description = avecAvant
-    ? `Voici ${leMeme} ${r}, avant et après. Le rendu ${s} a été généré à partir ` +
-      `d'une simple photo, sans rien déplacer ni acheter. Utile pour se projeter ` +
-      `avant de choisir des meubles, une palette ou une ambiance. ` +
-      `Essai gratuit sur instadeco.app, sans créer de compte.`
-    : `${Un} ${r} en style ${s}, ${compose} à partir de la photo d'une pièce vide. ` +
-      `De quoi tester une ambiance avant d'acheter le moindre meuble. ` +
-      `Essai gratuit sur instadeco.app, sans créer de compte.`;
-
-  return {
-    title,
-    description,
-    // Page de style quand elle existe, sinon l'essai : dans les deux cas le
-    // visiteur peut tester sans créer de compte.
-    link: STYLES_SANS_PAGE.has(style)
-      ? `${SITE}/fr/essai`
-      : `${SITE}/fr/style/${PAGE_STYLE[style] ?? style}`,
-  };
-}
 
 async function main() {
   const limitArg = process.argv.indexOf('--limit');
@@ -195,7 +121,7 @@ async function main() {
         : await telecharger(row.output_image_url as string);
       await writeFile(join(OUT_DIR, nom), buffer);
 
-      const pin = buildPin(style, room, avantVivant);
+      const pin = buildPinCopy(style, room, avantVivant);
       lignes.push(
         `## ${i + 1}. ${nom}`,
         '',

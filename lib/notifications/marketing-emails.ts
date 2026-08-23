@@ -416,6 +416,59 @@ export async function sendCreditsPurchaseEmail(
 }
 
 // ============================================
+// 4bis. PANIER ABANDONNÉ (relance unique)
+// ============================================
+function buildAbandonedCartEmail(recoveryUrl: string, credits?: number): string {
+  const quantite = credits ? `${credits} crédits` : 'vos crédits';
+  return emailWrapper(`
+    <h1 style="font-family:${SERIF}; color:${IVORY}; font-size:26px; line-height:1.25; margin:0 0 16px; text-align:center; font-weight:normal;">
+      Votre panier vous attend.
+    </h1>
+    <p style="color:${MIST}; line-height:1.7; font-size:15px; margin:0 0 26px; text-align:center;">
+      Vous avez commencé un achat de ${quantite} sans le terminer. Rien n'a été débité,
+      et votre panier est toujours là : il suffit d'un clic pour reprendre où vous en étiez.
+    </p>
+    <div style="text-align:center; margin:26px 0;">
+      ${primaryButton(recoveryUrl, 'Reprendre mon achat')}
+    </div>
+    <p style="color:${MIST_DIM}; font-size:13px; text-align:center; margin:16px 0 0;">
+      Ce lien reste valable 30 jours. Si vous avez changé d'avis, ignorez simplement ce message,
+      nous ne vous le renverrons pas.
+    </p>
+  `, 'Votre panier InstaDeco vous attend.');
+}
+
+/**
+ * Relance unique après un panier abandonné.
+ *
+ * Stripe n'envoie pas cet email lui-même : il fournit seulement une URL de
+ * reprise valable 30 jours via le webhook `checkout.session.expired`. L'envoi
+ * est déclenché une seule fois par session, le verrou d'idempotence du webhook
+ * empêchant qu'un rejeu produise une seconde relance.
+ */
+export async function sendAbandonedCartEmail(
+  email: string,
+  recoveryUrl: string,
+  credits?: number,
+): Promise<{ success: boolean; error?: string }> {
+  const resend = getResend();
+  if (!resend) return { success: false, error: 'RESEND_API_KEY not configured' };
+  try {
+    const { error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: [email],
+      subject: 'Votre panier InstaDeco vous attend',
+      html: buildAbandonedCartEmail(recoveryUrl, credits),
+    });
+    if (error) return { success: false, error: error.message };
+    console.log('[Abandoned Cart] Relance envoyée');
+    return { success: true };
+  } catch (err) {
+    return { success: false, error: err instanceof Error ? err.message : 'Unknown error' };
+  }
+}
+
+// ============================================
 // 5. CONFIRMATION D'ABONNEMENT
 // ============================================
 function buildSubscriptionEmail(planName: string): string {
