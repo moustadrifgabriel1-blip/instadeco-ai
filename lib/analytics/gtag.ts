@@ -95,9 +95,12 @@ export function trackGenerateComplete(style: string, roomType: string) {
 }
 
 /** Achat de crédits */
-export function trackPurchase(packId: string, value: number, currency: string = 'EUR') {
+export function trackPurchase(packId: string, value: number, currency: string = 'EUR', transactionId?: string) {
   trackEvent('purchase', {
-    transaction_id: `${packId}_${Date.now()}`,
+    // L'identifiant de session Stripe dédoublonne naturellement côté GA4 ;
+    // le repli horodaté reste pour les appels sans session connue.
+    transaction_id: transactionId || `${packId}_${Date.now()}`,
+    items: packId,
     value,
     currency,
     event_category: 'revenue',

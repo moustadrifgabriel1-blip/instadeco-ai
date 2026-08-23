@@ -17,21 +17,34 @@ export async function GET(request: Request) {
       return NextResponse.redirect(`${origin}/login?error=auth_error`);
     }
 
-    // Envoyer l'email de bienvenue pour les nouveaux utilisateurs
-    if (data?.user) {
+    // Email de bienvenue, une seule fois par compte.
+    // Avant : condition « compte créé il y a moins de 60 s », presque toujours
+    // fausse avec la confirmation par email (l'utilisateur clique plus tard).
+    // On se fonde désormais sur profiles.welcome_sent_at, posé AVANT l'envoi
+    // pour qu'un double callback ne produise pas deux emails.
+    if (data?.user?.email) {
       const user = data.user;
-      const createdAt = new Date(user.created_at);
-      const now = new Date();
-      const isNewUser = (now.getTime() - createdAt.getTime()) < 60 * 1000; // Inscrit il y a moins de 60s
+      const email = user.email as string;
+      const { data: profil } = await supabase
+        .from('profiles')
+        .select('welcome_sent_at')
+        .eq('id', user.id)
+        .maybeSingle();
 
-      if (isNewUser && user.email) {
-        // Récupérer le nom depuis les métadonnées
-        const name = user.user_metadata?.full_name || user.user_metadata?.name || null;
-        
-        // Envoyer en arrière-plan (ne pas bloquer le redirect)
-        sendWelcomeEmail(user.email, name).catch((err) => {
-          console.error('[Auth Callback] Welcome email failed:', err);
-        });
+      if (profil && !profil.welcome_sent_at) {
+        const { error: markErr } = await supabase
+          .from('profiles')
+          .update({ welcome_sent_at: new Date().toISOString() })
+          .eq('id', user.id)
+          .is('welcome_sent_at', null);
+
+        if (!markErr) {
+          const name = user.user_metadata?.full_name || user.user_metadata?.name || null;
+          // Envoyer en arrière-plan (ne pas bloquer le redirect)
+          sendWelcomeEmail(email, name).catch((err) => {
+            console.error('[Auth Callback] Welcome email failed:', err);
+          });
+        }
       }
     }
   }

@@ -307,7 +307,7 @@ export default async function StylesIndexPage({ params }: { params: Promise<{ lo
           <h2 className="prestige-display text-2xl font-bold text-foreground mb-4">Prêt à trouver votre style ?</h2>
           <p className="prestige-body mb-6 text-muted-foreground">Testez n&apos;importe quel style sur votre propre pièce. 3 crédits offerts.</p>
           <Button size="lg" className="rounded-full bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)]" asChild>
-            <Link href="/generate">
+            <Link href="/essai">
               Essayer maintenant <ArrowRight className="ml-2 w-4 h-4" />
             </Link>
           </Button>

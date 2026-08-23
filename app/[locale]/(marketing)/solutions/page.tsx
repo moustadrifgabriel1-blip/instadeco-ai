@@ -143,7 +143,7 @@ export default async function SolutionsIndexPage({ params }: { params: Promise<{
             Que vous soyez propriétaire, agent immobilier, décorateur ou simplement en quête d&apos;inspiration, InstaDeco a la solution qu&apos;il vous faut.
           </p>
           <Button size="lg" className="rounded-full bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)] transition duration-300 ease-out" asChild>
-            <Link href="/generate">
+            <Link href="/essai">
               Essayer gratuitement <ArrowRight className="ml-2 w-4 h-4" />
             </Link>
           </Button>
@@ -228,7 +228,7 @@ export default async function SolutionsIndexPage({ params }: { params: Promise<{
           <p className="prestige-body mb-6 text-muted-foreground">Testez InstaDeco gratuitement. 3 crédits offerts à l&apos;inscription.</p>
           <div className="flex flex-wrap justify-center gap-4">
             <Button size="lg" className="rounded-full bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)] transition duration-300 ease-out" asChild>
-              <Link href="/generate">
+              <Link href="/essai">
                 Essayer maintenant <ArrowRight className="ml-2 w-4 h-4" />
               </Link>
             </Button>

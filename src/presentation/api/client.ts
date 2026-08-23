@@ -235,6 +235,33 @@ export async function createCheckoutSession(
   return handleResponse<CreateCheckoutResponse>(response);
 }
 
+/**
+ * Achat de crédits SANS compte. Le compte est créé par le webhook après
+ * paiement (magic link envoyé sur l'email saisi). Supprime l'obligation de
+ * s'inscrire avant de payer, qui est la première cause d'abandon au checkout.
+ */
+export interface CreateGuestCheckoutRequest {
+  email: string;
+  packId: string;
+  successUrl?: string;
+  cancelUrl?: string;
+  couponId?: string;
+}
+
+export async function createGuestCheckoutSession(
+  request: CreateGuestCheckoutRequest,
+  options?: RequestOptions
+): Promise<CreateCheckoutResponse> {
+  const response = await fetch(`${API_BASE}/payments/create-guest-checkout`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(request),
+    signal: options?.signal,
+  });
+
+  return handleResponse<CreateCheckoutResponse>(response);
+}
+
 // ========================
 // SUBSCRIPTIONS API
 // ========================

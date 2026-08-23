@@ -46,9 +46,9 @@ export const PRO_PRICING = [
 export const REAL_RENDERS = [
   {
     before:
-      'https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/input-images/f88c9b68-eda4-4d67-bfb4-f631d21b37c6/gallery30-4030028-japandi.jpg',
+      'https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/input-images/f88c9b68-eda4-4d67-bfb4-f631d21b37c6/proof-japandi-115712.jpg',
     after:
-      'https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/output-images/gemini/1782047046789-mee0h.jpg',
+      'https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/output-images/gemini/1787318759893-cbbb6o.jpg',
     beforeAlt: 'Salon vide avant home staging virtuel',
     afterAlt: 'Salon meublé style japandi après home staging virtuel par IA',
     eyebrow: 'Salon, style japandi',
@@ -56,9 +56,9 @@ export const REAL_RENDERS = [
   },
   {
     before:
-      'https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/input-images/f88c9b68-eda4-4d67-bfb4-f631d21b37c6/gallery30-6835102-midcentury.jpg',
+      'https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/input-images/f88c9b68-eda4-4d67-bfb4-f631d21b37c6/proof-midcentury-221951.jpg',
     after:
-      'https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/output-images/gemini/1782047014810-s1f7n.jpg',
+      'https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/output-images/gemini/1787318770545-ta617.jpg',
     beforeAlt: 'Salon vide avant home staging virtuel',
     afterAlt: 'Salon meublé style midcentury après home staging virtuel par IA',
     eyebrow: 'Salon, style midcentury',

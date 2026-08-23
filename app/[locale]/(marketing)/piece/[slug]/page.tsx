@@ -114,7 +114,7 @@ export default async function RoomPage({ params }: PageProps) {
               className="rounded-full bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)] transition duration-300 ease"
               asChild
             >
-              <Link href="/generate">
+              <Link href="/essai">
                 <Sparkles className="mr-2 w-4 h-4" />
                 Transformer mon {room.name.toLowerCase()}
               </Link>
@@ -219,7 +219,7 @@ export default async function RoomPage({ params }: PageProps) {
             className="rounded-full px-8 bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)] transition duration-300 ease"
             asChild
           >
-            <Link href="/generate">
+            <Link href="/essai">
               Commencer maintenant
               <ArrowRight className="ml-2 w-4 h-4" />
             </Link>

@@ -66,3 +66,7 @@ next-env.d.ts
 # Kit prive local : docs de travail contenant des contacts tiers (redactions,
 # medias) ou des assets non destines au depot public.
 /kit-prive/
+
+# Kit Pinterest genere localement (visuels lourds, regenerables via
+# scripts/build-pinterest-kit.ts). Pas de PII : uniquement le compte demo.
+pinterest-kit/

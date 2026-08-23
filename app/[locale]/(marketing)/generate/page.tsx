@@ -109,7 +109,8 @@ function GenerateContent() {
       setBuyingPack(packId);
       const url = await purchase({
         packId,
-        successUrl: `${window.location.origin}/${locale}/dashboard?payment=success`,
+        // Page de succès dédiée : mesure l'achat et attend les crédits.
+        successUrl: `${window.location.origin}/${locale}/credits/success?session_id={CHECKOUT_SESSION_ID}`,
         cancelUrl: `${window.location.origin}/${locale}/generate`,
       });
       if (url) {

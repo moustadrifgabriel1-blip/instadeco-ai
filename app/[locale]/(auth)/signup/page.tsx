@@ -23,7 +23,15 @@ function SignupForm() {
   const [emailSent, setEmailSent] = useState(false);
 
   // Pre-fill referral code from URL & get redirect
-  const redirectTo = searchParams.get('redirect') || '/generate';
+  //
+  // Sécurité + robustesse : on n'accepte qu'un chemin interne commençant par
+  // « / ». Une valeur comme `redirect=checkout` (envoyée par l'ancienne page
+  // Pro) produisait une navigation relative vers /<locale>/checkout, route qui
+  // n'existe pas : le prospect finissait sur une 404 juste après s'être
+  // inscrit, et le plan qu'il voulait acheter était perdu. Même garde que
+  // app/auth/callback, qui bloque aussi les redirections externes.
+  const rawRedirect = searchParams.get('redirect');
+  const redirectTo = rawRedirect?.startsWith('/') ? rawRedirect : '/generate';
   useEffect(() => {
     const ref = searchParams.get('ref');
     if (ref) {
@@ -61,6 +69,10 @@ function SignupForm() {
         email,
         password,
         options: {
+          // Le lien de confirmation passe par /auth/callback : c'est lui qui
+          // envoie l'email de bienvenue et respecte le `redirect` demandé
+          // (ex. retour sur /pro?checkout=... pour relancer un paiement).
+          emailRedirectTo: `${window.location.origin}/auth/callback?redirect=${encodeURIComponent(redirectTo)}`,
           data: {
             full_name: fullName,
             consent_marketing: acceptMarketing,

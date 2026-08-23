@@ -184,28 +184,20 @@ export default function ProPage() {
     fbTrackViewContent('pro', 'pricing');
   }, []);
 
-  const handleSubscribe = async (planId: PlanId) => {
-    const plan = PRO_PLANS.find((p) => p.id === planId);
-    // Valeur de conversion = montant réellement facturé (annuel = total sur l'année,
-    // pas l'équivalent mensuel), pour ne pas sous-évaluer le ROAS Meta/GA.
-    const value = plan ? (billingPeriod === 'monthly' ? plan.monthly : plan.annualTotal) : 0;
-
-    // Funnel : début de checkout (mesure essai→Pro).
-    trackBeginCheckout(planId, value);
-    fbTrackInitiateCheckout(planId, value);
-
-    // Non connecté → inscription, puis retour au checkout du plan choisi.
-    if (!user || !user.email) {
-      router.push(`/signup?plan=${planId}&redirect=checkout`);
-      return;
-    }
-
+  /**
+   * Ouvre la session Stripe pour un plan donné. Séparé de `handleSubscribe`
+   * pour pouvoir être rejoué automatiquement au retour d'inscription, sans
+   * refaire cliquer le prospect (cf. `?checkout=` plus bas).
+   */
+  const startCheckout = async (planId: PlanId, interval: 'monthly' | 'annual') => {
     setLoadingPlan(planId);
     setError(null);
     try {
+      const plan = PRO_PLANS.find((p) => p.id === planId);
+      const value = plan ? (interval === 'monthly' ? plan.monthly : plan.annualTotal) : 0;
       const res = await createSubscriptionSession({
         planId,
-        interval: billingPeriod,
+        interval,
         successUrl: `${window.location.origin}/${locale}/credits/success?type=subscription&plan=${planId}&v=${value}&session_id={CHECKOUT_SESSION_ID}`,
         cancelUrl: `${window.location.origin}/${locale}/pro?subscription=cancelled`,
       });
@@ -220,6 +212,51 @@ export default function ProPage() {
       setLoadingPlan(null);
     }
   };
+
+  const handleSubscribe = async (planId: PlanId) => {
+    const plan = PRO_PLANS.find((p) => p.id === planId);
+    // Valeur de conversion = montant réellement facturé (annuel = total sur l'année,
+    // pas l'équivalent mensuel), pour ne pas sous-évaluer le ROAS Meta/GA.
+    const value = plan ? (billingPeriod === 'monthly' ? plan.monthly : plan.annualTotal) : 0;
+
+    // Funnel : début de checkout (mesure essai→Pro).
+    trackBeginCheckout(planId, value);
+    fbTrackInitiateCheckout(planId, value);
+
+    // Non connecté → inscription, puis RETOUR ICI avec le plan en mémoire.
+    // L'ancien `redirect=checkout` envoyait vers une route /checkout qui n'a
+    // jamais existé (404 en prod), et le plan choisi était perdu : aucun
+    // prospect venu de cette page ne pouvait aller jusqu'au paiement.
+    if (!user || !user.email) {
+      const back = `/pro?checkout=${planId}&interval=${billingPeriod}`;
+      router.push(`/signup?redirect=${encodeURIComponent(back)}`);
+      return;
+    }
+
+    await startCheckout(planId, billingPeriod);
+  };
+
+  // Reprise du paiement après inscription ou connexion : le prospect revient
+  // sur `/pro?checkout=<plan>`, on relance Stripe pour lui. Ne se déclenche
+  // qu'une fois la session connue et qu'une seule fois.
+  //
+  // On lit la query via `window.location` plutôt que `useSearchParams` : ce
+  // hook ferait sortir toute la page du prérendu statique (bail-out), alors
+  // que cette reprise n'a lieu qu'après hydratation de toute façon.
+  const [resumed, setResumed] = useState(false);
+  useEffect(() => {
+    if (resumed || !user?.email) return;
+    const params = new URLSearchParams(window.location.search);
+    const wanted = params.get('checkout');
+    if (!wanted) return;
+    const planId = PRO_PLANS.find((p) => p.id === wanted)?.id;
+    if (!planId) return;
+    const interval = params.get('interval') === 'annual' ? 'annual' : 'monthly';
+    setResumed(true);
+    setBillingPeriod(interval);
+    void startCheckout(planId, interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, resumed]);
 
   return (
     <div className="min-h-[100dvh] bg-background">

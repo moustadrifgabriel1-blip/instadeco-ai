@@ -1,4 +1,4 @@
-import { createAdminClient } from '@/lib/supabase/server';
+import { createStaticAdminClient } from '@/lib/supabase/server';
 import { GalleryClient, type GalleryItem } from './GalleryClient';
 
 // ISR : la page est rendue côté serveur (HTML + données pré-rendues pour SEO/LCP)
@@ -18,7 +18,7 @@ const DEMO_GALLERY_USER = 'f88c9b68-eda4-4d67-bfb4-f631d21b37c6';
  */
 async function getInitialGallery(): Promise<{ items: GalleryItem[]; total: number }> {
   try {
-    const supabaseAdmin = await createAdminClient();
+    const supabaseAdmin = createStaticAdminClient();
     const limit = Math.max(1, Math.min(DEFAULT_LIMIT, 50));
 
     const { data, error } = await supabaseAdmin

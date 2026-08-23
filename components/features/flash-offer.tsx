@@ -5,46 +5,75 @@ import Link from 'next/link';
 import { Flame, Clock, ArrowRight, Check, Sparkles, Gift, Zap } from 'lucide-react';
 
 interface FlashOfferProps {
-  /** URL du Stripe Payment Link pour l'offre flash */
+  /**
+   * Achat immédiat. Fourni par la page, il ouvre le paiement sans compte.
+   * Préféré à un lien : au pic d'intention (le visiteur vient de voir sa
+   * pièce transformée), chaque étape ajoutée coûte des ventes.
+   */
+  onBuy?: () => void;
+  /** Repli si `onBuy` n'est pas fourni. */
   stripePaymentUrl?: string;
   /** Durée du countdown en minutes */
   durationMinutes?: number;
   /** Prix barré (original) */
   originalPrice?: string;
-  /** Prix de l'offre flash */
+  /**
+   * Prix réellement facturé. Doit correspondre au coupon appliqué côté
+   * serveur : on n'affiche jamais une remise qu'on ne peut pas honorer.
+   * Absent, l'offre s'affiche au prix plein sans remise annoncée.
+   */
   flashPrice?: string;
+  /** Libellé de remise (ex. « -20% »), affiché seulement s'il est réel. */
+  discountLabel?: string;
   /** Nombre de crédits inclus */
   credits?: number;
   /** Callback quand l'offre expire */
   onExpire?: () => void;
+  /**
+   * Change à chaque nouveau résultat (ex. l'URL de l'image générée) : le
+   * chrono repart de zéro au lieu de réutiliser un compte à rebours
+   * entamé par une génération précédente.
+   */
+  resetKey?: string;
   /** Classe CSS supplémentaire */
   className?: string;
 }
 
 export function FlashOffer({
+  onBuy,
   stripePaymentUrl = '/pricing',
   durationMinutes = 15,
   originalPrice = '9,90 €',
-  flashPrice = '4,99 €',
+  flashPrice,
+  discountLabel,
   credits = 10,
   onExpire,
+  resetKey,
   className = '',
 }: FlashOfferProps) {
+  // Un chrono n'a de sens qu'avec une vraie remise a faire expirer. Sans
+  // coupon, l'encart est permanent : rien ne « se termine ».
+  const avecRemise = Boolean(flashPrice && discountLabel);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [isExpired, setIsExpired] = useState(false);
   const [isPulsing, setIsPulsing] = useState(false);
 
-  // Persist timer in localStorage so it survives page refresh
+  // Le chrono survit a un rechargement (localStorage), mais repart a chaque
+  // nouveau resultat : la cle memorise pour quel rendu il a ete lance.
   useEffect(() => {
+    if (!avecRemise) return;
     const STORAGE_KEY = 'instadeco_flash_offer_end';
+    const KEY_FOR = 'instadeco_flash_offer_for';
     const stored = localStorage.getItem(STORAGE_KEY);
+    const storedFor = localStorage.getItem(KEY_FOR);
     let endTime: number;
 
-    if (stored) {
+    if (stored && (!resetKey || storedFor === resetKey)) {
       endTime = parseInt(stored, 10);
     } else {
       endTime = Date.now() + durationMinutes * 60 * 1000;
       localStorage.setItem(STORAGE_KEY, endTime.toString());
+      if (resetKey) localStorage.setItem(KEY_FOR, resetKey);
     }
 
     const remaining = Math.max(0, Math.floor((endTime - Date.now()) / 1000));
@@ -52,9 +81,10 @@ export function FlashOffer({
       setIsExpired(true);
       onExpire?.();
     } else {
+      setIsExpired(false);
       setTimeLeft(remaining);
     }
-  }, [durationMinutes, onExpire]);
+  }, [durationMinutes, onExpire, resetKey, avecRemise]);
 
   useEffect(() => {
     if (timeLeft === null || timeLeft <= 0) {
@@ -95,33 +125,49 @@ export function FlashOffer({
   // Calculer le pourcentage de temps restant pour la barre de progression
   const percentage = timeLeft !== null ? (timeLeft / (durationMinutes * 60)) * 100 : 100;
 
-  if (isExpired || timeLeft === null) {
-    return null;
-  }
+  // L'encart ne disparait JAMAIS : a l'expiration, seule la remise tombe, le
+  // bouton d'achat reste. Avant, le composant rendait `null` une fois le
+  // chrono ecoule et la cle n'etait jamais remise a zero : un visiteur qui
+  // revenait 20 minutes plus tard n'avait plus aucun moyen d'acheter.
+  const remiseActive = avecRemise && !isExpired && timeLeft !== null;
+  const prixAffiche = remiseActive ? flashPrice : originalPrice;
 
   return (
     <div className={`relative overflow-hidden ${className}`}>
       {/* Fond prestige nuit + or */}
       <div className={`rounded-[24px] border ${isPulsing ? 'border-[var(--gold)] animate-pulse' : 'border-[var(--gold-line)]'} bg-[var(--ink)] p-6 sm:p-8 shadow-lg`}>
 
-        {/* Badge "Offre limitée" */}
+        {/* Badge : « offre » seulement s'il y a une remise, sinon un repère calme */}
         <div className="flex items-center justify-center mb-4">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[var(--gold)] text-[#0c0a09] rounded-full text-sm font-bold shadow-lg shadow-[var(--gold)]/20">
-            <Flame className="w-4 h-4 animate-bounce" />
-            OFFRE DE BIENVENUE
-            <Flame className="w-4 h-4 animate-bounce" />
-          </div>
+          {remiseActive ? (
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[var(--gold)] text-[#0c0a09] rounded-full text-sm font-bold shadow-lg shadow-[var(--gold)]/20">
+              <Flame className="w-4 h-4 animate-bounce" />
+              OFFRE DE BIENVENUE
+              <Flame className="w-4 h-4 animate-bounce" />
+            </div>
+          ) : (
+            <span className="prestige-eyebrow !text-[var(--gold)]">Gardez la main sur cette pièce</span>
+          )}
         </div>
 
         {/* Titre */}
         <h3 className="prestige-display text-center text-[24px] sm:text-[28px] font-semibold text-[var(--ivory)] tracking-[-0.02em] mb-1">
-          {credits} générations pour <span className="text-[var(--gold)]">{flashPrice}</span>
+          {credits} générations pour{' '}
+          <span className="text-[var(--gold)]">{prixAffiche}</span>
         </h3>
-        <p className="text-center text-[15px] text-[var(--mist)] mb-5">
-          au lieu de <span className="line-through">{originalPrice}</span>, <span className="font-semibold text-[var(--gold)]">-50%</span>
-        </p>
+        {remiseActive ? (
+          <p className="text-center text-[15px] text-[var(--mist)] mb-5">
+            au lieu de <span className="line-through">{originalPrice}</span>,{' '}
+            <span className="font-semibold text-[var(--gold)]">{discountLabel}</span>
+          </p>
+        ) : (
+          <p className="text-center text-[15px] text-[var(--mist)] mb-5">
+            Votre photo, {credits} ambiances différentes, sans abonnement
+          </p>
+        )}
 
-        {/* Countdown */}
+        {/* Countdown, seulement tant qu'une remise court */}
+        {remiseActive && timeLeft !== null && (
         <div className="flex justify-center mb-5">
           <div className={`inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-[#1c1917] border ${isPulsing ? 'border-red-500/40' : 'border-[var(--gold-line)]'} shadow-sm`}>
             <Clock className={`w-5 h-5 ${isPulsing ? 'text-red-400' : 'text-[var(--gold)]'}`} />
@@ -132,14 +178,17 @@ export function FlashOffer({
             </div>
           </div>
         </div>
+        )}
 
         {/* Barre de progression */}
+        {remiseActive && (
         <div className="w-full max-w-xs mx-auto h-1.5 bg-[#1c1917] rounded-full overflow-hidden mb-5">
           <div
             className={`h-full rounded-full transition-all duration-1000 ease-linear ${isPulsing ? 'bg-red-400' : 'bg-[var(--gold)]'}`}
             style={{ width: `${percentage}%` }}
           />
         </div>
+        )}
 
         {/* Avantages */}
         <div className="flex flex-wrap justify-center gap-3 mb-6">
@@ -159,14 +208,26 @@ export function FlashOffer({
 
         {/* CTA principal */}
         <div className="flex flex-col items-center gap-3">
-          <Link
-            href={stripePaymentUrl}
-            className="group w-full max-w-sm inline-flex items-center justify-center gap-2 bg-[var(--gold)] text-[#0c0a09] px-8 py-4 rounded-full text-[17px] font-bold hover:bg-[#d4b15f] transition-all duration-200 shadow-xl shadow-[var(--gold)]/20 active:scale-[0.98] hover:scale-[1.02]"
-          >
-            <Zap className="w-5 h-5" />
-            Profiter de l&apos;offre, {flashPrice}
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-          </Link>
+          {onBuy ? (
+            <button
+              type="button"
+              onClick={onBuy}
+              className="group w-full max-w-sm inline-flex items-center justify-center gap-2 bg-[var(--gold)] text-[#0c0a09] px-8 py-4 rounded-full text-[17px] font-bold hover:bg-[#d4b15f] transition-all duration-200 shadow-xl shadow-[var(--gold)]/20 active:scale-[0.98] hover:scale-[1.02]"
+            >
+              <Zap className="w-5 h-5" />
+              Payer {prixAffiche}, {credits} crédits
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </button>
+          ) : (
+            <Link
+              href={stripePaymentUrl}
+              className="group w-full max-w-sm inline-flex items-center justify-center gap-2 bg-[var(--gold)] text-[#0c0a09] px-8 py-4 rounded-full text-[17px] font-bold hover:bg-[#d4b15f] transition-all duration-200 shadow-xl shadow-[var(--gold)]/20 active:scale-[0.98] hover:scale-[1.02]"
+            >
+              <Zap className="w-5 h-5" />
+              Payer {prixAffiche}, {credits} crédits
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          )}
           <p className="text-[11px] text-[var(--mist)]">
             Paiement sécurisé par Stripe • Sans engagement
           </p>

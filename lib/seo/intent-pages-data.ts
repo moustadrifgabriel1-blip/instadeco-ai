@@ -41,6 +41,12 @@ export interface IntentPageData {
       isUs?: boolean;
     }>;
   };
+  /**
+   * Vrais avant/après (compte démo, RGPD), rendus sous le hero avec le
+   * comparateur. Chaque paire vient d'UNE ligne de `generations` : même pièce,
+   * l'« après » est bien issu de l'« avant ».
+   */
+  proof?: Array<{ before: string; after: string; beforeAlt: string; afterAlt: string; caption: string }>;
   /** Étapes d'utilisation */
   steps: Array<{ step: number; title: string; description: string }>;
   /** Sections de contenu de fond (long-forme) : profondeur SEO réelle + E-E-A-T. Optionnel. */
@@ -72,7 +78,7 @@ export const INTENT_PAGES: IntentPageData[] = [
       headline: 'Home Staging Virtuel par IA',
       subheadline: 'Meublez et décorez n\'importe quelle pièce en 30 secondes. Résultat photoréaliste. 50x moins cher que le home staging physique.',
       cta: 'Essayer le home staging virtuel',
-      ctaLink: '/generate',
+      ctaLink: '/essai',
     },
     problem: {
       title: 'Le home staging physique est trop cher',
@@ -123,7 +129,7 @@ export const INTENT_PAGES: IntentPageData[] = [
       headline: 'Simulateur de Décoration Intérieure',
       subheadline: 'Visualisez votre future décoration avant d\'acheter quoi que ce soit. Uploadez une photo, choisissez un style, voyez le résultat en 30 secondes.',
       cta: 'Tester le simulateur',
-      ctaLink: '/generate',
+      ctaLink: '/essai',
     },
     problem: {
       title: 'Décorer à l\'aveugle, c\'est risqué',
@@ -167,7 +173,7 @@ export const INTENT_PAGES: IntentPageData[] = [
       headline: 'Le Logiciel de Home Staging le Plus Simple',
       subheadline: 'Pas de logiciel à installer. Pas de formation nécessaire. Uploadez une photo, l\'IA fait le reste en 30 secondes.',
       cta: 'Essayer maintenant',
-      ctaLink: '/generate',
+      ctaLink: '/essai',
     },
     problem: {
       title: 'Les logiciels de home staging traditionnels sont compliqués',
@@ -251,7 +257,7 @@ export const INTENT_PAGES: IntentPageData[] = [
       headline: 'Aménagez Votre Studio avec l\'IA',
       subheadline: 'Studio de 20m², 25m² ou 30m² ? Visualisez des dizaines d\'aménagements possibles en quelques minutes. Optimisez chaque mètre carré.',
       cta: 'Visualiser mon studio',
-      ctaLink: '/generate',
+      ctaLink: '/essai',
     },
     problem: {
       title: 'Aménager un studio est un casse-tête',
@@ -293,7 +299,7 @@ export const INTENT_PAGES: IntentPageData[] = [
       headline: 'Testez les Couleurs Avant de Peindre',
       subheadline: 'Fini les échantillons de peinture ! Uploadez une photo de votre pièce et visualisez instantanément le rendu avec différentes ambiances colorées.',
       cta: 'Tester les couleurs',
-      ctaLink: '/generate',
+      ctaLink: '/essai',
     },
     problem: {
       title: 'Choisir une couleur de peinture est stressant',
@@ -335,7 +341,7 @@ export const INTENT_PAGES: IntentPageData[] = [
       headline: 'Trouvez la Déco Parfaite pour Votre Salon',
       subheadline: 'Le salon est la pièce la plus importante de votre maison. Visualisez 12 styles disponibles directement sur votre photo en 30 secondes.',
       cta: 'Redécorer mon salon',
-      ctaLink: '/generate',
+      ctaLink: '/essai',
     },
     problem: {
       title: 'Décorer son salon sans se tromper',
@@ -398,7 +404,7 @@ export const INTENT_PAGES: IntentPageData[] = [
       headline: 'Créez la Chambre de Vos Rêves',
       subheadline: 'Votre chambre est votre refuge. Visualisez-la dans un style cosy, scandinave, bohème ou tout autre ambiance en 30 secondes.',
       cta: 'Redécorer ma chambre',
-      ctaLink: '/generate',
+      ctaLink: '/essai',
     },
     problem: {
       title: 'Trouver le bon style pour sa chambre',
@@ -434,14 +440,33 @@ export const INTENT_PAGES: IntentPageData[] = [
   {
     slug: 'avant-apres-decoration',
     title: 'Avant/Après Décoration par IA',
-    metaTitle: 'Avant Après Décoration : transformez vos pièces par IA',
-    metaDescription: 'Créez des avant/après impressionnants de décoration intérieure avec l\'IA. Montrez le potentiel de vos pièces en 30 secondes.',
+    // C'est la page la plus visitée du site (GSC : position 12,9). Le title
+    // vise la requête réelle « avant après déco » et dit ce qui fait cliquer :
+    // à partir d'une photo, gratuit, sans compte.
+    metaTitle: 'Avant après décoration par IA, à partir d\'une photo (gratuit)',
+    metaDescription: 'Envoyez la photo de votre pièce, choisissez un style, et comparez l\'avant et l\'après en 30 secondes. Essai gratuit sans compte, exemples réels sur cette page.',
     hero: {
-      headline: 'Avant / Après en 30 Secondes',
-      subheadline: 'Transformez n\'importe quelle pièce et créez des comparaisons avant/après bluffantes. Idéal pour les pros de l\'immobilier et les passionnés de déco.',
+      headline: 'Avant/après décoration : votre pièce transformée par IA en 30 secondes',
+      subheadline: 'Une photo de la pièce telle qu\'elle est, un style, et le rendu arrive. Les exemples ci-dessous sont de vrais rendus, pas des montages.',
       cta: 'Créer mon avant/après',
-      ctaLink: '/generate',
+      ctaLink: '/essai',
     },
+    proof: [
+      {
+        before: 'https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/input-images/f88c9b68-eda4-4d67-bfb4-f631d21b37c6/proof-japandi-115712.jpg',
+        after: 'https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/output-images/gemini/1787318759893-cbbb6o.jpg',
+        beforeAlt: 'Salon vide aux murs gris, avant décoration par IA',
+        afterAlt: 'Le même salon décoré en style japandi après transformation par IA',
+        caption: 'Salon, style japandi. Même pièce, même fenêtre, même porte.',
+      },
+      {
+        before: 'https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/input-images/f88c9b68-eda4-4d67-bfb4-f631d21b37c6/proof-midcentury-221951.jpg',
+        after: 'https://tocgrsdlegabfkykhdrz.supabase.co/storage/v1/object/public/output-images/gemini/1787318770545-ta617.jpg',
+        beforeAlt: 'Pièce vide avant décoration par IA',
+        afterAlt: 'La même pièce meublée en style mid-century après transformation par IA',
+        caption: 'Séjour, style mid-century. Rien n\'a été déplacé ni acheté.',
+      },
+    ],
     problem: {
       title: 'Montrer le potentiel d\'un bien est difficile',
       points: [

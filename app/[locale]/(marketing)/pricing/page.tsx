@@ -30,6 +30,7 @@ import { useSearchParams } from 'next/navigation';
 import { usePurchaseCredits } from '@/src/presentation/hooks/usePurchaseCredits';
 import { createSubscriptionSession } from '@/src/presentation/api/client';
 import { LeadCaptureLazy } from '@/components/features/lead-capture-lazy';
+import { GuestCheckoutDialog } from '@/components/features/guest-checkout-dialog';
 import { CreditPackId, SubscriptionPlanId, BillingInterval } from '@/src/presentation/types';
 
 // v2 - force rebuild (cache Vercel stale après suppression footer dupliqué)
@@ -117,15 +118,24 @@ function PricingPage() {
 
 
 
+  // Pack choisi par un visiteur non connecté : on lui propose de payer
+  // directement avec son email, au lieu de l'envoyer créer un compte et de
+  // perdre son choix en route (l'ancien `router.push('/login')` ne mémorisait
+  // ni le pack ni le retour, le prospect devait tout recommencer).
+  const [guestPack, setGuestPack] = useState<CreditPackId | null>(null);
+
   const handleSelectPlan = async (planId: CreditPackId) => {
     if (!user) {
-      router.push('/login');
+      setGuestPack(planId);
       return;
     }
 
+    // Page de succès dédiée plutôt que le dashboard : c'est elle qui mesure
+    // l'achat (purchase GA4 + Purchase Pixel) et attend l'arrivée des crédits.
+    const chosen = PRICING_PLANS.find((x) => x.id === planId);
     const checkoutUrl = await purchase({
       packId: planId,
-      successUrl: `${window.location.origin}/${locale}/dashboard?payment=success`,
+      successUrl: `${window.location.origin}/${locale}/credits/success?session_id={CHECKOUT_SESSION_ID}${chosen ? `&n=${chosen.credits}&v=${chosen.price}` : ''}`,
       cancelUrl: `${window.location.origin}/${locale}/pricing?payment=cancelled`,
       couponId: couponFromUrl,
     });
@@ -137,7 +147,11 @@ function PricingPage() {
 
   const handleSelectSubscription = useCallback(async (planId: SubscriptionPlanId) => {
     if (!user || !user.email) {
-      router.push('/login');
+      // Un abonnement doit être rattaché à un compte : on passe par
+      // l'inscription, mais en gardant le plan choisi pour relancer le
+      // paiement au retour (cf. `?checkout=` sur /pro).
+      const back = `/pro?checkout=${planId}&interval=${billingInterval}`;
+      router.push(`/signup?redirect=${encodeURIComponent(back)}`);
       return;
     }
 
@@ -698,6 +712,38 @@ function PricingPage() {
       </div>
       {/* Exit-intent popup pour capturer les emails avant départ */}
       <LeadCaptureLazy variant="popup" delay={20000} />
+
+      <GuestCheckoutDialog
+        packId={guestPack}
+        packLabel={
+          guestPack
+            ? (() => {
+                const p = PRICING_PLANS.find((x) => x.id === guestPack);
+                if (!p) return undefined;
+                const prix = new Intl.NumberFormat(locale, {
+                  style: 'currency',
+                  currency: 'EUR',
+                }).format(p.price);
+                return `${p.credits} crédits, ${prix}`;
+              })()
+            : undefined
+        }
+        montant={
+          guestPack
+            ? (() => {
+                const p = PRICING_PLANS.find((x) => x.id === guestPack);
+                return p
+                  ? new Intl.NumberFormat(locale, { style: 'currency', currency: 'EUR' }).format(p.price)
+                  : undefined;
+              })()
+            : undefined
+        }
+        onClose={() => setGuestPack(null)}
+        successUrl={`${typeof window !== 'undefined' ? window.location.origin : ''}/${locale}/credits/success?session_id={CHECKOUT_SESSION_ID}`}
+        cancelUrl={`${typeof window !== 'undefined' ? window.location.origin : ''}/${locale}/pricing?payment=cancelled`}
+        couponId={couponFromUrl}
+        loginHref={`/login?redirect=${encodeURIComponent('/pricing')}`}
+      />
     </div>
   );
 }

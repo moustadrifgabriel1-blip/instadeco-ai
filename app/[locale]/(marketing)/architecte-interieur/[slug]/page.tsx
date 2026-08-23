@@ -286,7 +286,7 @@ export default async function CityPage({ params }: PageProps) {
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button size="xl" className="h-14 px-8 text-lg rounded-full bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)] shadow-xl shadow-[var(--gold-soft)]/20 hover:scale-105 transition-all" asChild>
-                  <Link href="/generate">
+                  <Link href="/essai">
                     <Wand2 className="mr-2 w-5 h-5" />
                     Décorer ma pièce
                   </Link>
@@ -443,7 +443,7 @@ export default async function CityPage({ params }: PageProps) {
                 </div>
               </div>
               <Button size="lg" className="rounded-full px-8 bg-[var(--gold)] text-[#0c0a09] border border-[var(--gold)] hover:bg-transparent hover:text-[var(--gold)]" asChild>
-                <Link href="/generate">C&apos;est parti <ArrowRight className="ml-2 w-4 h-4"/></Link>
+                <Link href="/essai">C&apos;est parti <ArrowRight className="ml-2 w-4 h-4"/></Link>
               </Button>
             </div>
             <div className="prestige-reveal relative aspect-square rounded-3xl bg-card backdrop-blur-sm border border-[var(--gold-line)] p-8 flex items-center justify-center transition duration-300 ease" style={{ ['--reveal-d' as string]: '160ms' }}>
