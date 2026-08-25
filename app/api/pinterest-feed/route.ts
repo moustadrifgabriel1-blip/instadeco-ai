@@ -15,6 +15,10 @@
  *  - chaque item pointe vers une URL du domaine revendiqué
  *  - 200 épingles par jour au maximum, publication sous 24 h
  *
+ * Le flux ne montre pas tout d'un coup : il révèle les épingles au compte
+ * gouttes, dans un ordre qui espace les destinations. Voir
+ * `lib/social/pin-schedule.ts` pour le detail des regles Pinterest suivies.
+ *
  * Le flux ne liste QUE les rendus du compte démo, jamais la photo d'un
  * utilisateur (même règle RGPD que la galerie et les pages indexées).
  */
@@ -23,11 +27,15 @@ import { NextResponse } from 'next/server';
 import { createStaticAdminClient } from '@/lib/supabase/server';
 import { DEMO_USER_ID } from '@/src/shared/storage/demo-assets';
 import { buildPinCopy, SITE } from '@/lib/social/pin-copy';
+import { PAR_JOUR, planifier } from '@/lib/social/pin-schedule';
 
 export const dynamic = 'force-dynamic';
 
-/** Plafond par lecture du flux. Pinterest accepte 200 pins par jour. */
-const MAX_ITEMS = 60;
+/**
+ * Plafond de lecture en base. Le cadencement reduit ensuite fortement ce qui
+ * est reellement expose, mais on borne quand meme la requete.
+ */
+const MAX_ITEMS = 200;
 
 /** Échappe le texte destiné à un attribut ou un noeud XML. */
 function xmlEscape(value: string): string {
@@ -69,8 +77,11 @@ export async function GET() {
     console.error('[pinterest-feed] lecture des générations impossible', error);
   }
 
-  const items = rows
-    .map((row) => {
+  // Cadencement : quelques épingles par jour, styles alternés, plutôt que les
+  // 30 d'un bloc. Protège des deux motifs que Pinterest sanctionne, la rafale
+  // et la répétition rapprochée vers une même URL.
+  const items = planifier(rows, Date.now())
+    .map(({ item: row, publieeLe }) => {
       // L'épingle montre le RENDU seul : le visuel composé avant/après n'existe
       // que dans le kit local, il n'est pas hébergé en ligne. Le texte décrit
       // donc ce que l'image montre vraiment, et n'annonce jamais un avant/après
@@ -84,7 +95,7 @@ export async function GET() {
       <link>${xmlEscape(copy.link)}</link>
       <guid isPermaLink="false">instadeco-pin-${xmlEscape(row.id)}</guid>
       <description><![CDATA[${copy.description}]]></description>
-      <pubDate>${new Date(row.created_at).toUTCString()}</pubDate>
+      <pubDate>${publieeLe.toUTCString()}</pubDate>
       <enclosure url="${xmlEscape(image)}" type="image/jpeg" />
       <media:content url="${xmlEscape(image)}" medium="image" type="image/jpeg" />
     </item>`;
@@ -96,7 +107,7 @@ export async function GET() {
   <channel>
     <title>InstaDeco AI, avant et après de décoration</title>
     <link>${SITE}/fr/galerie</link>
-    <description>Des pièces réelles transformées par IA à partir d'une simple photo, style par style.</description>
+    <description>Des pièces réelles transformées par IA à partir d'une simple photo, style par style. Environ ${PAR_JOUR} nouvelles épingles par jour.</description>
     <language>fr</language>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
     <atom:link href="${SITE}/api/pinterest-feed" rel="self" type="application/rss+xml" />${items}
