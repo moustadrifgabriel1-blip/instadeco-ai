@@ -16,7 +16,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   return {
-    title: "Générateur d'annonce immobilière gratuit | InstaDeco",
+    title: "Générateur d'annonce immobilière gratuit",
     description:
       "Rédigez une description d'annonce immobilière percutante en 10 secondes. Outil gratuit pour agents et particuliers : type de bien, atouts, ton, texte copiable prêt à publier.",
     keywords: ["générateur annonce immobilière", "rédiger annonce immobilière", "description bien immobilier", "texte annonce appartement", "modèle annonce immobilière"],

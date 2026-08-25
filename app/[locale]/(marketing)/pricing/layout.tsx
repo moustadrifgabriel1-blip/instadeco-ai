@@ -6,6 +6,7 @@ import { Metadata } from 'next';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { generateProductSchema, generateFAQSchema, generateBreadcrumbList } from '@/lib/seo/schemas';
 import { getCanonicalUrl, getLocalizedCanonicalUrl, withLocalePath } from '@/lib/seo/config';
+import { PricingResume } from './pricing-resume';
 import { getMessages, getTranslations } from 'next-intl/server';
 
 export async function generateMetadata({
@@ -92,6 +93,11 @@ export default async function PricingLayout({
         ]}
       />
       {children}
+      {/*
+        Rendu serveur des mêmes prix et des mêmes questions que l'interface :
+        sans lui, la page money ne contenait aucun texte lisible hors JS.
+      */}
+      <PricingResume packs={pricingPlans} faq={pricingFAQ} locale={locale} />
     </>
   );
 }

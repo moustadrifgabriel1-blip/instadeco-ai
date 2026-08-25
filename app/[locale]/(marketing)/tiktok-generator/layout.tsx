@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Générateur Vidéo TikTok Avant/Après - Transitions Virales | InstaDeco',
+  title: 'Générateur Vidéo TikTok Avant/Après - Transitions Virales',
   description: 'Créez des vidéos avant/après virales pour TikTok, Reels et Shorts en 1 clic. 6 transitions pro, format 9:16, export instantané. Gratuit.',
   keywords: [
     'générateur tiktok avant après',
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     'contenu viral décoration',
   ],
   openGraph: {
-    title: 'Générateur Vidéo TikTok Avant/Après | InstaDeco',
+    title: 'Générateur Vidéo TikTok Avant/Après',
     description: 'Créez des vidéos avant/après virales en 1 clic. Transitions pro, export instantané.',
     type: 'website',
     url: 'https://instadeco.app/tiktok-generator',

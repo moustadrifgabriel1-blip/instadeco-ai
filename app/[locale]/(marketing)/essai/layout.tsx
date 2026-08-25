@@ -1,7 +1,8 @@
 import { Metadata } from 'next';
 import { getCanonicalUrl, getLocalizedCanonicalUrl } from '@/lib/seo/config';
 import { JsonLd } from '@/lib/seo/json-ld';
-import { generateWebPageSchema, generateBreadcrumbList, generateHowToSchema } from '@/lib/seo/schemas';
+import { generateWebPageSchema, generateBreadcrumbList, generateHowToSchema, generateFAQSchema } from '@/lib/seo/schemas';
+import { EssaiContenu, ESSAI_FAQ } from './essai-contenu';
 
 export async function generateMetadata({
   params,
@@ -11,7 +12,9 @@ export async function generateMetadata({
   const { locale } = await params;
 
   return {
-    title: 'Essai Gratuit - Testez la Transformation IA | InstaDeco',
+    // Pas de suffixe de marque manuel : app/[locale]/layout.tsx applique déjà
+    // le template « %s | InstaDeco AI », qui produisait sinon un double suffixe.
+    title: 'Essai gratuit : voir sa pièce redécorée par IA, sans compte',
     description:
       'Testez gratuitement la transformation de votre pièce par IA. Uploadez une photo, choisissez un style, et voyez le résultat en 30 secondes. Sans inscription.',
     keywords: [
@@ -59,9 +62,13 @@ export default function EssaiLayout({ children }: { children: React.ReactNode })
             [{ label: 'Essai gratuit', path: getLocalizedCanonicalUrl('fr', '/essai') }],
             { home: { name: 'Accueil', url: getLocalizedCanonicalUrl('fr', '/') } },
           ),
+          // Mêmes questions que celles rendues dans la page : le JSON-LD ne
+          // doit jamais annoncer un contenu que le visiteur ne voit pas.
+          generateFAQSchema(ESSAI_FAQ),
         ]}
       />
       {children}
+      <EssaiContenu />
     </>
   );
 }

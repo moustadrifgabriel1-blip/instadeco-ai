@@ -8,7 +8,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const path = '/exemples';
 
   return {
-    title: 'Exemples de transformations IA, avant/après réels | InstaDeco',
+    title: 'Exemples de transformations IA, avant/après réels',
     description:
       'De vraies transformations de décoration par IA. Séjour, chambre, salle de bain : comparez la pièce brute et la pièce mise en scène, comme vous la livrerez à vos acquéreurs.',
     keywords: ['exemples décoration IA', 'avant après déco', 'transformation intérieur', 'home staging virtuel', 'galerie décoration', 'réalisations IA déco'],

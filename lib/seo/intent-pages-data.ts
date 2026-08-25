@@ -491,10 +491,31 @@ export const INTENT_PAGES: IntentPageData[] = [
       { step: 2, title: 'Génération "Après"', description: 'L\'IA crée une version meublée et décorée' },
       { step: 3, title: 'Avant/Après', description: 'Téléchargez les deux versions pour comparer' },
     ],
+    // Réponses calibrées entre 40 et 60 mots : c'est le format qu'un moteur de
+    // réponse (AI Overviews, ChatGPT, Perplexity) peut citer tel quel, sans
+    // avoir besoin du reste de la page. En dessous de 40 mots, la réponse est
+    // trop maigre pour être reprise ; au-delà de 60, elle se fait tronquer.
     faq: [
-      { question: 'Les avant/après sont-ils utilisables commercialement ?', answer: 'Oui ! Les images générées peuvent être utilisées dans vos annonces immobilières, présentations clients et supports marketing.' },
-      { question: 'Peut-on faire un avant/après d\'une pièce déjà meublée ?', answer: 'Oui ! L\'IA peut aussi redécorer une pièce existante en changeant complètement le style. Parfait pour montrer le potentiel d\'un relooking.' },
-      { question: 'Quelle qualité d\'image pour mon avant/après ?', answer: 'Les rendus sont en haute qualité, suffisante pour les portails immobiliers. L\'option HD est disponible pour des usages print ou grand format.' },
+      {
+        question: 'Comment faire un avant/après de décoration à partir d\'une photo ?',
+        answer: 'Photographiez la pièce telle qu\'elle est, envoyez l\'image sur InstaDeco, puis choisissez un style et un type de pièce. En une trentaine de secondes, vous obtenez le rendu décoré à comparer avec la photo d\'origine. La structure de la pièce, murs, fenêtres et volumes, reste identique : seuls le mobilier et la décoration changent.',
+      },
+      {
+        question: 'Peut-on faire un avant/après d\'une pièce déjà meublée ?',
+        answer: 'Oui. Le service ne se limite pas aux pièces vides : il remplace le mobilier et la décoration existants tout en conservant l\'architecture réelle de la pièce. C\'est le cas d\'usage le plus courant pour un relooking, puisqu\'il montre au propriétaire ce que deviendrait son salon actuel dans un autre style.',
+      },
+      {
+        question: 'Combien coûte un avant/après de décoration ?',
+        answer: 'Le premier essai est gratuit, sans inscription et sans carte bancaire. Ensuite, dix rendus coûtent 9,90 €, soit 0,99 € par avant/après, sans abonnement ni engagement. Les crédits achetés n\'expirent pas. Les professionnels de l\'immobilier disposent d\'abonnements séparés à partir de 19 € par mois.',
+      },
+      {
+        question: 'Les avant/après sont-ils utilisables commercialement ?',
+        answer: 'Oui. Les rendus produits vous appartiennent et peuvent servir dans une annonce immobilière, une présentation client ou un support marketing. Pour une annonce, la déontologie impose simplement d\'indiquer que les pièces sont meublées virtuellement, afin que l\'acheteur ne se méprenne pas sur l\'état réel du bien.',
+      },
+      {
+        question: 'Quelle qualité d\'image pour mon avant/après ?',
+        answer: 'Les rendus sortent en haute définition, une qualité suffisante pour les portails immobiliers comme SeLoger, Immoweb ou Homegate, ainsi que pour une publication sur les réseaux sociaux. Le fichier se télécharge directement depuis votre espace, sans filigrane, et reste utilisable pour un usage grand format.',
+      },
     ],
     keywords: ['avant après décoration', 'transformation pièce', 'relooking intérieur', 'avant après home staging', 'transformation décoration', 'avant après déco'],
   },

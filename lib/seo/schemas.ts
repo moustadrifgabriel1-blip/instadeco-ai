@@ -104,15 +104,24 @@ export function generateSoftwareAppSchema() {
     applicationCategory: 'DesignApplication',
     operatingSystem: 'Web',
     description: SEO_CONFIG.siteDescription,
-    url: getCanonicalUrl('/generate'),
+    // Destination réelle des appels à l'action : l'essai se fait sans compte,
+    // c'est la porte d'entrée du produit, pas /generate qui exige une session.
+    url: getCanonicalUrl('/essai'),
     offers: {
       '@type': 'AggregateOffer',
-      // Prix d'abonnement Pro reels (Solo 19, Pro 49, Agence 99 EUR/mois).
-      // Avant : anciens prix credits B2C (9,90 a 34,90) qui desinformaient les moteurs IA.
-      lowPrice: '19',
+      // Toute la gamme réellement vendue, du pack de crédits le moins cher à
+      // l'abonnement Agence : 9,90 / 19,90 / 34,90 € en crédits, puis 19 / 49 /
+      // 99 € par mois en abonnement.
+      //
+      // Ce schéma est émis sur TOUTES les pages : c'est lui qu'un moteur de
+      // réponse cite quand on lui demande le prix d'InstaDeco. Annoncer 19 €
+      // comme prix plancher revenait à faire dire aux IA que le service
+      // commence à 19 € par mois, alors qu'un particulier entre à 9,90 € sans
+      // abonnement, et que l'essai est gratuit.
+      lowPrice: '9.90',
       highPrice: '99',
       priceCurrency: 'EUR',
-      offerCount: 3,
+      offerCount: 6,
       priceValidUntil,
     },
     screenshot: getFullUrl(SEO_CONFIG.ogImage),

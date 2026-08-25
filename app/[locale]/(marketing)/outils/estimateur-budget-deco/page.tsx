@@ -15,7 +15,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   return {
-    title: 'Estimateur de budget déco par pièce (gratuit) | InstaDeco',
+    title: 'Estimateur de budget déco par pièce (gratuit)',
     description:
       "Estimez en 10 secondes le budget pour redécorer une pièce : salon, chambre, cuisine. Fourchette indicative selon la surface et le niveau. Outil gratuit, puis visualisez le résultat par IA.",
     keywords: ['budget déco', 'combien coûte refaire sa déco', 'budget décoration salon', 'prix relooking pièce', 'estimation budget décoration'],

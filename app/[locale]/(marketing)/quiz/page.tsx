@@ -16,7 +16,7 @@ export async function generateMetadata({
   const { locale } = await params;
   const path = '/quiz';
   return {
-    title: 'Quiz : Quel est votre style de décoration ? | InstaDeco',
+    title: 'Quiz : Quel est votre style de décoration ?',
     description:
       'Découvrez votre style de décoration idéal en 8 questions visuelles. Quiz gratuit et personnalisé : moderne, scandinave, bohème, japandi et 8 autres styles. Résultat immédiat.',
     keywords: ['quiz déco', 'quel est mon style de décoration', 'test style déco', 'quiz décoration intérieur', 'trouver son style déco', 'styles de décoration'],
