@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const path = '/pieces';
 
   return {
-    title: 'Décoration par Pièce - Salon, Chambre, Cuisine, Bureau | InstaDeco AI',
+    title: 'Décoration par Pièce - Salon, Chambre, Cuisine, Bureau',
     description: 'Trouvez l\'inspiration déco pour chaque pièce de votre maison. Salon, chambre, cuisine, salle de bain, bureau, entrée : visualisez la transformation par IA en 30 secondes.',
     keywords: [
       'décoration salon',

@@ -18,7 +18,7 @@ export async function generateMetadata({
   const { locale } = await params;
 
   return {
-    title: 'Rendu d\'intérieur premium par IA | Planche déco professionnelle | InstaDeco',
+    title: 'Rendu d\'intérieur premium par IA | Planche déco professionnelle',
     description:
       'Créez une planche d\'ambiance digne d\'une agence : importez une photo, choisissez un style (Moderne, Japandi, Haussmannien…). Rendu photoréaliste, téléchargement HD. Home staging et relooking virtuels.',
     keywords: [

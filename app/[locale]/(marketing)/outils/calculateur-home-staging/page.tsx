@@ -17,7 +17,7 @@ export async function generateMetadata({
   // Outil au contenu français (cible agents immo FR/BE/CH). Canonical fr,
   // les variantes en/de ne sont pas indexées (contenu non traduit).
   return {
-    title: 'Calculateur ROI home staging virtuel pour agents immobiliers | InstaDeco',
+    title: 'Calculateur ROI home staging virtuel pour agents immobiliers',
     description:
       "Calculez en 10 secondes ce que le home staging virtuel vous fait économiser par rapport au home staging physique. Outil gratuit pour agents immobiliers, home stagers et promoteurs.",
     keywords: ['calculateur home staging', 'coût home staging', 'roi home staging virtuel', 'home staging prix agent immobilier', 'économie home staging'],

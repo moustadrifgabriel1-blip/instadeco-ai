@@ -28,7 +28,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   return {
-    title: 'Blog Décoration Intérieure | Conseils & Tendances | InstaDeco AI',
+    title: 'Blog Décoration Intérieure | Conseils & Tendances',
     description: 'Découvrez nos articles sur la décoration intérieure, les tendances 2026, conseils de home staging et idées d\'aménagement pour votre maison en Suisse, France et Belgique.',
     keywords: [
       'blog décoration intérieure',

@@ -16,7 +16,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   return {
-    title: 'Outils gratuits pour la déco et l\'immobilier | InstaDeco',
+    title: 'Outils gratuits pour la déco et l\'immobilier',
     description:
       "Des outils gratuits pour agents immobiliers et particuliers : calculateur ROI home staging, estimateur de budget déco, générateur d'annonce et quiz de style. Sans inscription.",
     keywords: ['outils déco gratuits', 'outils immobilier gratuits', 'calculateur home staging', 'générateur annonce immobilière', 'estimateur budget déco'],

@@ -6,7 +6,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const path = '/galerie';
 
   return {
-    title: 'Galerie - Avant/Après Décoration IA | InstaDeco',
+    title: 'Galerie - Avant/Après Décoration IA',
     description: 'Découvrez des centaines de transformations avant/après réalisées par IA. Salon, chambre, cuisine : survolez pour voir le résultat. Inspirez-vous et testez gratuitement.',
     keywords: [
       'avant après décoration',

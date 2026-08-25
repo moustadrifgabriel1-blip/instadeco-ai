@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Gift, Users, Sparkles, ArrowRight, Heart, Infinity, Zap, Wallet } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Parrainage : gagnez 5 crédits gratuits | InstaDeco AI',
+  title: 'Parrainage : gagnez 5 crédits gratuits',
   description: 'Parrainez vos amis sur InstaDeco AI et recevez 5 crédits gratuits chacun. Partagez votre code de parrainage et transformez vos pièces gratuitement.',
   openGraph: {
     title: 'Parrainage InstaDeco AI : 5 crédits offerts',

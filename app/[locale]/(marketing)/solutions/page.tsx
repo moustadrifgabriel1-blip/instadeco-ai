@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const path = '/solutions';
 
   return {
-    title: 'Solutions Décoration IA - Home Staging, Simulateur, Avant/Après | InstaDeco',
+    title: 'Solutions Décoration IA - Home Staging, Simulateur, Avant/Après',
     description: 'Découvrez toutes les solutions de décoration par intelligence artificielle : home staging virtuel, simulateur déco, avant/après, idées d\'aménagement, et plus. Résultat en 30 secondes.',
     keywords: [
       'home staging virtuel',
